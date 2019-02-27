@@ -7,6 +7,7 @@
         <Version>1.0.0</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <UseProjectRef Condition="'$(Configuration)' == 'Debug'">true</UseProjectRef>
+        <PackageProjectUrl>https://github.com/Vectron/PlcInterface</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,4 +29,9 @@
     <ItemGroup Condition="'$(UseProjectRef)' == 'true'">
         <ProjectReference Include="..\PlcInterface.Abstraction\PlcInterface.Abstraction.csproj" />
     </ItemGroup>
+
+    <!-- Enables automatic NuGet push after packaging in Release mode. -->
+    <Target Name="PostBuildRelease" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">
+        <Exec Command="dotnet nuget push &quot;$(ProjectDir)bin\$(Configuration)\$(ProjectName).$(PackageVersion).nupkg&quot; -s &quot;https://api.nuget.org/v3/index.json&quot;" />
+    </Target>
 </Project>

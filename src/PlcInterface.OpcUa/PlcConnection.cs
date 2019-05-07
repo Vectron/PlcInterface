@@ -7,7 +7,6 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace PlcInterface.OpcUa
@@ -57,8 +56,8 @@ namespace PlcInterface.OpcUa
 
                 var settings = this.settings.Value;
                 Utils.SetTraceOutput(Utils.TraceOutput.DebugAndFile);
+                logger.LogInformation("Opening connection to {0}", settings.Address);
                 logger.LogDebug("Creating an Application Configuration.");
-
                 var config = new ApplicationConfiguration()
                 {
                     ApplicationName = settings.ApplicationName,
@@ -103,7 +102,7 @@ namespace PlcInterface.OpcUa
                 if (!haveAppCertificate && settings.AutoGenCertificate)
                 {
                     logger.LogDebug($"Creating new application certificate: {config.ApplicationName}");
-                    X509Certificate2 certificate = CertificateFactory.CreateCertificate(
+                    var certificate = CertificateFactory.CreateCertificate(
                         config.SecurityConfiguration.ApplicationCertificate.StoreType,
                         config.SecurityConfiguration.ApplicationCertificate.StorePath,
                         null,
@@ -144,7 +143,7 @@ namespace PlcInterface.OpcUa
                 }
                 else
                 {
-                    logger.LogWarning("missing application certificate, using unsecure connection.");
+                    logger.LogWarning("Missing application certificate, using unsecure connection.");
                 }
 
                 logger.LogDebug($"Discover endpoints of {settings.DiscoveryAdress}.");
@@ -206,10 +205,7 @@ namespace PlcInterface.OpcUa
                      h => session.SessionClosing += h,
                      h => session.SessionClosing -= h);
 
-                disposables.Add(sessionClosingStream.Subscribe(e =>
-                {
-                    connectionState.OnNext(Connected.No<Session>());
-                }));
+                disposables.Add(sessionClosingStream.Subscribe(_ => connectionState.OnNext(Connected.No<Session>())));
 
                 connectionState.OnNext(Connected.Yes(session));
             }
@@ -242,12 +238,12 @@ namespace PlcInterface.OpcUa
 
         public void Disconnect()
         {
-            if (connectionState.TryGetValue(out IConnected<Session> lastConnectionState)
+            if (connectionState.TryGetValue(out var lastConnectionState)
                 && lastConnectionState.IsConnected == true
                 && lastConnectionState.Value?.Connected == true)
             {
                 connectionState.OnNext(Connected.No<Session>());
-                lastConnectionState.Value.CloseSession(null, false);
+                _ = lastConnectionState.Value.CloseSession(null, false);
             }
         }
 
@@ -255,9 +251,7 @@ namespace PlcInterface.OpcUa
             => Task.Run(() => Disconnect());
 
         public void Dispose()
-        {
-            Dispose(true);
-        }
+            => Dispose(true);
 
         protected virtual void Dispose(bool disposing)
         {

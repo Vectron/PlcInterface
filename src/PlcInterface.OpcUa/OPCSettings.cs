@@ -63,6 +63,12 @@ namespace PlcInterface.OpcUa
             set;
         }
 
+        public bool AutoGenCertificate
+        {
+            get;
+            set;
+        }
+
         public Uri DiscoveryAdress => new UriBuilder(Address)
         {
             Path = "/discovery"

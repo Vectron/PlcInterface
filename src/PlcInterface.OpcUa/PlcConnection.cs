@@ -56,14 +56,6 @@ namespace PlcInterface.OpcUa
                 }
 
                 var settings = this.settings.Value;
-
-                var applicationCert = new CertificateIdentifier
-                {
-                    StoreType = "X509Store",
-                    StorePath = "CurrentUser\\My",
-                    SubjectName = settings.ApplicationName
-                };
-
                 Utils.SetTraceOutput(Utils.TraceOutput.DebugAndFile);
                 logger.LogDebug("Creating an Application Configuration.");
 
@@ -74,7 +66,12 @@ namespace PlcInterface.OpcUa
                     ApplicationUri = "urn:" + Utils.GetHostName() + ":" + settings.ApplicationName,
                     SecurityConfiguration = new SecurityConfiguration
                     {
-                        ApplicationCertificate = applicationCert,
+                        ApplicationCertificate = new CertificateIdentifier
+                        {
+                            StoreType = "X509Store",
+                            StorePath = "CurrentUser\\My",
+                            SubjectName = settings.ApplicationName
+                        },
                         TrustedPeerCertificates = new CertificateTrustList
                         {
                             StoreType = "Directory",
@@ -103,7 +100,7 @@ namespace PlcInterface.OpcUa
                 await config.Validate(ApplicationType.Client);
                 bool haveAppCertificate = config.SecurityConfiguration.ApplicationCertificate.Certificate != null;
 
-                if (!haveAppCertificate)
+                if (!haveAppCertificate && settings.AutoGenCertificate)
                 {
                     logger.LogDebug($"Creating new application certificate: {config.ApplicationName}");
                     X509Certificate2 certificate = CertificateFactory.CreateCertificate(

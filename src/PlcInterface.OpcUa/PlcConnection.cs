@@ -28,7 +28,7 @@ namespace PlcInterface.OpcUa
 
             if (settings.Value.AutoConnect)
             {
-                ConnectAsync().LogExceptionsAsync(logger);
+                _ = Task.Run(ConnectAsync).LogExceptionsAsync(logger);
             }
         }
 

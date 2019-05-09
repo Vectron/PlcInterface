@@ -8,6 +8,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using VectronsLibrary.Extensions;
 
 namespace PlcInterface.OpcUa
 {

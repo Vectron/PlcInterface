@@ -215,23 +215,19 @@ namespace PlcInterface.OpcUa
                 switch (ex.Result.StatusCode.Code)
                 {
                     case StatusCodes.BadNotConnected:
-                        logger.LogError("Failed to connect to Opc, check network connection and Opc settings");
-                        logger.LogTrace(ex, "Failed to connect to Opc, check network connection and Opc settings");
+                        logger.LogError(ex, "Failed to connect to Opc, check network connection and Opc settings");
                         break;
 
                     case StatusCodes.BadSecurityChecksFailed:
-                        logger.LogError("Security Checks Failed, Check if certificate is trusted");
-                        logger.LogTrace(ex, "Security Checks Failed, Check if certificate is trusted");
+                        logger.LogError(ex, "Security Checks Failed, Check if certificate is trusted");
                         break;
 
                     case StatusCodes.BadRequestTimeout:
-                        logger.LogError("Request Timed Out");
-                        logger.LogTrace(ex, "Request Timed Out");
+                        logger.LogError(ex, "Request Timed Out");
                         break;
 
                     default:
-                        logger.LogError($"Unproccesed error {StatusCodes.GetBrowseName(ex.Result.StatusCode.Code)}");
-                        logger.LogTrace(ex, $"Unproccesed error {StatusCodes.GetBrowseName(ex.Result.StatusCode.Code)}");
+                        logger.LogError(ex, $"Unproccesed error {StatusCodes.GetBrowseName(ex.Result.StatusCode.Code)}");
                         break;
                 }
             }

@@ -56,105 +56,19 @@ namespace PlcInterface.OpcUa
                 }
 
                 var settings = this.settings.Value;
+                var config = settings.ApplicationConfiguration;
                 Utils.SetTraceOutput(Utils.TraceOutput.DebugAndFile);
                 logger.LogInformation("Opening connection to {0}", settings.Address);
                 logger.LogDebug("Creating an Application Configuration.");
-                var config = new ApplicationConfiguration()
-                {
-                    ApplicationName = settings.ApplicationName,
-                    ApplicationType = ApplicationType.Client,
-                    ApplicationUri = "urn:" + Utils.GetHostName() + ":" + settings.ApplicationName,
-                    SecurityConfiguration = new SecurityConfiguration
-                    {
-                        ApplicationCertificate = new CertificateIdentifier
-                        {
-                            StoreType = "X509Store",
-                            StorePath = "CurrentUser\\My",
-                            SubjectName = settings.ApplicationName
-                        },
-                        TrustedPeerCertificates = new CertificateTrustList
-                        {
-                            StoreType = "Directory",
-                            StorePath = "OPC Foundation/CertificateStores/UA Applications",
-                        },
-                        TrustedIssuerCertificates = new CertificateTrustList
-                        {
-                            StoreType = "Directory",
-                            StorePath = "OPC Foundation/CertificateStores/UA Certificate Authorities",
-                        },
-                        RejectedCertificateStore = new CertificateTrustList
-                        {
-                            StoreType = "Directory",
-                            StorePath = "OPC Foundation/CertificateStores/RejectedCertificates",
-                        },
-                        NonceLength = 32,
-                        AutoAcceptUntrustedCertificates = true
-                    },
-                    TransportConfigurations = new TransportConfigurationCollection(),
-                    TransportQuotas = new TransportQuotas { OperationTimeout = 15000 },
-                    ClientConfiguration = new ClientConfiguration { DefaultSessionTimeout = 60000, }
-                };
-
-                // TODO: Option to get data from application settings section
-                // var config = await ApplicationConfiguration.Load(settings.ConfigSection, ApplicationType.Client);
                 await config.Validate(ApplicationType.Client);
-                bool haveAppCertificate = config.SecurityConfiguration.ApplicationCertificate.Certificate != null;
-
-                if (!haveAppCertificate && settings.AutoGenCertificate)
-                {
-                    logger.LogDebug($"Creating new application certificate: {config.ApplicationName}");
-                    var certificate = CertificateFactory.CreateCertificate(
-                        config.SecurityConfiguration.ApplicationCertificate.StoreType,
-                        config.SecurityConfiguration.ApplicationCertificate.StorePath,
-                        null,
-                        config.ApplicationUri,
-                        config.ApplicationName,
-                        config.SecurityConfiguration.ApplicationCertificate.SubjectName,
-                        null,
-                        CertificateFactory.defaultKeySize,
-                        DateTime.UtcNow - TimeSpan.FromDays(1),
-                        CertificateFactory.defaultLifeTime,
-                        CertificateFactory.defaultHashSize,
-                        false,
-                        null,
-                        null);
-
-                    config.SecurityConfiguration.ApplicationCertificate.Certificate = certificate;
-                }
-
-                haveAppCertificate = config.SecurityConfiguration.ApplicationCertificate.Certificate != null;
-
-                if (haveAppCertificate)
-                {
-                    config.ApplicationUri = Utils.GetApplicationUriFromCertificate(config.SecurityConfiguration.ApplicationCertificate.Certificate);
-
-                    if (config.SecurityConfiguration.AutoAcceptUntrustedCertificates)
-                    {
-                        var certificateValidationStream = Observable.FromEventPattern<CertificateValidationEventHandler, CertificateValidationEventArgs>(
-                            handler => handler.Invoke,
-                            h => config.CertificateValidator.CertificateValidation += h,
-                            h => config.CertificateValidator.CertificateValidation -= h);
-
-                        disposables.Add(certificateValidationStream.Subscribe(e =>
-                        {
-                            logger.LogDebug($"Accepted Certificate: {e.EventArgs.Certificate.Subject}");
-                            e.EventArgs.Accept = e.EventArgs.Error.StatusCode == StatusCodes.BadCertificateUntrusted;
-                        }));
-                    }
-                }
-                else
-                {
-                    logger.LogWarning("Missing application certificate, using unsecure connection.");
-                }
-
+                var usesSecurity = SetupSecurity();
                 logger.LogDebug($"Discover endpoints of {settings.DiscoveryAdress}.");
-                var selectedEndpoint = CoreClientUtils.SelectEndpoint(settings.DiscoveryAdress.ToString(), haveAppCertificate, 15000);
+                var selectedEndpoint = CoreClientUtils.SelectEndpoint(settings.DiscoveryAdress.ToString(), usesSecurity, 15000);
                 logger.LogDebug($"Selected endpoint uses: {selectedEndpoint.SecurityPolicyUri.Substring(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1)}");
 
                 logger.LogDebug("Create a session with OPC UA server.");
                 var endpointConfiguration = EndpointConfiguration.Create(config);
                 var endpoint = new ConfiguredEndpoint(null, selectedEndpoint, endpointConfiguration);
-
                 var tokenType = selectedEndpoint.UserIdentityTokens.Where(x => x.TokenType == UserTokenType.UserName).FirstOrDefault();
                 UserIdentity identity;
 
@@ -168,7 +82,7 @@ namespace PlcInterface.OpcUa
                     identity = new UserIdentity(new AnonymousIdentityToken());
                 }
 
-                var session = await Session.Create(config, endpoint, false, settings.ApplicationName, 60000, identity, null);
+                var session = await Session.Create(config, endpoint, false, settings.ApplicationConfiguration.ApplicationName, 60000, identity, null);
 
                 if (session.Connected)
                 {
@@ -202,11 +116,10 @@ namespace PlcInterface.OpcUa
                         });
                     }));
 
-                var sessionClosingStream = Observable.FromEventPattern(
+                disposables.Add(Observable.FromEventPattern(
                      h => session.SessionClosing += h,
-                     h => session.SessionClosing -= h);
-
-                disposables.Add(sessionClosingStream.Subscribe(_ => connectionState.OnNext(Connected.No<Session>())));
+                     h => session.SessionClosing -= h)
+                     .Subscribe(_ => connectionState.OnNext(Connected.No<Session>())));
 
                 connectionState.OnNext(Connected.Yes(session));
             }
@@ -266,6 +179,83 @@ namespace PlcInterface.OpcUa
             }
 
             disposedValue = true;
+        }
+
+        private void CreateCertificate()
+        {
+            var settings = this.settings.Value;
+            var applicationConfiguration = settings.ApplicationConfiguration;
+            var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
+
+            logger.LogDebug($"Creating new application certificate for: {applicationConfiguration.ApplicationName}");
+            applicationCertificate.Certificate = CertificateFactory.CreateCertificate(
+                applicationCertificate.StoreType,
+                applicationCertificate.StorePath,
+                null,
+                applicationConfiguration.ApplicationUri,
+                applicationConfiguration.ApplicationName,
+                applicationCertificate.SubjectName,
+                null,
+                CertificateFactory.defaultKeySize,
+                DateTime.UtcNow - TimeSpan.FromDays(1),
+                CertificateFactory.defaultLifeTime,
+                CertificateFactory.defaultHashSize,
+                false,
+                null,
+                null);
+        }
+
+        private void SetupCertificateSigning()
+        {
+            var settings = this.settings.Value;
+            var applicationConfiguration = settings.ApplicationConfiguration;
+            var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
+            applicationConfiguration.ApplicationUri = Utils.GetApplicationUriFromCertificate(applicationCertificate.Certificate);
+
+            if (!applicationConfiguration.SecurityConfiguration.AutoAcceptUntrustedCertificates)
+            {
+                return;
+            }
+
+            var certificateValidationStream = Observable.FromEventPattern<CertificateValidationEventHandler, CertificateValidationEventArgs>(
+                handler => handler.Invoke,
+                h => applicationConfiguration.CertificateValidator.CertificateValidation += h,
+                h => applicationConfiguration.CertificateValidator.CertificateValidation -= h);
+
+            disposables.Add(certificateValidationStream.Subscribe(e =>
+            {
+                logger.LogDebug($"Accepted Certificate: {e.EventArgs.Certificate.Subject}");
+                e.EventArgs.Accept = e.EventArgs.Error.StatusCode == StatusCodes.BadCertificateUntrusted;
+            }));
+        }
+
+        private bool SetupSecurity()
+        {
+            var settings = this.settings.Value;
+            var applicationConfiguration = settings.ApplicationConfiguration;
+            var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
+
+            if (!settings.UseSecurity)
+            {
+                logger.LogWarning("Security turned off, using unsecure connection.");
+                return false;
+            }
+
+            if (applicationCertificate.Certificate != null)
+            {
+                SetupCertificateSigning();
+                return true;
+            }
+
+            if (!settings.AutoGenCertificate)
+            {
+                logger.LogWarning("Missing application certificate, using unsecure connection.");
+                return false;
+            }
+
+            CreateCertificate();
+            SetupCertificateSigning();
+            return true;
         }
     }
 }

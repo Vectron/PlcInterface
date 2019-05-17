@@ -210,7 +210,11 @@ namespace PlcInterface.OpcUa
             var settings = this.settings.Value;
             var applicationConfiguration = settings.ApplicationConfiguration;
             var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
-            applicationConfiguration.ApplicationUri = Utils.GetApplicationUriFromCertificate(applicationCertificate.Certificate);
+
+            if (applicationCertificate.Certificate != null)
+            {
+                applicationConfiguration.ApplicationUri = Utils.GetApplicationUriFromCertificate(applicationCertificate.Certificate);
+            }
 
             if (!applicationConfiguration.SecurityConfiguration.AutoAcceptUntrustedCertificates)
             {
@@ -247,6 +251,8 @@ namespace PlcInterface.OpcUa
                 return true;
             }
 
+            SetupCertificateSigning();
+
             if (!settings.AutoGenCertificate)
             {
                 logger.LogWarning("Missing application certificate, using unsecure connection.");
@@ -254,7 +260,6 @@ namespace PlcInterface.OpcUa
             }
 
             CreateCertificate();
-            SetupCertificateSigning();
             return true;
         }
     }

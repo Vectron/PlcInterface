@@ -159,8 +159,17 @@ namespace PlcInterface.OpcUa
                 return;
             }
 
-            var symbol = symbolHandler.GetSymbolinfo(name).ConvertAndValidate();
-            var item = subscription.MonitoredItems.Where(x => x.Handle == symbol.Handle).FirstOrDefault();
+            MonitoredItem item = null;
+
+            if (session == null || !session.Connected || !subscription.Created)
+            {
+                item = subscription.MonitoredItems.Where(x => x.DisplayName == nameLower).FirstOrDefault();
+            }
+            else
+            {
+                var symbol = symbolHandler.GetSymbolinfo(name).ConvertAndValidate();
+                item = subscription.MonitoredItems.Where(x => x.Handle == symbol.Handle).FirstOrDefault();
+            }
 
             if (item != null)
             {
@@ -195,7 +204,8 @@ namespace PlcInterface.OpcUa
                         Handle = symbol,
                         SamplingInterval = item.Value.UpdateInterval,
                         QueueSize = 1,
-                        DiscardOldest = true
+                        DiscardOldest = true,
+                        DisplayName = item.Key
                     };
 
                     disposables.Add(Observable

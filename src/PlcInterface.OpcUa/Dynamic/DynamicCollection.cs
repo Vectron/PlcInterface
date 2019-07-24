@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
+using System.Text;
 
 namespace PlcInterface.OpcUa.Dynamic
 {
@@ -11,7 +13,7 @@ namespace PlcInterface.OpcUa.Dynamic
             => dictionary[name] = value;
 
         public override IEnumerable<string> GetDynamicMemberNames()
-                    => dictionary.Keys;
+            => dictionary.Keys;
 
         public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
         {
@@ -37,8 +39,15 @@ namespace PlcInterface.OpcUa.Dynamic
 
         private string CreateIndexedName(object[] indexes)
         {
-            int index = (int)indexes[0];
-            return $"[{index}]";
+            var key = dictionary.Keys.First();
+            var name = key.Substring(0, key.IndexOf("["));
+            var builder = new StringBuilder()
+                .Append(name)
+                .Append("[")
+                .Append(string.Join(",", indexes))
+                .Append("]");
+
+            return builder.ToString();
         }
     }
 }

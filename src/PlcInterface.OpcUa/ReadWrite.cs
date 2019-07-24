@@ -196,18 +196,7 @@ namespace PlcInterface.OpcUa
         {
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
 
-            if (symbol.IsBigType)
-            {
-                var collection = new DynamicCollection();
-                foreach (var childSymbol in symbol.ChildSymbols)
-                {
-                    var value = ReadDynamic(childSymbol);
-                    var shortName = symbolHandler.GetSymbolinfo(childSymbol).ShortName;
-                    collection.Add(shortName, value);
-                }
-                return collection;
-            }
-            else if (symbol.IsArray)
+            if (symbol.ChildSymbols.Count > 0)
             {
                 var collection = new DynamicCollection();
                 foreach (var childSymbol in symbol.ChildSymbols)
@@ -221,7 +210,12 @@ namespace PlcInterface.OpcUa
             else
             {
                 var value = Read(ioName);
-                return new DynamicValue(symbol.ShortName, value);
+                if (value is Matrix matrixValue)
+                {
+                    return matrixValue.ToArray();
+                }
+
+                return value;
             }
         }
 

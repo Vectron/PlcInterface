@@ -33,57 +33,23 @@ namespace PlcInterface.Tests
 
             // Assert
             readWrite.ToggleBool(ioName);
-            await Task.Delay(400);
-            Assert.IsTrue(results.Count == 4);
-            foreach (var result in results)
-            {
-                Console.Write(result);
-                Console.Write(", ");
-            }
-            results.Clear();
+            await SubscribeCheckAsync(results, 4);
             subscription1.Dispose();
 
             readWrite.ToggleBool(ioName);
-            await Task.Delay(400);
-            Assert.IsTrue(results.Count == 3);
-            foreach (var result in results)
-            {
-                Console.Write(result);
-                Console.Write(", ");
-            }
-            results.Clear();
+            await SubscribeCheckAsync(results, 3);
             subscription2.Dispose();
 
             readWrite.ToggleBool(ioName);
-            await Task.Delay(400);
-            Assert.IsTrue(results.Count == 2);
-            foreach (var result in results)
-            {
-                Console.Write(result);
-                Console.Write(", ");
-            }
-            results.Clear();
+            await SubscribeCheckAsync(results, 2);
             subscription3.Dispose();
 
             readWrite.ToggleBool(ioName);
-            await Task.Delay(400);
-            Assert.IsTrue(results.Count == 1);
-            foreach (var result in results)
-            {
-                Console.Write(result);
-                Console.Write(", ");
-            }
-            results.Clear();
+            await SubscribeCheckAsync(results, 1);
             subscription4.Dispose();
 
             readWrite.ToggleBool(ioName);
-            await Task.Delay(400);
-            Assert.IsTrue(results.Count == 0);
-            foreach (var result in results)
-            {
-                Console.Write(result);
-                Console.Write(", ");
-            }
+            await SubscribeCheckAsync(results, 0);
         }
 
         [TestMethod]
@@ -97,15 +63,15 @@ namespace PlcInterface.Tests
 
             // Act
             var original = readWrite.Read<bool>(ioName);
-            monitor.SymbolStream.Subscribe(x =>
-            {
-                if (x.Name == ioName)
-                {
-                    var value = (bool)x.Value;
-                    Assert.AreNotEqual(original, value);
-                    done.Set();
-                }
-            });
+            var subscription = monitor.SymbolStream.Subscribe(x =>
+              {
+                  if (x.Name == ioName)
+                  {
+                      var value = (bool)x.Value;
+                      Assert.AreNotEqual(original, value);
+                      _ = done.Set();
+                  }
+              });
 
             monitor.RegisterIO(ioName, 1000);
             readWrite.ToggleBool(ioName);
@@ -126,16 +92,16 @@ namespace PlcInterface.Tests
 
             // Act
             var originals = readWrite.Read(BooleanVarIONames);
-            monitor.SymbolStream.Subscribe(x =>
+            var subscription = monitor.SymbolStream.Subscribe(x =>
             {
                 var value = (bool)x.Value;
-                originals.TryGetValue(x.Name, out object original);
+                _ = originals.TryGetValue(x.Name, out object original);
                 Assert.AreNotEqual((bool)original, value);
                 hits++;
 
                 if (originals.Count == hits)
                 {
-                    done.Set();
+                    _ = done.Set();
                 }
             });
 
@@ -146,7 +112,7 @@ namespace PlcInterface.Tests
             var result = done.WaitOne(TimeSpan.FromSeconds(5));
 
             // Assert
-            Assert.IsTrue(result, $"Timeout, items processed {hits}");
+            Assert.IsTrue(result, $"Timeout, items processed {hits}/{originals.Count}");
         }
 
         [TestMethod]
@@ -160,12 +126,25 @@ namespace PlcInterface.Tests
 
             // Act
             var original = readWrite.Read<bool>(ioName);
-            monitor.SubscribeIO(ioName, !original, () => done.Set());
+            var subscription = monitor.SubscribeIO(ioName, !original, () => done.Set());
             readWrite.ToggleBool(ioName);
             var result = done.WaitOne(TimeSpan.FromSeconds(30));
 
             // Assert
             Assert.IsTrue(result, "Timeout");
+        }
+
+        private async Task SubscribeCheckAsync(IList<bool> results, int expectedCount)
+        {
+            await Task.Delay(500);
+            Assert.AreEqual(expectedCount, results.Count);
+            foreach (var result in results)
+            {
+                Console.Write(result);
+                Console.Write(", ");
+            }
+            Console.WriteLine();
+            results.Clear();
         }
     }
 }

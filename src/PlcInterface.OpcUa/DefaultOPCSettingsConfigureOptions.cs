@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace PlcInterface.OpcUa
 {
-    internal class DefaultOPCSettingsConfigureOptions : IConfigureOptions<OPCSettings>
+    public class DefaultOPCSettingsConfigureOptions : IConfigureOptions<OPCSettings>
     {
         public void Configure(OPCSettings options)
         {
@@ -14,7 +14,7 @@ namespace PlcInterface.OpcUa
             options.UserName = string.Empty;
             options.Password = string.Empty;
             options.AutoConnect = false;
-            options.UseSecurity = false;
+            options.UseSecurity = true;
             options.AutoGenCertificate = false;
             options.ApplicationConfiguration = CreateApplicationConfiguration();
         }

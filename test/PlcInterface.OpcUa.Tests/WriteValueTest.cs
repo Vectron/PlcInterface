@@ -23,29 +23,35 @@ namespace PlcInterface.OpcUa.Tests
         [ClassInitialize]
         public static async Task ConnectAsync(TestContext testContext)
         {
-            var connectionsettings = new OPCSettings(Settings.OpcIp, Settings.OpcPort, Settings.RootNode, "PlcConnectionTest", true);
+            var connectionsettings = new OPCSettings();
+            new DefaultOPCSettingsConfigureOptions().Configure(connectionsettings);
+            connectionsettings.Address = Settings.PLCUri;
+
             connection = new PlcConnection(GetOptionsMoq(connectionsettings), GetLoggerMock<PlcConnection>());
             symbolHandler = new SymbolHandler(connection, GetLoggerMock<SymbolHandler>());
             readWrite = new ReadWrite(connection, symbolHandler, GetLoggerMock<ReadWrite>());
             await connection.ConnectAsync();
-            var result = await connection.SessionStream.FirstAsync();
+            _ = await connection.SessionStream.FirstAsync();
         }
 
         [ClassCleanup]
         public static void Disconnect()
             => connection.Dispose();
 
-        [TestMethod]
-        public override void WriteGeneric()
+        [TestInitialize]
+        public void ResetPLCValues()
         {
-            WriteValueGenericHelper("WriteTestData.BoolValue", true);
+            var readWrite = GetReadWrite();
+            readWrite.Write("MAIN.Reset", true);
         }
 
         [TestMethod]
+        public override void WriteGeneric()
+            => WriteValueGenericHelper("WriteTestData.BoolValue", false);
+
+        [TestMethod]
         public override async Task WriteGenericAsync()
-        {
-            await WriteValueGenericHelperAsync("WriteTestData.BoolValue", true);
-        }
+            => await WriteValueGenericHelperAsync("WriteTestData.BoolValue", false);
 
         protected override IPlcConnection GetPLCConnection()
             => connection;

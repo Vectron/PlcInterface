@@ -15,13 +15,16 @@ namespace PlcInterface.OpcUa.Tests
             var connection = GetPLCConnection() as PlcConnection;
 
             // Act
-            var result = connection.GetConnectedClient();
+            _ = connection.GetConnectedClient();
         }
 
         protected override IPlcConnection GetPLCConnection()
         {
-            var settings = new OPCSettings(Settings.OpcIp, Settings.OpcPort, string.Empty, "PlcConnectionTest");
-            return new PlcConnection(GetOptionsMoq(settings), GetLoggerMock<PlcConnection>());
+            var connectionsettings = new OPCSettings();
+            new DefaultOPCSettingsConfigureOptions().Configure(connectionsettings);
+            connectionsettings.Address = Settings.PLCUriNoRoot;
+
+            return new PlcConnection(GetOptionsMoq(connectionsettings), GetLoggerMock<PlcConnection>());
         }
     }
 }

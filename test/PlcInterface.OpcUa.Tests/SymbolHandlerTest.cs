@@ -18,11 +18,15 @@ namespace PlcInterface.OpcUa.Tests
         [ClassInitialize]
         public static async Task ConnectAsync(TestContext testContext)
         {
-            var connectionsettings = new OPCSettings(Settings.OpcIp, Settings.OpcPort, Settings.RootNode, "PlcConnectionTest", true);
+            var connectionsettings = new OPCSettings();
+            new DefaultOPCSettingsConfigureOptions().Configure(connectionsettings);
+            connectionsettings.Address = Settings.PLCUri;
+
             connection = new PlcConnection(GetOptionsMoq(connectionsettings), GetLoggerMock<PlcConnection>());
             symbolHandler = new SymbolHandler(connection, GetLoggerMock<SymbolHandler>());
             await connection.ConnectAsync();
-            var result = await connection.SessionStream.FirstAsync();
+
+            _ = await connection.SessionStream.FirstAsync();
         }
 
         [ClassCleanup]

@@ -23,9 +23,12 @@
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
         <PackageReference Include="VectronsLibrary" Version="1.0.3" />
-        <PackageReference Include="PlcInterface.Abstraction" Version="2.0.1" />
     </ItemGroup>
 
+    <ItemGroup Condition="'$(UseProjectRef)' == 'false'">
+        <PackageReference Include="PlcInterface.Abstraction" Version="2.0.1" />
+    </ItemGroup>
+    
     <ItemGroup Condition="'$(UseProjectRef)' == 'true'">
         <ProjectReference Include="..\PlcInterface.Abstraction\PlcInterface.Abstraction.csproj" />
     </ItemGroup>

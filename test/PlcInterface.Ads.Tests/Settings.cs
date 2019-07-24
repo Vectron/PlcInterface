@@ -7,7 +7,7 @@ namespace PlcInterface.Ads.Tests
     internal static class Settings
     {
         public static string AmsNetId
-            => "172.22.50.1.1.1";
+            => "local";
 
         public static int Port
             => 851;

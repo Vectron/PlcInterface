@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using TwinCAT.Ads;
 
 namespace PlcInterface.Ads.Tests
 {
@@ -41,14 +40,11 @@ namespace PlcInterface.Ads.Tests
         public static void Disconnect()
             => connection.Dispose();
 
-        [TestCleanup]
-        public async Task ResetDataAsync()
+        [TestInitialize]
+        public void ResetPLCValues()
         {
-            var client = await connection.SessionStream.Cast<IConnected<TcAdsClient>>().FirstAsync();
-            var errorCode = client.Value.TryWriteControl(new StateInfo(AdsState.Reset, 0));
-            Assert.AreEqual(AdsErrorCode.NoError, errorCode);
-            errorCode = client.Value.TryWriteControl(new StateInfo(AdsState.Run, 0));
-            Assert.AreEqual(AdsErrorCode.NoError, errorCode);
+            var readWrite = GetReadWrite();
+            readWrite.Write("MAIN.Reset", true);
         }
 
         [TestMethod]

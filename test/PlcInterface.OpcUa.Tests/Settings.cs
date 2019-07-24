@@ -7,7 +7,6 @@ namespace PlcInterface.OpcUa.Tests
     internal static class Settings
     {
         public static string OpcIp
-            //=> "172.22.50.5";
             => "localhost";
 
         public static int OpcPort

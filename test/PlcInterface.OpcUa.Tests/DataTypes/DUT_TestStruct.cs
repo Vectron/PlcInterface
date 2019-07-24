@@ -26,11 +26,11 @@ namespace PlcInterface.OpcUa.Tests.DataTypes
             ULongValue = ulong.MaxValue,
             FloatValue = -3.402823E+38F,
             DoubleValue = -1.79769313486231E+308,
-            TimeValue = TimeSpan.FromMilliseconds(1000),
-            TimeOfDay = TimeSpan.FromHours(1),
-            LTimeValue = TimeSpan.FromTicks(10),
-            DateValue = new DateTime(2106, 02, 05),
-            DateAndTimeValue = new DateTime(2106, 02, 05, 06, 28, 15),
+            TimeValue = 1000u,
+            TimeOfDay = 3600000u,
+            LTimeValue = 1000ul,
+            DateValue = new DateTime(2106, 02, 06),
+            DateAndTimeValue = new DateTime(2106, 02, 06, 06, 28, 15),
             StringValue = "Test String",
             WStringValue = "Test WString",
             Nested = DUT_TestStruct2.Default,
@@ -140,17 +140,17 @@ namespace PlcInterface.OpcUa.Tests.DataTypes
             get; set;
         }
 
-        public TimeSpan TimeValue
+        public uint TimeValue
         {
             get; set;
         }
 
-        public TimeSpan TimeOfDay
+        public uint TimeOfDay
         {
             get; set;
         }
 
-        public TimeSpan LTimeValue
+        public ulong LTimeValue
         {
             get; set;
         }
@@ -267,9 +267,9 @@ namespace PlcInterface.OpcUa.Tests.DataTypes
             hashCode = hashCode * -1521134295 + ULongValue.GetHashCode();
             hashCode = hashCode * -1521134295 + FloatValue.GetHashCode();
             hashCode = hashCode * -1521134295 + DoubleValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<TimeSpan>.Default.GetHashCode(TimeValue);
-            hashCode = hashCode * -1521134295 + EqualityComparer<TimeSpan>.Default.GetHashCode(TimeOfDay);
-            hashCode = hashCode * -1521134295 + EqualityComparer<TimeSpan>.Default.GetHashCode(LTimeValue);
+            hashCode = hashCode * -1521134295 + TimeValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + TimeOfDay.GetHashCode();
+            hashCode = hashCode * -1521134295 + LTimeValue.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<DateTime>.Default.GetHashCode(DateValue);
             hashCode = hashCode * -1521134295 + EqualityComparer<DateTime>.Default.GetHashCode(DateAndTimeValue);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StringValue);

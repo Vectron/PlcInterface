@@ -2,13 +2,6 @@
 {
     public class ConnectionSettings
     {
-        public ConnectionSettings()
-        {
-            AmsNetId = "127.0.0.1.1.1";
-            Port = 851;
-            AutoConnect = false;
-        }
-
         public string AmsNetId
         {
             get;

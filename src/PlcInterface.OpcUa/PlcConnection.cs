@@ -181,10 +181,8 @@ namespace PlcInterface.OpcUa
             disposedValue = true;
         }
 
-        private void CreateCertificate()
+        private void CreateCertificate(ApplicationConfiguration applicationConfiguration)
         {
-            var settings = this.settings.Value;
-            var applicationConfiguration = settings.ApplicationConfiguration;
             var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
 
             logger.LogDebug($"Creating new application certificate for: {applicationConfiguration.ApplicationName}");
@@ -205,22 +203,9 @@ namespace PlcInterface.OpcUa
                 null);
         }
 
-        private void SetupCertificateSigning()
+        private void SetupCertificateSigning(ApplicationConfiguration applicationConfiguration)
         {
-            var settings = this.settings.Value;
-            var applicationConfiguration = settings.ApplicationConfiguration;
             var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
-
-            if (applicationCertificate.Certificate != null)
-            {
-                applicationConfiguration.ApplicationUri = Utils.GetApplicationUriFromCertificate(applicationCertificate.Certificate);
-            }
-
-            if (!applicationConfiguration.SecurityConfiguration.AutoAcceptUntrustedCertificates)
-            {
-                return;
-            }
-
             var certificateValidationStream = Observable.FromEventPattern<CertificateValidationEventHandler, CertificateValidationEventArgs>(
                 handler => handler.Invoke,
                 h => applicationConfiguration.CertificateValidator.CertificateValidation += h,
@@ -228,30 +213,38 @@ namespace PlcInterface.OpcUa
 
             disposables.Add(certificateValidationStream.Subscribe(e =>
             {
-                logger.LogDebug($"Accepted Certificate: {e.EventArgs.Certificate.Subject}");
-                e.EventArgs.Accept = e.EventArgs.Error.StatusCode == StatusCodes.BadCertificateUntrusted;
+                var eventArgs = e.EventArgs;
+                var certificate = e.EventArgs.Certificate;
+
+                if (applicationConfiguration.SecurityConfiguration.AutoAcceptUntrustedCertificates)
+                {
+                    logger.LogDebug("Accepted Certificate: {0} (errorcode: {1})", certificate.Subject, StatusCodes.GetBrowseName(eventArgs.Error.Code));
+                    eventArgs.Accept = true;
+                    return;
+                }
+
+                logger.LogDebug("Rejected Certificate: {0} (errorcode: {1})", certificate.Subject, StatusCodes.GetBrowseName(eventArgs.Error.Code));
             }));
         }
 
         private bool SetupSecurity()
         {
             var settings = this.settings.Value;
-            var applicationConfiguration = settings.ApplicationConfiguration;
-            var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
-
             if (!settings.UseSecurity)
             {
                 logger.LogWarning("Security turned off, using unsecure connection.");
                 return false;
             }
 
+            var applicationConfiguration = settings.ApplicationConfiguration;
+            SetupCertificateSigning(applicationConfiguration);
+
+            var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
             if (applicationCertificate.Certificate != null)
             {
-                SetupCertificateSigning();
+                UpdateAplicationUri(applicationConfiguration);
                 return true;
             }
-
-            SetupCertificateSigning();
 
             if (!settings.AutoGenCertificate)
             {
@@ -259,8 +252,18 @@ namespace PlcInterface.OpcUa
                 return false;
             }
 
-            CreateCertificate();
+            CreateCertificate(applicationConfiguration);
+            UpdateAplicationUri(applicationConfiguration);
             return true;
+        }
+
+        private void UpdateAplicationUri(ApplicationConfiguration applicationConfiguration)
+        {
+            var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
+            if (applicationCertificate.Certificate != null)
+            {
+                applicationConfiguration.ApplicationUri = Utils.GetApplicationUriFromCertificate(applicationCertificate.Certificate);
+            }
         }
     }
 }

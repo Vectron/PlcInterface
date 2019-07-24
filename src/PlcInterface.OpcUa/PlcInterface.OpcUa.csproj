@@ -7,6 +7,7 @@
         <Version>1.0.8</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <UseProjectRef Condition="'$(Configuration)' == 'Debug'">true</UseProjectRef>
+        <UseProjectRef Condition="'$(Configuration)' == 'Release'">false</UseProjectRef>
         <PackageProjectUrl>https://github.com/Vectron/PlcInterface</PackageProjectUrl>
         <Description>A abstraction to comunicate to a OPC server</Description>
     </PropertyGroup>

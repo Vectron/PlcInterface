@@ -100,7 +100,7 @@ namespace PlcInterface.OpcUa
                     .Subscribe(x =>
                     {
                         connectionState.OnNext(Connected.No<Session>());
-                        logger.LogInformation($"{x.EventArgs.Status}, Reconnecting to {x.Sender.ConfiguredEndpoint}");
+                        logger.LogError($"{x.EventArgs.Status}, Reconnecting to {x.Sender.ConfiguredEndpoint}");
                         var sessionReconnectHandler = new SessionReconnectHandler();
                         sessionReconnectHandler.BeginReconnect(x.Sender, (int)reconnectDelay.TotalMilliseconds, (s, e) =>
                         {

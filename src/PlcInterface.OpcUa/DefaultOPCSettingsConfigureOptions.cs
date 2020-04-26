@@ -21,7 +21,13 @@ namespace PlcInterface.OpcUa
 
         private ApplicationConfiguration CreateApplicationConfiguration()
         {
-            var appName = Assembly.GetEntryAssembly().GetName().Name;
+            var entryAssembly = Assembly.GetEntryAssembly();
+            if (entryAssembly == null)
+            {
+                entryAssembly = Assembly.GetExecutingAssembly();
+            }
+
+            var appName = entryAssembly.GetName().Name;
 
             return new ApplicationConfiguration()
             {

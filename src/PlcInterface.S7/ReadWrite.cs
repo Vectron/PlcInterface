@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace PlcInterface.S7
 {
-    internal class ReadWrite : IReadWrite
+    public class ReadWrite : IReadWrite
     {
         private readonly IPlcConnection<S7Client> connection;
         private readonly ILogger<ReadWrite> logger;
         private readonly ISymbolHandler symbolHandler;
 
-        public ReadWrite(IPlcConnection<S7Client> connection, ILogger<ReadWrite> logger, ISymbolHandler symbolHandler)
+        public ReadWrite(IPlcConnection<S7Client> connection, ISymbolHandler symbolHandler, ILogger<ReadWrite> logger)
         {
             this.connection = connection;
             this.logger = logger;

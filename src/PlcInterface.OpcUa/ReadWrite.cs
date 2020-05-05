@@ -94,7 +94,7 @@ namespace PlcInterface.OpcUa
                     {
                         var responseHeader = session.EndRead(ar, out DataValueCollection dataValues, out DiagnosticInfoCollection diagnosticInfos);
                         var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
-                        ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos);
+                        ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, ioNames);
 
                         var result = ioNames
                                 .Zip(dataValues, (name, value) => (name, value.Value, value.StatusCode))
@@ -139,7 +139,7 @@ namespace PlcInterface.OpcUa
                         var responseHeader = session.EndRead(ar, out DataValueCollection dataValues, out DiagnosticInfoCollection diagnosticInfos);
                         var val = dataValues.FirstOrDefault();
                         var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
-                        ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos);
+                        ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
                         taskCompletionSource.TrySetResult(val.Value);
                     }
                     catch (Exception ex)
@@ -179,7 +179,7 @@ namespace PlcInterface.OpcUa
                     {
                         var val = dataValues.FirstOrDefault();
                         var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
-                        ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos);
+                        ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
                         taskCompletionSource.TrySetResult((T)val.GetValue(typeof(T)));
                     }
                     catch (Exception ex)
@@ -246,7 +246,7 @@ namespace PlcInterface.OpcUa
                 out StatusCodeCollection statusCodes,
                 out DiagnosticInfoCollection diagnosticInfos);
 
-            ValidateResponse(nodesToWrite, responseHeader, statusCodes, diagnosticInfos);
+            ValidateResponse(nodesToWrite, responseHeader, statusCodes, diagnosticInfos, namesValues.Keys);
             Task.Delay(500).Wait();
         }
 
@@ -274,7 +274,7 @@ namespace PlcInterface.OpcUa
                     var responseHeader = session.EndWrite(r, out StatusCodeCollection statusCodes, out DiagnosticInfoCollection diagnosticInfos);
                     try
                     {
-                        ValidateResponse(nodesToWrite, responseHeader, statusCodes, diagnosticInfos);
+                        ValidateResponse(nodesToWrite, responseHeader, statusCodes, diagnosticInfos, namesValues.Keys);
                         taskCompletionSource.SetResult(true);
                     }
                     catch (Exception ex)
@@ -303,7 +303,7 @@ namespace PlcInterface.OpcUa
             }
         }
 
-        private void ValidateResponse(IList request, ResponseHeader responseHeader, StatusCodeCollection statusCodes, DiagnosticInfoCollection diagnosticInfos)
+        private void ValidateResponse(IList request, ResponseHeader responseHeader, StatusCodeCollection statusCodes, DiagnosticInfoCollection diagnosticInfos, IEnumerable<string> ioNames)
         {
             ClientBase.ValidateResponse(statusCodes, request);
             ClientBase.ValidateDiagnosticInfos(diagnosticInfos, request);
@@ -315,7 +315,13 @@ namespace PlcInterface.OpcUa
 
             if (!statusCodes.TrueForAll(x => StatusCode.IsGood(x)))
             {
-                throw new ServiceResultException($"Service result is bad");
+                var errors = statusCodes
+                    .Zip(ioNames, (statusCode, name) => (statusCode, name))
+                    .Where(x => !StatusCode.IsGood(x.statusCode))
+                    .Select(x => ServiceResultException.Create(x.statusCode.Code, "{0}: {1}", StatusCode.LookupSymbolicId(x.statusCode.Code), x.name))
+                    .ToList();
+
+                throw new AggregateException($"Service result is bad", errors);
             }
         }
     }

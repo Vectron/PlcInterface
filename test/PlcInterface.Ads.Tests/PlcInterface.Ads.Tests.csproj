@@ -1,11 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
-
     <IsPackable>false</IsPackable>
-
-    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,5 +16,4 @@
     <ProjectReference Include="..\..\src\PlcInterface.Ads\PlcInterface.Ads.csproj" />
     <ProjectReference Include="..\PlcInterface.Tests\PlcInterface.Tests.csproj" />
   </ItemGroup>
-
 </Project>

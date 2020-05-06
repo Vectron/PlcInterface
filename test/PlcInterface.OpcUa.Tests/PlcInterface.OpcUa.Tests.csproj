@@ -1,14 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
-
     <IsPackable>false</IsPackable>
-
-    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.0" />
     <PackageReference Include="Moq" Version="4.10.1" />
@@ -20,5 +17,4 @@
     <ProjectReference Include="..\..\src\PlcInterface.OpcUa\PlcInterface.OpcUa.csproj" />
     <ProjectReference Include="..\PlcInterface.Tests\PlcInterface.Tests.csproj" />
   </ItemGroup>
-
 </Project>

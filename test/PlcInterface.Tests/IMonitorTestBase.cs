@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests
 {
@@ -73,12 +73,15 @@ namespace PlcInterface.Tests
                   }
               });
 
-            monitor.RegisterIO(ioName, 1000);
-            readWrite.ToggleBool(ioName);
-            var result = done.WaitOne(TimeSpan.FromSeconds(30));
+            using (subscription)
+            {
+                monitor.RegisterIO(ioName, 1000);
+                readWrite.ToggleBool(ioName);
+                var result = done.WaitOne(TimeSpan.FromSeconds(30));
 
-            // Assert
-            Assert.IsTrue(result, "Timeout");
+                // Assert
+                Assert.IsTrue(result, "Timeout");
+            }
         }
 
         [TestMethod]
@@ -105,14 +108,17 @@ namespace PlcInterface.Tests
                 }
             });
 
-            monitor.RegisterIO(BooleanVarIONames);
+            using (subscription)
+            {
+                monitor.RegisterIO(BooleanVarIONames);
 
-            var valuesToWrite = originals.ToDictionary(x => x.Key, x => (object)!(bool)x.Value);
-            readWrite.Write(valuesToWrite);
-            var result = done.WaitOne(TimeSpan.FromSeconds(5));
+                var valuesToWrite = originals.ToDictionary(x => x.Key, x => (object)!(bool)x.Value);
+                readWrite.Write(valuesToWrite);
+                var result = done.WaitOne(TimeSpan.FromSeconds(5));
 
-            // Assert
-            Assert.IsTrue(result, $"Timeout, items processed {hits}/{originals.Count}");
+                // Assert
+                Assert.IsTrue(result, $"Timeout, items processed {hits}/{originals.Count}");
+            }
         }
 
         [TestMethod]
@@ -127,11 +133,14 @@ namespace PlcInterface.Tests
             // Act
             var original = readWrite.Read<bool>(ioName);
             var subscription = monitor.SubscribeIO(ioName, !original, () => done.Set());
-            readWrite.ToggleBool(ioName);
-            var result = done.WaitOne(TimeSpan.FromSeconds(30));
+            using (subscription)
+            {
+                readWrite.ToggleBool(ioName);
+                var result = done.WaitOne(TimeSpan.FromSeconds(5));
 
-            // Assert
-            Assert.IsTrue(result, "Timeout");
+                // Assert
+                Assert.IsTrue(result, "Timeout");
+            }
         }
 
         private async Task SubscribeCheckAsync(IList<bool> results, int expectedCount)

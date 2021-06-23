@@ -7,8 +7,8 @@
     <ItemGroup>
         <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="4.3.4" NoWarn="NU1701" />
         <PackageReference Include="Beckhoff.TwinCAT.Ads.Reactive" Version="4.3.4" NoWarn="NU1701" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
-        <PackageReference Include="VectronsLibrary" Version="1.0.3" />
         <PackageReference Condition="'$(Configuration)' == 'Release'" Include="PlcInterface.Abstraction" Version="2.1.*" />
     </ItemGroup>
 

@@ -264,3 +264,4 @@ __pycache__/
 # Ads test PLC
 /test/PlcInterface.Ads.PLC
 /test/PlcInterface.PLC.OPC
+*.AssemblyAttributes

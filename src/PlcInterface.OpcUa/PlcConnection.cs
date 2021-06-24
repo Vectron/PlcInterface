@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Opc.Ua;
-using Opc.Ua.Client;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Opc.Ua;
+using Opc.Ua.Client;
 using VectronsLibrary.Extensions;
 
 namespace PlcInterface.OpcUa
@@ -186,21 +186,14 @@ namespace PlcInterface.OpcUa
             var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
 
             logger.LogDebug($"Creating new application certificate for: {applicationConfiguration.ApplicationName}");
-            applicationCertificate.Certificate = CertificateFactory.CreateCertificate(
-                applicationCertificate.StoreType,
-                applicationCertificate.StorePath,
-                null,
-                applicationConfiguration.ApplicationUri,
-                applicationConfiguration.ApplicationName,
-                applicationCertificate.SubjectName,
-                null,
-                CertificateFactory.defaultKeySize,
-                DateTime.UtcNow - TimeSpan.FromDays(1),
-                CertificateFactory.defaultLifeTime,
-                CertificateFactory.defaultHashSize,
-                false,
-                null,
-                null);
+
+            _ = CertificateFactory.CreateCertificate(applicationConfiguration.ApplicationUri, applicationConfiguration.ApplicationName, applicationCertificate.SubjectName, null)
+                 .SetNotBefore(DateTime.UtcNow - TimeSpan.FromDays(1))
+                 .SetNotAfter((DateTime.UtcNow - TimeSpan.FromDays(1)).AddMonths(CertificateFactory.DefaultLifeTime))
+                 .SetHashAlgorithm(X509Utils.GetRSAHashAlgorithmName(CertificateFactory.DefaultHashSize))
+                 .SetRSAKeySize(CertificateFactory.DefaultKeySize)
+                 .CreateForRSA()
+                 .AddToStore(applicationCertificate.StoreType, applicationCertificate.StorePath);
         }
 
         private void SetupCertificateSigning(ApplicationConfiguration applicationConfiguration)
@@ -262,7 +255,7 @@ namespace PlcInterface.OpcUa
             var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
             if (applicationCertificate.Certificate != null)
             {
-                applicationConfiguration.ApplicationUri = Utils.GetApplicationUriFromCertificate(applicationCertificate.Certificate);
+                applicationConfiguration.ApplicationUri = X509Utils.GetApplicationUriFromCertificate(applicationCertificate.Certificate);
             }
         }
     }

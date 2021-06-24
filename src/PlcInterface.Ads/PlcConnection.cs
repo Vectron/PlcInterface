@@ -10,7 +10,7 @@ namespace PlcInterface.Ads
 {
     public class PlcConnection : IPlcConnection<IAdsConnection>, IDisposable
     {
-        private readonly BehaviorSubject<IConnected<TcAdsClient>> connectionState = new BehaviorSubject<IConnected<TcAdsClient>>(Connected.No<TcAdsClient>());
+        private readonly BehaviorSubject<IConnected<AdsClient>> connectionState = new BehaviorSubject<IConnected<AdsClient>>(Connected.No<AdsClient>());
         private readonly ILogger<PlcConnection> logger;
         private readonly IOptions<ConnectionSettings> settings;
 
@@ -38,22 +38,20 @@ namespace PlcInterface.Ads
 
         public void Connect()
         {
-            if (connectionState.TryGetValue(out IConnected<TcAdsClient> lastConnectionState)
+            if (connectionState.TryGetValue(out IConnected<AdsClient> lastConnectionState)
                 && lastConnectionState.IsConnected == true
-                && lastConnectionState.Value?.IsConnected == true
-                && lastConnectionState.Value?.RouterState == AmsRouterState.Start)
+                && lastConnectionState.Value?.IsConnected == true)
             {
                 return;
             }
 
-            var adsClient = new TcAdsClient();
-            adsClient.AmsRouterNotification += AmsRouterNotificationCallback;
+            var adsClient = new AdsClient();
 
+            adsClient.RouterStateChanged += AdsClient_RouterStateChanged;
             var Address = new AmsAddress(settings.Value.AmsNetId, settings.Value.Port);
             adsClient.Connect(Address);
 
-            if (adsClient.RouterState == AmsRouterState.Start
-                && adsClient.IsConnected
+            if (adsClient.IsConnected
                 && adsClient.TryReadState(out StateInfo plcState) == AdsErrorCode.NoError
                 && (plcState.AdsState == AdsState.Run || plcState.AdsState == AdsState.Stop))
             {
@@ -62,7 +60,7 @@ namespace PlcInterface.Ads
             }
             else
             {
-                connectionState.OnNext(Connected.No<TcAdsClient>());
+                connectionState.OnNext(Connected.No<AdsClient>());
             }
         }
 
@@ -71,13 +69,13 @@ namespace PlcInterface.Ads
 
         public void Disconnect()
         {
-            if (connectionState.TryGetValue(out IConnected<TcAdsClient> lastConnectionState)
+            if (connectionState.TryGetValue(out IConnected<AdsClient> lastConnectionState)
                 && lastConnectionState.IsConnected == false)
             {
                 return;
             }
 
-            connectionState.OnNext(Connected.No<TcAdsClient>());
+            connectionState.OnNext(Connected.No<AdsClient>());
             if (lastConnectionState == null)
             {
                 return;
@@ -123,7 +121,7 @@ namespace PlcInterface.Ads
             }
         }
 
-        private void AmsRouterNotificationCallback(object sender, AmsRouterNotificationEventArgs e)
+        private void AdsClient_RouterStateChanged(object sender, AmsRouterNotificationEventArgs e)
         {
             // TODO, this might indicate that we need to reconnect
             Console.WriteLine($"Ads Router Notification gotten {e.State}");

@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TwinCAT.Ads;
 using TwinCAT.Ads.SumCommand;
 using TwinCAT.TypeSystem;
@@ -66,8 +66,20 @@ namespace PlcInterface.Ads
 
             if (symbolInfo?.Symbol is DynamicSymbol dynamicSymbol)
             {
-                var value = dynamicSymbol.ReadValue() as DynamicObject;
-                return (T)dynamicValueConverter.ConvertFrom(value, typeof(T));
+                var value = dynamicSymbol.ReadValue();
+
+                if (value is DynamicObject dynamicObject)
+                {
+                    return (T)dynamicValueConverter.ConvertFrom(dynamicObject, typeof(T));
+                }
+                else if (value is T requestedType)
+                {
+                    return requestedType;
+                }
+                else
+                {
+                    throw new SymbolException($"Unable to convert type {value}");
+                }
             }
 
             if (symbolInfo?.Symbol is IValueAnySymbol valueAnySymbol)

@@ -5,16 +5,11 @@ namespace PlcInterface.Ads.Extensions
 {
     internal static class TcAdsClientExtension
     {
-        public static TcAdsClient ValidateConnection(this TcAdsClient client)
+        public static AdsClient ValidateConnection(this AdsClient client)
         {
             if (client == null)
             {
                 throw new ArgumentNullException(nameof(client));
-            }
-
-            if (client.RouterState != AmsRouterState.Start)
-            {
-                throw new InvalidOperationException("Router not connected");
             }
 
             if (!client.IsConnected)

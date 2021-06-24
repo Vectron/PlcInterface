@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using TwinCAT;
 using TwinCAT.Ads;
 using TwinCAT.Ads.TypeSystem;
@@ -139,7 +139,7 @@ namespace PlcInterface.Ads
                     AutomaticReconnection = false,
                     NonCachedArrayElements = true,
                     ValueAccessMode = ValueAccessMode.IndexGroupOffsetPreferred,
-                    ValueCreation = ValueCreationMode.Primitives
+                    ValueCreation = ValueCreationModes.Primitives
                 };
 
                 var symbolLoader = SymbolLoaderFactory.Create(client, settings);

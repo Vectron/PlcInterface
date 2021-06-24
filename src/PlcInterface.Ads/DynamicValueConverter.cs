@@ -101,6 +101,14 @@ namespace PlcInterface.Ads
                     var value = ConvertFrom(resultDynamicObject, ellementType);
                     destination.SetValue(value, index);
                 }
+                else if (result.GetType() == ellementType)
+                {
+                    destination.SetValue(result, index);
+                }
+                else
+                {
+                    throw new SymbolException($"Unable to convert type {result}");
+                }
             }
 
             return destination;

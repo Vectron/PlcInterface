@@ -4,6 +4,6 @@
         <Description>A PLC Abstraction</Description>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="System.Reactive" Version="4.1.5" />
+        <PackageReference Include="System.Reactive" Version="5.0.0" />
     </ItemGroup>
 </Project>

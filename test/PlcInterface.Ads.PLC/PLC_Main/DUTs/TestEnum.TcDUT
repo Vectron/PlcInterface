@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.18">
+  <DUT Name="TestEnum" Id="{cc621b9e-fd25-4cd7-8df0-4a20201c2fa3}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+{attribute 'OPC.UA.DA' := '1'}
+TYPE TestEnum :
+(
+	first := 0,
+	second := 1,
+	third := 2
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

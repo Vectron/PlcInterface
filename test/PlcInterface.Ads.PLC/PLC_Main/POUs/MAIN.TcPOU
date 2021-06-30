@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="MAIN" Id="{65800fe3-bb5f-43d1-b26a-4a3b6ac53c7a}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	{attribute 'OPC.UA.DA' := '1'}
+	Reset: BOOL;
+	{attribute 'OPC.UA.DA' := '0'}
+	EmptyStruct: DUT_TestStruct;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF Reset THEN
+	WriteTestData.BoolValue						:= TRUE;
+	
+	WriteTestData.ByteValue						:= 16#FF;
+	WriteTestData.WordValue						:= 16#FFFF;
+	WriteTestData.DWordValue					:= 16#FFFF_FFFF;
+	WriteTestData.LWordValue					:= 16#FFFF_FFFF_FFFF_FFFF;
+
+	WriteTestData.ShortValue					:= -128;
+	WriteTestData.IntValue						:= -32768;
+	WriteTestData.DIntValue						:= -2147483648 ;
+	WriteTestData.LongValue						:= -9223372036854775808;
+
+	WriteTestData.UShortValue					:= 255;
+	WriteTestData.UIntValue						:= 65535;
+	WriteTestData.UDIntValue					:= 4294967295;
+	WriteTestData.ULongValue					:= 18446744073709551615;
+	
+	WriteTestData.FloatValue					:= -3.402823E+38;
+	WriteTestData.DoubleValue					:= -1.79769313486231E+308;
+	
+	WriteTestData.TimeValue						:= T#1000MS;
+	WriteTestData.TimeOfDay						:= TOD#01:00;
+	WriteTestData.LTimeValue		 			:= LTIME#1000NS;
+	WriteTestData.DateValue						:= D#2106-02-06;
+	WriteTestData.DateAndTimeValue				:= DT#2106-02-06-06:28:15;
+	
+	WriteTestData.StringValue					:= 'Test String';
+	WriteTestData.WStringValue					:= "Test WString";
+	
+	WriteTestData.EnumValue						:= 1;
+	
+	WriteTestData.IntArray[0]			 		:= 1000;
+	WriteTestData.IntArray[1]			 		:= 1001;
+	WriteTestData.IntArray[2]			 		:= 1002;
+	WriteTestData.IntArray[3]			 		:= 1003;
+	WriteTestData.IntArray[4]			 		:= 1004;
+	WriteTestData.IntArray[5]			 		:= 1005;
+	WriteTestData.IntArray[6]			 		:= 1006;
+	WriteTestData.IntArray[7]			 		:= 1007;
+	WriteTestData.IntArray[8]			 		:= 1008;
+	WriteTestData.IntArray[9]			 		:= 1009;
+	WriteTestData.IntArray[10]			 		:= 1010;
+	
+	WriteTestData.StructValue					:= EmptyStruct;
+	
+	
+	Reset := FALSE;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="7" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="24" Count="1" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="33" Count="1" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="42" Count="1" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="47" Count="1" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="58" Count="1" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="63" Count="1" />
+      <LineId Id="66" Count="1" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="73" Count="9" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="85" Count="2" />
+      <LineId Id="12" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.18">
+  <GVL Name="MonitorTestData" Id="{d6d962eb-c07c-46a4-8601-f31297f7170b}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	{attribute 'OPC.UA.DA' := '1'}
+	BoolValue1			:BOOL			:= TRUE;
+	{attribute 'OPC.UA.DA' := '1'}
+	BoolValue2			:BOOL			:= TRUE;
+	{attribute 'OPC.UA.DA' := '1'}
+	BoolValue3			:BOOL			:= TRUE;
+	{attribute 'OPC.UA.DA' := '1'}
+	BoolValue4			:BOOL			:= TRUE;
+	{attribute 'OPC.UA.DA' := '1'}
+	BoolValue5			:BOOL			:= TRUE;
+	{attribute 'OPC.UA.DA' := '1'}
+	BoolValue6			:BOOL			:= TRUE;
+	{attribute 'OPC.UA.DA' := '1'}
+	BoolValue7			:BOOL			:= TRUE;
+	{attribute 'OPC.UA.DA' := '1'}
+	BoolValue8			:BOOL			:= TRUE;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

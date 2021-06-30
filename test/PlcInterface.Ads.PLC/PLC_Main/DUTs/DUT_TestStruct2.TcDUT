@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.18">
+  <DUT Name="DUT_TestStruct2" Id="{3b1a7687-6a60-4de7-859c-f4e40aa65cf7}">
+    <Declaration><![CDATA[{attribute 'OPC.UA.DA' := '1'}
+TYPE DUT_TestStruct2 :
+STRUCT
+	ByteValue			:BYTE			:= 16#FF;
+	WordValue			:WORD			:= 16#FFFF;
+	DWordValue			:DWORD			:= 16#FFFF_FFFF;
+	LWordValue			:LWORD			:= 16#FFFF_FFFF_FFFF_FFFF;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

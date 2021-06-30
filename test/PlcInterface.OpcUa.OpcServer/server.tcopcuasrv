@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GlobalServerConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ActiveServerUrl>opc.tcp://Vectrons-PC:4840</ActiveServerUrl>
+  <ActiveServerName>TcOpcUaServer@Vectrons-PC</ActiveServerName>
+  <ActiveEndpoint>opc.tcp://Vectrons-PC:4840 [SignAndEncrypt:Aes128Sha256RsaOaep:Binary]</ActiveEndpoint>
+  <UaPort>4840</UaPort>
+  <EK9160MessageFeedBack>false</EK9160MessageFeedBack>
+  <IsAnonymous>true</IsAnonymous>
+  <IsUserPassword>true</IsUserPassword>
+</GlobalServerConfig>

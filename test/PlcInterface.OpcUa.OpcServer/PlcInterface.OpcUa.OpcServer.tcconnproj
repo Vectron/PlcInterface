@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="10.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{c6b6e391-a9da-4bad-a62e-89651a65103d}</ProjectGuid>
+    <AssemblyName>PlcInterface.OpcUa.OpcServer</AssemblyName>
+    <Name>PlcInterface.OpcUa.OpcServer</Name>
+    <RootNamespace>PlcInterface.OpcUa.OpcServer</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="server.tcopcuasrv">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <tcopcuasrvdaCompile Include="server\Data Access\Data Access.opcuada">
+      <DependentUpon>server.tcopcuasrv</DependentUpon>
+    </tcopcuasrvdaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <tcopcuasrvalarmcCompile Include="server\Alarms and Conditions\Alarms and Conditions.ac">
+      <DependentUpon>server.tcopcuasrv</DependentUpon>
+    </tcopcuasrvalarmcCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <tcopcuasrvresCompile Include="server\Resources\Resources.res">
+      <DependentUpon>server.tcopcuasrv</DependentUpon>
+    </tcopcuasrvresCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <tcopcuasrvhaCompile Include="server\Historical Access\Historical Access.opcuaha">
+      <DependentUpon>server.tcopcuasrv</DependentUpon>
+    </tcopcuasrvhaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <tcopcuasrvsecCompile Include="server\Security Access\Security Access.sec">
+      <DependentUpon>server.tcopcuasrv</DependentUpon>
+    </tcopcuasrvsecCompile>
+  </ItemGroup>
+  <!-- This next bit is required unless the macro used to Import your targets is defined in an MSBuild toolset. -->
+  <ProjectExtensions>
+    <ProjectCapabilities>
+      <ProjectConfigurationsDeclaredAsItems />
+      <TcConnectivity />
+    </ProjectCapabilities>
+  </ProjectExtensions>
+</Project>

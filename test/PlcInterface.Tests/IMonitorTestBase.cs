@@ -11,18 +11,13 @@ namespace PlcInterface.Tests
     [TestClass]
     public abstract class IMonitorTestBase : ConnectionBase
     {
-        protected abstract IEnumerable<string> BooleanVarIONames
-        {
-            get;
-        }
-
         [TestMethod]
         public async Task MultipleSubscriptions()
         {
             // Arrange
             var monitor = GetMonitor();
             var readWrite = GetReadWrite();
-            var ioName = BooleanVarIONames.Last();
+            var ioName = "MonitorTestData.BoolValue8";
             var results = new List<bool>();
 
             // Act
@@ -32,24 +27,30 @@ namespace PlcInterface.Tests
             var subscription4 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x));
 
             // Assert
-            readWrite.ToggleBool(ioName);
-            await SubscribeCheckAsync(results, 4);
-            subscription1.Dispose();
+            using (subscription1)
+            using (subscription2)
+            using (subscription3)
+            using (subscription4)
+            {
+                readWrite.ToggleBool(ioName);
+                await SubscribeCheckAsync(results, 4);
+                subscription1.Dispose();
 
-            readWrite.ToggleBool(ioName);
-            await SubscribeCheckAsync(results, 3);
-            subscription2.Dispose();
+                readWrite.ToggleBool(ioName);
+                await SubscribeCheckAsync(results, 3);
+                subscription2.Dispose();
 
-            readWrite.ToggleBool(ioName);
-            await SubscribeCheckAsync(results, 2);
-            subscription3.Dispose();
+                readWrite.ToggleBool(ioName);
+                await SubscribeCheckAsync(results, 2);
+                subscription3.Dispose();
 
-            readWrite.ToggleBool(ioName);
-            await SubscribeCheckAsync(results, 1);
-            subscription4.Dispose();
+                readWrite.ToggleBool(ioName);
+                await SubscribeCheckAsync(results, 1);
+                subscription4.Dispose();
 
-            readWrite.ToggleBool(ioName);
-            await SubscribeCheckAsync(results, 0);
+                readWrite.ToggleBool(ioName);
+                await SubscribeCheckAsync(results, 0);
+            }
         }
 
         [TestMethod]
@@ -59,7 +60,7 @@ namespace PlcInterface.Tests
             var monitor = GetMonitor();
             var readWrite = GetReadWrite();
             var done = new ManualResetEvent(false);
-            var ioName = BooleanVarIONames.First();
+            var ioName = "MonitorTestData.BoolValue1";
 
             // Act
             var original = readWrite.Read<bool>(ioName);
@@ -92,13 +93,14 @@ namespace PlcInterface.Tests
             var readWrite = GetReadWrite();
             var done = new ManualResetEvent(false);
             var hits = 0;
+            var variables = Settings.GetMonitorMultiple();
 
             // Act
-            var originals = readWrite.Read(BooleanVarIONames);
+            var originals = readWrite.Read(variables);
             var subscription = monitor.SymbolStream.Subscribe(x =>
             {
                 var value = (bool)x.Value;
-                _ = originals.TryGetValue(x.Name, out object original);
+                _ = originals.TryGetValue(x.Name, out var original);
                 Assert.AreNotEqual((bool)original, value);
                 hits++;
 
@@ -110,7 +112,7 @@ namespace PlcInterface.Tests
 
             using (subscription)
             {
-                monitor.RegisterIO(BooleanVarIONames);
+                monitor.RegisterIO(variables);
 
                 var valuesToWrite = originals.ToDictionary(x => x.Key, x => (object)!(bool)x.Value);
                 readWrite.Write(valuesToWrite);
@@ -128,7 +130,7 @@ namespace PlcInterface.Tests
             var monitor = GetMonitor();
             var readWrite = GetReadWrite();
             var done = new ManualResetEvent(false);
-            var ioName = BooleanVarIONames.Last();
+            var ioName = "MonitorTestData.BoolValue8";
 
             // Act
             var original = readWrite.Read<bool>(ioName);

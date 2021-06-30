@@ -1,6 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.Tests;
-using System;
 
 namespace PlcInterface.Ads.Tests
 {
@@ -8,14 +8,13 @@ namespace PlcInterface.Ads.Tests
     public class PlcConnectionTest : IPlcConnectionTestBase
     {
         [TestMethod]
-        [ExpectedException(typeof(TimeoutException))]
         public void GetConnectedClient()
         {
             // Arrange
             var connection = GetPLCConnection() as PlcConnection;
 
             // Act
-            var result = connection.GetConnectedClient();
+            _ = Assert.ThrowsException<TimeoutException>(() => connection.GetConnectedClient());
         }
 
         protected override IPlcConnection GetPLCConnection()

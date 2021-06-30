@@ -1,8 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PlcInterface.Tests;
-using System.Collections.Generic;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PlcInterface.Tests;
 
 namespace PlcInterface.OpcUa.Tests
 {
@@ -14,10 +13,8 @@ namespace PlcInterface.OpcUa.Tests
         private static ReadWrite readWrite;
         private static SymbolHandler symbolHandler;
 
-        protected override IEnumerable<string> BooleanVarIONames
-            => Settings.GetMonitorData();
-
         [ClassInitialize]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public Api")]
         public static async Task ConnectAsync(TestContext testContext)
         {
             var connectionsettings = new OPCSettings();

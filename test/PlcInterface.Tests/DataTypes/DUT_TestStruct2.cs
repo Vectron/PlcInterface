@@ -1,13 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Text;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PlcInterface.Ads.Tests.DataTypes
+namespace PlcInterface.Tests.DataTypes
 {
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
-    internal class DUT_TestStruct2Class
+    internal struct DUT_TestStruct2
     {
-        public static DUT_TestStruct2Class Default => new DUT_TestStruct2Class()
+        public static DUT_TestStruct2 Default => new DUT_TestStruct2()
         {
             ByteValue = byte.MaxValue,
             WordValue = ushort.MaxValue,
@@ -37,12 +37,12 @@ namespace PlcInterface.Ads.Tests.DataTypes
 
         public override bool Equals(object obj)
         {
-            if (!(obj is DUT_TestStruct2Class))
+            if (!(obj is DUT_TestStruct2))
             {
                 return false;
             }
 
-            var other = (DUT_TestStruct2Class)obj;
+            var other = (DUT_TestStruct2)obj;
             Assert.AreEqual(ByteValue, other.ByteValue);
             Assert.AreEqual(WordValue, other.WordValue);
             Assert.AreEqual(DWordValue, other.DWordValue);
@@ -54,16 +54,15 @@ namespace PlcInterface.Ads.Tests.DataTypes
         public override int GetHashCode()
         {
             var hashCode = -1110352730;
-            hashCode = hashCode * -1521134295 + ByteValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + WordValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + DWordValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + LWordValue.GetHashCode();
+            hashCode = (hashCode * -1521134295) + ByteValue.GetHashCode();
+            hashCode = (hashCode * -1521134295) + WordValue.GetHashCode();
+            hashCode = (hashCode * -1521134295) + DWordValue.GetHashCode();
+            hashCode = (hashCode * -1521134295) + LWordValue.GetHashCode();
             return hashCode;
         }
 
         public override string ToString()
-        {
-            return new StringBuilder()
+            => new StringBuilder()
                 .Append("{ ")
                 .Append(ByteValue)
                 .Append(", ")
@@ -74,6 +73,5 @@ namespace PlcInterface.Ads.Tests.DataTypes
                 .Append(LWordValue)
                 .Append(" }")
                 .ToString();
-        }
     }
 }

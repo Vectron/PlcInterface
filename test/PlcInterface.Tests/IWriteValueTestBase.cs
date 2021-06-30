@@ -1,20 +1,19 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests
 {
     public abstract class IWriteValueTestBase : ConnectionBase
     {
-        protected abstract string BoolValue
+        [TestInitialize]
+        public void ResetPLCValues()
         {
-            get;
-        }
-
-        protected abstract IEnumerable<object[]> Data
-        {
-            get;
+            var readWrite = GetReadWrite();
+            readWrite.Write("MAIN.Reset", true);
+            while (readWrite.Read<bool>("MAIN.Reset"))
+            {
+            }
         }
 
         [TestMethod]
@@ -22,71 +21,75 @@ namespace PlcInterface.Tests
         {
             // Arrange
             var readWrite = GetReadWrite();
+            var ioName = "WriteTestData.BoolValue";
 
             // Act
-            var original = readWrite.Read<bool>(BoolValue);
-            readWrite.ToggleBool(BoolValue);
-            var newValue = readWrite.Read<bool>(BoolValue);
+            var original = readWrite.Read<bool>(ioName);
+            readWrite.ToggleBool(ioName);
+            var newValue = readWrite.Read<bool>(ioName);
 
             // Assert
             Assert.AreNotEqual(original, newValue);
         }
 
-        [TestMethod]
-        public void Write()
+        [DataTestMethod]
+        [DynamicData(nameof(Settings.GetWriteData), typeof(Settings), DynamicDataSourceType.Method)]
+        public void Write(string ioName, object newValue, object readValue)
+        {
+            // Arrange
+            var readWrite = GetReadWrite();
+
+            // Act
+            var original = readWrite.Read(ioName);
+            readWrite.Write(ioName, newValue);
+            var newValueRead = readWrite.Read(ioName);
+
+            // Assert
+            Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
+            Assert.That.ObjectEquals(readValue, newValueRead);
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(Settings.GetWriteData), typeof(Settings), DynamicDataSourceType.Method)]
+        public async Task WriteAsync(string ioName, object newValue, object readValue)
         {
             var readWrite = GetReadWrite();
 
-            foreach (var item in Data)
-            {
-                // Arrange
-                var ioName = item[0] as string;
-                var newValue = item[1];
+            // Arrange
 
-                // Act
-                var original = readWrite.Read(ioName);
-                readWrite.Write(ioName, newValue);
-                var newValueRead = readWrite.Read(ioName);
+            // Act
+            var original = await readWrite.ReadAsync(ioName);
+            await readWrite.WriteAsync(ioName, newValue);
+            var newValueRead = await readWrite.ReadAsync(ioName);
 
-                // Assert
-                Assert.That.ObjectNotEquals(newValue, original, "Reset values in PLC");
-                Assert.That.ObjectEquals(newValue, newValueRead);
-            }
+            // Assert
+            Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
+            Assert.That.ObjectEquals(readValue, newValueRead);
         }
 
-        [TestMethod]
-        public async Task WriteAsync()
+        [DataTestMethod]
+        [DynamicData(nameof(Settings.GetWriteData), typeof(Settings), DynamicDataSourceType.Method)]
+        public void WriteGeneric(string ioName, object newValue, object readValue)
         {
-            var readWrite = GetReadWrite();
-
-            foreach (var item in Data)
-            {
-                // Arrange
-                var ioName = item[0] as string;
-                var newValue = item[1];
-
-                // Act
-                var original = await readWrite.ReadAsync(ioName);
-                await readWrite.WriteAsync(ioName, newValue);
-                var newValueRead = await readWrite.ReadAsync(ioName);
-
-                // Assert
-                Assert.That.ObjectNotEquals(newValue, original, "Reset values in PLC");
-                Assert.That.ObjectEquals(newValue, newValueRead);
-            }
+            var methodInfo = GetType().GetMethod(nameof(WriteValueGenericHelper), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var method = methodInfo.MakeGenericMethod(newValue.GetType());
+            _ = method.Invoke(this, new[] { ioName, newValue, readValue });
         }
 
-        [TestMethod]
-        public abstract void WriteGeneric();
-
-        [TestMethod]
-        public abstract Task WriteGenericAsync();
+        [DataTestMethod]
+        [DynamicData(nameof(Settings.GetWriteData), typeof(Settings), DynamicDataSourceType.Method)]
+        public async Task WriteGenericAsync(string ioName, object newValue, object readValue)
+        {
+            var methodInfo = GetType().GetMethod(nameof(WriteValueGenericHelperAsync), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var method = methodInfo.MakeGenericMethod(newValue.GetType());
+            await (Task)method.Invoke(this, new[] { ioName, newValue, readValue });
+        }
 
         [TestMethod]
         public void WriteMultiple()
         {
             // Arrange
-            var data = Data.ToDictionary(x => (string)x[0], x => x[1]);
+            var data = Settings.GetWriteMultiple();
             var readWrite = GetReadWrite();
 
             // Act
@@ -122,7 +125,7 @@ namespace PlcInterface.Tests
         public async Task WriteMultipleAsync()
         {
             // Arrange
-            var data = Data.ToDictionary(x => (string)x[0], x => x[1]);
+            var data = Settings.GetWriteMultiple();
             var readWrite = GetReadWrite();
 
             // Act
@@ -155,11 +158,9 @@ namespace PlcInterface.Tests
         }
 
         protected override IMonitor GetMonitor()
-        {
-            throw new System.NotImplementedException();
-        }
+            => throw new NotImplementedException();
 
-        protected void WriteValueGenericHelper<T>(string ioName, T newValue)
+        protected void WriteValueGenericHelper<T1>(string ioName, T1 newValue, object readValue)
         {
             // Arrange
             var readWrite = GetReadWrite();
@@ -170,11 +171,11 @@ namespace PlcInterface.Tests
             var newValueRead = readWrite.Read(ioName);
 
             // Assert
-            Assert.That.ObjectNotEquals(newValue, original, "Reset values in PLC");
-            Assert.That.ObjectEquals(newValue, newValueRead);
+            Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
+            Assert.That.ObjectEquals(readValue, newValueRead);
         }
 
-        protected async Task WriteValueGenericHelperAsync<T>(string ioName, T newValue)
+        protected async Task WriteValueGenericHelperAsync<T>(string ioName, T newValue, object readValue)
         {
             // Arrange
             var readWrite = GetReadWrite();
@@ -185,8 +186,8 @@ namespace PlcInterface.Tests
             var newValueRead = await readWrite.ReadAsync(ioName);
 
             // Assert
-            Assert.That.ObjectNotEquals(newValue, original, "Reset values in PLC");
-            Assert.That.ObjectEquals(newValue, newValueRead);
+            Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
+            Assert.That.ObjectEquals(readValue, newValueRead);
         }
     }
 }

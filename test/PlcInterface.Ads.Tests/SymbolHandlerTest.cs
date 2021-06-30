@@ -1,8 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PlcInterface.Tests;
-using System.Collections.Generic;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PlcInterface.Tests;
 
 namespace PlcInterface.Ads.Tests
 {
@@ -12,10 +11,8 @@ namespace PlcInterface.Ads.Tests
         private static PlcConnection connection;
         private static SymbolHandler symbolHandler;
 
-        public override IEnumerable<object[]> Data
-            => Settings.GetReadData();
-
         [ClassInitialize]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public Api")]
         public static async Task ConnectAsync(TestContext testContext)
         {
             var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };

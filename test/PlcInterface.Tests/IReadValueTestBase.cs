@@ -1,39 +1,70 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PlcInterface.Tests.DataTypes;
 
 namespace PlcInterface.Tests
 {
     public abstract class IReadValueTestBase : ConnectionBase
     {
-        protected abstract string BoolValue
+        [TestMethod]
+        public void ReadDynamic()
         {
-            get;
+            // Arrange
+            var readWrite = GetReadWrite();
+            var expected = DUT_TestStruct.Default;
+
+            // Act
+            var structValue = readWrite.ReadDynamic("ReadTestData.StructValue");
+
+            // Assert
+            AssertExtension.DUT_TestStructEquals(expected, structValue);
         }
 
-        protected abstract IEnumerable<object[]> Data
+        [TestMethod]
+        public async Task ReadDynamicAsync()
         {
-            get;
+            // Arrange
+            var readWrite = GetReadWrite();
+            var expected = DUT_TestStruct.Default;
+
+            // Act
+            var structValue = await readWrite.ReadDynamicAsync("ReadTestData.StructValue");
+
+            // Assert
+            AssertExtension.DUT_TestStructEquals(expected, structValue);
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(Settings.GetReadData), typeof(Settings), DynamicDataSourceType.Method)]
+        [DynamicData(nameof(Settings.GetReadDataComplex), typeof(Settings), DynamicDataSourceType.Method)]
+        public void ReadGeneric(string ioName, object value)
+        {
+            var instanceType = value.GetType();
+            var method = typeof(IReadValueTestBase)
+                .GetMethod(nameof(ReadValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
+                .MakeGenericMethod(instanceType);
+            _ = method.Invoke(this, new object[] { ioName, value });
         }
 
         [TestMethod]
-        public abstract void ReadDynamic();
-
-        [TestMethod]
-        public abstract Task ReadDynamicAsync();
-
-        [TestMethod]
-        public abstract void ReadGeneric();
-
-        [TestMethod]
-        public abstract Task ReadGenericAsync();
+        [DynamicData(nameof(Settings.GetReadData), typeof(Settings), DynamicDataSourceType.Method)]
+        [DynamicData(nameof(Settings.GetReadDataComplex), typeof(Settings), DynamicDataSourceType.Method)]
+        public async Task ReadGenericAsync(string ioName, object value)
+        {
+            var instanceType = value.GetType();
+            var method = typeof(IReadValueTestBase)
+                .GetMethod(nameof(ReadValueGenericHelperAsync), BindingFlags.NonPublic | BindingFlags.Instance)
+                .MakeGenericMethod(instanceType);
+            await (Task)method.Invoke(this, new object[] { ioName, value });
+        }
 
         [TestMethod]
         public void ReadMultiple()
         {
             // Arrange
-            var data = Data.ToDictionary(x => (string)x[0], x => x[1]);
+            var data = Settings.GetReadMultiple();
             var readWrite = GetReadWrite();
 
             // Act
@@ -61,7 +92,7 @@ namespace PlcInterface.Tests
         public async Task ReadMultipleAsync()
         {
             // Arrange
-            var data = Data.ToDictionary(x => (string)x[0], x => x[1]);
+            var data = Settings.GetReadMultiple();
             var readWrite = GetReadWrite();
 
             // Act
@@ -85,48 +116,36 @@ namespace PlcInterface.Tests
             }
         }
 
-        [TestMethod]
-        public void ReadValue()
+        [DataTestMethod]
+        [DynamicData(nameof(Settings.GetReadData), typeof(Settings), DynamicDataSourceType.Method)]
+        public void ReadValue(string ioName, object expectedValue)
         {
+            // Arrange
             var readWrite = GetReadWrite();
 
-            foreach (var item in Data)
-            {
-                // Arrange
-                var ioName = item[0] as string;
-                var expectedValue = item[1];
+            // Act
+            var value = readWrite.Read(ioName);
 
-                // Act
-                var value = readWrite.Read(ioName);
-
-                // Assert
-                Assert.That.ObjectEquals(expectedValue, value);
-            }
+            // Assert
+            Assert.That.ObjectEquals(expectedValue, value);
         }
 
-        [TestMethod]
-        public async Task ReadValueAsync()
+        [DataTestMethod]
+        [DynamicData(nameof(Settings.GetReadData), typeof(Settings), DynamicDataSourceType.Method)]
+        public async Task ReadValueAsync(string ioName, object expectedValue)
         {
+            // Arrange
             var readWrite = GetReadWrite();
 
-            foreach (var item in Data)
-            {
-                // Arrange
-                var ioName = item[0] as string;
-                var expectedValue = item[1];
+            // Act
+            var value = await readWrite.ReadAsync(ioName);
 
-                // Act
-                var value = await readWrite.ReadAsync(ioName);
-
-                // Assert
-                Assert.That.ObjectEquals(expectedValue, value);
-            }
+            // Assert
+            Assert.That.ObjectEquals(expectedValue, value);
         }
 
         protected override IMonitor GetMonitor()
-        {
-            throw new System.NotImplementedException();
-        }
+            => throw new NotImplementedException();
 
         protected void ReadValueGenericHelper<T>(string ioName, T expectedValue)
         {

@@ -1,4 +1,4 @@
-﻿namespace PlcInterface.OpcUa.Tests.DataTypes
+﻿namespace PlcInterface.Tests.DataTypes
 {
     internal enum TestEnum
     {

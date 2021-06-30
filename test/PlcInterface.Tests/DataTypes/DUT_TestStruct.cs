@@ -1,13 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace PlcInterface.OpcUa.Tests.DataTypes
+namespace PlcInterface.Tests.DataTypes
 {
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
-    internal struct DUT_TestStruct
+    internal struct DUT_TestStruct : IEquatable<DUT_TestStruct>
     {
         public static DUT_TestStruct Default => new DUT_TestStruct()
         {
@@ -26,11 +26,11 @@ namespace PlcInterface.OpcUa.Tests.DataTypes
             ULongValue = ulong.MaxValue,
             FloatValue = -3.402823E+38F,
             DoubleValue = -1.79769313486231E+308,
-            TimeValue = 1000u,
-            TimeOfDay = 3600000u,
-            LTimeValue = 1000ul,
-            DateValue = new DateTime(2106, 02, 06),
-            DateAndTimeValue = new DateTime(2106, 02, 06, 06, 28, 15),
+            TimeValue = TimeSpan.FromSeconds(1),
+            TimeOfDay = TimeSpan.FromHours(1),
+            LTimeValue = TimeSpan.FromTicks(10),
+            DateValue = new DateTimeOffset(2106, 02, 05, 0, 0, 0, TimeSpan.FromHours(1)),
+            DateAndTimeValue = new DateTimeOffset(2106, 02, 05, 06, 28, 15, TimeSpan.FromHours(1)),
             StringValue = "Test String",
             WStringValue = "Test WString",
             Nested = DUT_TestStruct2.Default,
@@ -140,27 +140,27 @@ namespace PlcInterface.OpcUa.Tests.DataTypes
             get; set;
         }
 
-        public uint TimeValue
+        public TimeSpan TimeValue
         {
             get; set;
         }
 
-        public uint TimeOfDay
+        public TimeSpan TimeOfDay
         {
             get; set;
         }
 
-        public ulong LTimeValue
+        public TimeSpan LTimeValue
         {
             get; set;
         }
 
-        public DateTime DateValue
+        public DateTimeOffset DateValue
         {
             get; set;
         }
 
-        public DateTime DateAndTimeValue
+        public DateTimeOffset DateAndTimeValue
         {
             get; set;
         }
@@ -204,86 +204,41 @@ namespace PlcInterface.OpcUa.Tests.DataTypes
             set;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object obj) => obj is DUT_TestStruct @struct && Equals(@struct);
+
+        public bool Equals(DUT_TestStruct other)
         {
-            if (!(obj is DUT_TestStruct))
-            {
-                return false;
-            }
-
-            var other = (DUT_TestStruct)obj;
-            Assert.AreEqual(BoolValue, other.BoolValue);
-            Assert.AreEqual(ByteValue, other.ByteValue);
-            Assert.AreEqual(WordValue, other.WordValue);
-            Assert.AreEqual(DWordValue, other.DWordValue);
-            Assert.AreEqual(LWordValue, other.LWordValue);
-
-            Assert.AreEqual(ShortValue, other.ShortValue);
-            Assert.AreEqual(IntValue, other.IntValue);
-            Assert.AreEqual(DIntValue, other.DIntValue);
-            Assert.AreEqual(LongValue, other.LongValue);
-
-            Assert.AreEqual(UShortValue, other.UShortValue);
-            Assert.AreEqual(UIntValue, other.UIntValue);
-            Assert.AreEqual(UDIntValue, other.UDIntValue);
-            Assert.AreEqual(ULongValue, other.ULongValue);
-
-            Assert.AreEqual(FloatValue, other.FloatValue);
-            Assert.AreEqual(DoubleValue, other.DoubleValue);
-
-            Assert.AreEqual(TimeValue, other.TimeValue);
-            Assert.AreEqual(TimeOfDay, other.TimeOfDay);
-            Assert.AreEqual(LTimeValue, other.LTimeValue);
-            Assert.AreEqual(DateValue, other.DateValue);
-            Assert.AreEqual(DateAndTimeValue, other.DateAndTimeValue);
-
-            Assert.AreEqual(StringValue, other.StringValue);
-            Assert.AreEqual(WStringValue, other.WStringValue);
-
-            Assert.AreEqual(Nested, Nested);
-
-            CollectionAssert.AreEqual(IntArray, other.IntArray);
-            CollectionAssert.AreEqual(MultiDimensionArray, other.MultiDimensionArray);
-            CollectionAssert.AreEqual(ComplexArray, other.ComplexArray);
-            CollectionAssert.AreEqual(MultiDimensionComplexArray, other.MultiDimensionComplexArray);
-            return true;
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = -282460972;
-            hashCode = hashCode * -1521134295 + BoolValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + ByteValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + WordValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + DWordValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + LWordValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + ShortValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + IntValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + DIntValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + LongValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + UShortValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + UIntValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + UDIntValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + ULongValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + FloatValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + DoubleValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + TimeValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + TimeOfDay.GetHashCode();
-            hashCode = hashCode * -1521134295 + LTimeValue.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<DateTime>.Default.GetHashCode(DateValue);
-            hashCode = hashCode * -1521134295 + EqualityComparer<DateTime>.Default.GetHashCode(DateAndTimeValue);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StringValue);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(WStringValue);
-            //hashCode = hashCode * -1521134295 + EqualityComparer<short[]>.Default.GetHashCode(IntArray);
-            //hashCode = hashCode * -1521134295 + EqualityComparer<short[,,]>.Default.GetHashCode(MultiDimensionArray);
-            //hashCode = hashCode * -1521134295 + EqualityComparer<DUT_TestStruct2[]>.Default.GetHashCode(ComplexArray);
-            //hashCode = hashCode * -1521134295 + EqualityComparer<DUT_TestStruct2[,,]>.Default.GetHashCode(MultiDimensionComplexArray);
-            return hashCode;
+            AssertExtension.DUT_TestStructEquals(this, other);
+            return BoolValue == other.BoolValue
+                && ByteValue == other.ByteValue
+                && WordValue == other.WordValue
+                && DWordValue == other.DWordValue
+                && LWordValue == other.LWordValue
+                && ShortValue == other.ShortValue
+                && IntValue == other.IntValue
+                && DIntValue == other.DIntValue
+                && LongValue == other.LongValue
+                && UShortValue == other.UShortValue
+                && UIntValue == other.UIntValue
+                && UDIntValue == other.UDIntValue
+                && ULongValue == other.ULongValue
+                && FloatValue == other.FloatValue
+                && DoubleValue == other.DoubleValue
+                && TimeValue.Equals(other.TimeValue)
+                && TimeOfDay.Equals(other.TimeOfDay)
+                && LTimeValue.Equals(other.LTimeValue)
+                && DateValue.Equals(other.DateValue)
+                && DateAndTimeValue.Equals(other.DateAndTimeValue)
+                && StringValue == other.StringValue && WStringValue == other.WStringValue
+                && EqualityComparer<DUT_TestStruct2>.Default.Equals(Nested, other.Nested)
+                && IntArray.SequenceEqual(other.IntArray)
+                && MultiDimensionArray.SequenceEqual<short>(other.MultiDimensionArray)
+                && ComplexArray.SequenceEqual(other.ComplexArray)
+                && MultiDimensionComplexArray.SequenceEqual<DUT_TestStruct2>(other.MultiDimensionComplexArray);
         }
 
         public override string ToString()
-        {
-            return new StringBuilder()
+            => new StringBuilder()
                 .Append("{ ")
                 .Append(BoolValue)
                 .Append(", ")
@@ -330,79 +285,42 @@ namespace PlcInterface.OpcUa.Tests.DataTypes
                 .Append(Nested)
                 .Append(" }")
                 .ToString();
-        }
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 0)]
-    internal struct DUT_TestStruct2
-    {
-        public static DUT_TestStruct2 Default => new DUT_TestStruct2()
-        {
-            ByteValue = byte.MaxValue,
-            WordValue = ushort.MaxValue,
-            DWordValue = uint.MaxValue,
-            LWordValue = ulong.MaxValue,
-        };
-
-        public byte ByteValue
-        {
-            get; set;
-        }
-
-        public ushort WordValue
-        {
-            get; set;
-        }
-
-        public uint DWordValue
-        {
-            get; set;
-        }
-
-        public ulong LWordValue
-        {
-            get; set;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is DUT_TestStruct2))
-            {
-                return false;
-            }
-
-            var other = (DUT_TestStruct2)obj;
-            Assert.AreEqual(ByteValue, other.ByteValue);
-            Assert.AreEqual(WordValue, other.WordValue);
-            Assert.AreEqual(DWordValue, other.DWordValue);
-            Assert.AreEqual(LWordValue, other.LWordValue);
-
-            return true;
-        }
 
         public override int GetHashCode()
         {
-            var hashCode = -1110352730;
+            var hashCode = 1307849462;
+            hashCode = hashCode * -1521134295 + BoolValue.GetHashCode();
             hashCode = hashCode * -1521134295 + ByteValue.GetHashCode();
             hashCode = hashCode * -1521134295 + WordValue.GetHashCode();
             hashCode = hashCode * -1521134295 + DWordValue.GetHashCode();
             hashCode = hashCode * -1521134295 + LWordValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + ShortValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + IntValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + DIntValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + LongValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + UShortValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + UIntValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + UDIntValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + ULongValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + FloatValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + DoubleValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + TimeValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + TimeOfDay.GetHashCode();
+            hashCode = hashCode * -1521134295 + LTimeValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + DateValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + DateAndTimeValue.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StringValue);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(WStringValue);
+            hashCode = hashCode * -1521134295 + Nested.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<short[]>.Default.GetHashCode(IntArray);
+            hashCode = hashCode * -1521134295 + EqualityComparer<short[,,]>.Default.GetHashCode(MultiDimensionArray);
+            hashCode = hashCode * -1521134295 + EqualityComparer<DUT_TestStruct2[]>.Default.GetHashCode(ComplexArray);
+            hashCode = hashCode * -1521134295 + EqualityComparer<DUT_TestStruct2[,,]>.Default.GetHashCode(MultiDimensionComplexArray);
             return hashCode;
         }
 
-        public override string ToString()
-        {
-            return new StringBuilder()
-                .Append("{ ")
-                .Append(ByteValue)
-                .Append(", ")
-                .Append(WordValue)
-                .Append(", ")
-                .Append(DWordValue)
-                .Append(", ")
-                .Append(LWordValue)
-                .Append(" }")
-                .ToString();
-        }
+        public static bool operator ==(DUT_TestStruct left, DUT_TestStruct right) => left.Equals(right);
+
+        public static bool operator !=(DUT_TestStruct left, DUT_TestStruct right) => !(left == right);
     }
 }

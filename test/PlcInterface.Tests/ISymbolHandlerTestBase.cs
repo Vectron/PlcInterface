@@ -1,31 +1,22 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 
 namespace PlcInterface.Tests
 {
     public abstract class ISymbolHandlerTestBase : ConnectionBase
     {
-        public abstract IEnumerable<object[]> Data
-        {
-            get;
-        }
-
         [TestMethod]
-        public void GetSymbolInfo()
+        [DynamicData(nameof(Settings.GetMonitorData), typeof(Settings), DynamicDataSourceType.Method)]
+        public void GetSymbolInfo(string ioName)
         {
-            foreach (var item in Data)
-            {
-                // Arrange
-                var symbolHandler = GetSymbolHandler();
-                var ioName = item[0] as string;
+            // Arrange
+            var symbolHandler = GetSymbolHandler();
 
-                // Act
-                var symbol = symbolHandler.GetSymbolinfo(ioName);
+            // Act
+            var symbol = symbolHandler.GetSymbolinfo(ioName);
 
-                // Assert
-                Assert.IsNotNull(symbol);
-                Assert.AreEqual(ioName, symbol.Name);
-            }
+            // Assert
+            Assert.IsNotNull(symbol);
+            Assert.AreEqual(ioName, symbol.Name);
         }
 
         [TestMethod]
@@ -35,19 +26,16 @@ namespace PlcInterface.Tests
             var symbolHandler = GetSymbolHandler();
 
             // Act
+            var count = symbolHandler.AllSymbols.Count;
 
             // Assert
-            Assert.IsTrue(symbolHandler.AllSymbols.Count > 0);
+            Assert.IsTrue(count > 0);
         }
 
         protected override IMonitor GetMonitor()
-        {
-            throw new System.NotImplementedException();
-        }
+            => throw new System.NotImplementedException();
 
         protected override IReadWrite GetReadWrite()
-        {
-            throw new System.NotImplementedException();
-        }
+            => throw new System.NotImplementedException();
     }
 }

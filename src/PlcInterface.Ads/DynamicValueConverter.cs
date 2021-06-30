@@ -24,21 +24,35 @@ namespace PlcInterface.Ads
                     throw new InvalidOperationException($"{property.Name} is not found in the PLC type");
                 }
 
-                if (!(result is DynamicObject resultDynamicObject))
+                if (result is DynamicValue resultDynamicObject)
+                {
+                    if (property.PropertyType.IsArray)
+                    {
+                        var arrayValue = ConvertArray(resultDynamicObject, property.PropertyType);
+                        property.SetValue(destination, arrayValue);
+                        continue;
+                    }
+
+                    var value = ConvertFrom(resultDynamicObject, property.PropertyType);
+                    property.SetValue(destination, value);
+                }
+                else if (result is TwinCAT.PlcOpen.DateBase dateBase)
+                {
+                    property.SetValue(destination, dateBase.Date);
+                }
+                else if (result is TwinCAT.PlcOpen.TimeBase timeBase)
+                {
+                    property.SetValue(destination, timeBase.Time);
+                }
+                else if (result is TwinCAT.PlcOpen.LTimeBase lTimeBase)
+                {
+                    property.SetValue(destination, lTimeBase.Time);
+                }
+                else
                 {
                     property.SetValue(destination, result);
                     continue;
                 }
-
-                if (property.PropertyType.IsArray)
-                {
-                    var arrayValue = ConvertArray(resultDynamicObject, property.PropertyType);
-                    property.SetValue(destination, arrayValue);
-                    continue;
-                }
-
-                var value = ConvertFrom(resultDynamicObject, property.PropertyType);
-                property.SetValue(destination, value);
             }
             return destination;
         }

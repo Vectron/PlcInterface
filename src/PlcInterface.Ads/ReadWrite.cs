@@ -45,7 +45,14 @@ namespace PlcInterface.Ads
         {
             var symbolInfo = symbolHandler.GetSymbolinfo(ioName) as SymbolInfo;
             var adsSymbol = symbolInfo?.Symbol as IValueSymbol;
-            return adsSymbol?.ReadValue();
+            var value = adsSymbol?.ReadValue();
+
+            if (value is DynamicValue dynamicObject)
+            {
+                return dynamicObject.CleanDynamic();
+            }
+
+            return value;
         }
 
         public T Read<T>(string ioName)
@@ -61,7 +68,13 @@ namespace PlcInterface.Ads
 
             if (adsSymbol?.IsPrimitiveType == true)
             {
-                return (T)Read(ioName);
+                var value = Read(ioName);
+                if (value is T unboxed)
+                {
+                    return unboxed;
+                }
+
+                return (T)Convert.ChangeType(value, typeof(T));
             }
 
             if (symbolInfo?.Symbol is DynamicSymbol dynamicSymbol)
@@ -105,7 +118,11 @@ namespace PlcInterface.Ads
         {
             var value = Read(ioName);
 
-            if (value is DynamicObject dynamicSymbol)
+            if (value is DynamicObject dynamicObject)
+            {
+                return dynamicObject.CleanDynamic();
+            }
+            else if (value is ExpandoObject)
             {
                 return value;
             }

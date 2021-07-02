@@ -38,7 +38,6 @@ namespace PlcInterface.Tests
 
         [DataTestMethod]
         [DynamicData(nameof(Settings.GetReadData), typeof(Settings), DynamicDataSourceType.Method)]
-        [DynamicData(nameof(Settings.GetReadDataComplex), typeof(Settings), DynamicDataSourceType.Method)]
         public void ReadGeneric(string ioName, object value)
         {
             var instanceType = value.GetType();
@@ -48,9 +47,8 @@ namespace PlcInterface.Tests
             _ = method.Invoke(this, new object[] { ioName, value });
         }
 
-        [TestMethod]
+        [DataTestMethod]
         [DynamicData(nameof(Settings.GetReadData), typeof(Settings), DynamicDataSourceType.Method)]
-        [DynamicData(nameof(Settings.GetReadDataComplex), typeof(Settings), DynamicDataSourceType.Method)]
         public async Task ReadGenericAsync(string ioName, object value)
         {
             var instanceType = value.GetType();
@@ -83,8 +81,8 @@ namespace PlcInterface.Tests
                     break;
                 }
 
-                Assert.That.ObjectEquals(dataEnumerator.Current.Key, valueEnumerator.Current.Key);
-                Assert.That.ObjectEquals(dataEnumerator.Current.Value, valueEnumerator.Current.Value);
+                Assert.AreEqual(dataEnumerator.Current.Key, valueEnumerator.Current.Key);
+                Assert.That.ObjectEquals(dataEnumerator.Current.Value, valueEnumerator.Current.Value, dataEnumerator.Current.Key);
             }
         }
 
@@ -111,8 +109,8 @@ namespace PlcInterface.Tests
                     break;
                 }
 
-                Assert.That.ObjectEquals(dataEnumerator.Current.Key, valueEnumerator.Current.Key);
-                Assert.That.ObjectEquals(dataEnumerator.Current.Value, valueEnumerator.Current.Value);
+                Assert.AreEqual(dataEnumerator.Current.Key, valueEnumerator.Current.Key);
+                Assert.That.ObjectEquals(dataEnumerator.Current.Value, valueEnumerator.Current.Value, dataEnumerator.Current.Key);
             }
         }
 
@@ -127,7 +125,7 @@ namespace PlcInterface.Tests
             var value = readWrite.Read(ioName);
 
             // Assert
-            Assert.That.ObjectEquals(expectedValue, value);
+            Assert.That.ObjectEquals(expectedValue, value, ioName);
         }
 
         [DataTestMethod]
@@ -141,7 +139,7 @@ namespace PlcInterface.Tests
             var value = await readWrite.ReadAsync(ioName);
 
             // Assert
-            Assert.That.ObjectEquals(expectedValue, value);
+            Assert.That.ObjectEquals(expectedValue, value, ioName);
         }
 
         protected override IMonitor GetMonitor()
@@ -156,7 +154,7 @@ namespace PlcInterface.Tests
             var value = readWrite.Read<T>(ioName);
 
             // Assert
-            Assert.That.ObjectEquals(expectedValue, value);
+            Assert.That.ObjectEquals(expectedValue, value, ioName);
         }
 
         protected async Task ReadValueGenericHelperAsync<T>(string ioName, T expectedValue)
@@ -168,7 +166,7 @@ namespace PlcInterface.Tests
             var value = await readWrite.ReadAsync<T>(ioName);
 
             // Assert
-            Assert.That.ObjectEquals(expectedValue, value);
+            Assert.That.ObjectEquals(expectedValue, value, ioName);
         }
     }
 }

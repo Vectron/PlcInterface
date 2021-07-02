@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace PlcInterface.Tests.DataTypes
 {
@@ -60,6 +59,61 @@ namespace PlcInterface.Tests.DataTypes
                     { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
                     { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
                     { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
+                }
+            },
+        };
+
+        public static DUT_TestStruct Write => new DUT_TestStruct()
+        {
+            BoolValue = false,
+            ByteValue = byte.MinValue,
+            WordValue = ushort.MinValue,
+            DWordValue = uint.MinValue,
+            LWordValue = ulong.MinValue,
+            ShortValue = sbyte.MaxValue,
+            IntValue = short.MaxValue,
+            DIntValue = int.MaxValue,
+            LongValue = long.MaxValue,
+            UShortValue = byte.MinValue,
+            UIntValue = ushort.MinValue,
+            UDIntValue = uint.MinValue,
+            ULongValue = ulong.MinValue,
+            FloatValue = float.MaxValue,
+            DoubleValue = double.MaxValue,
+            TimeValue = TimeSpan.FromSeconds(3),
+            TimeOfDay = TimeSpan.FromHours(10),
+            LTimeValue = TimeSpan.FromTicks(100),
+            DateValue = new DateTimeOffset(2019, 02, 21, 00, 00, 00, TimeSpan.FromHours(1)),
+            DateAndTimeValue = new DateTimeOffset(2019, 02, 21, 12, 15, 10, TimeSpan.FromHours(1)),
+            StringValue = "new Test String",
+            WStringValue = "new Test WString",
+            Nested = DUT_TestStruct2.Write,
+            IntArray = new short[] { 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010 },
+            MultiDimensionArray = new short[,,]
+            {
+                {
+                    { 0100, 0200, 0300, 0400 },
+                    { 0500, 0600, 0700, 0800 },
+                    { 0900, 1000, 1100, 1200 },
+                },
+                {
+                    { 1300, 1400, 1500, 1600 },
+                    { 1700, 1800, 1900, 2000 },
+                    { 2100, 2200, 2300, 2400 },
+                },
+            },
+            ComplexArray = new DUT_TestStruct2[] { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+            MultiDimensionComplexArray = new DUT_TestStruct2[,,]
+            {
+                {
+                    { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                    { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                    { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                },
+                {
+                    { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                    { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                    { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
                 }
             },
         };
@@ -236,55 +290,6 @@ namespace PlcInterface.Tests.DataTypes
                 && ComplexArray.SequenceEqual(other.ComplexArray)
                 && MultiDimensionComplexArray.SequenceEqual<DUT_TestStruct2>(other.MultiDimensionComplexArray);
         }
-
-        public override string ToString()
-            => new StringBuilder()
-                .Append("{ ")
-                .Append(BoolValue)
-                .Append(", ")
-                .Append(ByteValue)
-                .Append(", ")
-                .Append(WordValue)
-                .Append(", ")
-                .Append(DWordValue)
-                .Append(", ")
-                .Append(LWordValue)
-                .Append(", ")
-                .Append(ShortValue)
-                .Append(", ")
-                .Append(IntValue)
-                .Append(", ")
-                .Append(DIntValue)
-                .Append(", ")
-                .Append(UShortValue)
-                .Append(", ")
-                .Append(UIntValue)
-                .Append(", ")
-                .Append(UDIntValue)
-                .Append(", ")
-                .Append(ULongValue)
-                .Append(", ")
-                .Append(FloatValue)
-                .Append(", ")
-                .Append(DoubleValue)
-                .Append(", ")
-                .Append(TimeValue)
-                .Append(", ")
-                .Append(TimeOfDay)
-                .Append(", ")
-                .Append(LTimeValue)
-                .Append(", ")
-                .Append(DateValue)
-                .Append(", ")
-                .Append(DateAndTimeValue)
-                .Append(", ")
-                .Append(StringValue)
-                .Append(", ")
-                .Append(WStringValue)
-                .Append(", ")
-                .Append(Nested)
-                .Append(" }")
-                .ToString();
 
         public override int GetHashCode()
         {

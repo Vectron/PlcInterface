@@ -46,7 +46,7 @@ namespace PlcInterface.Tests
 
             // Assert
             Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
-            Assert.That.ObjectEquals(readValue, newValueRead);
+            Assert.That.ObjectEquals(readValue, newValueRead, ioName);
         }
 
         [DataTestMethod]
@@ -64,7 +64,7 @@ namespace PlcInterface.Tests
 
             // Assert
             Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
-            Assert.That.ObjectEquals(readValue, newValueRead);
+            Assert.That.ObjectEquals(readValue, newValueRead, ioName);
         }
 
         [DataTestMethod]
@@ -114,10 +114,10 @@ namespace PlcInterface.Tests
                     break;
                 }
 
-                Assert.That.ObjectEquals(dataEnumerator.Current.Key, newValueEnumerator.Current.Key);
-                Assert.That.ObjectEquals(dataEnumerator.Current.Key, originalEnumerator.Current.Key);
+                Assert.AreEqual(dataEnumerator.Current.Key, newValueEnumerator.Current.Key);
+                Assert.AreEqual(dataEnumerator.Current.Key, originalEnumerator.Current.Key);
                 Assert.That.ObjectNotEquals(dataEnumerator.Current.Value, originalEnumerator.Current.Value, "Reset values in PLC");
-                Assert.That.ObjectEquals(dataEnumerator.Current.Value, newValueEnumerator.Current.Value);
+                Assert.That.ObjectEquals(dataEnumerator.Current.Value, newValueEnumerator.Current.Value, dataEnumerator.Current.Key);
             }
         }
 
@@ -150,10 +150,10 @@ namespace PlcInterface.Tests
                     break;
                 }
 
-                Assert.That.ObjectEquals(dataEnumerator.Current.Key, newValueEnumerator.Current.Key);
-                Assert.That.ObjectEquals(dataEnumerator.Current.Key, originalEnumerator.Current.Key);
+                Assert.AreEqual(dataEnumerator.Current.Key, newValueEnumerator.Current.Key);
+                Assert.AreEqual(dataEnumerator.Current.Key, originalEnumerator.Current.Key);
                 Assert.That.ObjectNotEquals(dataEnumerator.Current.Value, originalEnumerator.Current.Value, "Reset values in PLC");
-                Assert.That.ObjectEquals(dataEnumerator.Current.Value, newValueEnumerator.Current.Value);
+                Assert.That.ObjectEquals(dataEnumerator.Current.Value, newValueEnumerator.Current.Value, dataEnumerator.Current.Key);
             }
         }
 
@@ -172,7 +172,7 @@ namespace PlcInterface.Tests
 
             // Assert
             Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
-            Assert.That.ObjectEquals(readValue, newValueRead);
+            Assert.That.ObjectEquals(readValue, newValueRead, ioName);
         }
 
         protected async Task WriteValueGenericHelperAsync<T>(string ioName, T newValue, object readValue)
@@ -187,7 +187,7 @@ namespace PlcInterface.Tests
 
             // Assert
             Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
-            Assert.That.ObjectEquals(readValue, newValueRead);
+            Assert.That.ObjectEquals(readValue, newValueRead, ioName);
         }
     }
 }

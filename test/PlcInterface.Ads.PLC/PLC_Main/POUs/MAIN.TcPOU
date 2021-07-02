@@ -4,9 +4,8 @@
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
 	{attribute 'OPC.UA.DA' := '1'}
-	Reset: BOOL;
-	{attribute 'OPC.UA.DA' := '0'}
-	EmptyStruct: DUT_TestStruct;
+	Reset		: BOOL;
+	EmptyStruct	: DUT_TestStruct;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -42,20 +41,15 @@ END_VAR
 	
 	WriteTestData.EnumValue						:= 1;
 	
-	WriteTestData.IntArray[0]			 		:= 1000;
-	WriteTestData.IntArray[1]			 		:= 1001;
-	WriteTestData.IntArray[2]			 		:= 1002;
-	WriteTestData.IntArray[3]			 		:= 1003;
-	WriteTestData.IntArray[4]			 		:= 1004;
-	WriteTestData.IntArray[5]			 		:= 1005;
-	WriteTestData.IntArray[6]			 		:= 1006;
-	WriteTestData.IntArray[7]			 		:= 1007;
-	WriteTestData.IntArray[8]			 		:= 1008;
-	WriteTestData.IntArray[9]			 		:= 1009;
-	WriteTestData.IntArray[10]			 		:= 1010;
+	WriteTestData.IntArray				 		:= EmptyStruct.IntArray;	
+	WriteTestData.MultiDimensionArray			:= EmptyStruct.MultiDimensionArray;
+	WriteTestData.ComplexArray					:= EmptyStruct.ComplexArray;
+	WriteTestData.MultiDimensionComplexArray	:= EmptyStruct.MultiDimensionComplexArray;
 	
+	WriteTestData.Nested						:= EmptyStruct.Nested;
+	WriteTestData.Nested2						:= EmptyStruct.Nested;
 	WriteTestData.StructValue					:= EmptyStruct;
-	
+	WriteTestData.StructValue2					:= EmptyStruct;
 	
 	Reset := FALSE;
 END_IF]]></ST>
@@ -87,10 +81,13 @@ END_IF]]></ST>
       <LineId Id="63" Count="1" />
       <LineId Id="66" Count="1" />
       <LineId Id="69" Count="0" />
-      <LineId Id="73" Count="9" />
-      <LineId Id="70" Count="0" />
+      <LineId Id="97" Count="2" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="109" Count="1" />
       <LineId Id="11" Count="0" />
-      <LineId Id="85" Count="2" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="107" Count="0" />
+      <LineId Id="87" Count="0" />
       <LineId Id="12" Count="0" />
     </LineIds>
   </POU>

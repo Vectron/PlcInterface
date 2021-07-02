@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests.DataTypes
@@ -13,6 +12,14 @@ namespace PlcInterface.Tests.DataTypes
             WordValue = ushort.MaxValue,
             DWordValue = uint.MaxValue,
             LWordValue = ulong.MaxValue,
+        };
+
+        public static DUT_TestStruct2 Write => new DUT_TestStruct2()
+        {
+            ByteValue = byte.MinValue,
+            WordValue = ushort.MinValue,
+            DWordValue = uint.MinValue,
+            LWordValue = ulong.MinValue,
         };
 
         public byte ByteValue
@@ -60,18 +67,5 @@ namespace PlcInterface.Tests.DataTypes
             hashCode = (hashCode * -1521134295) + LWordValue.GetHashCode();
             return hashCode;
         }
-
-        public override string ToString()
-            => new StringBuilder()
-                .Append("{ ")
-                .Append(ByteValue)
-                .Append(", ")
-                .Append(WordValue)
-                .Append(", ")
-                .Append(DWordValue)
-                .Append(", ")
-                .Append(LWordValue)
-                .Append(" }")
-                .ToString();
     }
 }

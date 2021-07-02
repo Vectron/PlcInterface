@@ -23,18 +23,7 @@ namespace PlcInterface.Tests
             => GetMonitorData().Select(x => x[0]).Cast<string>();
 
         public static IEnumerable<object[]> GetReadData()
-        {
-            foreach (var keyValue in GetReadMultiple())
-            {
-                yield return new object[] { keyValue.Key, keyValue.Value };
-            }
-        }
-
-        public static IEnumerable<object[]> GetReadDataComplex()
-        {
-            yield return new object[] { "ReadTestData.StructValue", DUT_TestStruct.Default };
-            yield return new object[] { "ReadTestData.StructValue", DUT_TestClass.Default };
-        }
+            => GetReadMultiple().Select(kv => new object[] { kv.Key, kv.Value });
 
         public static Dictionary<string, object> GetReadMultiple()
             => new Dictionary<string, object>()
@@ -63,6 +52,37 @@ namespace PlcInterface.Tests
                 { "ReadTestData.WStringValue", "Test WString" },
                 { "ReadTestData.EnumValue", (short)TestEnum.second },
                 { "ReadTestData.IntArray", new short[] { 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010 } },
+                { "ReadTestData.MultiDimensionArray",  new short[,,]
+                    {
+                        {
+                            { 0100, 0200, 0300, 0400 },
+                            { 0500, 0600, 0700, 0800 },
+                            { 0900, 1000, 1100, 1200 },
+                        },
+                        {
+                            { 1300, 1400, 1500, 1600 },
+                            { 1700, 1800, 1900, 2000 },
+                            { 2100, 2200, 2300, 2400 },
+                        },
+                    }
+                },
+                { "ReadTestData.ComplexArray", new DUT_TestStruct2[] { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default } },
+                { "ReadTestData.MultiDimensionComplexArray", new DUT_TestStruct2[,,]
+                    {
+                        {
+                            { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
+                            { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
+                            { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
+                        },
+                        {
+                            { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
+                            { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
+                            { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
+                        }
+                    }
+                },
+                { "ReadTestData.StructValue", DUT_TestStruct.Default },
+                { "ReadTestData.StructValue2", DUT_TestClass.Default },
             };
 
         public static IEnumerable<object[]> GetWriteData()
@@ -107,6 +127,40 @@ namespace PlcInterface.Tests
                 { "WriteTestData.WStringValue", "new Test WString" },
                 { "WriteTestData.EnumValue", (short)TestEnum.third },
                 { "WriteTestData.IntArray", new short[] { 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010 } },
+                { "WriteTestData.MultiDimensionArray",  new short[,,]
+                    {
+                        {
+                            { 01000, 02000, 03000, 04000 },
+                            { 05000, 06000, 07000, 08000 },
+                            { 09000, 10000, 11000, 12000 },
+                        },
+                        {
+                            { 13000, 14000, 15000, 16000 },
+                            { 17000, 18000, 19000, 20000 },
+                            { 21000, 22000, 23000, 24000 },
+                        },
+                    }
+                },
+                { "WriteTestData.ComplexArray", new DUT_TestStruct2[] { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write } },
+                { "WriteTestData.MultiDimensionComplexArray", new DUT_TestStruct2[,,]
+                    {
+                        {
+                            { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                            { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                            { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                        },
+                        {
+                            { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                            { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                            { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                        }
+                    }
+                },
+                // TODO not supported by ADS (nesting problem)
+                //{ "WriteTestData.StructValue", DUT_TestStruct.Write },
+                //{ "WriteTestData.StructValue2", DUT_TestClass.Write },
+                { "WriteTestData.Nested", DUT_TestStruct2.Write },
+                { "WriteTestData.Nested2", DUT_TestClass2.Write },
             };
     }
 }

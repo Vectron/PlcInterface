@@ -147,7 +147,7 @@ namespace PlcInterface.Tests
 
         private async Task SubscribeCheckAsync(IList<bool> results, int expectedCount)
         {
-            await Task.Delay(500);
+            await Task.Delay(1000);
             Assert.AreEqual(expectedCount, results.Count);
             foreach (var result in results)
             {

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using PlcInterface.Ads.Extensions;
 using TwinCAT.Ads;
 using TwinCAT.Ads.SumCommand;
 using TwinCAT.TypeSystem;
@@ -39,107 +41,80 @@ namespace PlcInterface.Ads
             return ioNames
                 .Zip(result, (ioName, value) =>
                 {
-                    if (value is DynamicValue dynamicObject)
-                    {
-                        return (ioName, dynamicObject.CleanDynamic());
-                    }
-
-                    return (ioName, value);
+                    var adsSymbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate().Symbol as IValueSymbol;
+                    var fixedValue = FixType(value, adsSymbol);
+                    return (ioName, fixedValue);
                 })
-                .ToDictionary(x => x.ioName, x => x.Item2);
+                .ToDictionary(x => x.ioName, x => x.fixedValue);
         }
 
         public object Read(string ioName)
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName) as SymbolInfo;
-            var adsSymbol = symbolInfo?.Symbol as IValueSymbol;
-            var value = adsSymbol?.ReadValue();
-
-            if (value is DynamicValue dynamicObject)
-            {
-                return dynamicObject.CleanDynamic();
-            }
-
-            return value;
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
+            var adsSymbol = symbolInfo.Symbol as IValueSymbol;
+            var value = adsSymbol.ReadValue();
+            return FixType(value, adsSymbol);
         }
 
         public T Read<T>(string ioName)
         {
             var symbolInfo = symbolHandler.GetSymbolinfo(ioName) as SymbolInfo;
-            var adsSymbol = symbolInfo?.Symbol as ISymbol;
-
-            if (adsSymbol.Category == DataTypeCategory.Enum
-                && typeof(T).IsEnum)
-            {
-                return (T)Enum.ToObject(typeof(T), Read(ioName));
-            }
-
-            if (adsSymbol?.IsPrimitiveType == true)
-            {
-                var value = Read(ioName);
-                if (value is T unboxed)
-                {
-                    return unboxed;
-                }
-
-                return (T)Convert.ChangeType(value, typeof(T));
-            }
-
-            if (symbolInfo?.Symbol is DynamicSymbol dynamicSymbol)
-            {
-                var value = dynamicSymbol.ReadValue();
-
-                if (value is DynamicObject dynamicObject)
-                {
-                    return (T)dynamicValueConverter.ConvertFrom(dynamicObject, typeof(T));
-                }
-                else if (value is T requestedType)
-                {
-                    return requestedType;
-                }
-                else
-                {
-                    throw new SymbolException($"Unable to convert type {value}");
-                }
-            }
-
-            if (symbolInfo?.Symbol is IValueAnySymbol valueAnySymbol)
-            {
-                var destination = Activator.CreateInstance(typeof(T));
-                valueAnySymbol.UpdateAnyValue(ref destination);
-                return (T)destination;
-            }
-
-            throw new NotSupportedException($"Unable to read {ioName} as {typeof(T)}");
+            var adsSymbol = symbolInfo?.Symbol as IValueSymbol;
+            var value = adsSymbol?.ReadValue();
+            return FixType<T>(value);
         }
 
         public Task<object> ReadAsync(string ioName)
-            => Task.Run(() => Read(ioName));
+        {
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
+            var adsSymbol = symbolInfo?.Symbol as IValueSymbol;
+            return adsSymbol.ReadValueAsync(CancellationToken.None).ContinueWith(x => FixType(x.Result.Value, adsSymbol));
+        }
 
         public Task<T> ReadAsync<T>(string ioName)
-            => Task.Run(() => Read<T>(ioName));
+        {
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
+            var adsSymbol = symbolInfo?.Symbol as IValueSymbol;
+            return adsSymbol.ReadValueAsync(CancellationToken.None).ContinueWith(x => FixType<T>(x.Result.Value));
+        }
 
         public Task<IDictionary<string, object>> ReadAsync(IEnumerable<string> ioNames)
-            => Task.Run(() => Read(ioNames));
+        {
+            var client = connection.GetConnectedClient();
+            var tcSymbols = ioNames
+                .Select(x => symbolHandler.GetSymbolinfo(x))
+                .Cast<SymbolInfo>()
+                .Select(x => x.Symbol)
+                .ToList();
+
+            var sumReader = new SumSymbolRead(client, tcSymbols);
+            return sumReader.ReadAsync(CancellationToken.None).ContinueWith(t =>
+            {
+                var dictionary = ioNames
+                    .Zip(t.Result.Values, (ioName, value) =>
+                    {
+                        var adsSymbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate().Symbol as IValueSymbol;
+                        var fixedValue = FixType(value, adsSymbol);
+                        return (ioName, fixedValue);
+                    })
+                    .ToDictionary(x => x.ioName, x => x.fixedValue);
+
+                return (IDictionary<string, object>)dictionary;
+            });
+        }
 
         public dynamic ReadDynamic(string ioName)
         {
             var value = Read(ioName);
-
-            if (value is DynamicObject dynamicObject)
-            {
-                return dynamicObject.CleanDynamic();
-            }
-            else if (value is ExpandoObject)
-            {
-                return value;
-            }
-
-            throw new NotImplementedException("dynamic values are only supported when read mode is set to dynamic");
+            return value is ExpandoObject
+                ? value
+                : throw new NotImplementedException("dynamic values are only supported when read mode is set to dynamic");
         }
 
         public Task<dynamic> ReadDynamicAsync(string ioName)
-            => Task.Run(() => ReadDynamic(ioName));
+            => ReadAsync(ioName).ContinueWith(x => x.Result is ExpandoObject
+                ? x.Result
+                : throw new NotImplementedException("dynamic values are only supported when read mode is set to dynamic"));
 
         public void ToggleBool(string ioName)
         {
@@ -155,7 +130,6 @@ namespace PlcInterface.Ads
                 .Cast<SymbolInfo>()
                 .Select(x => x.Symbol)
                 .ToList();
-
             var sumReader = new SumSymbolWrite(client, tcSymbols);
             sumReader.Write(namesValues.Values.ToArray());
         }
@@ -163,14 +137,63 @@ namespace PlcInterface.Ads
         public void Write<T>(string ioName, T value)
         {
             var symbolInfo = symbolHandler.GetSymbolinfo(ioName) as SymbolInfo;
-            var adsSymbol = symbolInfo?.Symbol as IValueSymbol;
+            var adsSymbol = symbolInfo.Symbol as IValueSymbol;
             adsSymbol.WriteValue(value);
         }
 
         public Task WriteAsync(IDictionary<string, object> namesValues)
-            => Task.Run(() => Write(namesValues));
+        {
+            var client = connection.GetConnectedClient();
+            var tcSymbols = namesValues
+                .Select(x => symbolHandler.GetSymbolinfo(x.Key))
+                .Cast<SymbolInfo>()
+                .Select(x => x.Symbol)
+                .ToList();
+            var sumReader = new SumSymbolWrite(client, tcSymbols);
+            return sumReader.WriteAsync(namesValues.Values.ToArray(), CancellationToken.None);
+        }
 
         public Task WriteAsync<T>(string ioName, T value)
-            => Task.Run(() => Write(ioName, value));
+        {
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName) as SymbolInfo;
+            var adsSymbol = symbolInfo.Symbol as IValueSymbol;
+            return adsSymbol.WriteValueAsync(value, CancellationToken.None);
+        }
+
+        private object FixType(object value, IValueSymbol valueSymbol)
+        {
+            if (value is DynamicValue dynamicObject)
+            {
+                return dynamicObject.CleanDynamic();
+            }
+
+            if (valueSymbol.Category == DataTypeCategory.Enum
+                && value is short)
+            {
+                return Convert.ToInt32(value);
+            }
+
+            return value;
+        }
+
+        private T FixType<T>(object value)
+        {
+            if (typeof(T).IsEnum)
+            {
+                return (T)Enum.ToObject(typeof(T), value);
+            }
+
+            if (value is T unboxed)
+            {
+                return unboxed;
+            }
+
+            if (value is DynamicObject dynamicObject)
+            {
+                return (T)dynamicValueConverter.ConvertFrom(dynamicObject, typeof(T));
+            }
+
+            return (T)Convert.ChangeType(value, typeof(T));
+        }
     }
 }

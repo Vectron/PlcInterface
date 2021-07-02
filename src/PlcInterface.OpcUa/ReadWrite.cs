@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-using Opc.Ua;
-using Opc.Ua.Client;
-using PlcInterface.OpcUa.Dynamic;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Opc.Ua;
+using Opc.Ua.Client;
 
 namespace PlcInterface.OpcUa
 {
@@ -34,7 +34,7 @@ namespace PlcInterface.OpcUa
         public IDictionary<string, object> Read(IEnumerable<string> ioNames)
         {
             var nodesToRead = ioNames
-                .Select(x => symbolHandler.GetSymbolinfo(x))
+                .SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler))
                 .Where(x => x is SymbolInfo)
                 .Cast<SymbolInfo>()
                 .Select(x => x.Handle)
@@ -43,33 +43,63 @@ namespace PlcInterface.OpcUa
             var nodesTypes = Enumerable.Repeat(typeof(object), nodesToRead.Count).ToList();
 
             var session = client.GetConnectedClient();
-            session.ReadValues(nodesToRead, nodesTypes, out List<object> values, out List<ServiceResult> errors);
+            session.ReadValues(nodesToRead, nodesTypes, out var values, out var errors);
 
-            return ioNames
-                .Zip(values, (name, value) => (name, value))
-                .Zip(errors, (nv, error) => (nv.name, nv.value, error))
-                .Where(x => ServiceResult.IsGood(x.error))
-                .ToDictionary(nve => nve.name, nve => nve.value);
+            var valueEnumerator = values.Zip(errors, (value, error) => new DataValue(error.StatusCode) { Value = value }).GetEnumerator();
+            var result = new Dictionary<string, object>();
+            foreach (var ioName in ioNames)
+            {
+                var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
+                var value = CreateDynamic(symbolInfo, valueEnumerator);
+                result.Add(ioName, value);
+            }
+
+            return result;
         }
 
         public T Read<T>(string ioName)
         {
-            var session = client.GetConnectedClient();
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
-            return (T)session.ReadValue(symbol.Handle).GetValue(typeof(T));
+            if (symbol.ChildSymbols.Count > 0)
+            {
+                var dynamic = ReadDynamic(ioName);
+                return (T)FixType(dynamic, typeof(T));
+            }
+
+            var session = client.GetConnectedClient();
+            var value = session.ReadValue(symbol.Handle);
+            return (T)FixType(value.Value, typeof(T));
         }
 
         public object Read(string ioName)
         {
-            var session = client.GetConnectedClient();
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
-            return session.ReadValue(symbol.Handle).Value;
+            if (symbol.ChildSymbols.Count > 0)
+            {
+                return ReadDynamic(ioName);
+            }
+
+            var session = client.GetConnectedClient();
+            var value = session.ReadValue(symbol.Handle);
+            if (value.Value is DateTime dateTime)
+            {
+                var specified = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
+                return new DateTimeOffset(specified);
+            }
+
+            if (value.Value is Matrix matrix)
+            {
+                return matrix.ToArray();
+            }
+
+            return value.Value;
         }
 
         public Task<IDictionary<string, object>> ReadAsync(IEnumerable<string> ioNames)
         {
             var querry = ioNames
-                .Select(x => symbolHandler.GetSymbolinfo(x))
+                .SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler))
+                .Where(x => x.ChildSymbols.Count == 0)
                 .Where(x => x is SymbolInfo)
                 .Cast<SymbolInfo>()
                 .Select(x => new ReadValueId()
@@ -79,7 +109,6 @@ namespace PlcInterface.OpcUa
                 });
 
             var session = client.GetConnectedClient();
-
             var nodesToRead = new ReadValueIdCollection(querry);
             var taskCompletionSource = new TaskCompletionSource<IDictionary<string, object>>();
 
@@ -92,14 +121,18 @@ namespace PlcInterface.OpcUa
                 {
                     try
                     {
-                        var responseHeader = session.EndRead(ar, out DataValueCollection dataValues, out DiagnosticInfoCollection diagnosticInfos);
+                        var responseHeader = session.EndRead(ar, out var dataValues, out var diagnosticInfos);
                         var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                         ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, ioNames);
 
-                        var result = ioNames
-                                .Zip(dataValues, (name, value) => (name, value.Value, value.StatusCode))
-                                .Where(x => ServiceResult.IsGood(x.StatusCode))
-                                .ToDictionary(nve => nve.name, nve => nve.Value);
+                        var valueEnumerator = dataValues.GetEnumerator() as IEnumerator<DataValue>;
+                        var result = new Dictionary<string, object>();
+                        foreach (var ioName in ioNames)
+                        {
+                            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
+                            var value = CreateDynamic(symbolInfo, valueEnumerator);
+                            result.Add(ioName, value);
+                        }
 
                         taskCompletionSource.TrySetResult(result);
                     }
@@ -115,8 +148,13 @@ namespace PlcInterface.OpcUa
 
         public Task<object> ReadAsync(string ioName)
         {
-            var session = client.GetConnectedClient();
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
+            if (symbol.ChildSymbols.Count > 0)
+            {
+                return ReadDynamicAsync(ioName);
+            }
+
+            var session = client.GetConnectedClient();
             var nodesToRead = new ReadValueIdCollection
             {
                 new ReadValueId()
@@ -140,6 +178,18 @@ namespace PlcInterface.OpcUa
                         var val = dataValues.FirstOrDefault();
                         var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                         ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
+
+                        if (val.Value is DateTime dateTime)
+                        {
+                            var specified = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
+                            taskCompletionSource.TrySetResult(new DateTimeOffset(specified));
+                        }
+
+                        if (val.Value is Matrix matrix)
+                        {
+                            taskCompletionSource.TrySetResult(matrix.ToArray());
+                        }
+
                         taskCompletionSource.TrySetResult(val.Value);
                     }
                     catch (Exception ex)
@@ -154,8 +204,13 @@ namespace PlcInterface.OpcUa
 
         public Task<T> ReadAsync<T>(string ioName)
         {
-            var session = client.GetConnectedClient();
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
+            if (symbol.ChildSymbols.Count > 0)
+            {
+                return ReadDynamicAsync(ioName).ContinueWith(x => (T)FixType(x.Result, typeof(T)));
+            }
+
+            var session = client.GetConnectedClient();
             var nodesToRead = new ReadValueIdCollection
             {
                 new ReadValueId()
@@ -180,11 +235,11 @@ namespace PlcInterface.OpcUa
                         var val = dataValues.FirstOrDefault();
                         var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                         ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
-                        taskCompletionSource.TrySetResult((T)val.GetValue(typeof(T)));
+                        taskCompletionSource.SetResult((T)FixType(val.Value, typeof(T)));
                     }
                     catch (Exception ex)
                     {
-                        taskCompletionSource.TrySetException(ex);
+                        taskCompletionSource.SetException(ex);
                     }
                 },
                 null);
@@ -198,7 +253,20 @@ namespace PlcInterface.OpcUa
 
             if (symbol.ChildSymbols.Count > 0)
             {
-                var collection = new DynamicCollection();
+                if (symbol.IsArray)
+                {
+                    var array = Array.CreateInstance(typeof(ExpandoObject), symbol.ArrayBounds);
+                    foreach (var childSymbol in symbol.ChildSymbols)
+                    {
+                        var value = ReadDynamic(childSymbol);
+                        var indices = symbolHandler.GetSymbolinfo(childSymbol).ConvertAndValidate().Indices;
+                        array.SetValue(value, indices);
+                    }
+
+                    return array;
+                }
+
+                var collection = new ExpandoObject() as IDictionary<string, object>;
                 foreach (var childSymbol in symbol.ChildSymbols)
                 {
                     var value = ReadDynamic(childSymbol);
@@ -231,12 +299,15 @@ namespace PlcInterface.OpcUa
         public void Write(IDictionary<string, object> namesValues)
         {
             var session = client.GetConnectedClient();
-            var querry = namesValues.Select(x => new WriteValue()
-            {
-                NodeId = symbolHandler.GetSymbolinfo(x.Key).ConvertAndValidate().Handle,
-                AttributeId = Attributes.Value,
-                Value = new DataValue(new Variant(x.Value))
-            });
+            var querry = namesValues
+                .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
+                .Select(x => (x.SymbolInfo.ConvertAndValidate(), x.Value))
+                .Select(x => new WriteValue()
+                {
+                    NodeId = x.Item1.Handle,
+                    AttributeId = Attributes.Value,
+                    Value = new DataValue(ConvertToOpcType(x.Value, x.Item1.BuiltInType))
+                });
 
             var nodesToWrite = new WriteValueCollection(querry);
 
@@ -247,7 +318,6 @@ namespace PlcInterface.OpcUa
                 out DiagnosticInfoCollection diagnosticInfos);
 
             ValidateResponse(nodesToWrite, responseHeader, statusCodes, diagnosticInfos, namesValues.Keys);
-            Task.Delay(500).Wait();
         }
 
         public void Write<T>(string ioName, T value)
@@ -256,12 +326,15 @@ namespace PlcInterface.OpcUa
         public Task WriteAsync(IDictionary<string, object> namesValues)
         {
             var session = client.GetConnectedClient();
-            var querry = namesValues.Select(x => new WriteValue()
-            {
-                NodeId = symbolHandler.GetSymbolinfo(x.Key).ConvertAndValidate().Handle,
-                AttributeId = Attributes.Value,
-                Value = new DataValue(new Variant(x.Value))
-            });
+            var querry = namesValues
+                 .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
+                 .Select(x => (x.SymbolInfo.ConvertAndValidate(), x.Value))
+                 .Select(x => new WriteValue()
+                 {
+                     NodeId = x.Item1.Handle,
+                     AttributeId = Attributes.Value,
+                     Value = new DataValue(ConvertToOpcType(x.Value, x.Item1.BuiltInType))
+                 });
 
             var nodesToWrite = new WriteValueCollection(querry);
             var taskCompletionSource = new TaskCompletionSource<bool>();
@@ -301,6 +374,195 @@ namespace PlcInterface.OpcUa
 
                 disposedValue = true;
             }
+        }
+
+        private Variant ConvertToOpcType(object value, BuiltInType builtInType)
+        {
+            if (value is DateTimeOffset dateTimeOffset)
+            {
+                var specified = DateTime.SpecifyKind(dateTimeOffset.DateTime, DateTimeKind.Utc);
+                return new Variant(specified);
+            }
+            else if (value is TimeSpan timeSpan)
+            {
+                var ticks = timeSpan.Ticks;
+                var seconds = timeSpan.TotalSeconds;
+                switch (builtInType)
+                {
+                    case BuiltInType.Int32:
+                        return new Variant((int)seconds);
+
+                    case BuiltInType.UInt32:
+                        return new Variant((uint)seconds);
+
+                    case BuiltInType.Int64:
+                        return new Variant(ticks);
+
+                    case BuiltInType.UInt64:
+                        return new Variant((ulong)ticks);
+
+                    case BuiltInType.Float:
+                        return new Variant((float)seconds);
+
+                    case BuiltInType.Double:
+                        return new Variant(seconds);
+
+                    case BuiltInType.Null:
+                    case BuiltInType.Boolean:
+                    case BuiltInType.SByte:
+                    case BuiltInType.Byte:
+                    case BuiltInType.Int16:
+                    case BuiltInType.UInt16:
+                    case BuiltInType.String:
+                    case BuiltInType.DateTime:
+                    case BuiltInType.DataValue:
+                    case BuiltInType.Enumeration:
+                    case BuiltInType.Number:
+                    case BuiltInType.Integer:
+                    case BuiltInType.UInteger:
+                    case BuiltInType.Guid:
+                    case BuiltInType.ByteString:
+                    case BuiltInType.XmlElement:
+                    case BuiltInType.NodeId:
+                    case BuiltInType.ExpandedNodeId:
+                    case BuiltInType.StatusCode:
+                    case BuiltInType.QualifiedName:
+                    case BuiltInType.LocalizedText:
+                    case BuiltInType.ExtensionObject:
+                    case BuiltInType.Variant:
+                    case BuiltInType.DiagnosticInfo:
+                    default:
+                        break;
+                }
+            }
+            else if (builtInType == BuiltInType.Enumeration)
+            {
+                return new Variant(Convert.ToInt32(value));
+            }
+            return new Variant(value);
+        }
+
+        private object CreateDynamic(SymbolInfo symbolInfo, IEnumerator<DataValue> valueEnumerator)
+        {
+            if (symbolInfo.ChildSymbols.Count == 0)
+            {
+                if (valueEnumerator.MoveNext() && ServiceResult.IsGood(valueEnumerator.Current.StatusCode))
+                {
+                    if (valueEnumerator.Current.Value is Matrix matrixValue)
+                    {
+                        return matrixValue.ToArray();
+                    }
+
+                    return valueEnumerator.Current.Value;
+                }
+            }
+
+            if (symbolInfo.IsArray)
+            {
+                var array = Array.CreateInstance(typeof(ExpandoObject), symbolInfo.ArrayBounds);
+                foreach (var childSymbolName in symbolInfo.ChildSymbols)
+                {
+                    var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName).ConvertAndValidate();
+                    var value = CreateDynamic(childSymbolInfo, valueEnumerator);
+                    var indices = childSymbolInfo.Indices;
+                    array.SetValue(value, indices);
+                }
+
+                return array;
+            }
+
+            var collection = new ExpandoObject() as IDictionary<string, object>;
+            foreach (var childSymbolName in symbolInfo.ChildSymbols)
+            {
+                var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName).ConvertAndValidate();
+                var value = CreateDynamic(childSymbolInfo, valueEnumerator);
+                var shortName = childSymbolInfo.ShortName;
+                collection.Add(shortName, value);
+            }
+            return collection;
+        }
+
+        private object FixType(object value, Type targetType)
+        {
+            if (value == null)
+            {
+                return value;
+            }
+
+            if (value.GetType() == targetType)
+            {
+                return value;
+            }
+
+            if (targetType == typeof(DateTimeOffset) && value is DateTime dateTime)
+            {
+                var specified = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
+                return new DateTimeOffset(specified);
+            }
+
+            if (targetType == typeof(TimeSpan))
+            {
+                if (value.GetType() == typeof(ulong))
+                {
+                    var ticks = Convert.ToInt64(value) / 100; // ticks are in 100 nano seconds, value is in micro seconds
+                    return TimeSpan.FromTicks(ticks);
+                }
+
+                var miliSeconds = Convert.ToDouble(value);
+                return TimeSpan.FromMilliseconds(miliSeconds);
+            }
+
+            if (value is Matrix matrix)
+            {
+                return matrix.ToArray();
+            }
+
+            if (value.GetType().IsArray && targetType.IsArray)
+            {
+                var array = value as Array;
+                var upperBoundsRank = new int[array.Rank];
+
+                for (var dimension = 0; dimension < array.Rank; dimension++)
+                {
+                    upperBoundsRank[dimension] = array.GetLength(dimension);
+                }
+
+                var elementType = targetType.GetElementType();
+                var typedArray = Array.CreateInstance(elementType, upperBoundsRank);
+                var indices = new int[array.Rank];
+                indices[indices.Length - 1]--;
+
+                while (array.IncrementIndices(indices))
+                {
+                    var item = array.GetValue(indices);
+                    var fixedObject = FixType(item, elementType);
+                    typedArray.SetValue(fixedObject, indices);
+                }
+
+                return typedArray;
+            }
+
+            if (value is ExpandoObject keyValues)
+            {
+                var instance = Activator.CreateInstance(targetType);
+                foreach (var keyValue in keyValues)
+                {
+                    var property = targetType.GetProperty(keyValue.Key);
+
+                    if (property == null)
+                    {
+                        logger.LogError("No property found with name: {0} on object of type: {1}", keyValue.Key, targetType.Name);
+                        continue;
+                    }
+
+                    var fixedObject = FixType(keyValue.Value, property.PropertyType);
+                    property.SetValue(instance, fixedObject);
+                }
+
+                return instance;
+            }
+
+            return Convert.ChangeType(value, targetType);
         }
 
         private void ValidateResponse(IList request, ResponseHeader responseHeader, StatusCodeCollection statusCodes, DiagnosticInfoCollection diagnosticInfos, IEnumerable<string> ioNames)

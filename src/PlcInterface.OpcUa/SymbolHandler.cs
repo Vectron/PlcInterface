@@ -1,16 +1,16 @@
-﻿using Microsoft.Extensions.Logging;
-using Opc.Ua;
-using Opc.Ua.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
+using Microsoft.Extensions.Logging;
+using Opc.Ua;
+using Opc.Ua.Client;
 
 namespace PlcInterface.OpcUa
 {
     public class SymbolHandler : ISymbolHandler, IDisposable
     {
-        private readonly Dictionary<string, ISymbolInfo> allSymbols = new Dictionary<string, ISymbolInfo>();
+        private readonly Dictionary<string, SymbolInfo> allSymbols = new Dictionary<string, SymbolInfo>();
         private readonly IPlcConnection<Session> client;
         private readonly CompositeDisposable disposables = new CompositeDisposable();
         private readonly ILogger logger;
@@ -106,9 +106,11 @@ namespace PlcInterface.OpcUa
 
         private SymbolInfo AddSymbol(ReferenceDescription description, string fullName)
         {
-            var symbol = new SymbolInfo(description, fullName.Replace("\"", string.Empty));
-            if (!allSymbols.ContainsKey(symbol.NameLower))
+            var name = fullName.Replace("\"", string.Empty);
+            if (!allSymbols.TryGetValue(name.ToLower(), out var symbol))
             {
+                var nodeInfo = ReadNodeInfo((NodeId)description.NodeId);
+                symbol = new SymbolInfo(description, name, nodeInfo);
                 allSymbols.Add(symbol.NameLower, symbol);
             }
 
@@ -150,6 +152,87 @@ namespace PlcInterface.OpcUa
             }
 
             return uri.Replace(rootName, string.Empty).Trim(splitChar);
+        }
+
+        /// <summary>
+        /// Gets the datatype of an OPC tag
+        /// </summary>
+        /// <param name="tag">Tag to get datatype of</param>
+        /// <returns>System Type</returns>
+        private NodeInfo ReadNodeInfo(NodeId nodeId)
+        {
+            var nodesToRead = new ReadValueIdCollection()
+            {
+                new ReadValueId
+                {
+                    NodeId = nodeId,
+                    AttributeId = Attributes.Description
+                },
+                new ReadValueId
+                {
+                    NodeId = nodeId,
+                    AttributeId = Attributes.DataType
+                },
+                new ReadValueId
+                {
+                    NodeId = nodeId,
+                    AttributeId = Attributes.ValueRank
+                },
+            };
+
+            _ = session.Read(
+                null,
+                0,
+                TimestampsToReturn.Neither,
+                nodesToRead,
+                out var results,
+                out var diagnosticInfos);
+
+            ClientBase.ValidateResponse(results, nodesToRead);
+            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
+
+            var nodeInfo = new NodeInfo
+            {
+                Description = results[0].GetValue(LocalizedText.Null).Text,
+                DataType = results[1].GetValue(NodeId.Null),
+                ValueRank = results[2].GetValue(ValueRanks.Any),
+            };
+
+            if (!NodeId.IsNull(nodeInfo.DataType))
+            {
+                nodeInfo.BuiltInType = DataTypes.GetBuiltInType(nodeInfo.DataType, session.TypeTree);
+                nodeInfo.DataTypeDisplayText = session.NodeCache.GetDisplayText(nodeInfo.DataType);
+
+                if (nodeInfo.ValueRank >= 0)
+                {
+                    nodeInfo.DataTypeDisplayText += "[]";
+                }
+
+                if (nodeInfo.BuiltInType == BuiltInType.Enumeration)
+                {
+                    var nodesToRead2 = new ReadValueIdCollection()
+                    {
+                        new ReadValueId
+                        {
+                            NodeId = nodeInfo.DataType,
+                            AttributeId = Attributes.DataTypeDefinition
+                        },
+                    };
+
+                    _ = session.Read(
+                        null,
+                        0,
+                        TimestampsToReturn.Neither,
+                        nodesToRead2,
+                        out var results2,
+                        out var diagnosticInfos2);
+
+                    ClientBase.ValidateResponse(results2, nodesToRead2);
+                    ClientBase.ValidateDiagnosticInfos(diagnosticInfos2, nodesToRead2);
+                }
+            }
+
+            return nodeInfo;
         }
 
         private void UpdateRootNode(Browser browser)

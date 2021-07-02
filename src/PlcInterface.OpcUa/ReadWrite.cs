@@ -81,18 +81,7 @@ namespace PlcInterface.OpcUa
 
             var session = client.GetConnectedClient();
             var value = session.ReadValue(symbol.Handle);
-            if (value.Value is DateTime dateTime)
-            {
-                var specified = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
-                return new DateTimeOffset(specified);
-            }
-
-            if (value.Value is Matrix matrix)
-            {
-                return matrix.ToArray();
-            }
-
-            return value.Value;
+            return FixType(value.Value);
         }
 
         public Task<IDictionary<string, object>> ReadAsync(IEnumerable<string> ioNames)
@@ -178,23 +167,11 @@ namespace PlcInterface.OpcUa
                         var val = dataValues.FirstOrDefault();
                         var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                         ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
-
-                        if (val.Value is DateTime dateTime)
-                        {
-                            var specified = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
-                            taskCompletionSource.TrySetResult(new DateTimeOffset(specified));
-                        }
-
-                        if (val.Value is Matrix matrix)
-                        {
-                            taskCompletionSource.TrySetResult(matrix.ToArray());
-                        }
-
-                        taskCompletionSource.TrySetResult(val.Value);
+                        taskCompletionSource.SetResult(FixType(FixType(val.Value)));
                     }
                     catch (Exception ex)
                     {
-                        taskCompletionSource.TrySetException(ex);
+                        taskCompletionSource.SetException(ex);
                     }
                 },
                 null);
@@ -278,17 +255,12 @@ namespace PlcInterface.OpcUa
             else
             {
                 var value = Read(ioName);
-                if (value is Matrix matrixValue)
-                {
-                    return matrixValue.ToArray();
-                }
-
                 return value;
             }
         }
 
-        public async Task<dynamic> ReadDynamicAsync(string ioName)
-            => await Task.Run(() => ReadDynamic(ioName));
+        public Task<dynamic> ReadDynamicAsync(string ioName)
+            => Task.Run(() => ReadDynamic(ioName));
 
         public void ToggleBool(string ioName)
         {
@@ -374,6 +346,22 @@ namespace PlcInterface.OpcUa
 
                 disposedValue = true;
             }
+        }
+
+        private static object FixType(object value)
+        {
+            if (value is DateTime dateTime)
+            {
+                var specified = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
+                return new DateTimeOffset(specified);
+            }
+
+            if (value is Matrix matrix)
+            {
+                return matrix.ToArray();
+            }
+
+            return value;
         }
 
         private Variant ConvertToOpcType(object value, BuiltInType builtInType)

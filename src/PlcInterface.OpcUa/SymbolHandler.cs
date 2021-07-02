@@ -47,9 +47,7 @@ namespace PlcInterface.OpcUa
 
         public ISymbolInfo GetSymbolinfo(string ioName)
         {
-            allSymbols.TryGetValue(ioName.ToLower(), out ISymbolInfo value);
-
-            if (value == null)
+            if (!allSymbols.TryGetValue(ioName.ToLower(), out var value))
             {
                 throw new SymbolException($"{ioName} Does not excist in the PLC");
             }

@@ -17,30 +17,6 @@ namespace System.Dynamic
             {
                 if (valueObject.TryGetArrayElementValues(out var elementValues))
                 {
-                    bool incArray(Array a, int[] ind)
-                    {
-                        var rank = a.Rank;
-                        ind[rank - 1]++;
-                        for (var i = rank - 1; i >= 0; i--)
-                        {
-                            if (ind[i] > a.GetUpperBound(i))
-                            {
-                                if (i == 0)
-                                {
-                                    return false;
-                                }
-
-                                for (var j = i; j < rank; j++)
-                                {
-                                    ind[j] = 0;
-                                }
-
-                                ind[i - 1]++;
-                            }
-                        }
-
-                        return true;
-                    }
                     var dimensionLengts = arrayType.Dimensions.GetDimensionLengths();
                     var indices = new int[dimensionLengts.Length];
                     indices[indices.Length - 1]--;
@@ -51,7 +27,7 @@ namespace System.Dynamic
                         var ellementType = arrayType.ManagedType.GetElementType();
                         var destination = Array.CreateInstance(ellementType, dimensionLengts);
 
-                        while (incArray(destination, indices) && ellementEnumerator.MoveNext())
+                        while (destination.IncrementIndices(indices) && ellementEnumerator.MoveNext())
                         {
                             destination.SetValue(ellementEnumerator.Current, indices);
                         }
@@ -62,16 +38,15 @@ namespace System.Dynamic
                     {
                         var destination = Array.CreateInstance(typeof(ExpandoObject), dimensionLengts);
 
-                        while (incArray(destination, indices) && ellementEnumerator.MoveNext())
+                        while (destination.IncrementIndices(indices) && ellementEnumerator.MoveNext())
                         {
                             var dynamicObject = ellementEnumerator.Current as DynamicObject;
                             var cleaned = CleanDynamic(dynamicObject) as ExpandoObject;
                             destination.SetValue(cleaned, indices);
                         }
+
+                        return destination;
                     }
-                }
-                else
-                {
                 }
 
                 return value;

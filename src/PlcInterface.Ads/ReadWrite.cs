@@ -37,8 +37,16 @@ namespace PlcInterface.Ads
             var sumReader = new SumSymbolRead(client, tcSymbols);
             var result = sumReader.Read();
             return ioNames
-                .Zip(result, (ioName, value) => (ioName, value))
-                .ToDictionary(x => x.ioName, x => x.value);
+                .Zip(result, (ioName, value) =>
+                {
+                    if (value is DynamicValue dynamicObject)
+                    {
+                        return (ioName, dynamicObject.CleanDynamic());
+                    }
+
+                    return (ioName, value);
+                })
+                .ToDictionary(x => x.ioName, x => x.Item2);
         }
 
         public object Read(string ioName)

@@ -38,6 +38,7 @@ namespace PlcInterface.Tests
 
         [DataTestMethod]
         [DynamicData(nameof(Settings.GetReadData), typeof(Settings), DynamicDataSourceType.Method)]
+        [DataRow("ReadTestData.EnumValue", TestEnum.Second)]
         public void ReadGeneric(string ioName, object value)
         {
             var instanceType = value.GetType();
@@ -49,6 +50,7 @@ namespace PlcInterface.Tests
 
         [DataTestMethod]
         [DynamicData(nameof(Settings.GetReadData), typeof(Settings), DynamicDataSourceType.Method)]
+        [DataRow("ReadTestData.EnumValue", TestEnum.Second)]
         public async Task ReadGenericAsync(string ioName, object value)
         {
             var instanceType = value.GetType();

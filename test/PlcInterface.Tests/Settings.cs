@@ -50,7 +50,7 @@ namespace PlcInterface.Tests
                 { "ReadTestData.DateAndTimeValue", new DateTimeOffset(2106, 02, 05, 06, 28, 15, TimeSpan.FromHours(1)) },
                 { "ReadTestData.StringValue", "Test String" },
                 { "ReadTestData.WStringValue", "Test WString" },
-                { "ReadTestData.EnumValue", (short)TestEnum.second },
+                { "ReadTestData.EnumValue", (int)TestEnum.Second },
                 { "ReadTestData.IntArray", new short[] { 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010 } },
                 { "ReadTestData.MultiDimensionArray",  new short[,,]
                     {
@@ -97,7 +97,8 @@ namespace PlcInterface.Tests
             yield return new object[] { "WriteTestData.LTimeValue", 10000ul, TimeSpan.FromTicks(100) };
             yield return new object[] { "WriteTestData.DateValue", new DateTime(2019, 02, 21), new DateTimeOffset(2019, 02, 21, 00, 00, 00, TimeSpan.FromHours(1)) };
             yield return new object[] { "WriteTestData.DateAndTimeValue", new DateTime(2019, 02, 21, 12, 15, 10), new DateTimeOffset(2019, 02, 21, 12, 15, 10, TimeSpan.FromHours(1)) };
-            yield return new object[] { "WriteTestData.EnumValue", (int)TestEnum.third, (short)TestEnum.third };
+            yield return new object[] { "WriteTestData.EnumValue", (short)TestEnum.Third, (int)TestEnum.Third };
+            yield return new object[] { "WriteTestData.EnumValue", TestEnum.Third, (int)TestEnum.Third };
         }
 
         public static Dictionary<string, object> GetWriteMultiple()
@@ -125,7 +126,7 @@ namespace PlcInterface.Tests
                 { "WriteTestData.DateAndTimeValue", new DateTimeOffset(2019, 02, 21, 12, 15, 10, TimeSpan.FromHours(1)) },
                 { "WriteTestData.StringValue", "new Test String" },
                 { "WriteTestData.WStringValue", "new Test WString" },
-                { "WriteTestData.EnumValue", (short)TestEnum.third },
+                { "WriteTestData.EnumValue", (int)TestEnum.Third },
                 { "WriteTestData.IntArray", new short[] { 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010 } },
                 { "WriteTestData.MultiDimensionArray",  new short[,,]
                     {

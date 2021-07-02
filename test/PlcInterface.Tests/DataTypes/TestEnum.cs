@@ -2,8 +2,8 @@
 {
     internal enum TestEnum
     {
-        first = 0,
-        second = 1,
-        third = 2
+        First = 0,
+        Second = 1,
+        Third = 2
     }
 }

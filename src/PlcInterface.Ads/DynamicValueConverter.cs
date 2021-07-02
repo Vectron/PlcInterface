@@ -10,6 +10,12 @@ namespace PlcInterface.Ads
     {
         public object ConvertFrom(DynamicObject dynamicObject, Type type)
         {
+            if (type.IsArray)
+            {
+                var arrayValue = ConvertArray(dynamicObject, type);
+                return arrayValue;
+            }
+
             var destination = Activator.CreateInstance(type);
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var property in properties)

@@ -124,10 +124,11 @@ namespace PlcInterface.OpcUa
 
                 foreach (var item in kv.Value)
                 {
-                    var itemName = parrent.Name + "." + item.DisplayName;
+                    var arrayIndex = item.BrowseName.Name.IndexOf('[');
+                    var itemName = arrayIndex == -1 ? $"{parrent.Name}.{item.BrowseName.Name}" : $"{parrent.Name}{item.BrowseName.Name.Substring(arrayIndex)}";
                     itemName = CleanName(itemName);
                     var symbol = AddSymbol(item, itemName);
-                    parrent.ChildSymbols.Add(symbol.NameLower);
+                    parrent.ChildSymbols.Add(symbol.Name);
                     itemsToBrowseNext.Add(symbol);
                 }
 

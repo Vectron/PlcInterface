@@ -64,7 +64,7 @@ namespace PlcInterface.OpcUa
             {
                 var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
                 var value = CreateDynamic(symbolInfo, valueEnumerator);
-                result.Add(ioName, value);
+                result.Add(ioName, FixType(value));
             }
 
             return result;
@@ -135,7 +135,7 @@ namespace PlcInterface.OpcUa
                         {
                             var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
                             var value = CreateDynamic(symbolInfo, valueEnumerator);
-                            result.Add(ioName, value);
+                            result.Add(ioName, FixType(value));
                         }
 
                         taskCompletionSource.SetResult(result);
@@ -183,7 +183,7 @@ namespace PlcInterface.OpcUa
                         var val = dataValues.FirstOrDefault();
                         var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                         ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
-                        taskCompletionSource.SetResult(FixType(FixType(val.Value)));
+                        taskCompletionSource.SetResult(FixType(val.Value));
                     }
                     catch (Exception ex)
                     {
@@ -384,8 +384,14 @@ namespace PlcInterface.OpcUa
         {
             if (value is DateTimeOffset dateTimeOffset)
             {
-                var specified = DateTime.SpecifyKind(dateTimeOffset.DateTime, DateTimeKind.Utc);
-                return new Variant(specified);
+                // Mark it as UTC time so OPC lib won't try and convert it.
+                return new Variant(DateTime.SpecifyKind(dateTimeOffset.LocalDateTime, DateTimeKind.Utc));
+            }
+
+            if (value is DateTime dateTime)
+            {
+                // Mark it as UTC time so OPC lib won't try and convert it.
+                return new Variant(DateTime.SpecifyKind(dateTime, DateTimeKind.Utc));
             }
 
             if (builtInType == BuiltInType.Enumeration)
@@ -518,7 +524,7 @@ namespace PlcInterface.OpcUa
                         return matrixValue.ToArray();
                     }
 
-                    return valueEnumerator.Current.Value;
+                    return FixType(valueEnumerator.Current.Value);
                 }
             }
 

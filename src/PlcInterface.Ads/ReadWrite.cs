@@ -1,32 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using PlcInterface.Ads.Extensions;
 using TwinCAT.Ads;
 using TwinCAT.Ads.SumCommand;
 using TwinCAT.TypeSystem;
 
 namespace PlcInterface.Ads
 {
+    /// <summary>
+    /// Implementation of <see cref="IReadWrite"/>.
+    /// </summary>
     public class ReadWrite : IReadWrite
     {
         private readonly IPlcConnection<IAdsConnection> connection;
         private readonly IDynamicValueConverter dynamicValueConverter;
-        private readonly ILogger<ReadWrite> logger;
         private readonly ISymbolHandler symbolHandler;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadWrite"/> class.
+        /// </summary>
+        /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
+        /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
+        /// <param name="dynamicValueConverter">A <see cref="IDynamicValueConverter"/> implementation.</param>
+        /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public api, backwards compatability")]
         public ReadWrite(IPlcConnection<IAdsConnection> connection, ISymbolHandler symbolHandler, IDynamicValueConverter dynamicValueConverter, ILogger<ReadWrite> logger)
         {
             this.connection = connection;
             this.symbolHandler = symbolHandler;
             this.dynamicValueConverter = dynamicValueConverter;
-            this.logger = logger;
         }
 
+        /// <inheritdoc/>
         public IDictionary<string, object> Read(IEnumerable<string> ioNames)
         {
             var client = connection.GetConnectedClient();
@@ -41,44 +51,55 @@ namespace PlcInterface.Ads
             return ioNames
                 .Zip(result, (ioName, value) =>
                 {
-                    var adsSymbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate().Symbol as IValueSymbol;
+                    if (symbolHandler.GetSymbolinfo(ioName).CastAndValidate().Symbol is not IValueSymbol adsSymbol)
+                    {
+                        throw new SymbolException($"{ioName} is not a value symbol.");
+                    }
+
                     var fixedValue = FixType(value, adsSymbol);
                     return (ioName, fixedValue);
                 })
-                .ToDictionary(x => x.ioName, x => x.fixedValue);
+                .ToDictionary(x => x.ioName, x => x.fixedValue, StringComparer.OrdinalIgnoreCase);
         }
 
+        /// <inheritdoc/>
         public object Read(string ioName)
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
-            var adsSymbol = symbolInfo.Symbol as IValueSymbol;
-            var value = adsSymbol.ReadValue();
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
+            var adsSymbol = symbolInfo.Symbol.CastAndValidate();
+            var value = adsSymbol.ReadValue().ThrowIfNull();
             return FixType(value, adsSymbol);
         }
 
+        /// <inheritdoc/>
         public T Read<T>(string ioName)
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName) as SymbolInfo;
-            var adsSymbol = symbolInfo?.Symbol as IValueSymbol;
-            var value = adsSymbol?.ReadValue();
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
+            var adsSymbol = symbolInfo.Symbol.CastAndValidate();
+            var value = adsSymbol.ReadValue().ThrowIfNull();
             return FixType<T>(value);
         }
 
-        public Task<object> ReadAsync(string ioName)
+        /// <inheritdoc/>
+        public async Task<object> ReadAsync(string ioName)
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
-            var adsSymbol = symbolInfo?.Symbol as IValueSymbol;
-            return adsSymbol.ReadValueAsync(CancellationToken.None).ContinueWith(x => FixType(x.Result.Value, adsSymbol));
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
+            var adsSymbol = symbolInfo.Symbol.CastAndValidate();
+            var resultReadValue = await adsSymbol.ReadValueAsync(CancellationToken.None).ConfigureAwait(false);
+            return FixType(resultReadValue.Value.ThrowIfNull(), adsSymbol);
         }
 
-        public Task<T> ReadAsync<T>(string ioName)
+        /// <inheritdoc/>
+        public async Task<T> ReadAsync<T>(string ioName)
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
-            var adsSymbol = symbolInfo?.Symbol as IValueSymbol;
-            return adsSymbol.ReadValueAsync(CancellationToken.None).ContinueWith(x => FixType<T>(x.Result.Value));
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
+            var adsSymbol = symbolInfo.Symbol.CastAndValidate();
+            var resultReadValue = await adsSymbol.ReadValueAsync(CancellationToken.None).ConfigureAwait(false);
+            return FixType<T>(resultReadValue.Value.ThrowIfNull());
         }
 
-        public Task<IDictionary<string, object>> ReadAsync(IEnumerable<string> ioNames)
+        /// <inheritdoc/>
+        public async Task<IDictionary<string, object>> ReadAsync(IEnumerable<string> ioNames)
         {
             var client = connection.GetConnectedClient();
             var tcSymbols = ioNames
@@ -88,40 +109,45 @@ namespace PlcInterface.Ads
                 .ToList();
 
             var sumReader = new SumSymbolRead(client, tcSymbols);
-            return sumReader.ReadAsync(CancellationToken.None).ContinueWith(t =>
-            {
-                var dictionary = ioNames
-                    .Zip(t.Result.Values, (ioName, value) =>
+            var resultSum = await sumReader.ReadAsync(CancellationToken.None).ConfigureAwait(false);
+            var dictionary = ioNames
+                    .Zip(resultSum.Values, (ioName, value) =>
                     {
-                        var adsSymbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate().Symbol as IValueSymbol;
+                        var adsSymbol = symbolHandler.GetSymbolinfo(ioName).CastAndValidate().Symbol.CastAndValidate();
                         var fixedValue = FixType(value, adsSymbol);
                         return (ioName, fixedValue);
                     })
-                    .ToDictionary(x => x.ioName, x => x.fixedValue);
-
-                return (IDictionary<string, object>)dictionary;
-            });
+                    .ToDictionary(x => x.ioName, x => x.fixedValue, StringComparer.OrdinalIgnoreCase);
+            return dictionary;
         }
 
+        /// <inheritdoc/>
         public dynamic ReadDynamic(string ioName)
         {
             var value = Read(ioName);
             return value is ExpandoObject
                 ? value
-                : throw new NotImplementedException("dynamic values are only supported when read mode is set to dynamic");
+                : throw new NotSupportedException("dynamic values are only supported when read mode is set to dynamic");
         }
 
-        public Task<dynamic> ReadDynamicAsync(string ioName)
-            => ReadAsync(ioName).ContinueWith(x => x.Result is ExpandoObject
-                ? x.Result
-                : throw new NotImplementedException("dynamic values are only supported when read mode is set to dynamic"));
+        /// <inheritdoc/>
+        public async Task<dynamic> ReadDynamicAsync(string ioName)
+        {
+            var readResult = await ReadAsync(ioName).ConfigureAwait(false);
 
+            return readResult is ExpandoObject
+                ? readResult
+                : throw new NotSupportedException("dynamic values are only supported when read mode is set to dynamic");
+        }
+
+        /// <inheritdoc/>
         public void ToggleBool(string ioName)
         {
             var current = Read<bool>(ioName);
             Write(ioName, !current);
         }
 
+        /// <inheritdoc/>
         public void Write(IDictionary<string, object> namesValues)
         {
             var client = connection.GetConnectedClient();
@@ -134,13 +160,16 @@ namespace PlcInterface.Ads
             sumReader.Write(namesValues.Values.ToArray());
         }
 
+        /// <inheritdoc/>
         public void Write<T>(string ioName, T value)
+            where T : notnull
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName) as SymbolInfo;
-            var adsSymbol = symbolInfo.Symbol as IValueSymbol;
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
+            var adsSymbol = symbolInfo.Symbol.CastAndValidate();
             adsSymbol.WriteValue(value);
         }
 
+        /// <inheritdoc/>
         public Task WriteAsync(IDictionary<string, object> namesValues)
         {
             var client = connection.GetConnectedClient();
@@ -153,14 +182,16 @@ namespace PlcInterface.Ads
             return sumReader.WriteAsync(namesValues.Values.ToArray(), CancellationToken.None);
         }
 
+        /// <inheritdoc/>
         public Task WriteAsync<T>(string ioName, T value)
+            where T : notnull
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName) as SymbolInfo;
-            var adsSymbol = symbolInfo.Symbol as IValueSymbol;
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
+            var adsSymbol = symbolInfo.Symbol.CastAndValidate();
             return adsSymbol.WriteValueAsync(value, CancellationToken.None);
         }
 
-        private object FixType(object value, IValueSymbol valueSymbol)
+        private static object FixType(object value, IValueSymbol valueSymbol)
         {
             if (value is DynamicValue dynamicObject)
             {
@@ -170,7 +201,7 @@ namespace PlcInterface.Ads
             if (valueSymbol.Category == DataTypeCategory.Enum
                 && value is short)
             {
-                return Convert.ToInt32(value);
+                return Convert.ToInt32(value, CultureInfo.InvariantCulture);
             }
 
             return value;
@@ -193,7 +224,7 @@ namespace PlcInterface.Ads
                 return (T)dynamicValueConverter.ConvertFrom(dynamicObject, typeof(T));
             }
 
-            return (T)Convert.ChangeType(value, typeof(T));
+            return (T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
         }
     }
 }

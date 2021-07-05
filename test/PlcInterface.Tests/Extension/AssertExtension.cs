@@ -253,8 +253,7 @@ namespace PlcInterface.Tests
             DUT_TestStructNotEquals(expected.Nested, current.Nested);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public Api")]
-        public static void ObjectEquals(this Assert assert, object expectedValue, object value, string message = null)
+        public static void ObjectEquals(this Assert assert, object expectedValue, object value, string message = "")
         {
             if (value is System.Dynamic.IDynamicMetaObjectProvider dynamic)
             {
@@ -263,17 +262,20 @@ namespace PlcInterface.Tests
                     DUT_TestStructEquals(testStruct, dynamic);
                     return;
                 }
-                else if (expectedValue is DUT_TestStruct2 testStruct2)
+
+                if (expectedValue is DUT_TestStruct2 testStruct2)
                 {
                     DUT_TestStructEquals(testStruct2, dynamic);
                     return;
                 }
-                else if (expectedValue is DUT_TestClass testClass)
+
+                if (expectedValue is DUT_TestClass testClass)
                 {
                     DUT_TestStructEquals(testClass, dynamic);
                     return;
                 }
-                else if (expectedValue is DUT_TestClass2 testClass2)
+
+                if (expectedValue is DUT_TestClass2 testClass2)
                 {
                     DUT_TestStructEquals(testClass2, dynamic);
                     return;
@@ -287,29 +289,21 @@ namespace PlcInterface.Tests
                     CollectionAssert.AreEqual(expectedCollection, valueCollection, message);
                     return;
                 }
-                else
-                {
-                    var expectedEnumerator = expectedCollection.GetEnumerator();
-                    var valueEnumerator = valueCollection.GetEnumerator();
-                    while (expectedEnumerator.MoveNext() && valueEnumerator.MoveNext())
-                    {
-                        assert.ObjectEquals(expectedEnumerator.Current, valueEnumerator.Current, message);
-                    }
 
-                    return;
+                var expectedEnumerator = expectedCollection.GetEnumerator();
+                var valueEnumerator = valueCollection.GetEnumerator();
+                while (expectedEnumerator.MoveNext() && valueEnumerator.MoveNext())
+                {
+                    assert.ObjectEquals(expectedEnumerator.Current, valueEnumerator.Current, message);
                 }
-            }
-            else
-            {
-                Assert.AreEqual(expectedValue, value, message);
+
                 return;
             }
 
-            Assert.Fail(message);
+            Assert.AreEqual(expectedValue, value, message);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public Api")]
-        public static void ObjectNotEquals(this Assert assert, object expectedValue, object value, string message = null)
+        public static void ObjectNotEquals(this Assert assert, object expectedValue, object value, string message = "")
         {
             if (value is System.Dynamic.IDynamicMetaObjectProvider dynamic)
             {
@@ -318,17 +312,20 @@ namespace PlcInterface.Tests
                     DUT_TestStructNotEquals(testStruct, dynamic);
                     return;
                 }
-                else if (expectedValue is DUT_TestStruct2 testStruct2)
+
+                if (expectedValue is DUT_TestStruct2 testStruct2)
                 {
                     DUT_TestStructNotEquals(testStruct2, dynamic);
                     return;
                 }
-                else if (expectedValue is DUT_TestClass testClass)
+
+                if (expectedValue is DUT_TestClass testClass)
                 {
                     DUT_TestStructNotEquals(testClass, dynamic);
                     return;
                 }
-                else if (expectedValue is DUT_TestClass2 testClass2)
+
+                if (expectedValue is DUT_TestClass2 testClass2)
                 {
                     DUT_TestStructNotEquals(testClass2, dynamic);
                     return;
@@ -342,25 +339,18 @@ namespace PlcInterface.Tests
                     CollectionAssert.AreNotEqual(expectedCollection, valueCollection, message);
                     return;
                 }
-                else
-                {
-                    var expectedEnumerator = expectedCollection.GetEnumerator();
-                    var valueEnumerator = valueCollection.GetEnumerator();
-                    while (expectedEnumerator.MoveNext() && valueEnumerator.MoveNext())
-                    {
-                        assert.ObjectNotEquals(expectedEnumerator.Current, valueEnumerator.Current, message);
-                    }
 
-                    return;
+                var expectedEnumerator = expectedCollection.GetEnumerator();
+                var valueEnumerator = valueCollection.GetEnumerator();
+                while (expectedEnumerator.MoveNext() && valueEnumerator.MoveNext())
+                {
+                    assert.ObjectNotEquals(expectedEnumerator.Current, valueEnumerator.Current, message);
                 }
-            }
-            else
-            {
-                Assert.AreNotEqual(expectedValue, value, message);
+
                 return;
             }
 
-            Assert.Fail(message);
+            Assert.AreNotEqual(expectedValue, value, message);
         }
     }
 }

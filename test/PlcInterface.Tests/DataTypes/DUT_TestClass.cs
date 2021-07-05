@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 namespace PlcInterface.Tests.DataTypes
 {
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
-    internal class DUT_TestClass
+    internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
     {
-        public static DUT_TestClass Default => new DUT_TestClass()
+        public static DUT_TestClass Default => new()
         {
             BoolValue = true,
             ByteValue = byte.MaxValue,
@@ -59,11 +59,11 @@ namespace PlcInterface.Tests.DataTypes
                     { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
                     { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
                     { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
-                }
+                },
             },
         };
 
-        public static DUT_TestClass Write => new DUT_TestClass()
+        public static DUT_TestClass Write => new()
         {
             BoolValue = false,
 
@@ -121,7 +121,7 @@ namespace PlcInterface.Tests.DataTypes
                     { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
                     { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
                     { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
-                }
+                },
             },
         };
 
@@ -133,133 +133,155 @@ namespace PlcInterface.Tests.DataTypes
 
         public byte ByteValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public ushort WordValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public uint DWordValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public ulong LWordValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public sbyte ShortValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public short IntValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public int DIntValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public long LongValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public byte UShortValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public ushort UIntValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public uint UDIntValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public ulong ULongValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public float FloatValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public double DoubleValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public TimeSpan TimeValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public TimeSpan TimeOfDay
         {
-            get; set;
+            get;
+            set;
         }
 
         public TimeSpan LTimeValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public DateTimeOffset DateValue
         {
-            get; set;
+            get;
+            set;
         }
 
         public DateTimeOffset DateAndTimeValue
         {
-            get; set;
+            get;
+            set;
         }
 
-        public string StringValue
-        {
-            get; set;
-        }
-
-        public string WStringValue
-        {
-            get; set;
-        }
-
-        public DUT_TestClass2 Nested
-        {
-            get; set;
-        }
-
-        public short[] IntArray
+        public string? StringValue
         {
             get;
             set;
         }
 
-        public short[,,] MultiDimensionArray
+        public string? WStringValue
         {
             get;
             set;
         }
 
-        public DUT_TestClass2[] ComplexArray
+        public DUT_TestClass2? Nested
         {
             get;
             set;
         }
 
-        public DUT_TestClass2[,,] MultiDimensionComplexArray
+        public short[]? IntArray
+        {
+            get;
+            set;
+        }
+
+        public short[,,]? MultiDimensionArray
+        {
+            get;
+            set;
+        }
+
+        public DUT_TestClass2[]? ComplexArray
+        {
+            get;
+            set;
+        }
+
+        public DUT_TestClass2[,,]? MultiDimensionComplexArray
         {
             get;
             set;
@@ -290,11 +312,18 @@ namespace PlcInterface.Tests.DataTypes
                 && LTimeValue.Equals(other.LTimeValue)
                 && DateValue.Equals(other.DateValue)
                 && DateAndTimeValue.Equals(other.DateAndTimeValue)
-                && StringValue == other.StringValue && WStringValue == other.WStringValue
+                && string.Equals(StringValue, other.StringValue, StringComparison.Ordinal)
+                && string.Equals(WStringValue, other.WStringValue, StringComparison.Ordinal)
+                && Nested != null
+                && other.Nested != null
                 && EqualityComparer<DUT_TestClass2>.Default.Equals(Nested, other.Nested)
                 && IntArray.SequenceEqual(other.IntArray)
+                && MultiDimensionArray != null
+                && other.MultiDimensionArray != null
                 && MultiDimensionArray.SequenceEqual<short>(other.MultiDimensionArray)
                 && ComplexArray.SequenceEqual(other.ComplexArray)
+                && MultiDimensionComplexArray != null
+                && other.MultiDimensionComplexArray != null
                 && MultiDimensionComplexArray.SequenceEqual<DUT_TestClass2>(other.MultiDimensionComplexArray);
         }
 
@@ -321,18 +350,14 @@ namespace PlcInterface.Tests.DataTypes
             hashCode = (hashCode * -1521134295) + LTimeValue.GetHashCode();
             hashCode = (hashCode * -1521134295) + DateValue.GetHashCode();
             hashCode = (hashCode * -1521134295) + DateAndTimeValue.GetHashCode();
-            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(StringValue);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(WStringValue);
-            hashCode = (hashCode * -1521134295) + Nested.GetHashCode();
-            hashCode = (hashCode * -1521134295) + EqualityComparer<short[]>.Default.GetHashCode(IntArray);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<short[,,]>.Default.GetHashCode(MultiDimensionArray);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<DUT_TestClass2[]>.Default.GetHashCode(ComplexArray);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<DUT_TestClass2[,,]>.Default.GetHashCode(MultiDimensionComplexArray);
+            hashCode = (hashCode * -1521134295) + StringComparer.Ordinal.GetHashCode(StringValue);
+            hashCode = (hashCode * -1521134295) + StringComparer.Ordinal.GetHashCode(WStringValue);
+            hashCode = (hashCode * -1521134295) + (Nested == null ? 0 : Nested.GetHashCode());
+            hashCode = (hashCode * -1521134295) + (IntArray == null ? 0 : EqualityComparer<short[]>.Default.GetHashCode(IntArray));
+            hashCode = (hashCode * -1521134295) + (MultiDimensionArray == null ? 0 : EqualityComparer<short[,,]>.Default.GetHashCode(MultiDimensionArray));
+            hashCode = (hashCode * -1521134295) + (ComplexArray == null ? 0 : EqualityComparer<DUT_TestClass2[]>.Default.GetHashCode(ComplexArray));
+            hashCode = (hashCode * -1521134295) + (MultiDimensionComplexArray == null ? 0 : EqualityComparer<DUT_TestClass2[,,]>.Default.GetHashCode(MultiDimensionComplexArray));
             return hashCode;
         }
-
-        public static bool operator ==(DUT_TestClass left, DUT_TestClass right) => left.Equals(right);
-
-        public static bool operator !=(DUT_TestClass left, DUT_TestClass right) => !(left == right);
     }
 }

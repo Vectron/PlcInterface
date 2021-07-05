@@ -89,7 +89,7 @@ namespace PlcInterface.Tests
         public void WriteMultiple()
         {
             // Arrange
-            var data = Settings.GetWriteMultiple();
+            var data = Settings.WriteMultipleData;
             var readWrite = GetReadWrite();
 
             // Act
@@ -98,9 +98,9 @@ namespace PlcInterface.Tests
             var newValueRead = readWrite.Read(data.Keys);
 
             // Assert
-            var dataEnumerator = data.GetEnumerator();
-            var originalEnumerator = original.GetEnumerator();
-            var newValueEnumerator = newValueRead.GetEnumerator();
+            using var dataEnumerator = data.GetEnumerator();
+            using var originalEnumerator = original.GetEnumerator();
+            using var newValueEnumerator = newValueRead.GetEnumerator();
 
             Assert.AreEqual(data.Count, original.Count);
             Assert.AreEqual(data.Count, newValueRead.Count);
@@ -125,7 +125,7 @@ namespace PlcInterface.Tests
         public async Task WriteMultipleAsync()
         {
             // Arrange
-            var data = Settings.GetWriteMultiple();
+            var data = Settings.WriteMultipleData;
             var readWrite = GetReadWrite();
 
             // Act
@@ -134,9 +134,9 @@ namespace PlcInterface.Tests
             var newValueRead = await readWrite.ReadAsync(data.Keys);
 
             // Assert
-            var dataEnumerator = data.GetEnumerator();
-            var originalEnumerator = original.GetEnumerator();
-            var newValueEnumerator = newValueRead.GetEnumerator();
+            using var dataEnumerator = data.GetEnumerator();
+            using var originalEnumerator = original.GetEnumerator();
+            using var newValueEnumerator = newValueRead.GetEnumerator();
 
             Assert.AreEqual(data.Count, original.Count);
             Assert.AreEqual(data.Count, newValueRead.Count);
@@ -158,9 +158,10 @@ namespace PlcInterface.Tests
         }
 
         protected override IMonitor GetMonitor()
-            => throw new NotImplementedException();
+            => throw new NotSupportedException();
 
-        protected void WriteValueGenericHelper<T1>(string ioName, T1 newValue, object readValue)
+        protected void WriteValueGenericHelper<T>(string ioName, T newValue, object readValue)
+            where T : notnull
         {
             // Arrange
             var readWrite = GetReadWrite();
@@ -176,14 +177,15 @@ namespace PlcInterface.Tests
         }
 
         protected async Task WriteValueGenericHelperAsync<T>(string ioName, T newValue, object readValue)
+            where T : notnull
         {
             // Arrange
             var readWrite = GetReadWrite();
 
             // Act
-            var original = await readWrite.ReadAsync(ioName);
-            await readWrite.WriteAsync(ioName, newValue);
-            var newValueRead = await readWrite.ReadAsync(ioName);
+            var original = await readWrite.ReadAsync(ioName).ConfigureAwait(false);
+            await readWrite.WriteAsync(ioName, newValue).ConfigureAwait(false);
+            var newValueRead = await readWrite.ReadAsync(ioName).ConfigureAwait(false);
 
             // Assert
             Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");

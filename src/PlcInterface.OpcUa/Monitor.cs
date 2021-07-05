@@ -1,30 +1,37 @@
-﻿using Microsoft.Extensions.Logging;
-using Opc.Ua;
-using Opc.Ua.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Microsoft.Extensions.Logging;
+using Opc.Ua;
+using Opc.Ua.Client;
 
 namespace PlcInterface.OpcUa
 {
+    /// <summary>
+    /// A implementation of <see cref="IMonitor"/>.
+    /// </summary>
     public class Monitor : IMonitor, IDisposable
     {
-        private readonly IPlcConnection<Session> client;
-        private readonly CompositeDisposable disposables = new CompositeDisposable();
+        private readonly CompositeDisposable disposables = new();
         private readonly ILogger<Monitor> logger;
-        private readonly Dictionary<string, RegisteredSymbol> registeredSymbols = new Dictionary<string, RegisteredSymbol>();
+        private readonly Dictionary<string, RegisteredSymbol> registeredSymbols = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Subject<IMonitorResult> subject = new();
+        private readonly Subscription subscription;
         private readonly ISymbolHandler symbolHandler;
-        private bool disposedValue = false;
-        private Session session;
-        private Subject<IMonitorResult> subject = new Subject<IMonitorResult>();
-        private Subscription subscription;
+        private bool disposedValue;
+        private Session? session;
 
-        public Monitor(IPlcConnection<Session> client, ISymbolHandler symbolHandler, ILogger<Monitor> logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Monitor"/> class.
+        /// </summary>
+        /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
+        /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
+        /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
+        public Monitor(IPlcConnection<Session> connection, ISymbolHandler symbolHandler, ILogger<Monitor> logger)
         {
-            this.client = client;
             this.symbolHandler = symbolHandler;
             this.logger = logger;
             subscription = new Subscription()
@@ -36,12 +43,12 @@ namespace PlcInterface.OpcUa
                 KeepAliveCount = 10,
                 LifetimeCount = 100,
                 MaxNotificationsPerPublish = 1000,
-                TimestampsToReturn = TimestampsToReturn.Both
+                TimestampsToReturn = TimestampsToReturn.Both,
             };
 
-            disposables.Add(client.SessionStream.Subscribe(x =>
+            disposables.Add(connection.SessionStream.Subscribe(x =>
             {
-                if (!x.IsConnected)
+                if (!x.IsConnected || x.Value == null)
                 {
                     session = null;
                     return;
@@ -54,22 +61,26 @@ namespace PlcInterface.OpcUa
                 }
                 else
                 {
-                    session.AddSubscription(subscription);
+                    _ = session.AddSubscription(subscription);
                     subscription.Create();
                     Update();
                 }
             }));
         }
 
+        /// <inheritdoc/>
         public IObservable<IMonitorResult> SymbolStream => subject.AsObservable();
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        public void RegisterIO(IEnumerable<string> ioNames, int updateInterval)
+        /// <inheritdoc/>
+        public void RegisterIO(IEnumerable<string> ioNames, int updateInterval = 1000)
         {
             foreach (var name in ioNames)
             {
@@ -79,12 +90,14 @@ namespace PlcInterface.OpcUa
             Update();
         }
 
-        public void RegisterIO(string ioName, int updateInterval)
+        /// <inheritdoc/>
+        public void RegisterIO(string ioName, int updateInterval = 1000)
         {
             RegisterIOInternal(ioName, updateInterval);
             Update();
         }
 
+        /// <inheritdoc/>
         public void UnregisterIO(IEnumerable<string> ioNames)
         {
             foreach (var name in ioNames)
@@ -98,6 +111,7 @@ namespace PlcInterface.OpcUa
             }
         }
 
+        /// <inheritdoc/>
         public void UnregisterIO(string ioName)
         {
             UnregisterIOInternal(ioName);
@@ -108,6 +122,10 @@ namespace PlcInterface.OpcUa
             }
         }
 
+        /// <summary>
+        /// Protected implementation of Dispose pattern.
+        /// </summary>
+        /// <param name="disposing">Value indicating if we need to cleanup managed resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -159,22 +177,22 @@ namespace PlcInterface.OpcUa
                 return;
             }
 
-            MonitoredItem item = null;
+            MonitoredItem? item = null;
 
             if (session == null || !session.Connected || !subscription.Created)
             {
-                item = subscription.MonitoredItems.Where(x => x.DisplayName == nameLower).FirstOrDefault();
+                item = subscription.MonitoredItems.FirstOrDefault(x => string.Equals(x.DisplayName, nameLower, StringComparison.OrdinalIgnoreCase));
             }
             else
             {
                 var symbol = symbolHandler.GetSymbolinfo(name).ConvertAndValidate();
-                item = subscription.MonitoredItems.Where(x => x.Handle == symbol.Handle).FirstOrDefault();
+                item = subscription.MonitoredItems.FirstOrDefault(x => x.Handle == symbol.Handle);
             }
 
             if (item != null)
             {
                 subscription.RemoveItem(item);
-                registeredSymbols.Remove(nameLower);
+                _ = registeredSymbols.Remove(nameLower);
                 logger.LogDebug($"Removed {name} from monitoring");
             }
         }
@@ -192,7 +210,7 @@ namespace PlcInterface.OpcUa
                 {
                     var symbol = symbolHandler.GetSymbolinfo(item.Key).ConvertAndValidate();
 
-                    if (subscription.MonitoredItems.Where(x => x.StartNodeId == symbol.Handle).Count() > 0)
+                    if (subscription.MonitoredItems.Any(x => x.StartNodeId == symbol.Handle))
                     {
                         continue;
                     }
@@ -205,7 +223,7 @@ namespace PlcInterface.OpcUa
                         SamplingInterval = item.Value.UpdateInterval,
                         QueueSize = 1,
                         DiscardOldest = true,
-                        DisplayName = item.Key
+                        DisplayName = item.Key,
                     };
 
                     disposables.Add(Observable
@@ -214,7 +232,7 @@ namespace PlcInterface.OpcUa
                         h => monitoredItem.Notification -= h)
                         .Select(x =>
                         {
-                            if (x.Sender.Handle is SymbolInfo s
+                            if (x.Sender?.Handle is SymbolInfo s
                                 && x.EventArgs.NotificationValue is MonitoredItemNotification datachange)
                             {
                                 return new MonitorResult(s.Name, datachange.Value.Value);
@@ -222,7 +240,7 @@ namespace PlcInterface.OpcUa
 
                             return null;
                         })
-                        .Where(x => x != null)
+                        .WhereNotNull()
                         .SubscribeSafe(subject));
                     logger.LogDebug($"Added {item.Key} to plc monitor");
                     subscription.AddItem(monitoredItem);
@@ -236,7 +254,7 @@ namespace PlcInterface.OpcUa
             subscription.ApplyChanges();
         }
 
-        private class RegisteredSymbol
+        private sealed class RegisteredSymbol
         {
             public int Subscriptions
             {

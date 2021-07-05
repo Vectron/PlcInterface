@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests
 {
@@ -12,6 +12,7 @@ namespace PlcInterface.Tests
         {
             // Arrange
             var connection = GetPLCConnection();
+            using var disposable = connection as IDisposable;
 
             // Act
             connection.Connect();
@@ -42,6 +43,7 @@ namespace PlcInterface.Tests
         {
             // Arrange
             var connection = GetPLCConnection();
+            using var disposable = connection as IDisposable;
 
             // Act
             await connection.ConnectAsync();
@@ -56,22 +58,16 @@ namespace PlcInterface.Tests
 
             // Assert
             Assert.IsFalse(result.IsConnected);
-            connection.Disconnect();
+            await connection.DisconnectAsync();
         }
 
         protected override IMonitor GetMonitor()
-        {
-            throw new System.NotImplementedException();
-        }
+            => throw new NotSupportedException();
 
         protected override IReadWrite GetReadWrite()
-        {
-            throw new System.NotImplementedException();
-        }
+            => throw new NotSupportedException();
 
         protected override ISymbolHandler GetSymbolHandler()
-        {
-            throw new System.NotImplementedException();
-        }
+            => throw new NotSupportedException();
     }
 }

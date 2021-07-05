@@ -5,7 +5,7 @@ namespace System.Threading.Tasks
     /// <summary>
     /// Extension methods for <see cref="Task"/>.
     /// </summary>
-    public static class TaskExtensions
+    internal static class TaskExtensions
     {
         /// <summary>
         /// Log exceptions async.

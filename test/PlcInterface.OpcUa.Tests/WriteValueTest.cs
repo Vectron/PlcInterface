@@ -8,9 +8,9 @@ namespace PlcInterface.OpcUa.Tests
     [TestClass]
     public class WriteValueTest : IWriteValueTestBase
     {
-        private static PlcConnection connection;
-        private static ReadWrite readWrite;
-        private static SymbolHandler symbolHandler;
+        private static PlcConnection? connection;
+        private static ReadWrite? readWrite;
+        private static SymbolHandler? symbolHandler;
 
         [ClassInitialize]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public Api")]
@@ -29,15 +29,19 @@ namespace PlcInterface.OpcUa.Tests
 
         [ClassCleanup]
         public static void Disconnect()
-            => connection.Dispose();
+        {
+            connection?.Dispose();
+            symbolHandler?.Dispose();
+            readWrite?.Dispose();
+        }
 
         protected override IPlcConnection GetPLCConnection()
-            => connection;
+            => connection ?? throw new System.NotSupportedException();
 
         protected override IReadWrite GetReadWrite()
-            => readWrite;
+            => readWrite ?? throw new System.NotSupportedException();
 
         protected override ISymbolHandler GetSymbolHandler()
-            => symbolHandler;
+            => symbolHandler ?? throw new System.NotSupportedException();
     }
 }

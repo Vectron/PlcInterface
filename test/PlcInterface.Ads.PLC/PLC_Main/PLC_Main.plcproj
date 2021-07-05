@@ -13,6 +13,7 @@
     <Implicit_Jitter_Distribution>{f176e373-83e5-4aad-818e-0aee74c70495}</Implicit_Jitter_Distribution>
     <LibraryReferences>{d0ae1b03-3ec8-4891-96e6-569af6562dd5}</LibraryReferences>
     <CompilerDefines>VISU_USEWSTRING</CompilerDefines>
+    <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DUTs\DUT_TestStruct.TcDUT">
@@ -74,17 +75,6 @@
     <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
-        <v>{246001F4-279D-43AC-B241-948EB31120E1}</v>
-        <o>
-          <v n="Name">"{246001F4-279D-43AC-B241-948EB31120E1}"</v>
-          <d n="SubKeys" t="Hashtable" />
-          <d n="Values" t="Hashtable" ckt="String">
-            <v>GlobalVisuImageFilePath</v>
-            <v>"%APPLICATIONPATH%"</v>
-            <v>UnicodeStrings</v>
-            <v>false</v>
-          </d>
-        </o>
         <v>{8F99A816-E488-41E4-9FA3-846536012284}</v>
         <o>
           <v n="Name">"{8F99A816-E488-41E4-9FA3-846536012284}"</v>
@@ -123,7 +113,7 @@
                   <d n="SubKeys" t="Hashtable" />
                   <d n="Values" t="Hashtable" ckt="String" cvt="Boolean">
                     <v>bActive</v>
-                    <v>False</v>
+                    <v>True</v>
                   </d>
                 </o>
                 <v>6</v>
@@ -174,12 +164,6 @@
           <d n="SubKeys" t="Hashtable" />
           <d n="Values" t="Hashtable" />
         </o>
-        <v>{F66C7017-BDD8-4114-926C-81D6D687E35F}</v>
-        <o>
-          <v n="Name">"{F66C7017-BDD8-4114-926C-81D6D687E35F}"</v>
-          <d n="SubKeys" t="Hashtable" />
-          <d n="Values" t="Hashtable" />
-        </o>
         <v>{E709B08B-B6E4-4966-8EED-D793A13114C6}</v>
         <o>
           <v n="Name">"{E709B08B-B6E4-4966-8EED-D793A13114C6}"</v>
@@ -187,6 +171,23 @@
           <d n="Values" t="Hashtable" ckt="String" cvt="Boolean">
             <v>ReplaceConstants</v>
             <v>False</v>
+          </d>
+        </o>
+        <v>{F66C7017-BDD8-4114-926C-81D6D687E35F}</v>
+        <o>
+          <v n="Name">"{F66C7017-BDD8-4114-926C-81D6D687E35F}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{246001F4-279D-43AC-B241-948EB31120E1}</v>
+        <o>
+          <v n="Name">"{246001F4-279D-43AC-B241-948EB31120E1}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" ckt="String">
+            <v>GlobalVisuImageFilePath</v>
+            <v>"%APPLICATIONPATH%"</v>
+            <v>UnicodeStrings</v>
+            <v>false</v>
           </d>
         </o>
       </d>

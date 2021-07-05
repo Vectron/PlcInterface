@@ -4,7 +4,9 @@
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
 	{attribute 'OPC.UA.DA' := '1'}
+	{attribute 'analysis' := '-27'}
 	Reset		: BOOL;
+	{attribute 'analysis' := '27'}
 	EmptyStruct	: DUT_TestStruct;
 END_VAR
 ]]></Declaration>

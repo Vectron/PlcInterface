@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
 using Microsoft.Extensions.Logging;
@@ -8,21 +9,28 @@ using Opc.Ua.Client;
 
 namespace PlcInterface.OpcUa
 {
+    /// <summary>
+    /// Implementation of <see cref="ISymbolHandler"/>.
+    /// </summary>
     public class SymbolHandler : ISymbolHandler, IDisposable
     {
-        private readonly Dictionary<string, SymbolInfo> allSymbols = new Dictionary<string, SymbolInfo>();
-        private readonly IPlcConnection<Session> client;
-        private readonly CompositeDisposable disposables = new CompositeDisposable();
+        private readonly Dictionary<string, SymbolInfo> allSymbols = new(StringComparer.OrdinalIgnoreCase);
+        private readonly IPlcConnection<Session> connection;
+        private readonly CompositeDisposable disposables = new();
         private readonly ILogger logger;
-        private bool disposedValue = false;
-        private SymbolInfo rootNode;
-        private Session session;
+        private bool disposedValue;
+        private Session? session;
 
-        public SymbolHandler(IPlcConnection<Session> client, ILogger<SymbolHandler> logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SymbolHandler"/> class.
+        /// </summary>
+        /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
+        /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
+        public SymbolHandler(IPlcConnection<Session> connection, ILogger<SymbolHandler> logger)
         {
-            this.client = client;
+            this.connection = connection;
             this.logger = logger;
-            disposables.Add(client.SessionStream.Subscribe(x =>
+            disposables.Add(connection.SessionStream.Subscribe(x =>
             {
                 if (x.IsConnected)
                 {
@@ -36,18 +44,22 @@ namespace PlcInterface.OpcUa
             }));
         }
 
+        /// <inheritdoc/>
         public IReadOnlyCollection<ISymbolInfo> AllSymbols
             => allSymbols.Values;
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc/>
         public ISymbolInfo GetSymbolinfo(string ioName)
         {
-            if (!allSymbols.TryGetValue(ioName.ToLower(), out var value))
+            if (!allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out var value))
             {
                 throw new SymbolException($"{ioName} Does not excist in the PLC");
             }
@@ -55,6 +67,10 @@ namespace PlcInterface.OpcUa
             return value;
         }
 
+        /// <summary>
+        /// Protected implementation of Dispose pattern.
+        /// </summary>
+        /// <param name="disposing">Value indicating if we need to cleanup managed resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -63,7 +79,6 @@ namespace PlcInterface.OpcUa
                 {
                     disposables.Dispose();
                     allSymbols.Clear();
-                    rootNode = null;
                     session = null;
                 }
 
@@ -71,79 +86,10 @@ namespace PlcInterface.OpcUa
             }
         }
 
-        private static void GetElements(Session session, Browser browser, uint level, ReferenceDescriptionCollection references)
-        {
-            var spaces = string.Empty;
-            for (int i = 0; i <= level; i++)
-            {
-                spaces += "   ";
-            }
-
-            // Iterate through the references and print the variables
-            foreach (ReferenceDescription reference in references)
-            {
-                // make sure the type definition is in the cache.
-                session.NodeCache.Find(reference.ReferenceTypeId);
-                switch (reference.NodeClass)
-                {
-                    case NodeClass.Object:
-                        Console.WriteLine(spaces + "+ " + reference.DisplayName);
-                        break;
-
-                    default:
-                        Console.WriteLine(spaces + "- " + reference.DisplayName);
-                        break;
-                }
-
-                var subReferences = browser.Browse((NodeId)reference.NodeId);
-                level += 1;
-                GetElements(session, browser, level, subReferences);
-                level -= 1;
-            }
-        }
-
-        private SymbolInfo AddSymbol(ReferenceDescription description, string fullName)
-        {
-            var name = fullName.Replace("\"", string.Empty);
-            if (!allSymbols.TryGetValue(name.ToLower(), out var symbol))
-            {
-                var nodeInfo = ReadNodeInfo((NodeId)description.NodeId);
-                symbol = new SymbolInfo(description, name, nodeInfo);
-                allSymbols.Add(symbol.NameLower, symbol);
-            }
-
-            return symbol;
-        }
-
-        private void BuildSymbolList(IDictionary<SymbolInfo, ReferenceDescriptionCollection> items, Browser browser)
-        {
-            foreach (var kv in items)
-            {
-                var parrent = kv.Key;
-                var itemsToBrowseNext = new List<SymbolInfo>();
-
-                foreach (var item in kv.Value)
-                {
-                    var arrayIndex = item.BrowseName.Name.IndexOf('[');
-                    var itemName = arrayIndex == -1 ? $"{parrent.Name}.{item.BrowseName.Name}" : $"{parrent.Name}{item.BrowseName.Name.Substring(arrayIndex)}";
-                    itemName = CleanName(itemName);
-                    var symbol = AddSymbol(item, itemName);
-                    parrent.ChildSymbols.Add(symbol.Name);
-                    itemsToBrowseNext.Add(symbol);
-                }
-
-                if (itemsToBrowseNext.Count > 0)
-                {
-                    var browseResult = browser.Browse(itemsToBrowseNext);
-                    BuildSymbolList(browseResult, browser);
-                }
-            }
-        }
-
-        private string CleanName(string uri)
+        private static string CleanName(string uri, SymbolInfo rootNode)
         {
             var splitChar = '.';
-            var rootName = rootNode.NameLower;
+            var rootName = rootNode?.NameLower;
             if (string.IsNullOrWhiteSpace(rootName))
             {
                 return uri.Trim(splitChar);
@@ -152,43 +98,8 @@ namespace PlcInterface.OpcUa
             return uri.Replace(rootName, string.Empty).Trim(splitChar);
         }
 
-        /// <summary>
-        /// Gets the datatype of an OPC tag
-        /// </summary>
-        /// <param name="tag">Tag to get datatype of</param>
-        /// <returns>System Type</returns>
-        private NodeInfo ReadNodeInfo(NodeId nodeId)
+        private static NodeInfo NodeInfoFromReadResult(DataValueCollection results, Session session)
         {
-            var nodesToRead = new ReadValueIdCollection()
-            {
-                new ReadValueId
-                {
-                    NodeId = nodeId,
-                    AttributeId = Attributes.Description
-                },
-                new ReadValueId
-                {
-                    NodeId = nodeId,
-                    AttributeId = Attributes.DataType
-                },
-                new ReadValueId
-                {
-                    NodeId = nodeId,
-                    AttributeId = Attributes.ValueRank
-                },
-            };
-
-            _ = session.Read(
-                null,
-                0,
-                TimestampsToReturn.Neither,
-                nodesToRead,
-                out var results,
-                out var diagnosticInfos);
-
-            ClientBase.ValidateResponse(results, nodesToRead);
-            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
-
             var nodeInfo = new NodeInfo
             {
                 Description = results[0].GetValue(LocalizedText.Null).Text,
@@ -213,7 +124,7 @@ namespace PlcInterface.OpcUa
                         new ReadValueId
                         {
                             NodeId = nodeInfo.DataType,
-                            AttributeId = Attributes.DataTypeDefinition
+                            AttributeId = Attributes.DataTypeDefinition,
                         },
                     };
 
@@ -233,24 +144,62 @@ namespace PlcInterface.OpcUa
             return nodeInfo;
         }
 
-        private void UpdateRootNode(Browser browser)
+        private SymbolInfo AddSymbol(ReferenceDescription description, string fullName)
         {
-            var lastNode = new ReferenceDescription() { NodeId = ObjectIds.ObjectsFolder, NodeClass = NodeClass.Object };
-            if (!(client.Settings is OPCSettings settings))
+            var name = fullName.Replace("\"", string.Empty);
+            if (!allSymbols.TryGetValue(name.ToLower(CultureInfo.InvariantCulture), out var symbol))
             {
-                throw new NullReferenceException("No vallid settings found");
+                var nodeInfo = ReadNodeInfo((NodeId)description.NodeId);
+                symbol = new SymbolInfo(description, name, nodeInfo);
+                allSymbols.Add(symbol.NameLower, symbol);
             }
 
-            var path = settings.Address.AbsolutePath.Trim('/');
+            return symbol;
+        }
+
+        private void BuildSymbolList(IDictionary<SymbolInfo, ReferenceDescriptionCollection> items, Browser browser, SymbolInfo rootNode)
+        {
+            foreach (var kv in items)
+            {
+                var parrent = kv.Key;
+                var itemsToBrowseNext = new List<SymbolInfo>();
+
+                foreach (var item in kv.Value)
+                {
+                    var arrayIndex = item.BrowseName.Name.IndexOf('[');
+                    var itemName = arrayIndex == -1 ? $"{parrent.Name}.{item.BrowseName.Name}" : $"{parrent.Name}{item.BrowseName.Name.Substring(arrayIndex)}";
+                    itemName = CleanName(itemName, rootNode);
+                    var symbol = AddSymbol(item, itemName);
+                    parrent.ChildSymbols.Add(symbol.Name);
+                    itemsToBrowseNext.Add(symbol);
+                }
+
+                if (itemsToBrowseNext.Count > 0)
+                {
+                    var browseResult = browser.Browse(itemsToBrowseNext);
+                    BuildSymbolList(browseResult, browser, rootNode);
+                }
+            }
+        }
+
+        private SymbolInfo CreateRootNode(Browser browser)
+        {
+            var lastNode = new ReferenceDescription() { NodeId = ObjectIds.ObjectsFolder, NodeClass = NodeClass.Object };
+            if (connection.Settings is not OPCSettings settings)
+            {
+                throw new InvalidOperationException("No vallid settings found");
+            }
+
+            var path = settings.Address?.AbsolutePath.Trim('/');
             var rootNodeName = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(path))
             {
-                var pathParts = path.Split('/');
+                var pathParts = path!.Split('/');
 
                 foreach (var item in pathParts)
                 {
-                    var subNode = browser.Browse((NodeId)lastNode.NodeId).Where(x => x.BrowseName.Name.Trim('"').Equals(item)).FirstOrDefault();
+                    var subNode = browser.Browse((NodeId)lastNode.NodeId).FirstOrDefault(x => x.BrowseName.Name.Trim('"').Equals(item, StringComparison.Ordinal));
 
                     if (subNode == null)
                     {
@@ -261,7 +210,54 @@ namespace PlcInterface.OpcUa
                 }
             }
 
-            rootNode = AddSymbol(lastNode, rootNodeName);
+            return AddSymbol(lastNode, rootNodeName);
+        }
+
+        /// <summary>
+        /// Gets the datatype of an OPC tag.
+        /// </summary>
+        /// <param name="nodeId"><see cref="NodeId"/> to get datatype of.</param>
+        /// <returns>System Type.</returns>
+        private NodeInfo ReadNodeInfo(NodeId nodeId)
+        {
+            if (session == null)
+            {
+                throw new InvalidOperationException("Session is null");
+            }
+
+            var nodesToRead = new ReadValueIdCollection()
+            {
+                new ReadValueId
+                {
+                    NodeId = nodeId,
+                    AttributeId = Attributes.Description,
+                },
+                new ReadValueId
+                {
+                    NodeId = nodeId,
+                    AttributeId = Attributes.DataType,
+                },
+                new ReadValueId
+                {
+                    NodeId = nodeId,
+                    AttributeId = Attributes.ValueRank,
+                },
+            };
+
+            _ = session.Read(
+                null,
+                0,
+                TimestampsToReturn.Neither,
+                nodesToRead,
+                out var results,
+                out var diagnosticInfos);
+
+            ClientBase.ValidateResponse(results, nodesToRead);
+            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
+
+            var nodeInfo = NodeInfoFromReadResult(results, session);
+
+            return nodeInfo;
         }
 
         private void UpdateSymbols()
@@ -279,7 +275,7 @@ namespace PlcInterface.OpcUa
             };
 
             // update the root node to the path in settings
-            UpdateRootNode(browser);
+            var rootNode = CreateRootNode(browser);
 
             // get the nodes in the root
             var result = browser.Browse(rootNode.Handle);
@@ -287,10 +283,10 @@ namespace PlcInterface.OpcUa
             allSymbols.Clear();
             var dictResult = new Dictionary<SymbolInfo, ReferenceDescriptionCollection>
             {
-                { rootNode, result }
+                { rootNode, result },
             };
 
-            BuildSymbolList(dictResult, browser);
+            BuildSymbolList(dictResult, browser, rootNode);
         }
     }
 }

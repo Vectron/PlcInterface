@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
@@ -11,26 +12,38 @@ using Opc.Ua.Client;
 
 namespace PlcInterface.OpcUa
 {
+    /// <summary>
+    /// Implementation of <see cref="IReadWrite"/>.
+    /// </summary>
     public class ReadWrite : IDisposable, IReadWrite
     {
-        private readonly IPlcConnection<Session> client;
-        private readonly CompositeDisposable disposables = new CompositeDisposable();
+        private readonly IPlcConnection<Session> connection;
+        private readonly CompositeDisposable disposables = new();
         private readonly ILogger logger;
         private readonly ISymbolHandler symbolHandler;
-        private bool disposedValue = false;
+        private bool disposedValue;
 
-        public ReadWrite(IPlcConnection<Session> client, ISymbolHandler symbolHandler, ILogger<ReadWrite> logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadWrite"/> class.
+        /// </summary>
+        /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
+        /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
+        /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
+        public ReadWrite(IPlcConnection<Session> connection, ISymbolHandler symbolHandler, ILogger<ReadWrite> logger)
         {
-            this.client = client;
+            this.connection = connection;
             this.symbolHandler = symbolHandler;
             this.logger = logger;
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc/>
         public IDictionary<string, object> Read(IEnumerable<string> ioNames)
         {
             var nodesToRead = ioNames
@@ -42,11 +55,11 @@ namespace PlcInterface.OpcUa
 
             var nodesTypes = Enumerable.Repeat(typeof(object), nodesToRead.Count).ToList();
 
-            var session = client.GetConnectedClient();
+            var session = connection.GetConnectedClient();
             session.ReadValues(nodesToRead, nodesTypes, out var values, out var errors);
 
-            var valueEnumerator = values.Zip(errors, (value, error) => new DataValue(error.StatusCode) { Value = value }).GetEnumerator();
-            var result = new Dictionary<string, object>();
+            using var valueEnumerator = values.Zip(errors, (value, error) => new DataValue(error.StatusCode) { Value = value }).GetEnumerator();
+            var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             foreach (var ioName in ioNames)
             {
                 var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
@@ -57,6 +70,7 @@ namespace PlcInterface.OpcUa
             return result;
         }
 
+        /// <inheritdoc/>
         public T Read<T>(string ioName)
         {
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
@@ -66,11 +80,12 @@ namespace PlcInterface.OpcUa
                 return (T)FixType(dynamic, typeof(T));
             }
 
-            var session = client.GetConnectedClient();
-            var value = session.ReadValue(symbol.Handle);
-            return (T)FixType(value.Value, typeof(T));
+            var session = connection.GetConnectedClient();
+            var dataValue = session.ReadValue(symbol.Handle);
+            return (T)FixType(dataValue.Value, typeof(T));
         }
 
+        /// <inheritdoc/>
         public object Read(string ioName)
         {
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
@@ -79,29 +94,29 @@ namespace PlcInterface.OpcUa
                 return ReadDynamic(ioName);
             }
 
-            var session = client.GetConnectedClient();
+            var session = connection.GetConnectedClient();
             var value = session.ReadValue(symbol.Handle);
             return FixType(value.Value);
         }
 
+        /// <inheritdoc/>
         public Task<IDictionary<string, object>> ReadAsync(IEnumerable<string> ioNames)
         {
             var querry = ioNames
                 .SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler))
-                .Where(x => x.ChildSymbols.Count == 0)
-                .Where(x => x is SymbolInfo)
+                .Where(x => x.ChildSymbols.Count == 0 && x is SymbolInfo)
                 .Cast<SymbolInfo>()
                 .Select(x => new ReadValueId()
                 {
                     NodeId = x.Handle,
-                    AttributeId = Attributes.Value
+                    AttributeId = Attributes.Value,
                 });
 
-            var session = client.GetConnectedClient();
+            var session = connection.GetConnectedClient();
             var nodesToRead = new ReadValueIdCollection(querry);
             var taskCompletionSource = new TaskCompletionSource<IDictionary<string, object>>();
 
-            session.BeginRead(
+            _ = session.BeginRead(
                 null,
                 0,
                 TimestampsToReturn.Neither,
@@ -114,8 +129,8 @@ namespace PlcInterface.OpcUa
                         var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                         ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, ioNames);
 
-                        var valueEnumerator = dataValues.GetEnumerator() as IEnumerator<DataValue>;
-                        var result = new Dictionary<string, object>();
+                        using var valueEnumerator = dataValues.GetEnumerator() as IEnumerator<DataValue>;
+                        var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
                         foreach (var ioName in ioNames)
                         {
                             var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
@@ -123,11 +138,11 @@ namespace PlcInterface.OpcUa
                             result.Add(ioName, value);
                         }
 
-                        taskCompletionSource.TrySetResult(result);
+                        taskCompletionSource.SetResult(result);
                     }
                     catch (Exception ex)
                     {
-                        taskCompletionSource.TrySetException(ex);
+                        taskCompletionSource.SetException(ex);
                     }
                 },
                 null);
@@ -135,6 +150,7 @@ namespace PlcInterface.OpcUa
             return taskCompletionSource.Task;
         }
 
+        /// <inheritdoc/>
         public Task<object> ReadAsync(string ioName)
         {
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
@@ -143,18 +159,18 @@ namespace PlcInterface.OpcUa
                 return ReadDynamicAsync(ioName);
             }
 
-            var session = client.GetConnectedClient();
+            var session = connection.GetConnectedClient();
             var nodesToRead = new ReadValueIdCollection
             {
                 new ReadValueId()
                 {
                     NodeId = symbol.Handle,
-                    AttributeId = Attributes.Value
-                }
+                    AttributeId = Attributes.Value,
+                },
             };
 
             var taskCompletionSource = new TaskCompletionSource<object>();
-            session.BeginRead(
+            _ = session.BeginRead(
                 null,
                 0,
                 TimestampsToReturn.Neither,
@@ -163,7 +179,7 @@ namespace PlcInterface.OpcUa
                 {
                     try
                     {
-                        var responseHeader = session.EndRead(ar, out DataValueCollection dataValues, out DiagnosticInfoCollection diagnosticInfos);
+                        var responseHeader = session.EndRead(ar, out var dataValues, out var diagnosticInfos);
                         var val = dataValues.FirstOrDefault();
                         var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                         ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
@@ -179,33 +195,35 @@ namespace PlcInterface.OpcUa
             return taskCompletionSource.Task;
         }
 
-        public Task<T> ReadAsync<T>(string ioName)
+        /// <inheritdoc/>
+        public async Task<T> ReadAsync<T>(string ioName)
         {
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
             if (symbol.ChildSymbols.Count > 0)
             {
-                return ReadDynamicAsync(ioName).ContinueWith(x => (T)FixType(x.Result, typeof(T)));
+                var value = await ReadDynamicAsync(ioName).ConfigureAwait(false);
+                return (T)FixType(value, typeof(T));
             }
 
-            var session = client.GetConnectedClient();
+            var session = connection.GetConnectedClient();
             var nodesToRead = new ReadValueIdCollection
             {
                 new ReadValueId()
                 {
                     NodeId = symbol.Handle,
-                    AttributeId = Attributes.Value
-                }
+                    AttributeId = Attributes.Value,
+                },
             };
 
             var taskCompletionSource = new TaskCompletionSource<T>();
-            session.BeginRead(
+            _ = session.BeginRead(
                 null,
                 0,
                 TimestampsToReturn.Neither,
                 nodesToRead,
                 ar =>
                 {
-                    var responseHeader = session.EndRead(ar, out DataValueCollection dataValues, out DiagnosticInfoCollection diagnosticInfos);
+                    var responseHeader = session.EndRead(ar, out var dataValues, out var diagnosticInfos);
 
                     try
                     {
@@ -221,10 +239,15 @@ namespace PlcInterface.OpcUa
                 },
                 null);
 
-            return taskCompletionSource.Task;
+            return await taskCompletionSource.Task.ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public dynamic ReadDynamic(string ioName)
+            => ReadDynamicAsync(ioName).GetAwaiter().GetResult();
+
+        /// <inheritdoc/>
+        public async Task<dynamic> ReadDynamicAsync(string ioName)
         {
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
 
@@ -235,7 +258,7 @@ namespace PlcInterface.OpcUa
                     var array = Array.CreateInstance(typeof(ExpandoObject), symbol.ArrayBounds);
                     foreach (var childSymbol in symbol.ChildSymbols)
                     {
-                        var value = ReadDynamic(childSymbol);
+                        var value = await ReadDynamicAsync(childSymbol).ConfigureAwait(false);
                         var indices = symbolHandler.GetSymbolinfo(childSymbol).ConvertAndValidate().Indices;
                         array.SetValue(value, indices);
                     }
@@ -246,31 +269,31 @@ namespace PlcInterface.OpcUa
                 var collection = new ExpandoObject() as IDictionary<string, object>;
                 foreach (var childSymbol in symbol.ChildSymbols)
                 {
-                    var value = ReadDynamic(childSymbol);
+                    var value = await ReadDynamicAsync(childSymbol).ConfigureAwait(false);
                     var shortName = symbolHandler.GetSymbolinfo(childSymbol).ShortName;
                     collection.Add(shortName, value);
                 }
+
                 return collection;
             }
             else
             {
-                var value = Read(ioName);
+                var value = await ReadAsync(ioName).ConfigureAwait(false);
                 return value;
             }
         }
 
-        public Task<dynamic> ReadDynamicAsync(string ioName)
-            => Task.Run(() => ReadDynamic(ioName));
-
+        /// <inheritdoc/>
         public void ToggleBool(string ioName)
         {
             var previousValue = Read<bool>(ioName);
             Write(ioName, !previousValue);
         }
 
+        /// <inheritdoc/>
         public void Write(IDictionary<string, object> namesValues)
         {
-            var session = client.GetConnectedClient();
+            var session = connection.GetConnectedClient();
             var querry = namesValues
                 .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
                 .Select(x => (x.SymbolInfo.ConvertAndValidate(), x.Value))
@@ -278,26 +301,29 @@ namespace PlcInterface.OpcUa
                 {
                     NodeId = x.Item1.Handle,
                     AttributeId = Attributes.Value,
-                    Value = new DataValue(ConvertToOpcType(x.Value, x.Item1.BuiltInType))
+                    Value = new DataValue(ConvertToOpcType(x.Value, x.Item1.BuiltInType)),
                 });
 
             var nodesToWrite = new WriteValueCollection(querry);
 
-            ResponseHeader responseHeader = session.Write(
+            var responseHeader = session.Write(
                 null,
                 nodesToWrite,
-                out StatusCodeCollection statusCodes,
-                out DiagnosticInfoCollection diagnosticInfos);
+                out var statusCodes,
+                out var diagnosticInfos);
 
             ValidateResponse(nodesToWrite, responseHeader, statusCodes, diagnosticInfos, namesValues.Keys);
         }
 
+        /// <inheritdoc/>
         public void Write<T>(string ioName, T value)
-            => Write(new Dictionary<string, object>() { { ioName, value } });
+            where T : notnull
+            => Write(new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { ioName, value } });
 
+        /// <inheritdoc/>
         public Task WriteAsync(IDictionary<string, object> namesValues)
         {
-            var session = client.GetConnectedClient();
+            var session = connection.GetConnectedClient();
             var querry = namesValues
                  .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
                  .Select(x => (x.SymbolInfo.ConvertAndValidate(), x.Value))
@@ -305,18 +331,18 @@ namespace PlcInterface.OpcUa
                  {
                      NodeId = x.Item1.Handle,
                      AttributeId = Attributes.Value,
-                     Value = new DataValue(ConvertToOpcType(x.Value, x.Item1.BuiltInType))
+                     Value = new DataValue(ConvertToOpcType(x.Value, x.Item1.BuiltInType)),
                  });
 
             var nodesToWrite = new WriteValueCollection(querry);
             var taskCompletionSource = new TaskCompletionSource<bool>();
 
-            session.BeginWrite(
+            _ = session.BeginWrite(
                 null,
                 nodesToWrite,
                 r =>
                 {
-                    var responseHeader = session.EndWrite(r, out StatusCodeCollection statusCodes, out DiagnosticInfoCollection diagnosticInfos);
+                    var responseHeader = session.EndWrite(r, out var statusCodes, out var diagnosticInfos);
                     try
                     {
                         ValidateResponse(nodesToWrite, responseHeader, statusCodes, diagnosticInfos, namesValues.Keys);
@@ -324,7 +350,7 @@ namespace PlcInterface.OpcUa
                     }
                     catch (Exception ex)
                     {
-                        taskCompletionSource.TrySetException(ex);
+                        taskCompletionSource.SetException(ex);
                     }
                 },
                 null);
@@ -332,9 +358,15 @@ namespace PlcInterface.OpcUa
             return taskCompletionSource.Task;
         }
 
+        /// <inheritdoc/>
         public Task WriteAsync<T>(string ioName, T value)
-            => WriteAsync(new Dictionary<string, object>() { { ioName, value } });
+            where T : notnull
+            => WriteAsync(new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { ioName, value } });
 
+        /// <summary>
+        /// Protected implementation of Dispose pattern.
+        /// </summary>
+        /// <param name="disposing">Value indicating if we need to cleanup managed resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -346,6 +378,74 @@ namespace PlcInterface.OpcUa
 
                 disposedValue = true;
             }
+        }
+
+        private static Variant ConvertToOpcType(object value, BuiltInType builtInType)
+        {
+            if (value is DateTimeOffset dateTimeOffset)
+            {
+                var specified = DateTime.SpecifyKind(dateTimeOffset.DateTime, DateTimeKind.Utc);
+                return new Variant(specified);
+            }
+
+            if (builtInType == BuiltInType.Enumeration)
+            {
+                return new Variant(Convert.ToInt32(value, CultureInfo.InvariantCulture));
+            }
+
+            if (value is TimeSpan timeSpan)
+            {
+                var ticks = timeSpan.Ticks;
+                var seconds = timeSpan.TotalSeconds;
+                return builtInType switch
+                {
+                    BuiltInType.Int32 => new Variant((int)seconds),
+                    BuiltInType.UInt32 => new Variant((uint)seconds),
+                    BuiltInType.Int64 => new Variant(ticks),
+                    BuiltInType.UInt64 => new Variant((ulong)ticks),
+                    BuiltInType.Float => new Variant((float)seconds),
+                    BuiltInType.Double => new Variant(seconds),
+                    BuiltInType.Null => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.Boolean => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.SByte => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.Byte => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.Int16 => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.UInt16 => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.String => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.DateTime => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.Guid => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.ByteString => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.XmlElement => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.NodeId => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.ExpandedNodeId => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.StatusCode => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.QualifiedName => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.LocalizedText => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.ExtensionObject => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.DataValue => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.Variant => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.DiagnosticInfo => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.Number => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.Integer => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.UInteger => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    BuiltInType.Enumeration => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                    _ => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
+                };
+            }
+
+            return new Variant(value);
+        }
+
+        private static TimeSpan CreateTimeSpan(object value)
+        {
+            if (value.GetType() == typeof(ulong))
+            {
+                var ticks = Convert.ToInt64(value, CultureInfo.InvariantCulture) / 100; // ticks are in 100 nano seconds, value is in micro seconds
+                return TimeSpan.FromTicks(ticks);
+            }
+
+            var miliSeconds = Convert.ToDouble(value, CultureInfo.InvariantCulture);
+            return TimeSpan.FromMilliseconds(miliSeconds);
         }
 
         private static object FixType(object value)
@@ -364,73 +464,50 @@ namespace PlcInterface.OpcUa
             return value;
         }
 
-        private Variant ConvertToOpcType(object value, BuiltInType builtInType)
+        private static void ValidateResponse(IList request, ResponseHeader responseHeader, StatusCodeCollection statusCodes, DiagnosticInfoCollection diagnosticInfos, IEnumerable<string> ioNames)
         {
-            if (value is DateTimeOffset dateTimeOffset)
+            ClientBase.ValidateResponse(statusCodes, request);
+            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, request);
+
+            if (!StatusCode.IsGood(responseHeader.ServiceResult))
             {
-                var specified = DateTime.SpecifyKind(dateTimeOffset.DateTime, DateTimeKind.Utc);
-                return new Variant(specified);
+                throw new ServiceResultException($"Response header is bad");
             }
-            else if (value is TimeSpan timeSpan)
+
+            if (!statusCodes.TrueForAll(x => StatusCode.IsGood(x)))
             {
-                var ticks = timeSpan.Ticks;
-                var seconds = timeSpan.TotalSeconds;
-                switch (builtInType)
-                {
-                    case BuiltInType.Int32:
-                        return new Variant((int)seconds);
+                var errors = statusCodes
+                    .Zip(ioNames, (statusCode, name) => (statusCode, name))
+                    .Where(x => !StatusCode.IsGood(x.statusCode))
+                    .Select(x => ServiceResultException.Create(x.statusCode.Code, "{0}: {1}", StatusCode.LookupSymbolicId(x.statusCode.Code), x.name))
+                    .ToList();
 
-                    case BuiltInType.UInt32:
-                        return new Variant((uint)seconds);
-
-                    case BuiltInType.Int64:
-                        return new Variant(ticks);
-
-                    case BuiltInType.UInt64:
-                        return new Variant((ulong)ticks);
-
-                    case BuiltInType.Float:
-                        return new Variant((float)seconds);
-
-                    case BuiltInType.Double:
-                        return new Variant(seconds);
-
-                    case BuiltInType.Null:
-                    case BuiltInType.Boolean:
-                    case BuiltInType.SByte:
-                    case BuiltInType.Byte:
-                    case BuiltInType.Int16:
-                    case BuiltInType.UInt16:
-                    case BuiltInType.String:
-                    case BuiltInType.DateTime:
-                    case BuiltInType.DataValue:
-                    case BuiltInType.Enumeration:
-                    case BuiltInType.Number:
-                    case BuiltInType.Integer:
-                    case BuiltInType.UInteger:
-                    case BuiltInType.Guid:
-                    case BuiltInType.ByteString:
-                    case BuiltInType.XmlElement:
-                    case BuiltInType.NodeId:
-                    case BuiltInType.ExpandedNodeId:
-                    case BuiltInType.StatusCode:
-                    case BuiltInType.QualifiedName:
-                    case BuiltInType.LocalizedText:
-                    case BuiltInType.ExtensionObject:
-                    case BuiltInType.Variant:
-                    case BuiltInType.DiagnosticInfo:
-                    default:
-                        break;
-                }
+                throw new AggregateException($"Service result is bad", errors);
             }
-            else if (builtInType == BuiltInType.Enumeration)
-            {
-                return new Variant(Convert.ToInt32(value));
-            }
-            return new Variant(value);
         }
 
-        private object CreateDynamic(SymbolInfo symbolInfo, IEnumerator<DataValue> valueEnumerator)
+        private Array CreateArray(Type targetType, Array array)
+        {
+            var upperBoundsRank = new int[array.Rank];
+            for (var dimension = 0; dimension < array.Rank; dimension++)
+            {
+                upperBoundsRank[dimension] = array.GetLength(dimension);
+            }
+
+            var elementType = targetType.GetElementType();
+            var typedArray = Array.CreateInstance(elementType, upperBoundsRank);
+
+            foreach (var indices in typedArray.Indices())
+            {
+                var item = array.GetValue(indices);
+                var fixedObject = FixType(item, elementType);
+                typedArray.SetValue(fixedObject, indices);
+            }
+
+            return typedArray;
+        }
+
+        private dynamic CreateDynamic(SymbolInfo symbolInfo, IEnumerator<DataValue> valueEnumerator)
         {
             if (symbolInfo.ChildSymbols.Count == 0)
             {
@@ -467,16 +544,12 @@ namespace PlcInterface.OpcUa
                 var shortName = childSymbolInfo.ShortName;
                 collection.Add(shortName, value);
             }
+
             return collection;
         }
 
         private object FixType(object value, Type targetType)
         {
-            if (value == null)
-            {
-                return value;
-            }
-
             if (value.GetType() == targetType)
             {
                 return value;
@@ -490,14 +563,7 @@ namespace PlcInterface.OpcUa
 
             if (targetType == typeof(TimeSpan))
             {
-                if (value.GetType() == typeof(ulong))
-                {
-                    var ticks = Convert.ToInt64(value) / 100; // ticks are in 100 nano seconds, value is in micro seconds
-                    return TimeSpan.FromTicks(ticks);
-                }
-
-                var miliSeconds = Convert.ToDouble(value);
-                return TimeSpan.FromMilliseconds(miliSeconds);
+                return CreateTimeSpan(value);
             }
 
             if (value is Matrix matrix)
@@ -505,29 +571,11 @@ namespace PlcInterface.OpcUa
                 return matrix.ToArray();
             }
 
-            if (value.GetType().IsArray && targetType.IsArray)
+            if (value.GetType().IsArray
+                && targetType.IsArray
+                && value is Array array)
             {
-                var array = value as Array;
-                var upperBoundsRank = new int[array.Rank];
-
-                for (var dimension = 0; dimension < array.Rank; dimension++)
-                {
-                    upperBoundsRank[dimension] = array.GetLength(dimension);
-                }
-
-                var elementType = targetType.GetElementType();
-                var typedArray = Array.CreateInstance(elementType, upperBoundsRank);
-                var indices = new int[array.Rank];
-                indices[indices.Length - 1]--;
-
-                while (array.IncrementIndices(indices))
-                {
-                    var item = array.GetValue(indices);
-                    var fixedObject = FixType(item, elementType);
-                    typedArray.SetValue(fixedObject, indices);
-                }
-
-                return typedArray;
+                return CreateArray(targetType, array);
             }
 
             if (value is ExpandoObject keyValues)
@@ -550,29 +598,12 @@ namespace PlcInterface.OpcUa
                 return instance;
             }
 
-            return Convert.ChangeType(value, targetType);
-        }
-
-        private void ValidateResponse(IList request, ResponseHeader responseHeader, StatusCodeCollection statusCodes, DiagnosticInfoCollection diagnosticInfos, IEnumerable<string> ioNames)
-        {
-            ClientBase.ValidateResponse(statusCodes, request);
-            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, request);
-
-            if (!StatusCode.IsGood(responseHeader.ServiceResult))
+            if (targetType.IsEnum)
             {
-                throw new ServiceResultException($"Response header is bad");
+                return Enum.ToObject(targetType, value);
             }
 
-            if (!statusCodes.TrueForAll(x => StatusCode.IsGood(x)))
-            {
-                var errors = statusCodes
-                    .Zip(ioNames, (statusCode, name) => (statusCode, name))
-                    .Where(x => !StatusCode.IsGood(x.statusCode))
-                    .Select(x => ServiceResultException.Create(x.statusCode.Code, "{0}: {1}", StatusCode.LookupSymbolicId(x.statusCode.Code), x.name))
-                    .ToList();
-
-                throw new AggregateException($"Service result is bad", errors);
-            }
+            return Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
         }
     }
 }

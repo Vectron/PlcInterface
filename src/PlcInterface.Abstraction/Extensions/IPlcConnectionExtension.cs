@@ -4,25 +4,29 @@ using System.Reactive.Threading.Tasks;
 
 namespace PlcInterface
 {
+    /// <summary>
+    /// Extension methods for <see cref="IPlcConnection{T}"/>.
+    /// </summary>
     public static class IPlcConnectionExtension
     {
         /// <summary>
         /// Gets the PLC Connection.
-        /// Throws a TimeoutException if no client is returned in 2 seconds
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="plcConnection"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The connection type to return.</typeparam>
+        /// <param name="plcConnection">The <see cref="IPlcConnection{T}"/> implementation.</param>
+        /// <returns>The gotten <typeparamref name="T"/>.</returns>
+        /// <exception cref="TimeoutException">If no client is returned in 2 seconds.</exception>
         public static T GetConnectedClient<T>(this IPlcConnection<T> plcConnection)
             => plcConnection.GetConnectedClient(TimeSpan.FromSeconds(2));
 
         /// <summary>
         /// Gets the PLC Connection.
-        /// Throws a TimeoutException if no client is returned in timeout
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="plcConnection"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The connection type to return.</typeparam>
+        /// <param name="plcConnection">The <see cref="IPlcConnection{T}"/> implementation.</param>
+        /// <param name="timeout">A <see cref="TimeSpan"/> indicating how long to wait for getting the connection.</param>
+        /// <returns>The gotten <typeparamref name="T"/>.</returns>
+        /// <exception cref="TimeoutException">If no client is returned after <paramref name="timeout"/>.</exception>
         public static T GetConnectedClient<T>(this IPlcConnection<T> plcConnection, TimeSpan timeout)
             => plcConnection
                 .SessionStream
@@ -31,6 +35,7 @@ namespace PlcInterface
                 .ToTask()
                 .GetAwaiter()
                 .GetResult()
-                .Value;
+                .Value
+                .ThrowIfNull();
     }
 }

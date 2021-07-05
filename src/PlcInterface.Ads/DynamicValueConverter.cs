@@ -6,8 +6,12 @@ using TwinCAT.TypeSystem;
 
 namespace PlcInterface.Ads
 {
+    /// <summary>
+    /// A implementation of a <see cref="IDynamicValueConverter"/>.
+    /// </summary>
     public class DynamicValueConverter : IDynamicValueConverter
     {
+        /// <inheritdoc/>
         public object ConvertFrom(DynamicObject dynamicObject, Type type)
         {
             if (type.IsArray)
@@ -25,7 +29,7 @@ namespace PlcInterface.Ads
                     continue;
                 }
 
-                if (!dynamicObject.TryGetMember(new MemberBinder(property.Name, true), out object result))
+                if (!dynamicObject.TryGetMember(new MemberBinder(property.Name, true), out var result))
                 {
                     throw new InvalidOperationException($"{property.Name} is not found in the PLC type");
                 }
@@ -60,70 +64,41 @@ namespace PlcInterface.Ads
                     continue;
                 }
             }
+
             return destination;
         }
 
         private Array ConvertArray(DynamicObject dynamicObject, Type type)
         {
-            if (!(dynamicObject is DynamicValue valueObject))
+            if (dynamicObject is not DynamicValue valueObject)
             {
                 throw new NotSupportedException($"dynamic object is not a {typeof(DynamicValue)}");
             }
 
-            if (!(valueObject.DataType is ArrayType dataType))
+            if (valueObject.DataType is not ArrayType dataType)
             {
                 throw new NotSupportedException($"Data Type is not a {typeof(ArrayType)}");
             }
 
-            var dimensionLengts = dataType.Dimensions.GetDimensionLengths();
             var ellementType = type.GetElementType();
+            var dimensionLengts = dataType.Dimensions.GetDimensionLengths();
             var destination = Array.CreateInstance(ellementType, dimensionLengts);
-            var indices = new int[dataType.ElementCount][];
-            int[] previous = null;
 
-            for (int i = 0; i < dataType.ElementCount; i++)
+            foreach (var indices in destination.Indices())
             {
-                var current = new int[dataType.DimensionCount];
-                previous?.CopyTo(current, 0);
-
-                for (int j = dataType.DimensionCount - 1; j >= 0; j--)
+                if (!valueObject.TryGetIndexValue(indices, out var result))
                 {
-                    var dimensionInfo = dataType.Dimensions[j];
-
-                    if (previous == null)
-                    {
-                        current[j] = dimensionInfo.LowerBound;
-                        continue;
-                    }
-
-                    var upperBound = dimensionInfo.LowerBound + dimensionInfo.ElementCount;
-                    current[j] += 1;
-
-                    if (current[j] >= upperBound)
-                    {
-                        current[j] = dimensionInfo.LowerBound;
-                        continue;
-                    }
-
-                    break;
+                    throw new SymbolException($"No value found at index {indices}");
                 }
-
-                indices[i] = current;
-                previous = current;
-            }
-
-            foreach (var index in indices)
-            {
-                valueObject.TryGetIndexValue(index, out object result);
 
                 if (result is DynamicValue resultDynamicObject)
                 {
                     var value = ConvertFrom(resultDynamicObject, ellementType);
-                    destination.SetValue(value, index);
+                    destination.SetValue(value, indices);
                 }
                 else if (result.GetType() == ellementType)
                 {
-                    destination.SetValue(result, index);
+                    destination.SetValue(result, indices);
                 }
                 else
                 {
@@ -134,7 +109,7 @@ namespace PlcInterface.Ads
             return destination;
         }
 
-        private class MemberBinder : GetMemberBinder
+        private sealed class MemberBinder : GetMemberBinder
         {
             public MemberBinder(string name, bool ignoreCase)
                 : base(name, ignoreCase)
@@ -142,9 +117,7 @@ namespace PlcInterface.Ads
             }
 
             public override DynamicMetaObject FallbackGetMember(DynamicMetaObject target, DynamicMetaObject errorSuggestion)
-            {
-                throw new NotImplementedException();
-            }
+                => throw new NotSupportedException();
         }
     }
 }

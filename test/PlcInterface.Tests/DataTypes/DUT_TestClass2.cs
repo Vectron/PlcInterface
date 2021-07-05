@@ -4,9 +4,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace PlcInterface.Tests.DataTypes
 {
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
-    internal class DUT_TestClass2
+    internal sealed class DUT_TestClass2
     {
-        public static DUT_TestClass2 Default => new DUT_TestClass2()
+        public static DUT_TestClass2 Default => new()
         {
             ByteValue = byte.MaxValue,
             WordValue = ushort.MaxValue,
@@ -14,7 +14,7 @@ namespace PlcInterface.Tests.DataTypes
             LWordValue = ulong.MaxValue,
         };
 
-        public static DUT_TestClass2 Write => new DUT_TestClass2()
+        public static DUT_TestClass2 Write => new()
         {
             ByteValue = byte.MinValue,
             WordValue = ushort.MinValue,
@@ -44,7 +44,7 @@ namespace PlcInterface.Tests.DataTypes
 
         public override bool Equals(object obj)
         {
-            if (!(obj is DUT_TestClass2))
+            if (obj is not DUT_TestClass2)
             {
                 return false;
             }

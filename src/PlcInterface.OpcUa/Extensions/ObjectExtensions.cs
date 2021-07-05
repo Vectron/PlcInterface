@@ -1,6 +1,9 @@
 ﻿namespace System.Collections.Generic
 {
-    internal static class IEnumerableExtensions
+    /// <summary>
+    /// Extension methods for <see cref="object"/>.
+    /// </summary>
+    internal static class ObjectExtensions
     {
         /// <summary>
         /// Wraps this object instance into an IEnumerable&lt;T&gt;

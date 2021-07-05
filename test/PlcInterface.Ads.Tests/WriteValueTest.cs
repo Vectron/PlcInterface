@@ -8,9 +8,9 @@ namespace PlcInterface.Ads.Tests
     [TestClass]
     public class WriteValueTest : IWriteValueTestBase
     {
-        private static PlcConnection connection;
-        private static ReadWrite readWrite;
-        private static SymbolHandler symbolHandler;
+        private static PlcConnection? connection;
+        private static ReadWrite? readWrite;
+        private static SymbolHandler? symbolHandler;
 
         [ClassInitialize]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public Api")]
@@ -24,20 +24,23 @@ namespace PlcInterface.Ads.Tests
             symbolHandler = new SymbolHandler(connection, GetOptionsMoq(symbolhandlersettings), GetLoggerMock<SymbolHandler>());
             readWrite = new ReadWrite(connection, symbolHandler, dynamicValueConverter, GetLoggerMock<ReadWrite>());
             await connection.ConnectAsync();
-            var result = await connection.SessionStream.FirstAsync();
+            _ = await connection.SessionStream.FirstAsync();
         }
 
         [ClassCleanup]
         public static void Disconnect()
-            => connection.Dispose();
+        {
+            connection?.Dispose();
+            symbolHandler?.Dispose();
+        }
 
         protected override IPlcConnection GetPLCConnection()
-            => connection;
+            => connection ?? throw new System.NotSupportedException();
 
         protected override IReadWrite GetReadWrite()
-            => readWrite;
+            => readWrite ?? throw new System.NotSupportedException();
 
         protected override ISymbolHandler GetSymbolHandler()
-            => symbolHandler;
+            => symbolHandler ?? throw new System.NotSupportedException();
     }
 }

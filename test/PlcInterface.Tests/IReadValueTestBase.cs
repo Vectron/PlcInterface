@@ -64,15 +64,15 @@ namespace PlcInterface.Tests
         public void ReadMultiple()
         {
             // Arrange
-            var data = Settings.GetReadMultiple();
+            var data = Settings.ReadMultipleData;
             var readWrite = GetReadWrite();
 
             // Act
             var value = readWrite.Read(data.Keys);
 
             // Assert
-            var dataEnumerator = data.GetEnumerator();
-            var valueEnumerator = value.GetEnumerator();
+            using var dataEnumerator = data.GetEnumerator();
+            using var valueEnumerator = value.GetEnumerator();
 
             Assert.AreEqual(data.Count, value.Count);
 
@@ -92,15 +92,15 @@ namespace PlcInterface.Tests
         public async Task ReadMultipleAsync()
         {
             // Arrange
-            var data = Settings.GetReadMultiple();
+            var data = Settings.ReadMultipleData;
             var readWrite = GetReadWrite();
 
             // Act
             var value = await readWrite.ReadAsync(data.Keys);
 
             // Assert
-            var dataEnumerator = data.GetEnumerator();
-            var valueEnumerator = value.GetEnumerator();
+            using var dataEnumerator = data.GetEnumerator();
+            using var valueEnumerator = value.GetEnumerator();
 
             Assert.AreEqual(data.Count, value.Count);
 
@@ -145,7 +145,7 @@ namespace PlcInterface.Tests
         }
 
         protected override IMonitor GetMonitor()
-            => throw new NotImplementedException();
+            => throw new NotSupportedException();
 
         protected void ReadValueGenericHelper<T>(string ioName, T expectedValue)
         {
@@ -156,6 +156,8 @@ namespace PlcInterface.Tests
             var value = readWrite.Read<T>(ioName);
 
             // Assert
+            Assert.IsNotNull(expectedValue);
+            Assert.IsNotNull(value);
             Assert.That.ObjectEquals(expectedValue, value, ioName);
         }
 
@@ -165,9 +167,11 @@ namespace PlcInterface.Tests
             var readWrite = GetReadWrite();
 
             // Act
-            var value = await readWrite.ReadAsync<T>(ioName);
+            var value = await readWrite.ReadAsync<T>(ioName).ConfigureAwait(false);
 
             // Assert
+            Assert.IsNotNull(expectedValue);
+            Assert.IsNotNull(value);
             Assert.That.ObjectEquals(expectedValue, value, ioName);
         }
     }

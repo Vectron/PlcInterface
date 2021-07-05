@@ -59,14 +59,14 @@ namespace PlcInterface.Tests
             // Arrange
             var monitor = GetMonitor();
             var readWrite = GetReadWrite();
-            var done = new ManualResetEvent(false);
+            using var done = new ManualResetEvent(false);
             var ioName = "MonitorTestData.BoolValue1";
 
             // Act
             var original = readWrite.Read<bool>(ioName);
             var subscription = monitor.SymbolStream.Subscribe(x =>
               {
-                  if (x.Name == ioName)
+                  if (string.Equals(x.Name, ioName, StringComparison.OrdinalIgnoreCase))
                   {
                       var value = (bool)x.Value;
                       Assert.AreNotEqual(original, value);
@@ -91,7 +91,7 @@ namespace PlcInterface.Tests
             // Arrange
             var monitor = GetMonitor();
             var readWrite = GetReadWrite();
-            var done = new ManualResetEvent(false);
+            using var done = new ManualResetEvent(false);
             var hits = 0;
             var variables = Settings.GetMonitorMultiple();
 
@@ -114,12 +114,12 @@ namespace PlcInterface.Tests
             {
                 monitor.RegisterIO(variables);
 
-                var valuesToWrite = originals.ToDictionary(x => x.Key, x => (object)!(bool)x.Value);
+                var valuesToWrite = originals.ToDictionary(x => x.Key, x => (object)!(bool)x.Value, StringComparer.OrdinalIgnoreCase);
                 readWrite.Write(valuesToWrite);
                 var result = done.WaitOne(TimeSpan.FromSeconds(5));
 
                 // Assert
-                Assert.IsTrue(result, $"Timeout, items processed {hits}/{originals.Count}");
+                Assert.IsTrue(result, FormattableString.Invariant($"Timeout, items processed {hits}/{originals.Count}"));
             }
         }
 
@@ -129,7 +129,7 @@ namespace PlcInterface.Tests
             // Arrange
             var monitor = GetMonitor();
             var readWrite = GetReadWrite();
-            var done = new ManualResetEvent(false);
+            using var done = new ManualResetEvent(false);
             var ioName = "MonitorTestData.BoolValue8";
 
             // Act
@@ -145,15 +145,16 @@ namespace PlcInterface.Tests
             }
         }
 
-        private async Task SubscribeCheckAsync(IList<bool> results, int expectedCount)
+        private static async Task SubscribeCheckAsync(IList<bool> results, int expectedCount)
         {
-            await Task.Delay(1000);
+            await Task.Delay(1000, CancellationToken.None).ConfigureAwait(false);
             Assert.AreEqual(expectedCount, results.Count);
             foreach (var result in results)
             {
                 Console.Write(result);
                 Console.Write(", ");
             }
+
             Console.WriteLine();
             results.Clear();
         }

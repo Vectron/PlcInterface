@@ -1,12 +1,16 @@
-﻿using Microsoft.Extensions.Options;
-using Opc.Ua;
-using System;
+﻿using System;
 using System.Reflection;
+using Microsoft.Extensions.Options;
+using Opc.Ua;
 
 namespace PlcInterface.OpcUa
 {
+    /// <summary>
+    /// A <see cref="IConfigureOptions{TOptions}"/> for configuring <see cref="OPCSettings"/> with default values.
+    /// </summary>
     public class DefaultOPCSettingsConfigureOptions : IConfigureOptions<OPCSettings>
     {
+        /// <inheritdoc/>
         public void Configure(OPCSettings options)
         {
             var builder = new UriBuilder("opc.tcp", "127.0.0.1", 48010, string.Empty);
@@ -19,7 +23,7 @@ namespace PlcInterface.OpcUa
             options.ApplicationConfiguration = CreateApplicationConfiguration();
         }
 
-        private ApplicationConfiguration CreateApplicationConfiguration()
+        private static ApplicationConfiguration CreateApplicationConfiguration()
         {
             var entryAssembly = Assembly.GetEntryAssembly();
             if (entryAssembly == null)
@@ -40,7 +44,7 @@ namespace PlcInterface.OpcUa
                     {
                         StoreType = "X509Store",
                         StorePath = "CurrentUser\\My",
-                        SubjectName = appName
+                        SubjectName = appName,
                     },
                     TrustedPeerCertificates = new CertificateTrustList
                     {
@@ -58,11 +62,11 @@ namespace PlcInterface.OpcUa
                         StorePath = "OPC Foundation/CertificateStores/RejectedCertificates",
                     },
                     NonceLength = 32,
-                    AutoAcceptUntrustedCertificates = true
+                    AutoAcceptUntrustedCertificates = true,
                 },
                 TransportConfigurations = new TransportConfigurationCollection(),
                 TransportQuotas = new TransportQuotas { OperationTimeout = 15000 },
-                ClientConfiguration = new ClientConfiguration { DefaultSessionTimeout = 60000, }
+                ClientConfiguration = new ClientConfiguration { DefaultSessionTimeout = 60000, },
             };
         }
     }

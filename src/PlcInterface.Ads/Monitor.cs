@@ -1,24 +1,32 @@
-﻿using Microsoft.Extensions.Logging;
-using PlcInterface.Ads.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Microsoft.Extensions.Logging;
 using TwinCAT.Ads;
 using TwinCAT.Ads.Reactive;
 using TwinCAT.TypeSystem;
 
 namespace PlcInterface.Ads
 {
+    /// <summary>
+    /// A implementation of <see cref="IMonitor"/>.
+    /// </summary>
     public class Monitor : IMonitor
     {
         private readonly IPlcConnection<IAdsConnection> connection;
-        private readonly ILogger<Monitor> logger;
-        private readonly Dictionary<string, DisposableMonitorItem> streams = new Dictionary<string, DisposableMonitorItem>();
+        private readonly ILogger logger;
+        private readonly Dictionary<string, DisposableMonitorItem> streams = new(StringComparer.OrdinalIgnoreCase);
         private readonly ISymbolHandler symbolHandler;
-        private Subject<IMonitorResult> symbolStream = new Subject<IMonitorResult>();
+        private readonly Subject<IMonitorResult> symbolStream = new();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Monitor"/> class.
+        /// </summary>
+        /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
+        /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
+        /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
         public Monitor(IPlcConnection<IAdsConnection> connection, ISymbolHandler symbolHandler, ILogger<Monitor> logger)
         {
             this.connection = connection;
@@ -26,9 +34,11 @@ namespace PlcInterface.Ads
             this.logger = logger;
         }
 
+        /// <inheritdoc/>
         public IObservable<IMonitorResult> SymbolStream
             => symbolStream.AsObservable();
 
+        /// <inheritdoc/>
         public void RegisterIO(IEnumerable<string> ioNames, int updateInterval = 1000)
         {
             var symbols = ioNames
@@ -47,7 +57,7 @@ namespace PlcInterface.Ads
 
             foreach (var ioName in ioNames)
             {
-                if (streams.TryGetValue(ioName, out DisposableMonitorItem disposableMonitorItem))
+                if (streams.TryGetValue(ioName, out var disposableMonitorItem))
                 {
                     disposableMonitorItem.Subscriptions += 1;
                     continue;
@@ -58,9 +68,10 @@ namespace PlcInterface.Ads
             }
         }
 
+        /// <inheritdoc/>
         public void RegisterIO(string ioName, int updateInterval = 1000)
         {
-            if (streams.TryGetValue(ioName, out DisposableMonitorItem disposableMonitorItem))
+            if (streams.TryGetValue(ioName, out var disposableMonitorItem))
             {
                 disposableMonitorItem.Subscriptions += 1;
                 return;
@@ -77,6 +88,7 @@ namespace PlcInterface.Ads
             streams.Add(ioName, new DisposableMonitorItem(subscription));
         }
 
+        /// <inheritdoc/>
         public void UnregisterIO(IEnumerable<string> ioNames)
         {
             foreach (var ioName in ioNames)
@@ -85,9 +97,10 @@ namespace PlcInterface.Ads
             }
         }
 
+        /// <inheritdoc/>
         public void UnregisterIO(string ioName)
         {
-            if (!streams.TryGetValue(ioName, out DisposableMonitorItem disposableMonitorItem))
+            if (!streams.TryGetValue(ioName, out var disposableMonitorItem))
             {
                 return;
             }
@@ -98,7 +111,11 @@ namespace PlcInterface.Ads
                 return;
             }
 
-            streams.Remove(ioName);
+            if (!streams.Remove(ioName))
+            {
+                logger.LogError("Unable to unregister {0}", ioName);
+            }
+
             disposableMonitorItem.Dispose();
         }
     }

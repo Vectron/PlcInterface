@@ -6,7 +6,7 @@ namespace PlcInterface.Tests.DataTypes
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
     internal struct DUT_TestStruct2
     {
-        public static DUT_TestStruct2 Default => new DUT_TestStruct2()
+        public static DUT_TestStruct2 Default => new()
         {
             ByteValue = byte.MaxValue,
             WordValue = ushort.MaxValue,
@@ -14,7 +14,7 @@ namespace PlcInterface.Tests.DataTypes
             LWordValue = ulong.MaxValue,
         };
 
-        public static DUT_TestStruct2 Write => new DUT_TestStruct2()
+        public static DUT_TestStruct2 Write => new()
         {
             ByteValue = byte.MinValue,
             WordValue = ushort.MinValue,
@@ -42,9 +42,9 @@ namespace PlcInterface.Tests.DataTypes
             get; set;
         }
 
-        public override bool Equals(object obj)
+        public override readonly bool Equals(object obj)
         {
-            if (!(obj is DUT_TestStruct2))
+            if (obj is not DUT_TestStruct2)
             {
                 return false;
             }
@@ -58,7 +58,7 @@ namespace PlcInterface.Tests.DataTypes
             return true;
         }
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             var hashCode = -1110352730;
             hashCode = (hashCode * -1521134295) + ByteValue.GetHashCode();

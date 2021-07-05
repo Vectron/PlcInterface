@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net461;net5.0</TargetFrameworks>
+    <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 

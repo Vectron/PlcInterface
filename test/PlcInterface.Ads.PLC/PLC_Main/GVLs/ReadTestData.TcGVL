@@ -4,6 +4,7 @@
     <Declaration><![CDATA[{attribute 'qualified_only'}
 {attribute 'read_only'}
 {attribute 'OPC.UA.DA' := '1'}
+{attribute 'analysis' := '-33'}
 VAR_GLOBAL
 	BoolValue			:BOOL			:= TRUE;
 	

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,109 +14,94 @@ using VectronsLibrary.Extensions;
 
 namespace PlcInterface.OpcUa
 {
+    /// <summary>
+    /// Implementation of <see cref="IPlcConnection{T}"/> for the <see cref="Session"/>.
+    /// </summary>
     public class PlcConnection : IPlcConnection<Session>, IDisposable
     {
-        private readonly BehaviorSubject<IConnected<Session>> connectionState = new BehaviorSubject<IConnected<Session>>(Connected.No<Session>());
-        private readonly CompositeDisposable disposables = new CompositeDisposable();
+        private readonly BehaviorSubject<IConnected<Session>> connectionState = new(Connected.No<Session>());
+        private readonly CompositeDisposable disposables = new();
         private readonly ILogger logger;
+        private readonly IOptions<OPCSettings> options;
         private readonly TimeSpan reconnectDelay = TimeSpan.FromSeconds(1);
-        private readonly IOptions<OPCSettings> settings;
-        private bool disposedValue = false;
+        private bool disposedValue;
+        private Session? session;
 
-        public PlcConnection(IOptions<OPCSettings> settings, ILogger<PlcConnection> logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlcConnection"/> class.
+        /// </summary>
+        /// <param name="options">A <see cref="IOptions{TOptions}"/> implementation.</param>
+        /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
+        public PlcConnection(IOptions<OPCSettings> options, ILogger<PlcConnection> logger)
         {
-            this.settings = settings;
+            this.options = options;
             this.logger = logger;
 
-            if (settings.Value.AutoConnect)
+            if (options.Value.AutoConnect)
             {
-                _ = Task.Run(ConnectAsync).LogExceptionsAsync(logger);
+                _ = Task.Run(ConnectAsync, CancellationToken.None).LogExceptionsAsync(logger);
             }
         }
 
+        /// <inheritdoc/>
         public IObservable<IConnected<Session>> SessionStream
             => connectionState.AsObservable();
 
+        /// <inheritdoc/>
         IObservable<IConnected> IPlcConnection.SessionStream
              => SessionStream;
 
+        /// <inheritdoc/>
         public object Settings
-            => settings.Value;
+            => options.Value;
 
+        /// <inheritdoc/>
         public void Connect()
             => ConnectAsync().GetAwaiter().GetResult();
 
+        /// <inheritdoc/>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "MA0051:Method is too long", Justification = "Unable to make it shorter.")]
         public async Task ConnectAsync()
         {
             try
             {
-                if (connectionState.TryGetValue(out IConnected<Session> lastConnectionState) &&
-                    lastConnectionState.IsConnected == true &&
-                    lastConnectionState.Value?.Connected == true)
+                if (session != null
+                    && session.Connected)
                 {
                     return;
                 }
 
-                var settings = this.settings.Value;
-                var config = settings.ApplicationConfiguration;
+                var settings = options.Value;
+                var config = settings.ApplicationConfiguration ?? throw new InvalidOperationException("No vallid application configuration given.");
                 Utils.SetTraceOutput(Utils.TraceOutput.DebugAndFile);
                 logger.LogInformation("Opening connection to {0}", settings.Address);
                 logger.LogDebug("Creating an Application Configuration.");
-                await config.Validate(ApplicationType.Client);
-                var usesSecurity = SetupSecurity();
-                logger.LogDebug($"Discover endpoints of {settings.DiscoveryAdress}.");
+                await config.Validate(ApplicationType.Client).ConfigureAwait(false);
+                var usesSecurity = SetupSecurity(config);
+                logger.LogDebug("Discover endpoints of {0}.", settings.DiscoveryAdress);
                 var selectedEndpoint = CoreClientUtils.SelectEndpoint(settings.DiscoveryAdress.ToString(), usesSecurity, 15000);
-                logger.LogDebug($"Selected endpoint uses: {selectedEndpoint.SecurityPolicyUri.Substring(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1)}");
-
+                logger.LogDebug("Selected endpoint uses: {0}", selectedEndpoint.SecurityPolicyUri.Substring(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1));
                 logger.LogDebug("Create a session with OPC UA server.");
                 var endpointConfiguration = EndpointConfiguration.Create(config);
                 var endpoint = new ConfiguredEndpoint(null, selectedEndpoint, endpointConfiguration);
-                var tokenType = selectedEndpoint.UserIdentityTokens.Where(x => x.TokenType == UserTokenType.UserName).FirstOrDefault();
-                UserIdentity identity;
+                var identity = GetUserIdentity(settings, selectedEndpoint);
+                session?.Dispose();
+                session = await Session.Create(config, endpoint, false, config.ApplicationName, 60000, identity, null).ConfigureAwait(false);
 
-                if (!string.IsNullOrEmpty(settings.UserName) && tokenType != null)
+                if (!session.Connected)
                 {
-                    logger.LogDebug($"Logging in with user: {settings.UserName}");
-                    identity = new UserIdentity(settings.UserName, settings.Password);
-                }
-                else
-                {
-                    identity = new UserIdentity(new AnonymousIdentityToken());
-                }
-
-                var session = await Session.Create(config, endpoint, false, settings.ApplicationConfiguration.ApplicationName, 60000, identity, null);
-
-                if (session.Connected)
-                {
-                    logger.LogInformation($"Connected to {endpoint}");
-                }
-                else
-                {
-                    logger.LogError($"Failed to connect to {endpoint}");
+                    logger.LogError("Failed to connect to {0}", endpoint);
+                    session.Dispose();
+                    session = null;
+                    return;
                 }
 
+                logger.LogInformation("Connected to {0}", endpoint);
                 disposables.Add(Observable.FromEventPattern<KeepAliveEventHandler, Session, KeepAliveEventArgs>(
                     h => session.KeepAlive += h,
                     h => session.KeepAlive -= h)
                     .Where(x => ServiceResult.IsBad(x.EventArgs.Status))
-                    .Subscribe(x =>
-                    {
-                        connectionState.OnNext(Connected.No<Session>());
-                        logger.LogError($"{x.EventArgs.Status}, Reconnecting to {x.Sender.ConfiguredEndpoint}");
-                        var sessionReconnectHandler = new SessionReconnectHandler();
-                        sessionReconnectHandler.BeginReconnect(x.Sender, (int)reconnectDelay.TotalMilliseconds, (s, e) =>
-                        {
-                            // ignore callbacks from discarded objects.
-                            if (!ReferenceEquals(s, sessionReconnectHandler))
-                            {
-                                return;
-                            }
-                            var sender = s as SessionReconnectHandler;
-                            logger.LogInformation($"Connected to {sender.Session.ConfiguredEndpoint}");
-                            connectionState.OnNext(Connected.Yes(sessionReconnectHandler.Session));
-                            sessionReconnectHandler.Dispose();
-                        });
-                    }));
+                    .Subscribe(KeepAliveSubscription));
 
                 disposables.Add(Observable.FromEventPattern(
                      h => session.SessionClosing += h,
@@ -140,29 +127,47 @@ namespace PlcInterface.OpcUa
                         break;
 
                     default:
-                        logger.LogError(ex, $"Unproccesed error {StatusCodes.GetBrowseName(ex.Result.StatusCode.Code)}");
+                        logger.LogError(ex, "Unproccesed error {0}", StatusCodes.GetBrowseName(ex.Result.StatusCode.Code));
                         break;
                 }
             }
         }
 
+        /// <inheritdoc/>
         public void Disconnect()
-        {
-            if (connectionState.TryGetValue(out var lastConnectionState)
-                && lastConnectionState.IsConnected == true
-                && lastConnectionState.Value?.Connected == true)
+            => DisconnectAsync().GetAwaiter().GetResult();
+
+        /// <inheritdoc/>
+        public Task DisconnectAsync()
+            => Task.Run(() =>
             {
+                if (session == null)
+                {
+                    return;
+                }
+
                 connectionState.OnNext(Connected.No<Session>());
-                _ = lastConnectionState.Value.CloseSession(null, false);
-            }
+                if (session.Connected)
+                {
+                    _ = session.CloseSession(null, false);
+                }
+
+                disposables.Dispose();
+                session?.Dispose();
+                session = null;
+            });
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        public Task DisconnectAsync()
-            => Task.Run(() => Disconnect());
-
-        public void Dispose()
-            => Dispose(true);
-
+        /// <summary>
+        /// Protected implementation of Dispose pattern.
+        /// </summary>
+        /// <param name="disposing">Value indicating if we need to cleanup managed resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposedValue)
@@ -175,25 +180,69 @@ namespace PlcInterface.OpcUa
                 Disconnect();
                 connectionState.OnCompleted();
                 disposables.Dispose();
-                connectionState?.Dispose();
+                connectionState.Dispose();
+
+                session?.Dispose();
             }
 
             disposedValue = true;
+        }
+
+        private static void UpdateAplicationUri(ApplicationConfiguration applicationConfiguration)
+        {
+            var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
+            if (applicationCertificate.Certificate != null)
+            {
+                applicationConfiguration.ApplicationUri = X509Utils.GetApplicationUriFromCertificate(applicationCertificate.Certificate);
+            }
         }
 
         private void CreateCertificate(ApplicationConfiguration applicationConfiguration)
         {
             var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
 
-            logger.LogDebug($"Creating new application certificate for: {applicationConfiguration.ApplicationName}");
+            logger.LogDebug("Creating new application certificate for: {0}", applicationConfiguration.ApplicationName);
 
-            _ = CertificateFactory.CreateCertificate(applicationConfiguration.ApplicationUri, applicationConfiguration.ApplicationName, applicationCertificate.SubjectName, null)
+            using var certificate = CertificateFactory.CreateCertificate(applicationConfiguration.ApplicationUri, applicationConfiguration.ApplicationName, applicationCertificate.SubjectName, null)
                  .SetNotBefore(DateTime.UtcNow - TimeSpan.FromDays(1))
                  .SetNotAfter((DateTime.UtcNow - TimeSpan.FromDays(1)).AddMonths(CertificateFactory.DefaultLifeTime))
                  .SetHashAlgorithm(X509Utils.GetRSAHashAlgorithmName(CertificateFactory.DefaultHashSize))
                  .SetRSAKeySize(CertificateFactory.DefaultKeySize)
                  .CreateForRSA()
                  .AddToStore(applicationCertificate.StoreType, applicationCertificate.StorePath);
+        }
+
+        private UserIdentity GetUserIdentity(OPCSettings settings, EndpointDescription endpoint)
+        {
+            var tokenType = endpoint.UserIdentityTokens.FirstOrDefault(x => x.TokenType == UserTokenType.UserName);
+            if (!string.IsNullOrEmpty(settings.UserName)
+                && tokenType != null)
+            {
+                logger.LogDebug("Logging in with user: {0}", settings.UserName);
+                return new UserIdentity(settings.UserName, settings.Password);
+            }
+
+            return new UserIdentity(new AnonymousIdentityToken());
+        }
+
+        private void KeepAliveSubscription(EventPattern<Session, KeepAliveEventArgs> x)
+        {
+            connectionState.OnNext(Connected.No<Session>());
+            logger.LogError("{0}, Reconnecting to {1}", x.EventArgs.Status, x.Sender?.ConfiguredEndpoint);
+            var sessionReconnectHandler = new SessionReconnectHandler();
+            sessionReconnectHandler.BeginReconnect(x.Sender, (int)reconnectDelay.TotalMilliseconds, (s, e) =>
+            {
+                // ignore callbacks from discarded objects.
+                if (!ReferenceEquals(s, sessionReconnectHandler))
+                {
+                    return;
+                }
+
+                var sender = s as SessionReconnectHandler;
+                logger.LogInformation("Connected to {0}", sender?.Session.ConfiguredEndpoint);
+                connectionState.OnNext(Connected.Yes(sessionReconnectHandler.Session));
+                sessionReconnectHandler.Dispose();
+            });
         }
 
         private void SetupCertificateSigning(ApplicationConfiguration applicationConfiguration)
@@ -220,22 +269,21 @@ namespace PlcInterface.OpcUa
             }));
         }
 
-        private bool SetupSecurity()
+        private bool SetupSecurity(ApplicationConfiguration config)
         {
-            var settings = this.settings.Value;
+            var settings = options.Value;
             if (!settings.UseSecurity)
             {
                 logger.LogWarning("Security turned off, using unsecure connection.");
                 return false;
             }
 
-            var applicationConfiguration = settings.ApplicationConfiguration;
-            SetupCertificateSigning(applicationConfiguration);
+            SetupCertificateSigning(config);
 
-            var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
+            var applicationCertificate = config.SecurityConfiguration.ApplicationCertificate;
             if (applicationCertificate.Certificate != null)
             {
-                UpdateAplicationUri(applicationConfiguration);
+                UpdateAplicationUri(config);
                 return true;
             }
 
@@ -245,18 +293,9 @@ namespace PlcInterface.OpcUa
                 return false;
             }
 
-            CreateCertificate(applicationConfiguration);
-            UpdateAplicationUri(applicationConfiguration);
+            CreateCertificate(config);
+            UpdateAplicationUri(config);
             return true;
-        }
-
-        private void UpdateAplicationUri(ApplicationConfiguration applicationConfiguration)
-        {
-            var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
-            if (applicationCertificate.Certificate != null)
-            {
-                applicationConfiguration.ApplicationUri = X509Utils.GetApplicationUriFromCertificate(applicationCertificate.Certificate);
-            }
         }
     }
 }

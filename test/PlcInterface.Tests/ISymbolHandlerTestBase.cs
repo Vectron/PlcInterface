@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests
 {
@@ -33,9 +34,9 @@ namespace PlcInterface.Tests
         }
 
         protected override IMonitor GetMonitor()
-            => throw new System.NotImplementedException();
+            => throw new NotSupportedException();
 
         protected override IReadWrite GetReadWrite()
-            => throw new System.NotImplementedException();
+            => throw new NotSupportedException();
     }
 }

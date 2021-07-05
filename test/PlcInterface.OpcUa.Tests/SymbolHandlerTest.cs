@@ -8,8 +8,8 @@ namespace PlcInterface.OpcUa.Tests
     [TestClass]
     public class SymbolHandlerTest : ISymbolHandlerTestBase
     {
-        private static PlcConnection connection;
-        private static SymbolHandler symbolHandler;
+        private static PlcConnection? connection;
+        private static SymbolHandler? symbolHandler;
 
         [ClassInitialize]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public Api")]
@@ -28,12 +28,15 @@ namespace PlcInterface.OpcUa.Tests
 
         [ClassCleanup]
         public static void Disconnect()
-            => connection.Dispose();
+        {
+            connection?.Dispose();
+            symbolHandler?.Dispose();
+        }
 
         protected override IPlcConnection GetPLCConnection()
-            => connection;
+            => connection ?? throw new System.NotSupportedException();
 
         protected override ISymbolHandler GetSymbolHandler()
-            => symbolHandler;
+            => symbolHandler ?? throw new System.NotSupportedException();
     }
 }

@@ -11,12 +11,14 @@ namespace PlcInterface.OpcUa.Tests
         public void GetConnectedClient()
         {
             // Arrange
-            var connection = GetPLCConnection() as PlcConnection;
+            using var connection = GetPLCConnection() as PlcConnection;
 
             // Act
+            Assert.IsNotNull(connection);
             _ = Assert.ThrowsException<TimeoutException>(() => connection.GetConnectedClient());
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP005:Return type should indicate that the value should be disposed.", Justification = "Can't mark interface as IDisposable")]
         protected override IPlcConnection GetPLCConnection()
         {
             var connectionsettings = new OPCSettings();

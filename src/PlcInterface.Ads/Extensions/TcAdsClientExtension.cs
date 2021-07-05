@@ -1,10 +1,18 @@
 ﻿using System;
-using TwinCAT.Ads;
 
-namespace PlcInterface.Ads.Extensions
+namespace TwinCAT.Ads
 {
+    /// <summary>
+    /// Extension methods for <see cref="AdsClient"/>.
+    /// </summary>
     internal static class TcAdsClientExtension
     {
+        /// <summary>
+        /// Validate the PLC connection.
+        /// </summary>
+        /// <param name="client">The <see cref="AdsClient"/> to check.</param>
+        /// <returns>The <see cref="AdsClient"/> for chaining.</returns>
+        /// <exception cref="InvalidOperationException">When the plc is not in a vallid state.</exception>
         public static AdsClient ValidateConnection(this AdsClient client)
         {
             if (client == null)
@@ -17,7 +25,12 @@ namespace PlcInterface.Ads.Extensions
                 throw new InvalidOperationException("PLC not connected");
             }
 
-            client.TryReadState(out StateInfo lastPLCState);
+            var errorCode = client.TryReadState(out var lastPLCState);
+
+            if (errorCode != AdsErrorCode.NoError)
+            {
+                throw new InvalidOperationException("Unable to read the PLC state");
+            }
 
             if (lastPLCState.AdsState != AdsState.Run)
             {

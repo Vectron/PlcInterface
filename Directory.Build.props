@@ -19,6 +19,14 @@
     <PackageProjectUrl>https://github.com/Vectron/PlcInterface</PackageProjectUrl>
   </PropertyGroup>
 
+  <!--Settings to move the bin en output folders to the root folder-->
+  <PropertyGroup>
+    <RepositoryRootDirectory>$(MSBuildThisFileDirectory)</RepositoryRootDirectory>
+    <BinDir>$(RepositoryRootDirectory)bin</BinDir>
+    <OutputPath>$([System.IO.Path]::GetFullPath('$(RepositoryRootDirectory)bin\$(Configuration)'))\$(MSBuildProjectName)</OutputPath>
+    <BaseIntermediateOutputPath>$([System.IO.Path]::GetFullPath('$(RepositoryRootDirectory)bin\obj\$(MSBuildProjectName)'))\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
   <!--Microsoft.SourceLink.GitHub settings-->
   <PropertyGroup>
     <IncludeSymbols>true</IncludeSymbols>

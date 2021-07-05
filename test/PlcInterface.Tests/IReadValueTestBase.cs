@@ -75,17 +75,16 @@ namespace PlcInterface.Tests
             using var valueEnumerator = value.GetEnumerator();
 
             Assert.AreEqual(data.Count, value.Count);
+            var multiAssert = new MultiAssert();
 
-            while (true)
+            while (dataEnumerator.MoveNext()
+                && valueEnumerator.MoveNext())
             {
-                if (!dataEnumerator.MoveNext() || !valueEnumerator.MoveNext())
-                {
-                    break;
-                }
-
-                Assert.AreEqual(dataEnumerator.Current.Key, valueEnumerator.Current.Key);
-                Assert.That.ObjectEquals(dataEnumerator.Current.Value, valueEnumerator.Current.Value, dataEnumerator.Current.Key);
+                multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, valueEnumerator.Current.Key));
+                multiAssert.Check(() => Assert.That.ObjectEquals(dataEnumerator.Current.Value, valueEnumerator.Current.Value, dataEnumerator.Current.Key));
             }
+
+            multiAssert.Assert();
         }
 
         [TestMethod]
@@ -103,17 +102,16 @@ namespace PlcInterface.Tests
             using var valueEnumerator = value.GetEnumerator();
 
             Assert.AreEqual(data.Count, value.Count);
+            var multiAssert = new MultiAssert();
 
-            while (true)
+            while (dataEnumerator.MoveNext()
+                && valueEnumerator.MoveNext())
             {
-                if (!dataEnumerator.MoveNext() || !valueEnumerator.MoveNext())
-                {
-                    break;
-                }
-
-                Assert.AreEqual(dataEnumerator.Current.Key, valueEnumerator.Current.Key);
-                Assert.That.ObjectEquals(dataEnumerator.Current.Value, valueEnumerator.Current.Value, dataEnumerator.Current.Key);
+                multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, valueEnumerator.Current.Key));
+                multiAssert.Check(() => Assert.That.ObjectEquals(dataEnumerator.Current.Value, valueEnumerator.Current.Value, dataEnumerator.Current.Key));
             }
+
+            multiAssert.Assert();
         }
 
         [DataTestMethod]

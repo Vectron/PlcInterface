@@ -104,21 +104,19 @@ namespace PlcInterface.Tests
 
             Assert.AreEqual(data.Count, original.Count);
             Assert.AreEqual(data.Count, newValueRead.Count);
+            var multiAssert = new MultiAssert();
 
-            while (true)
+            while (dataEnumerator.MoveNext()
+                    && newValueEnumerator.MoveNext()
+                    && originalEnumerator.MoveNext())
             {
-                if (!dataEnumerator.MoveNext()
-                    || !newValueEnumerator.MoveNext()
-                    || originalEnumerator.MoveNext())
-                {
-                    break;
-                }
-
-                Assert.AreEqual(dataEnumerator.Current.Key, newValueEnumerator.Current.Key);
-                Assert.AreEqual(dataEnumerator.Current.Key, originalEnumerator.Current.Key);
-                Assert.That.ObjectNotEquals(dataEnumerator.Current.Value, originalEnumerator.Current.Value, "Reset values in PLC");
-                Assert.That.ObjectEquals(dataEnumerator.Current.Value, newValueEnumerator.Current.Value, dataEnumerator.Current.Key);
+                multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, newValueEnumerator.Current.Key));
+                multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, originalEnumerator.Current.Key));
+                multiAssert.Check(() => Assert.That.ObjectNotEquals(dataEnumerator.Current.Value, originalEnumerator.Current.Value, "Reset values in PLC"));
+                multiAssert.Check(() => Assert.That.ObjectEquals(dataEnumerator.Current.Value, newValueEnumerator.Current.Value, dataEnumerator.Current.Key));
             }
+
+            multiAssert.Assert();
         }
 
         [TestMethod]
@@ -140,21 +138,19 @@ namespace PlcInterface.Tests
 
             Assert.AreEqual(data.Count, original.Count);
             Assert.AreEqual(data.Count, newValueRead.Count);
+            var multiAssert = new MultiAssert();
 
-            while (true)
+            while (dataEnumerator.MoveNext()
+                && newValueEnumerator.MoveNext()
+                && originalEnumerator.MoveNext())
             {
-                if (!dataEnumerator.MoveNext()
-                    || !newValueEnumerator.MoveNext()
-                    || originalEnumerator.MoveNext())
-                {
-                    break;
-                }
-
-                Assert.AreEqual(dataEnumerator.Current.Key, newValueEnumerator.Current.Key);
-                Assert.AreEqual(dataEnumerator.Current.Key, originalEnumerator.Current.Key);
-                Assert.That.ObjectNotEquals(dataEnumerator.Current.Value, originalEnumerator.Current.Value, "Reset values in PLC");
-                Assert.That.ObjectEquals(dataEnumerator.Current.Value, newValueEnumerator.Current.Value, dataEnumerator.Current.Key);
+                multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, newValueEnumerator.Current.Key));
+                multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, originalEnumerator.Current.Key));
+                multiAssert.Check(() => Assert.That.ObjectNotEquals(dataEnumerator.Current.Value, originalEnumerator.Current.Value, "Reset values in PLC"));
+                multiAssert.Check(() => Assert.That.ObjectEquals(dataEnumerator.Current.Value, newValueEnumerator.Current.Value, dataEnumerator.Current.Key));
             }
+
+            multiAssert.Assert();
         }
 
         protected override IMonitor GetMonitor()

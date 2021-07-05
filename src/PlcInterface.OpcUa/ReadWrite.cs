@@ -100,7 +100,7 @@ namespace PlcInterface.OpcUa
         }
 
         /// <inheritdoc/>
-        public Task<IDictionary<string, object>> ReadAsync(IEnumerable<string> ioNames)
+        public async Task<IDictionary<string, object>> ReadAsync(IEnumerable<string> ioNames)
         {
             var querry = ioNames
                 .SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler))
@@ -112,7 +112,7 @@ namespace PlcInterface.OpcUa
                     AttributeId = Attributes.Value,
                 });
 
-            var session = connection.GetConnectedClient();
+            var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
             var nodesToRead = new ReadValueIdCollection(querry);
             var taskCompletionSource = new TaskCompletionSource<IDictionary<string, object>>();
 
@@ -147,11 +147,11 @@ namespace PlcInterface.OpcUa
                 },
                 null);
 
-            return taskCompletionSource.Task;
+            return await taskCompletionSource.Task.ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public Task<object> ReadAsync(string ioName)
+        public async Task<object> ReadAsync(string ioName)
         {
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
             if (symbol.ChildSymbols.Count > 0)
@@ -159,7 +159,7 @@ namespace PlcInterface.OpcUa
                 return ReadDynamicAsync(ioName);
             }
 
-            var session = connection.GetConnectedClient();
+            var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
             var nodesToRead = new ReadValueIdCollection
             {
                 new ReadValueId()
@@ -192,7 +192,7 @@ namespace PlcInterface.OpcUa
                 },
                 null);
 
-            return taskCompletionSource.Task;
+            return await taskCompletionSource.Task.ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -205,7 +205,7 @@ namespace PlcInterface.OpcUa
                 return (T)FixType(value, typeof(T));
             }
 
-            var session = connection.GetConnectedClient();
+            var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
             var nodesToRead = new ReadValueIdCollection
             {
                 new ReadValueId()
@@ -321,9 +321,9 @@ namespace PlcInterface.OpcUa
             => Write(new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { ioName, value } });
 
         /// <inheritdoc/>
-        public Task WriteAsync(IDictionary<string, object> namesValues)
+        public async Task WriteAsync(IDictionary<string, object> namesValues)
         {
-            var session = connection.GetConnectedClient();
+            var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
             var querry = namesValues
                  .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
                  .Select(x => (x.SymbolInfo.ConvertAndValidate(), x.Value))
@@ -355,7 +355,7 @@ namespace PlcInterface.OpcUa
                 },
                 null);
 
-            return taskCompletionSource.Task;
+            _ = await taskCompletionSource.Task.ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

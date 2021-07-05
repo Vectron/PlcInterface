@@ -101,7 +101,7 @@ namespace PlcInterface.Ads
         /// <inheritdoc/>
         public async Task<IDictionary<string, object>> ReadAsync(IEnumerable<string> ioNames)
         {
-            var client = connection.GetConnectedClient();
+            var client = await connection.GetConnectedClientAsync().ConfigureAwait(false);
             var tcSymbols = ioNames
                 .Select(x => symbolHandler.GetSymbolinfo(x))
                 .Cast<SymbolInfo>()
@@ -170,16 +170,16 @@ namespace PlcInterface.Ads
         }
 
         /// <inheritdoc/>
-        public Task WriteAsync(IDictionary<string, object> namesValues)
+        public async Task WriteAsync(IDictionary<string, object> namesValues)
         {
-            var client = connection.GetConnectedClient();
+            var client = await connection.GetConnectedClientAsync().ConfigureAwait(false);
             var tcSymbols = namesValues
                 .Select(x => symbolHandler.GetSymbolinfo(x.Key))
                 .Cast<SymbolInfo>()
                 .Select(x => x.Symbol)
                 .ToList();
             var sumReader = new SumSymbolWrite(client, tcSymbols);
-            return sumReader.WriteAsync(namesValues.Values.ToArray(), CancellationToken.None);
+            _ = await sumReader.WriteAsync(namesValues.Values.ToArray(), CancellationToken.None).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

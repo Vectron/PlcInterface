@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -71,18 +73,32 @@ namespace PlcInterface.Tests
         [DynamicData(nameof(Settings.GetWriteData), typeof(Settings), DynamicDataSourceType.Method)]
         public void WriteGeneric(string ioName, object newValue, object readValue)
         {
-            var methodInfo = GetType().GetMethod(nameof(WriteValueGenericHelper), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var methodInfo = GetType().GetMethod(nameof(WriteValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance);
             var method = methodInfo.MakeGenericMethod(newValue.GetType());
-            _ = method.Invoke(this, new[] { ioName, newValue, readValue });
+            try
+            {
+                _ = method.Invoke(this, new[] { ioName, newValue, readValue });
+            }
+            catch (TargetInvocationException ex)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            }
         }
 
         [DataTestMethod]
         [DynamicData(nameof(Settings.GetWriteData), typeof(Settings), DynamicDataSourceType.Method)]
         public async Task WriteGenericAsync(string ioName, object newValue, object readValue)
         {
-            var methodInfo = GetType().GetMethod(nameof(WriteValueGenericHelperAsync), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var methodInfo = GetType().GetMethod(nameof(WriteValueGenericHelperAsync), BindingFlags.NonPublic | BindingFlags.Instance);
             var method = methodInfo.MakeGenericMethod(newValue.GetType());
-            await (Task)method.Invoke(this, new[] { ioName, newValue, readValue });
+            try
+            {
+                await (Task)method.Invoke(this, new[] { ioName, newValue, readValue });
+            }
+            catch (TargetInvocationException ex)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            }
         }
 
         [TestMethod]

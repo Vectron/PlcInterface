@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.Tests.DataTypes;
@@ -45,7 +46,14 @@ namespace PlcInterface.Tests
             var method = typeof(IReadValueTestBase)
                 .GetMethod(nameof(ReadValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
                 .MakeGenericMethod(instanceType);
-            _ = method.Invoke(this, new object[] { ioName, value });
+            try
+            {
+                _ = method.Invoke(this, new object[] { ioName, value });
+            }
+            catch (TargetInvocationException ex)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            }
         }
 
         [DataTestMethod]
@@ -57,7 +65,14 @@ namespace PlcInterface.Tests
             var method = typeof(IReadValueTestBase)
                 .GetMethod(nameof(ReadValueGenericHelperAsync), BindingFlags.NonPublic | BindingFlags.Instance)
                 .MakeGenericMethod(instanceType);
-            await (Task)method.Invoke(this, new object[] { ioName, value });
+            try
+            {
+                await (Task)method.Invoke(this, new object[] { ioName, value });
+            }
+            catch (TargetInvocationException ex)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            }
         }
 
         [TestMethod]

@@ -112,7 +112,9 @@ namespace PlcInterface.OpcUa
                     AttributeId = Attributes.Value,
                 });
 
+#pragma warning disable IDISP001 // Dispose created.
             var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
+#pragma warning restore IDISP001 // Dispose created.
             var nodesToRead = new ReadValueIdCollection(querry);
             var taskCompletionSource = new TaskCompletionSource<IDictionary<string, object>>();
 
@@ -159,7 +161,9 @@ namespace PlcInterface.OpcUa
                 return ReadDynamicAsync(ioName);
             }
 
+#pragma warning disable IDISP001 // Dispose created.
             var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
+#pragma warning restore IDISP001 // Dispose created.
             var nodesToRead = new ReadValueIdCollection
             {
                 new ReadValueId()
@@ -205,7 +209,9 @@ namespace PlcInterface.OpcUa
                 return (T)FixType(value, typeof(T));
             }
 
+#pragma warning disable IDISP001 // Dispose created.
             var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
+#pragma warning restore IDISP001 // Dispose created.
             var nodesToRead = new ReadValueIdCollection
             {
                 new ReadValueId()
@@ -323,7 +329,9 @@ namespace PlcInterface.OpcUa
         /// <inheritdoc/>
         public async Task WriteAsync(IDictionary<string, object> namesValues)
         {
+#pragma warning disable IDISP001 // Dispose created.
             var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
+#pragma warning restore IDISP001 // Dispose created.
             var querry = namesValues
                  .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
                  .Select(x => (x.SymbolInfo.ConvertAndValidate(), x.Value))

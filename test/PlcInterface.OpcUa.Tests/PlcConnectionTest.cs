@@ -45,7 +45,9 @@ namespace PlcInterface.OpcUa.Tests
 
             // Act
             var connectionTask = connection.ConnectAsync();
+#pragma warning disable IDISP001 // Dispose created.
             var client = await connection.GetConnectedClientAsync();
+#pragma warning restore IDISP001 // Dispose created.
             await connectionTask;
 
             // Assert

@@ -62,8 +62,7 @@ namespace PlcInterface.Ads
                 }
 
                 adsClient?.Dispose();
-                adsClient = new AdsClient();
-
+                adsClient = new AdsClient(logger);
                 adsClient.RouterStateChanged += AdsClient_RouterStateChanged;
                 var address = new AmsAddress(settings.Value.AmsNetId, settings.Value.Port);
                 adsClient.Connect(address);

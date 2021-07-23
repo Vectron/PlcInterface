@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using TwinCAT.Ads.Reactive;
@@ -11,18 +12,15 @@ namespace PlcInterface.Ads
     /// </summary>
     internal sealed class DisposableMonitorItem : IDisposable
     {
-        private readonly IDisposable stream;
-
+        private readonly string name;
         private bool disposedValue;
+        private IDisposable stream;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DisposableMonitorItem"/> class.
-        /// </summary>
-        /// <param name="stream">The item to dispose when the refcount is 0.</param>
-        private DisposableMonitorItem(IDisposable stream)
+        private DisposableMonitorItem(string name)
         {
-            this.stream = stream;
+            stream = Disposable.Empty;
             Subscriptions = 1;
+            this.name = name;
         }
 
         /// <summary>
@@ -37,25 +35,42 @@ namespace PlcInterface.Ads
         /// <summary>
         /// Create a <see cref="DisposableMonitorItem"/>.
         /// </summary>
-        /// <param name="symbolStream">The stream to publish updates to.</param>
-        /// <param name="symbolInfo">The symbol to register with.</param>
-        /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
+        /// <param name="name">The name of the symbol.</param>
         /// <returns>The created <see cref="DisposableMonitorItem"/>.</returns>
-        public static DisposableMonitorItem Create(ISubject<IMonitorResult> symbolStream, SymbolInfo symbolInfo, IAdsTypeConverter typeConverter)
-        {
-            var valueSymbol = symbolInfo.Symbol as IValueSymbol;
-            var subscriptions = valueSymbol
-                  .ThrowIfNull()
-                  .WhenValueChanged()
-                  .Select(x => new MonitorResult(symbolInfo.Name, typeConverter.Convert(x, valueSymbol!)))
-                  .SubscribeSafe(symbolStream);
-
-            return new DisposableMonitorItem(subscriptions);
-        }
+        public static DisposableMonitorItem Create(string name)
+            => new(name);
 
         /// <inheritdoc/>
         public void Dispose()
             => Dispose(true);
+
+        /// <summary>
+        /// Update the subscriptions.
+        /// </summary>
+        /// <param name="symbolHandler">A <see cref="ISymbolHandler"/>.</param>
+        /// <param name="symbolStream">The stream to subscribe to.</param>
+        /// <param name="typeConverter">A <see cref="ITypeConverter"/>.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "Dont need a cancelation token.")]
+        public void Update(ISymbolHandler symbolHandler, ISubject<IMonitorResult> symbolStream, IAdsTypeConverter typeConverter)
+        {
+            if (symbolHandler.GetSymbolinfo(name) is SymbolInfo symbolInfo
+                && symbolInfo.Symbol is IValueSymbol valueSymbol
+                && valueSymbol.Connection != null
+                && valueSymbol.Connection.IsConnected)
+            {
+                try
+                {
+                    stream.Dispose();
+                }
+                catch (Exception)
+                {
+                }
+                stream = valueSymbol
+                    .WhenValueChanged()
+                    .Select(x => new MonitorResult(name, typeConverter.Convert(x, valueSymbol)))
+                    .Subscribe(symbolStream);
+            }
+        }
 
         /// <summary>
         /// Protected implementation of Dispose pattern.

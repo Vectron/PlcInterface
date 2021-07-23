@@ -24,7 +24,7 @@ namespace PlcInterface.Ads.Tests
             connection = new PlcConnection(GetOptionsMoq(connectionsettings), GetLoggerMock<PlcConnection>());
             symbolHandler = new SymbolHandler(connection, GetOptionsMoq(symbolhandlersettings), GetLoggerMock<SymbolHandler>());
             readWrite = new ReadWrite(connection, symbolHandler, typeConverter);
-            monitor = new Monitor(symbolHandler, typeConverter, GetLoggerMock<Monitor>());
+            monitor = new Monitor(connection, symbolHandler, typeConverter, GetLoggerMock<Monitor>());
             await connection.ConnectAsync();
             _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
         }
@@ -34,6 +34,7 @@ namespace PlcInterface.Ads.Tests
         {
             connection?.Dispose();
             symbolHandler?.Dispose();
+            monitor?.Dispose();
         }
 
         protected override IMonitor GetMonitor()

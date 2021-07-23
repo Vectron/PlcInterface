@@ -3,31 +3,43 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
+using TwinCAT.Ads;
 
 namespace PlcInterface.Ads
 {
     /// <summary>
     /// A implementation of <see cref="IMonitor"/>.
     /// </summary>
-    public class Monitor : IMonitor
+    public class Monitor : IMonitor, IDisposable
     {
         private readonly ILogger logger;
+        private readonly IDisposable sesionStream;
         private readonly Dictionary<string, DisposableMonitorItem> streams = new(StringComparer.OrdinalIgnoreCase);
         private readonly ISymbolHandler symbolHandler;
         private readonly Subject<IMonitorResult> symbolStream = new();
         private readonly IAdsTypeConverter typeConverter;
+        private bool disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Monitor"/> class.
         /// </summary>
+        /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
         /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
         /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
         /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-        public Monitor(ISymbolHandler symbolHandler, IAdsTypeConverter typeConverter, ILogger<Monitor> logger)
+        public Monitor(IPlcConnection<IAdsConnection> connection, ISymbolHandler symbolHandler, IAdsTypeConverter typeConverter, ILogger<Monitor> logger)
         {
             this.symbolHandler = symbolHandler;
             this.typeConverter = typeConverter;
             this.logger = logger;
+
+            sesionStream = connection.SessionStream.Where(x => x.IsConnected).Select(x => x.Value).WhereNotNull().Subscribe(x =>
+            {
+                foreach (var keyValue in streams)
+                {
+                    keyValue.Value.Update(symbolHandler, symbolStream, typeConverter);
+                }
+            });
         }
 
         /// <inheritdoc/>
@@ -37,6 +49,14 @@ namespace PlcInterface.Ads
         /// <inheritdoc/>
         public ITypeConverter TypeConverter
             => typeConverter;
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
 
         /// <inheritdoc/>
         public void RegisterIO(IEnumerable<string> ioNames, int updateInterval = 1000)
@@ -56,9 +76,9 @@ namespace PlcInterface.Ads
                 return;
             }
 
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName) as SymbolInfo;
-            _ = symbolInfo.ThrowIfNull(nameof(symbolInfo));
-            streams.Add(ioName, DisposableMonitorItem.Create(symbolStream, symbolInfo!, typeConverter));
+            disposableMonitorItem = DisposableMonitorItem.Create(ioName);
+            disposableMonitorItem.Update(symbolHandler, symbolStream, typeConverter);
+            streams.Add(ioName, disposableMonitorItem);
         }
 
         /// <inheritdoc/>
@@ -90,6 +110,23 @@ namespace PlcInterface.Ads
             }
 
             disposableMonitorItem.Dispose();
+        }
+
+        /// <summary>
+        /// Protected implementation of Dispose pattern.
+        /// </summary>
+        /// <param name="disposing">Value indicating if we need to cleanup managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    sesionStream.Dispose();
+                }
+
+                disposedValue = true;
+            }
         }
     }
 }

@@ -161,7 +161,7 @@ namespace PlcInterface.OpcUa
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
             if (symbol.ChildSymbols.Count > 0)
             {
-                return ReadDynamicAsync(ioName);
+                return await ReadDynamicAsync(ioName).ConfigureAwait(false);
             }
 
 #pragma warning disable IDISP001 // Dispose created.

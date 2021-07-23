@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <DUT Name="DUT_TestStruct" Id="{68a03939-fb1d-4106-be99-71ec9d9c03ea}">
-    <Declaration><![CDATA[{attribute 'OPC.UA.DA' := '1'}
-{attribute 'analysis' := '-33'}
+    <Declaration><![CDATA[{attribute 'analysis' := '-33'}
 TYPE DUT_TestStruct :
 STRUCT
 	BoolValue			:BOOL			:= TRUE;

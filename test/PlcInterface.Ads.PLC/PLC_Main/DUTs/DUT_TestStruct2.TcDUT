@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <DUT Name="DUT_TestStruct2" Id="{3b1a7687-6a60-4de7-859c-f4e40aa65cf7}">
-    <Declaration><![CDATA[{attribute 'OPC.UA.DA' := '1'}
-{attribute 'analysis' := '-33'}
+    <Declaration><![CDATA[{attribute 'analysis' := '-33'}
 TYPE DUT_TestStruct2 :
 STRUCT
 	ByteValue			:BYTE			:= 16#FF;

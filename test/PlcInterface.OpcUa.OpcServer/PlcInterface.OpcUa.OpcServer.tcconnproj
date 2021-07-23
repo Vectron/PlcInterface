@@ -22,11 +22,6 @@
     </tcopcuasrvalarmcCompile>
   </ItemGroup>
   <ItemGroup>
-    <tcopcuasrvresCompile Include="TwinCAT OPC-UA Server Project1\Resources\Resources.res">
-      <DependentUpon>Server.tcopcuasrv</DependentUpon>
-    </tcopcuasrvresCompile>
-  </ItemGroup>
-  <ItemGroup>
     <tcopcuasrvhaCompile Include="Server\Historical Access\Historical Access.opcuaha">
       <DependentUpon>Server.tcopcuasrv</DependentUpon>
     </tcopcuasrvhaCompile>

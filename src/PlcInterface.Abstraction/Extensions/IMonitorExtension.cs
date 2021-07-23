@@ -59,7 +59,7 @@ namespace PlcInterface
         /// <param name="ioName">The name of the IO to monitor.</param>
         /// <param name="updateInterval">The update interval for this subscription.</param>
         /// <returns>A <see cref="IDisposable"/> to unsubscribe from the stream.</returns>
-        public static IObservable<T> SubscribeIO<T>(this IMonitor monitor, string ioName, int updateInterval)
+        public static IObservable<T> SubscribeIO<T>(this IMonitor monitor, string ioName, int updateInterval = 1000)
         {
             monitor.RegisterIO(ioName, updateInterval);
             return monitor

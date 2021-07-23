@@ -9,7 +9,7 @@ namespace PlcInterface.Ads
     /// <summary>
     /// A <see cref="IDisposable"/> for counting reference to the item.
     /// </summary>
-    internal class DisposableMonitorItem : IDisposable
+    internal sealed class DisposableMonitorItem : IDisposable
     {
         private readonly IDisposable stream;
 
@@ -55,17 +55,13 @@ namespace PlcInterface.Ads
 
         /// <inheritdoc/>
         public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+            => Dispose(true);
 
         /// <summary>
         /// Protected implementation of Dispose pattern.
         /// </summary>
         /// <param name="disposing">Value indicating if we need to cleanup managed resources.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP007:Don't dispose injected.", Justification = "Class is meant to take ownership")]
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposedValue)
             {

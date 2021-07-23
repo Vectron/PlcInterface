@@ -18,12 +18,11 @@ namespace PlcInterface.OpcUa
         private readonly CompositeDisposable disposables = new();
         private readonly ILogger<Monitor> logger;
         private readonly Dictionary<string, RegisteredSymbol> registeredSymbols = new(StringComparer.OrdinalIgnoreCase);
-        private readonly Subject<IMonitorResult> subject = new();
         private readonly Subscription subscription;
         private readonly ISymbolHandler symbolHandler;
+        private readonly Subject<IMonitorResult> symbolStream = new();
         private readonly IOpcTypeConverter typeConverter;
         private bool disposedValue;
-        private Session? session;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Monitor"/> class.
@@ -49,30 +48,41 @@ namespace PlcInterface.OpcUa
                 TimestampsToReturn = TimestampsToReturn.Both,
             };
 
-            disposables.Add(connection.SessionStream.Subscribe(x =>
+            disposables.Add(connection.SessionStream.Where(x => x.IsConnected).Subscribe(x =>
             {
-                if (!x.IsConnected || x.Value == null)
+                if (x.Value == null)
                 {
-                    session = null;
                     return;
                 }
 
-                session = x.Value;
-                if (session.Subscriptions.Contains(subscription))
+                foreach (var keyValue in registeredSymbols)
                 {
-                    Update();
+                    var name = keyValue.Key;
+                    var value = keyValue.Value;
+                    var symbolInfo = symbolHandler.GetSymbolinfo(name).ConvertAndValidate();
+                    value.MonitoredItem.StartNodeId = symbolInfo.Handle;
+                    value.MonitoredItem.Handle = symbolInfo;
+                }
+
+                if (x.Value.Subscriptions.Contains(subscription))
+                {
+                    subscription.ApplyChanges();
                 }
                 else
                 {
-                    _ = session.AddSubscription(subscription);
+                    _ = x.Value.AddSubscription(subscription);
                     subscription.Create();
-                    Update();
+                    subscription.ApplyChanges();
                 }
             }));
         }
 
         /// <inheritdoc/>
-        public IObservable<IMonitorResult> SymbolStream => subject.AsObservable();
+        public IObservable<IMonitorResult> SymbolStream => symbolStream.AsObservable();
+
+        /// <inheritdoc/>
+        public ITypeConverter TypeConverter
+            => typeConverter;
 
         /// <inheritdoc/>
         public void Dispose()
@@ -90,14 +100,14 @@ namespace PlcInterface.OpcUa
                 RegisterIOInternal(name, updateInterval);
             }
 
-            Update();
+            subscription.ApplyChanges();
         }
 
         /// <inheritdoc/>
         public void RegisterIO(string ioName, int updateInterval = 1000)
         {
             RegisterIOInternal(ioName, updateInterval);
-            Update();
+            subscription.ApplyChanges();
         }
 
         /// <inheritdoc/>
@@ -108,21 +118,14 @@ namespace PlcInterface.OpcUa
                 UnregisterIOInternal(name);
             }
 
-            if (session != null && session.Connected && subscription.Created)
-            {
-                subscription.ApplyChanges();
-            }
+            subscription.ApplyChanges();
         }
 
         /// <inheritdoc/>
         public void UnregisterIO(string ioName)
         {
             UnregisterIOInternal(ioName);
-
-            if (session != null && session.Connected && subscription.Created)
-            {
-                subscription.ApplyChanges();
-            }
+            subscription.ApplyChanges();
         }
 
         /// <summary>
@@ -135,7 +138,7 @@ namespace PlcInterface.OpcUa
             {
                 if (disposing)
                 {
-                    subject?.Dispose();
+                    symbolStream?.Dispose();
                     subscription?.Dispose();
                     disposables?.Dispose();
                     registeredSymbols?.Clear();
@@ -152,16 +155,17 @@ namespace PlcInterface.OpcUa
                 throw new ArgumentException("Name is null or whitespace", nameof(name));
             }
 
-            var nameLower = name.ToLowerInvariant();
-
-            if (registeredSymbols.ContainsKey(nameLower))
+            if (registeredSymbols.TryGetValue(name, out var registeredSymbol))
             {
-                registeredSymbols[nameLower].Subscriptions += 1;
+                registeredSymbol.Subscriptions++;
                 return;
             }
 
             logger.LogDebug($"Registered {name} for monitoring");
-            registeredSymbols.Add(nameLower, new RegisteredSymbol() { Subscriptions = 1, UpdateInterval = updateInterval });
+            registeredSymbol = RegisteredSymbol.Create(name, updateInterval, symbolStream, typeConverter);
+            registeredSymbols.Add(name, registeredSymbol);
+            subscription.AddItem(registeredSymbol.MonitoredItem);
+            registeredSymbol.UpdateMonitoredItem(symbolHandler);
         }
 
         private void UnregisterIOInternal(string name)
@@ -171,102 +175,103 @@ namespace PlcInterface.OpcUa
                 throw new ArgumentException("Name is null or whitespace", nameof(name));
             }
 
-            var nameLower = name.ToLowerInvariant();
-
-            if (registeredSymbols.ContainsKey(nameLower) && registeredSymbols[nameLower].Subscriptions > 1)
+            if (!registeredSymbols.TryGetValue(name, out var registeredSymbol))
             {
-                logger.LogDebug($"Unregistered {name} from monitoring");
-                registeredSymbols[nameLower].Subscriptions -= 1;
                 return;
             }
 
-            MonitoredItem? item = null;
+            logger.LogDebug($"Unregistered {name} from monitoring");
+            registeredSymbol.Subscriptions--;
 
-            if (session == null || !session.Connected || !subscription.Created)
+            if (registeredSymbol.Subscriptions == 0)
             {
-                item = subscription.MonitoredItems.FirstOrDefault(x => string.Equals(x.DisplayName, nameLower, StringComparison.OrdinalIgnoreCase));
-            }
-            else
-            {
-                var symbol = symbolHandler.GetSymbolinfo(name).ConvertAndValidate();
-                item = subscription.MonitoredItems.FirstOrDefault(x => x.Handle == symbol.Handle);
-            }
-
-            if (item != null)
-            {
-                subscription.RemoveItem(item);
-                _ = registeredSymbols.Remove(nameLower);
+                subscription.RemoveItem(registeredSymbol.MonitoredItem);
+                _ = registeredSymbols.Remove(name);
+                registeredSymbol.Dispose();
                 logger.LogDebug($"Removed {name} from monitoring");
             }
         }
 
-        private void Update()
+        private sealed class RegisteredSymbol : IDisposable
         {
-            if (session == null || !session.Connected || !subscription.Created)
+            private readonly string name = string.Empty;
+            private readonly IDisposable symbolStream;
+            private bool disposedValue;
+
+            private RegisteredSymbol(string name, MonitoredItem monitoredItem, IDisposable symbolStream)
             {
-                return;
+                this.name = name;
+                MonitoredItem = monitoredItem;
+                this.symbolStream = symbolStream;
+                Subscriptions = 1;
             }
 
-            foreach (var item in registeredSymbols)
+            public MonitoredItem MonitoredItem
             {
-                try
-                {
-                    var symbol = symbolHandler.GetSymbolinfo(item.Key).ConvertAndValidate();
-
-                    if (subscription.MonitoredItems.Any(x => x.StartNodeId == symbol.Handle))
-                    {
-                        continue;
-                    }
-
-                    var monitoredItem = new MonitoredItem()
-                    {
-                        StartNodeId = symbol.Handle,
-                        AttributeId = Attributes.Value,
-                        Handle = symbol,
-                        SamplingInterval = item.Value.UpdateInterval,
-                        QueueSize = 1,
-                        DiscardOldest = true,
-                        DisplayName = item.Key,
-                    };
-
-                    disposables.Add(Observable
-                        .FromEventPattern<MonitoredItemNotificationEventHandler, MonitoredItem, MonitoredItemNotificationEventArgs>(
-                        h => monitoredItem.Notification += h,
-                        h => monitoredItem.Notification -= h)
-                        .Select(x =>
-                        {
-                            if (x.Sender?.Handle is SymbolInfo s
-                                && x.EventArgs.NotificationValue is MonitoredItemNotification datachange)
-                            {
-                                return new MonitorResult(s.Name, datachange.Value.Value);
-                            }
-
-                            return null;
-                        })
-                        .WhereNotNull()
-                        .SubscribeSafe(subject));
-                    logger.LogDebug($"Added {item.Key} to plc monitor");
-                    subscription.AddItem(monitoredItem);
-                }
-                catch (SymbolException ex)
-                {
-                    logger.LogCritical(ex, $"Failed to monitor {item.Key}");
-                }
+                get;
             }
 
-            subscription.ApplyChanges();
-        }
-
-        private sealed class RegisteredSymbol
-        {
             public int Subscriptions
             {
-                get; set;
+                get;
+                set;
             }
 
-            public int UpdateInterval
+            public static RegisteredSymbol Create(string name, int updateInterval, ISubject<IMonitorResult> symbolStream, IOpcTypeConverter typeConverter)
             {
-                get; set;
+                var monitoredItem = new MonitoredItem()
+                {
+                    AttributeId = Attributes.Value,
+                    SamplingInterval = updateInterval,
+                    QueueSize = 1,
+                    DiscardOldest = true,
+                    DisplayName = name,
+                };
+
+                var stream = Observable.FromEventPattern<MonitoredItemNotificationEventHandler, MonitoredItem, MonitoredItemNotificationEventArgs>(
+                    h => monitoredItem.Notification += h,
+                    h => monitoredItem.Notification -= h)
+                    .Select(x =>
+                    {
+                        if (x.Sender?.Handle is SymbolInfo s
+                        && x.EventArgs.NotificationValue is MonitoredItemNotification datachange)
+                        {
+                            return new MonitorResult(s.Name, typeConverter.Convert(datachange.Value.Value));
+                        }
+
+                        return null;
+                    })
+                    .WhereNotNull()
+                    .SubscribeSafe(symbolStream);
+
+                return new RegisteredSymbol(name, monitoredItem, stream);
+            }
+
+            public void Dispose()
+                => Dispose(disposing: true);
+
+            public void UpdateMonitoredItem(ISymbolHandler symbolHandler)
+            {
+                var symbol = symbolHandler.GetSymbolinfo(name);
+                if (symbol != null)
+                {
+                    var symbolInfo = symbol.ConvertAndValidate();
+                    MonitoredItem.StartNodeId = symbolInfo.Handle;
+                    MonitoredItem.Handle = symbolInfo;
+                }
+            }
+
+            private void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+                        symbolStream?.Dispose();
+                    }
+
+                    disposedValue = true;
+                }
             }
         }
     }

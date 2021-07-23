@@ -25,8 +25,8 @@ namespace PlcInterface.Ads.Tests
             symbolHandler = new SymbolHandler(connection, GetOptionsMoq(symbolhandlersettings), GetLoggerMock<SymbolHandler>());
             readWrite = new ReadWrite(connection, symbolHandler, typeConverter);
             monitor = new Monitor(symbolHandler, typeConverter, GetLoggerMock<Monitor>());
-
             await connection.ConnectAsync();
+            _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
         }
 
         [ClassCleanup]

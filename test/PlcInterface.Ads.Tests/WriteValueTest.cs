@@ -1,4 +1,4 @@
-﻿using System.Reactive.Linq;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.Tests;
@@ -24,7 +24,7 @@ namespace PlcInterface.Ads.Tests
             symbolHandler = new SymbolHandler(connection, GetOptionsMoq(symbolhandlersettings), GetLoggerMock<SymbolHandler>());
             readWrite = new ReadWrite(connection, symbolHandler, typeConverter);
             await connection.ConnectAsync();
-            _ = await connection.SessionStream.FirstAsync();
+            _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
         }
 
         [ClassCleanup]

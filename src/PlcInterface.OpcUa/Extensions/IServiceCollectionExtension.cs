@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using PlcInterface;
+﻿using PlcInterface;
 using PlcInterface.OpcUa;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -25,6 +24,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton(typeof(PlcConnection), typeof(PlcConnection))
                 .AddSingleton(typeof(IPlcConnection<Opc.Ua.Client.Session>), x => x.GetRequiredService<PlcConnection>())
                 .AddSingleton(typeof(IPlcConnection), x => x.GetRequiredService<IPlcConnection<Opc.Ua.Client.Session>>())
-                .AddSingleton<IConfigureOptions<OPCSettings>, DefaultOPCSettingsConfigureOptions>();
+                .ConfigureOptions<DefaultOPCSettingsConfigureOptions>();
     }
 }

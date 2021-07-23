@@ -26,6 +26,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton(typeof(IPlcConnection<IAdsConnection>), x => x.GetRequiredService<PlcConnection>())
                 .AddSingleton(typeof(IPlcConnection), x => x.GetRequiredService<IPlcConnection<IAdsConnection>>())
                 .AddSingleton(typeof(DynamicValueConverter), typeof(DynamicValueConverter))
-                .AddSingleton(typeof(IDynamicValueConverter), x => x.GetRequiredService<DynamicValueConverter>());
+                .AddSingleton(typeof(IDynamicValueConverter), x => x.GetRequiredService<DynamicValueConverter>())
+                .ConfigureOptions<DefaultConnectionSettingsConfigureOptions>()
+                .ConfigureOptions<DefaultSymbolHandlerSettingsConfigureOptions>();
     }
 }

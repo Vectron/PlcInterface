@@ -20,6 +20,57 @@ VAR_GLOBAL
 	BoolValue7			:BOOL			:= TRUE;
 	{attribute 'OPC.UA.DA' := '1'}
 	BoolValue8			:BOOL			:= TRUE;
+	
+	{attribute 'OPC.UA.DA' := '1'}
+	ByteValue			:BYTE			:= 16#FF;
+	{attribute 'OPC.UA.DA' := '1'}
+	WordValue			:WORD			:= 16#FFFF;
+	{attribute 'OPC.UA.DA' := '1'}
+	DWordValue			:DWORD			:= 16#FFFF_FFFF;
+	{attribute 'OPC.UA.DA' := '1'}
+	LWordValue			:LWORD			:= 16#FFFF_FFFF_FFFF_FFFF;
+
+	{attribute 'OPC.UA.DA' := '1'}
+	ShortValue			:SINT			:= -128;
+	{attribute 'OPC.UA.DA' := '1'}
+	IntValue			:INT			:= -32768;
+	{attribute 'OPC.UA.DA' := '1'}
+	DIntValue			:DINT			:= -2147483648 ;
+	{attribute 'OPC.UA.DA' := '1'}
+	LongValue			:LINT			:= -9223372036854775808;
+
+	{attribute 'OPC.UA.DA' := '1'}
+	UShortValue			:USINT			:= 255;
+	{attribute 'OPC.UA.DA' := '1'}
+	UIntValue			:UINT			:= 65535;
+	{attribute 'OPC.UA.DA' := '1'}
+	UDIntValue			:UDINT			:= 4294967295;
+	{attribute 'OPC.UA.DA' := '1'}
+	ULongValue			:ULINT			:= 18446744073709551615;
+	
+	{attribute 'OPC.UA.DA' := '1'}
+	FloatValue			:REAL			:= -3.402823E+38;
+	{attribute 'OPC.UA.DA' := '1'}
+	DoubleValue			:LREAL			:= -1.79769313486231E+308;
+	
+	{attribute 'OPC.UA.DA' := '1'}
+	TimeValue			:TIME			:= T#1000MS;
+	{attribute 'OPC.UA.DA' := '1'}
+	TimeOfDay			:TIME_OF_DAY	:= TOD#01:00;
+	{attribute 'OPC.UA.DA' := '1'}
+	LTimeValue			:LTIME 			:= LTIME#1000NS;
+	{attribute 'OPC.UA.DA' := '1'}
+	DateValue			:DATE			:= D#2106-02-06;
+	{attribute 'OPC.UA.DA' := '1'}
+	DateAndTimeValue	:DATE_AND_TIME	:= DT#2106-02-06-06:28:15;
+	
+	{attribute 'OPC.UA.DA' := '1'}
+	StringValue			:STRING			:= 'Test String';
+	{attribute 'OPC.UA.DA' := '1'}
+	WStringValue		:WSTRING		:= "Test WString";
+	
+	{attribute 'OPC.UA.DA' := '1'}
+	EnumValue			:TestEnum		:= 1;
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

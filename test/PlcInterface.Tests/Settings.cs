@@ -313,6 +313,48 @@ namespace PlcInterface.Tests
             yield return new object[] { "MonitorTestData.BoolValue8" };
         }
 
+        public static IEnumerable<object[]> GetMonitorData2()
+        {
+            yield return new object[] { "MonitorTestData.BoolValue1", typeof(bool) };
+            yield return new object[] { "MonitorTestData.BoolValue2", typeof(bool) };
+            yield return new object[] { "MonitorTestData.BoolValue3", typeof(bool) };
+            yield return new object[] { "MonitorTestData.BoolValue4", typeof(bool) };
+            yield return new object[] { "MonitorTestData.BoolValue5", typeof(bool) };
+            yield return new object[] { "MonitorTestData.BoolValue6", typeof(bool) };
+            yield return new object[] { "MonitorTestData.BoolValue7", typeof(bool) };
+            yield return new object[] { "MonitorTestData.BoolValue8", typeof(bool) };
+
+            yield return new object[] { "MonitorTestData.ByteValue", typeof(byte) };
+            yield return new object[] { "MonitorTestData.WordValue", typeof(ushort) };
+            yield return new object[] { "MonitorTestData.DWordValue", typeof(uint) };
+            yield return new object[] { "MonitorTestData.LWordValue", typeof(ulong) };
+
+            yield return new object[] { "MonitorTestData.ShortValue", typeof(sbyte) };
+            yield return new object[] { "MonitorTestData.IntValue", typeof(short) };
+            yield return new object[] { "MonitorTestData.DIntValue", typeof(int) };
+            yield return new object[] { "MonitorTestData.LongValue", typeof(long) };
+
+            yield return new object[] { "MonitorTestData.UShortValue", typeof(byte) };
+            yield return new object[] { "MonitorTestData.UIntValue", typeof(ushort) };
+            yield return new object[] { "MonitorTestData.UDIntValue", typeof(uint) };
+            yield return new object[] { "MonitorTestData.ULongValue", typeof(ulong) };
+
+            yield return new object[] { "MonitorTestData.FloatValue", typeof(float) };
+            yield return new object[] { "MonitorTestData.DoubleValue", typeof(double) };
+
+            yield return new object[] { "MonitorTestData.TimeValue", typeof(TimeSpan) };
+            yield return new object[] { "MonitorTestData.TimeOfDay", typeof(TimeSpan) };
+            yield return new object[] { "MonitorTestData.LTimeValue", typeof(TimeSpan) };
+            yield return new object[] { "MonitorTestData.DateValue", typeof(DateTimeOffset) };
+            yield return new object[] { "MonitorTestData.DateAndTimeValue", typeof(DateTimeOffset) };
+
+            yield return new object[] { "MonitorTestData.StringValue", typeof(string) };
+            yield return new object[] { "MonitorTestData.WStringValue", typeof(string) };
+
+            yield return new object[] { "MonitorTestData.EnumValue", typeof(int) };
+            yield return new object[] { "MonitorTestData.EnumValue", typeof(TestEnum) };
+        }
+
         public static IEnumerable<string> GetMonitorMultiple()
             => GetMonitorData().Select(x => x[0]).Cast<string>();
 

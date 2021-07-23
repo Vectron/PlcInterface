@@ -145,6 +145,37 @@ namespace PlcInterface.Tests
             }
         }
 
+        [DataTestMethod]
+        [DynamicData(nameof(Settings.GetMonitorData2), typeof(Settings), DynamicDataSourceType.Method)]
+        public void SubscribeIOShouldTriggerOnSubscribe(string ioName, Type instanceType)
+        {
+            var method = typeof(IMonitorTestBase)
+                .GetMethod(nameof(MonitorValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
+                .MakeGenericMethod(instanceType);
+            try
+            {
+                _ = method.Invoke(this, new object[] { ioName });
+            }
+            catch (TargetInvocationException ex)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            }
+        }
+
+        protected void MonitorValueGenericHelper<T>(string ioName)
+        {
+            // Arrange
+            var monitor = GetMonitor();
+            using var done = new ManualResetEvent(false);
+
+            // Act
+            using var subscription = monitor.SubscribeIO<T>(ioName, _ => done.Set());
+            var result = done.WaitOne(TimeSpan.FromMilliseconds(2000));
+
+            // Assert
+            Assert.IsTrue(result, "Timeout");
+        }
+
         private static async Task SubscribeCheckAsync(IList<bool> results, int expectedCount)
         {
             await Task.Delay(1000, CancellationToken.None).ConfigureAwait(false);

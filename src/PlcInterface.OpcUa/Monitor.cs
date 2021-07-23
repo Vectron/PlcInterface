@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
@@ -15,14 +14,14 @@ namespace PlcInterface.OpcUa
     /// </summary>
     public class Monitor : IMonitor, IDisposable
     {
-        private readonly CompositeDisposable disposables = new();
         private readonly ILogger<Monitor> logger;
         private readonly Dictionary<string, RegisteredSymbol> registeredSymbols = new(StringComparer.OrdinalIgnoreCase);
-        private readonly Subscription subscription;
+        private readonly IDisposable sesionStream;
         private readonly ISymbolHandler symbolHandler;
         private readonly Subject<IMonitorResult> symbolStream = new();
         private readonly IOpcTypeConverter typeConverter;
         private bool disposedValue;
+        private Subscription subscription;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Monitor"/> class.
@@ -48,33 +47,32 @@ namespace PlcInterface.OpcUa
                 TimestampsToReturn = TimestampsToReturn.Both,
             };
 
-            disposables.Add(connection.SessionStream.Where(x => x.IsConnected).Subscribe(x =>
-            {
-                if (x.Value == null)
-                {
-                    return;
-                }
+            sesionStream = connection.SessionStream.Where(x => x.IsConnected).Select(x => x.Value).WhereNotNull().Subscribe(x =>
+             {
+                 foreach (var keyValue in registeredSymbols)
+                 {
+                     var value = keyValue.Value;
+                     value.UpdateMonitoredItem(symbolHandler);
+                 }
 
-                foreach (var keyValue in registeredSymbols)
-                {
-                    var name = keyValue.Key;
-                    var value = keyValue.Value;
-                    var symbolInfo = symbolHandler.GetSymbolinfo(name).ConvertAndValidate();
-                    value.MonitoredItem.StartNodeId = symbolInfo.Handle;
-                    value.MonitoredItem.Handle = symbolInfo;
-                }
+                 if (x.Subscriptions.Contains(subscription))
+                 {
+                     subscription.ApplyChanges();
+                 }
+                 else
+                 {
+                     if (subscription.Created)
+                     {
+                         var previous = subscription;
+                         subscription = new Subscription(subscription, true);
+                         previous.Dispose();
+                     }
 
-                if (x.Value.Subscriptions.Contains(subscription))
-                {
-                    subscription.ApplyChanges();
-                }
-                else
-                {
-                    _ = x.Value.AddSubscription(subscription);
-                    subscription.Create();
-                    subscription.ApplyChanges();
-                }
-            }));
+                     _ = x.AddSubscription(subscription);
+                     subscription.Create();
+                     subscription.ApplyChanges();
+                 }
+             });
         }
 
         /// <inheritdoc/>
@@ -100,14 +98,14 @@ namespace PlcInterface.OpcUa
                 RegisterIOInternal(name, updateInterval);
             }
 
-            subscription.ApplyChanges();
+            ApplyChanges();
         }
 
         /// <inheritdoc/>
         public void RegisterIO(string ioName, int updateInterval = 1000)
         {
             RegisterIOInternal(ioName, updateInterval);
-            subscription.ApplyChanges();
+            ApplyChanges();
         }
 
         /// <inheritdoc/>
@@ -118,14 +116,14 @@ namespace PlcInterface.OpcUa
                 UnregisterIOInternal(name);
             }
 
-            subscription.ApplyChanges();
+            ApplyChanges();
         }
 
         /// <inheritdoc/>
         public void UnregisterIO(string ioName)
         {
             UnregisterIOInternal(ioName);
-            subscription.ApplyChanges();
+            ApplyChanges();
         }
 
         /// <summary>
@@ -138,13 +136,21 @@ namespace PlcInterface.OpcUa
             {
                 if (disposing)
                 {
-                    symbolStream?.Dispose();
-                    subscription?.Dispose();
-                    disposables?.Dispose();
+                    symbolStream.Dispose();
+                    subscription.Dispose();
+                    sesionStream.Dispose();
                     registeredSymbols?.Clear();
                 }
 
                 disposedValue = true;
+            }
+        }
+
+        private void ApplyChanges()
+        {
+            if (subscription.Created && subscription.Session.Connected)
+            {
+                subscription.ApplyChanges();
             }
         }
 
@@ -217,6 +223,7 @@ namespace PlcInterface.OpcUa
                 set;
             }
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "Dont need a cancelation token.")]
             public static RegisteredSymbol Create(string name, int updateInterval, ISubject<IMonitorResult> symbolStream, IOpcTypeConverter typeConverter)
             {
                 var monitoredItem = new MonitoredItem()
@@ -242,7 +249,7 @@ namespace PlcInterface.OpcUa
                         return null;
                     })
                     .WhereNotNull()
-                    .SubscribeSafe(symbolStream);
+                    .Subscribe(symbolStream);
 
                 return new RegisteredSymbol(name, monitoredItem, stream);
             }
@@ -267,7 +274,7 @@ namespace PlcInterface.OpcUa
                 {
                     if (disposing)
                     {
-                        symbolStream?.Dispose();
+                        symbolStream.Dispose();
                     }
 
                     disposedValue = true;

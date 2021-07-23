@@ -4,7 +4,6 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using TwinCAT.Ads;
 using TwinCAT.Ads.SumCommand;
 using TwinCAT.TypeSystem;
@@ -26,9 +25,7 @@ namespace PlcInterface.Ads
         /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
         /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
         /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
-        /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public api, backwards compatability")]
-        public ReadWrite(IPlcConnection<IAdsConnection> connection, ISymbolHandler symbolHandler, IAdsTypeConverter typeConverter, ILogger<ReadWrite> logger)
+        public ReadWrite(IPlcConnection<IAdsConnection> connection, ISymbolHandler symbolHandler, IAdsTypeConverter typeConverter)
         {
             this.connection = connection;
             this.symbolHandler = symbolHandler;

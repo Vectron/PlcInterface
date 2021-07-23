@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,6 +14,7 @@ namespace PlcInterface.Tests
     public abstract class IMonitorTestBase : ConnectionBase
     {
         [TestMethod]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP017:Prefer using.", Justification = "Need to dispose for test flow")]
         public async Task MultipleSubscriptions()
         {
             // Arrange
@@ -21,36 +24,30 @@ namespace PlcInterface.Tests
             var results = new List<bool>();
 
             // Act
-            var subscription1 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x));
-            var subscription2 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x));
-            var subscription3 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x));
-            var subscription4 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x));
+            using var subscription1 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x));
+            using var subscription2 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x));
+            using var subscription3 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x));
+            using var subscription4 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x));
 
             // Assert
-            using (subscription1)
-            using (subscription2)
-            using (subscription3)
-            using (subscription4)
-            {
-                readWrite.ToggleBool(ioName);
-                await SubscribeCheckAsync(results, 4);
-                subscription1.Dispose();
+            readWrite.ToggleBool(ioName);
+            await SubscribeCheckAsync(results, 4);
+            subscription1.Dispose();
 
-                readWrite.ToggleBool(ioName);
-                await SubscribeCheckAsync(results, 3);
-                subscription2.Dispose();
+            readWrite.ToggleBool(ioName);
+            await SubscribeCheckAsync(results, 3);
+            subscription2.Dispose();
 
-                readWrite.ToggleBool(ioName);
-                await SubscribeCheckAsync(results, 2);
-                subscription3.Dispose();
+            readWrite.ToggleBool(ioName);
+            await SubscribeCheckAsync(results, 2);
+            subscription3.Dispose();
 
-                readWrite.ToggleBool(ioName);
-                await SubscribeCheckAsync(results, 1);
-                subscription4.Dispose();
+            readWrite.ToggleBool(ioName);
+            await SubscribeCheckAsync(results, 1);
+            subscription4.Dispose();
 
-                readWrite.ToggleBool(ioName);
-                await SubscribeCheckAsync(results, 0);
-            }
+            readWrite.ToggleBool(ioName);
+            await SubscribeCheckAsync(results, 0);
         }
 
         [TestMethod]
@@ -61,27 +58,36 @@ namespace PlcInterface.Tests
             var readWrite = GetReadWrite();
             using var done = new ManualResetEvent(false);
             var ioName = "MonitorTestData.BoolValue1";
+            var results = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            monitor.RegisterIO(ioName, 1000);
 
             // Act
-            var original = readWrite.Read<bool>(ioName);
-            var subscription = monitor.SymbolStream.Subscribe(x =>
+            var originals = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { ioName, readWrite.Read<bool>(ioName) } };
+            using var subscription = monitor.SymbolStream.Subscribe(x =>
               {
                   if (string.Equals(x.Name, ioName, StringComparison.OrdinalIgnoreCase))
                   {
-                      var value = (bool)x.Value;
-                      Assert.AreNotEqual(original, value);
+                      results.Add(x.Name, x.Value);
                       _ = done.Set();
                   }
               });
 
-            using (subscription)
-            {
-                monitor.RegisterIO(ioName, 1000);
-                readWrite.ToggleBool(ioName);
-                var result = done.WaitOne(TimeSpan.FromSeconds(30));
+            readWrite.ToggleBool(ioName);
+            var timeoutResult = done.WaitOne(TimeSpan.FromSeconds(30));
+            monitor.UnregisterIO(ioName);
 
-                // Assert
-                Assert.IsTrue(result, "Timeout");
+            // Assert
+            Assert.IsTrue(timeoutResult, "Timeout");
+            Assert.AreEqual(originals.Count, results.Count);
+            using var originalsEnumerator = originals.OrderBy(x => x.Key).GetEnumerator();
+            using var resultsEnumerator = results.OrderBy(x => x.Key).GetEnumerator();
+
+            while (originalsEnumerator.MoveNext() && resultsEnumerator.MoveNext())
+            {
+                var original = originalsEnumerator.Current;
+                var result = resultsEnumerator.Current;
+                Assert.AreEqual(original.Key, result.Key);
+                Assert.AreNotEqual(original.Value, result.Value);
             }
         }
 
@@ -94,14 +100,14 @@ namespace PlcInterface.Tests
             using var done = new ManualResetEvent(false);
             var hits = 0;
             var variables = Settings.GetMonitorMultiple();
+            var results = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            monitor.RegisterIO(variables);
 
             // Act
             var originals = readWrite.Read(variables);
-            var subscription = monitor.SymbolStream.Subscribe(x =>
+            using var subscription = monitor.SymbolStream.Subscribe(x =>
             {
-                var value = (bool)x.Value;
-                _ = originals.TryGetValue(x.Name, out var original);
-                Assert.AreNotEqual((bool)original, value);
+                results.Add(x.Name, x.Value);
                 hits++;
 
                 if (originals.Count == hits)
@@ -110,16 +116,23 @@ namespace PlcInterface.Tests
                 }
             });
 
-            using (subscription)
+            var valuesToWrite = originals.ToDictionary(x => x.Key, x => (object)!(bool)x.Value, StringComparer.OrdinalIgnoreCase);
+            readWrite.Write(valuesToWrite);
+            var timeoutResult = done.WaitOne(TimeSpan.FromSeconds(5));
+            monitor.UnregisterIO(variables);
+
+            // Assert
+            Assert.IsTrue(timeoutResult, FormattableString.Invariant($"Timeout, items processed {hits}/{originals.Count}"));
+            Assert.AreEqual(originals.Count, results.Count);
+            using var originalsEnumerator = originals.OrderBy(x => x.Key).GetEnumerator();
+            using var resultsEnumerator = results.OrderBy(x => x.Key).GetEnumerator();
+
+            while (originalsEnumerator.MoveNext() && resultsEnumerator.MoveNext())
             {
-                monitor.RegisterIO(variables);
-
-                var valuesToWrite = originals.ToDictionary(x => x.Key, x => (object)!(bool)x.Value, StringComparer.OrdinalIgnoreCase);
-                readWrite.Write(valuesToWrite);
-                var result = done.WaitOne(TimeSpan.FromSeconds(5));
-
-                // Assert
-                Assert.IsTrue(result, FormattableString.Invariant($"Timeout, items processed {hits}/{originals.Count}"));
+                var original = originalsEnumerator.Current;
+                var result = resultsEnumerator.Current;
+                Assert.AreEqual(original.Key, result.Key);
+                Assert.AreNotEqual(original.Value, result.Value);
             }
         }
 
@@ -134,15 +147,12 @@ namespace PlcInterface.Tests
 
             // Act
             var original = readWrite.Read<bool>(ioName);
-            var subscription = monitor.SubscribeIO(ioName, !original, () => done.Set());
-            using (subscription)
-            {
-                readWrite.ToggleBool(ioName);
-                var result = done.WaitOne(TimeSpan.FromSeconds(5));
+            using var subscription = monitor.SubscribeIO(ioName, !original, () => done.Set());
+            readWrite.ToggleBool(ioName);
+            var result = done.WaitOne(TimeSpan.FromSeconds(5));
 
-                // Assert
-                Assert.IsTrue(result, "Timeout");
-            }
+            // Assert
+            Assert.IsTrue(result, "Timeout");
         }
 
         [DataTestMethod]

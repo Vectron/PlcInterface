@@ -33,9 +33,9 @@ namespace PlcInterface.OpcUa.Tests
         }
 
         protected override IPlcConnection GetPLCConnection()
-            => connection ?? throw new System.NotSupportedException();
+            => connection ?? throw new NotSupportedException();
 
         protected override ISymbolHandler GetSymbolHandler()
-            => symbolHandler ?? throw new System.NotSupportedException();
+            => symbolHandler ?? throw new NotSupportedException();
     }
 }

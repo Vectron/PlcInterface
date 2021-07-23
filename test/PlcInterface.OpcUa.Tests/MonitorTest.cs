@@ -41,15 +41,15 @@ namespace PlcInterface.OpcUa.Tests
         }
 
         protected override IMonitor GetMonitor()
-            => monitor ?? throw new System.NotSupportedException();
+            => monitor ?? throw new NotSupportedException();
 
         protected override IPlcConnection GetPLCConnection()
-            => connection ?? throw new System.NotSupportedException();
+            => connection ?? throw new NotSupportedException();
 
         protected override IReadWrite GetReadWrite()
-            => readWrite ?? throw new System.NotSupportedException();
+            => readWrite ?? throw new NotSupportedException();
 
         protected override ISymbolHandler GetSymbolHandler()
-            => symbolHandler ?? throw new System.NotSupportedException();
+            => symbolHandler ?? throw new NotSupportedException();
     }
 }

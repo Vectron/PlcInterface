@@ -65,6 +65,7 @@ namespace PlcInterface.Ads
                 catch (Exception)
                 {
                 }
+
                 stream = valueSymbol
                     .WhenValueChanged()
                     .Select(x => new MonitorResult(name, typeConverter.Convert(x, valueSymbol)))

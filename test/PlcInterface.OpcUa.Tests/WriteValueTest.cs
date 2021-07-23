@@ -19,10 +19,11 @@ namespace PlcInterface.OpcUa.Tests
             var connectionsettings = new OPCSettings();
             new DefaultOPCSettingsConfigureOptions().Configure(connectionsettings);
             connectionsettings.Address = Settings.PLCUri;
+            var typeConverter = new OpcTypeConverter();
 
             connection = new PlcConnection(GetOptionsMoq(connectionsettings), GetLoggerMock<PlcConnection>());
             symbolHandler = new SymbolHandler(connection, GetLoggerMock<SymbolHandler>());
-            readWrite = new ReadWrite(connection, symbolHandler, GetLoggerMock<ReadWrite>());
+            readWrite = new ReadWrite(connection, symbolHandler, typeConverter, GetLoggerMock<ReadWrite>());
             await connection.ConnectAsync();
             _ = await connection.SessionStream.FirstAsync();
         }

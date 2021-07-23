@@ -17,6 +17,14 @@ namespace PlcInterface
         }
 
         /// <summary>
+        /// Gets a <see cref="ITypeConverter"/>.
+        /// </summary>
+        ITypeConverter TypeConverter
+        {
+            get;
+        }
+
+        /// <summary>
         /// Register IO tags for monitoring.
         /// </summary>
         /// <param name="ioNames">The names of the tags.</param>

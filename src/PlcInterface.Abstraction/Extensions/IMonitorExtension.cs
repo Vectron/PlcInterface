@@ -65,8 +65,7 @@ namespace PlcInterface
             return monitor
                 .SymbolStream
                 .Where(x => string.Equals(x.Name, ioName, StringComparison.OrdinalIgnoreCase))
-                .Select(x => x.Value)
-                .Cast<T>()
+                .Select(x => monitor.TypeConverter.Convert<T>(x.Value))
                 .Finally(() => monitor.UnregisterIO(ioName));
         }
     }

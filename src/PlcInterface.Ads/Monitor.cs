@@ -20,23 +20,30 @@ namespace PlcInterface.Ads
         private readonly Dictionary<string, DisposableMonitorItem> streams = new(StringComparer.OrdinalIgnoreCase);
         private readonly ISymbolHandler symbolHandler;
         private readonly Subject<IMonitorResult> symbolStream = new();
+        private readonly IAdsTypeConverter typeConverter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Monitor"/> class.
         /// </summary>
         /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
         /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
+        /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
         /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-        public Monitor(IPlcConnection<IAdsConnection> connection, ISymbolHandler symbolHandler, ILogger<Monitor> logger)
+        public Monitor(IPlcConnection<IAdsConnection> connection, ISymbolHandler symbolHandler, IAdsTypeConverter typeConverter, ILogger<Monitor> logger)
         {
             this.connection = connection;
             this.symbolHandler = symbolHandler;
+            this.typeConverter = typeConverter;
             this.logger = logger;
         }
 
         /// <inheritdoc/>
         public IObservable<IMonitorResult> SymbolStream
             => symbolStream.AsObservable();
+
+        /// <inheritdoc/>
+        public ITypeConverter TypeConverter
+            => typeConverter;
 
         /// <inheritdoc/>
         public void RegisterIO(IEnumerable<string> ioNames, int updateInterval = 1000)

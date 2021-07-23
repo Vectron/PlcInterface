@@ -18,11 +18,11 @@ namespace PlcInterface.Ads.Tests
         {
             var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
             var symbolhandlersettings = new SymbolHandlerSettings() { StoreSymbolsToDisk = false };
-            var dynamicValueConverter = new DynamicValueConverter();
+            var typeConverter = new AdsTypeConverter();
 
             connection = new PlcConnection(GetOptionsMoq(connectionsettings), GetLoggerMock<PlcConnection>());
             symbolHandler = new SymbolHandler(connection, GetOptionsMoq(symbolhandlersettings), GetLoggerMock<SymbolHandler>());
-            readWrite = new ReadWrite(connection, symbolHandler, dynamicValueConverter, GetLoggerMock<ReadWrite>());
+            readWrite = new ReadWrite(connection, symbolHandler, typeConverter, GetLoggerMock<ReadWrite>());
             await connection.ConnectAsync();
             _ = await connection.SessionStream.FirstAsync();
         }

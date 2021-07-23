@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,22 +17,22 @@ namespace PlcInterface.Ads
     public class ReadWrite : IReadWrite
     {
         private readonly IPlcConnection<IAdsConnection> connection;
-        private readonly IDynamicValueConverter dynamicValueConverter;
         private readonly ISymbolHandler symbolHandler;
+        private readonly IAdsTypeConverter typeConverter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadWrite"/> class.
         /// </summary>
         /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
         /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
-        /// <param name="dynamicValueConverter">A <see cref="IDynamicValueConverter"/> implementation.</param>
+        /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
         /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public api, backwards compatability")]
-        public ReadWrite(IPlcConnection<IAdsConnection> connection, ISymbolHandler symbolHandler, IDynamicValueConverter dynamicValueConverter, ILogger<ReadWrite> logger)
+        public ReadWrite(IPlcConnection<IAdsConnection> connection, ISymbolHandler symbolHandler, IAdsTypeConverter typeConverter, ILogger<ReadWrite> logger)
         {
             this.connection = connection;
             this.symbolHandler = symbolHandler;
-            this.dynamicValueConverter = dynamicValueConverter;
+            this.typeConverter = typeConverter;
         }
 
         /// <inheritdoc/>
@@ -56,7 +55,7 @@ namespace PlcInterface.Ads
                         throw new SymbolException($"{ioName} is not a value symbol.");
                     }
 
-                    var fixedValue = FixType(value, adsSymbol);
+                    var fixedValue = typeConverter.Convert(value, adsSymbol);
                     return (ioName, fixedValue);
                 })
                 .ToDictionary(x => x.ioName, x => x.fixedValue, StringComparer.OrdinalIgnoreCase);
@@ -68,7 +67,7 @@ namespace PlcInterface.Ads
             var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
             var value = adsSymbol.ReadValue().ThrowIfNull();
-            return FixType(value, adsSymbol);
+            return typeConverter.Convert(value, adsSymbol);
         }
 
         /// <inheritdoc/>
@@ -77,7 +76,7 @@ namespace PlcInterface.Ads
             var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
             var value = adsSymbol.ReadValue().ThrowIfNull();
-            return FixType<T>(value);
+            return typeConverter.Convert<T>(value);
         }
 
         /// <inheritdoc/>
@@ -86,7 +85,7 @@ namespace PlcInterface.Ads
             var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
             var resultReadValue = await adsSymbol.ReadValueAsync(CancellationToken.None).ConfigureAwait(false);
-            return FixType(resultReadValue.Value.ThrowIfNull(), adsSymbol);
+            return typeConverter.Convert(resultReadValue.Value.ThrowIfNull(), adsSymbol);
         }
 
         /// <inheritdoc/>
@@ -95,7 +94,7 @@ namespace PlcInterface.Ads
             var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
             var resultReadValue = await adsSymbol.ReadValueAsync(CancellationToken.None).ConfigureAwait(false);
-            return FixType<T>(resultReadValue.Value.ThrowIfNull());
+            return typeConverter.Convert<T>(resultReadValue.Value.ThrowIfNull());
         }
 
         /// <inheritdoc/>
@@ -114,7 +113,7 @@ namespace PlcInterface.Ads
                     .Zip(resultSum.Values, (ioName, value) =>
                     {
                         var adsSymbol = symbolHandler.GetSymbolinfo(ioName).CastAndValidate().Symbol.CastAndValidate();
-                        var fixedValue = FixType(value, adsSymbol);
+                        var fixedValue = typeConverter.Convert(value, adsSymbol);
                         return (ioName, fixedValue);
                     })
                     .ToDictionary(x => x.ioName, x => x.fixedValue, StringComparer.OrdinalIgnoreCase);
@@ -189,42 +188,6 @@ namespace PlcInterface.Ads
             var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
             return adsSymbol.WriteValueAsync(value, CancellationToken.None);
-        }
-
-        private static object FixType(object value, IValueSymbol valueSymbol)
-        {
-            if (value is DynamicValue dynamicObject)
-            {
-                return dynamicObject.CleanDynamic();
-            }
-
-            if (valueSymbol.Category == DataTypeCategory.Enum
-                && value is short)
-            {
-                return Convert.ToInt32(value, CultureInfo.InvariantCulture);
-            }
-
-            return value;
-        }
-
-        private T FixType<T>(object value)
-        {
-            if (typeof(T).IsEnum)
-            {
-                return (T)Enum.ToObject(typeof(T), value);
-            }
-
-            if (value is T unboxed)
-            {
-                return unboxed;
-            }
-
-            if (value is DynamicObject dynamicObject)
-            {
-                return (T)dynamicValueConverter.ConvertFrom(dynamicObject, typeof(T));
-            }
-
-            return (T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
         }
     }
 }

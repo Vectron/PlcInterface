@@ -24,6 +24,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton(typeof(PlcConnection), typeof(PlcConnection))
                 .AddSingleton(typeof(IPlcConnection<Opc.Ua.Client.Session>), x => x.GetRequiredService<PlcConnection>())
                 .AddSingleton(typeof(IPlcConnection), x => x.GetRequiredService<IPlcConnection<Opc.Ua.Client.Session>>())
+                .AddTransient<IOpcTypeConverter, OpcTypeConverter>(x => x.GetRequiredService<OpcTypeConverter>())
+                .AddTransient<OpcTypeConverter, OpcTypeConverter>()
                 .ConfigureOptions<DefaultOPCSettingsConfigureOptions>();
     }
 }

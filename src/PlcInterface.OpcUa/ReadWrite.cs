@@ -21,6 +21,7 @@ namespace PlcInterface.OpcUa
         private readonly CompositeDisposable disposables = new();
         private readonly ILogger logger;
         private readonly ISymbolHandler symbolHandler;
+        private readonly IOpcTypeConverter typeConverter;
         private bool disposedValue;
 
         /// <summary>
@@ -28,11 +29,13 @@ namespace PlcInterface.OpcUa
         /// </summary>
         /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
         /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
+        /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
         /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-        public ReadWrite(IPlcConnection<Session> connection, ISymbolHandler symbolHandler, ILogger<ReadWrite> logger)
+        public ReadWrite(IPlcConnection<Session> connection, ISymbolHandler symbolHandler, IOpcTypeConverter typeConverter, ILogger<ReadWrite> logger)
         {
             this.connection = connection;
             this.symbolHandler = symbolHandler;
+            this.typeConverter = typeConverter;
             this.logger = logger;
         }
 
@@ -63,8 +66,8 @@ namespace PlcInterface.OpcUa
             foreach (var ioName in ioNames)
             {
                 var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
-                var value = CreateDynamic(symbolInfo, valueEnumerator);
-                result.Add(ioName, FixType(value));
+                var value = typeConverter.CreateDynamic(symbolInfo, valueEnumerator, symbolHandler);
+                result.Add(ioName, typeConverter.Convert(value));
             }
 
             return result;
@@ -76,13 +79,13 @@ namespace PlcInterface.OpcUa
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
             if (symbol.ChildSymbols.Count > 0)
             {
-                var dynamic = ReadDynamic(ioName);
-                return (T)FixType(dynamic, typeof(T));
+                var dynamic = ReadDynamic(ioName) as object;
+                return typeConverter.Convert<T>(dynamic);
             }
 
             var session = connection.GetConnectedClient();
             var dataValue = session.ReadValue(symbol.Handle);
-            return (T)FixType(dataValue.Value, typeof(T));
+            return typeConverter.Convert<T>(dataValue.Value);
         }
 
         /// <inheritdoc/>
@@ -96,7 +99,7 @@ namespace PlcInterface.OpcUa
 
             var session = connection.GetConnectedClient();
             var value = session.ReadValue(symbol.Handle);
-            return FixType(value.Value);
+            return typeConverter.Convert(value.Value);
         }
 
         /// <inheritdoc/>
@@ -136,8 +139,8 @@ namespace PlcInterface.OpcUa
                         foreach (var ioName in ioNames)
                         {
                             var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
-                            var value = CreateDynamic(symbolInfo, valueEnumerator);
-                            result.Add(ioName, FixType(value));
+                            var value = typeConverter.CreateDynamic(symbolInfo, valueEnumerator, symbolHandler);
+                            result.Add(ioName, typeConverter.Convert(value));
                         }
 
                         taskCompletionSource.SetResult(result);
@@ -187,7 +190,7 @@ namespace PlcInterface.OpcUa
                         var val = dataValues.FirstOrDefault();
                         var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                         ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
-                        taskCompletionSource.SetResult(FixType(val.Value));
+                        taskCompletionSource.SetResult(typeConverter.Convert(val.Value));
                     }
                     catch (Exception ex)
                     {
@@ -205,8 +208,8 @@ namespace PlcInterface.OpcUa
             var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
             if (symbol.ChildSymbols.Count > 0)
             {
-                var value = await ReadDynamicAsync(ioName).ConfigureAwait(false);
-                return (T)FixType(value, typeof(T));
+                var value = await ReadDynamicAsync(ioName).ConfigureAwait(false) as object;
+                return typeConverter.Convert<T>(value);
             }
 
 #pragma warning disable IDISP001 // Dispose created.
@@ -236,7 +239,7 @@ namespace PlcInterface.OpcUa
                         var val = dataValues.FirstOrDefault();
                         var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                         ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
-                        taskCompletionSource.SetResult((T)FixType(val.Value, typeof(T)));
+                        taskCompletionSource.SetResult(typeConverter.Convert<T>(val.Value));
                     }
                     catch (Exception ex)
                     {
@@ -450,34 +453,6 @@ namespace PlcInterface.OpcUa
             return new Variant(value);
         }
 
-        private static TimeSpan CreateTimeSpan(object value)
-        {
-            if (value.GetType() == typeof(ulong))
-            {
-                var ticks = Convert.ToInt64(value, CultureInfo.InvariantCulture) / 100; // ticks are in 100 nano seconds, value is in micro seconds
-                return TimeSpan.FromTicks(ticks);
-            }
-
-            var miliSeconds = Convert.ToDouble(value, CultureInfo.InvariantCulture);
-            return TimeSpan.FromMilliseconds(miliSeconds);
-        }
-
-        private static object FixType(object value)
-        {
-            if (value is DateTime dateTime)
-            {
-                var specified = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
-                return new DateTimeOffset(specified);
-            }
-
-            if (value is Matrix matrix)
-            {
-                return matrix.ToArray();
-            }
-
-            return value;
-        }
-
         private static void ValidateResponse(IList request, ResponseHeader responseHeader, StatusCodeCollection statusCodes, DiagnosticInfoCollection diagnosticInfos, IEnumerable<string> ioNames)
         {
             ClientBase.ValidateResponse(statusCodes, request);
@@ -498,126 +473,6 @@ namespace PlcInterface.OpcUa
 
                 throw new AggregateException($"Service result is bad", errors);
             }
-        }
-
-        private Array CreateArray(Type targetType, Array array)
-        {
-            var upperBoundsRank = new int[array.Rank];
-            for (var dimension = 0; dimension < array.Rank; dimension++)
-            {
-                upperBoundsRank[dimension] = array.GetLength(dimension);
-            }
-
-            var elementType = targetType.GetElementType();
-            var typedArray = Array.CreateInstance(elementType, upperBoundsRank);
-
-            foreach (var indices in typedArray.Indices())
-            {
-                var item = array.GetValue(indices);
-                var fixedObject = FixType(item, elementType);
-                typedArray.SetValue(fixedObject, indices);
-            }
-
-            return typedArray;
-        }
-
-        private dynamic CreateDynamic(SymbolInfo symbolInfo, IEnumerator<DataValue> valueEnumerator)
-        {
-            if (symbolInfo.ChildSymbols.Count == 0)
-            {
-                if (valueEnumerator.MoveNext() && ServiceResult.IsGood(valueEnumerator.Current.StatusCode))
-                {
-                    if (valueEnumerator.Current.Value is Matrix matrixValue)
-                    {
-                        return matrixValue.ToArray();
-                    }
-
-                    return FixType(valueEnumerator.Current.Value);
-                }
-            }
-
-            if (symbolInfo.IsArray)
-            {
-                var array = Array.CreateInstance(typeof(ExpandoObject), symbolInfo.ArrayBounds);
-                foreach (var childSymbolName in symbolInfo.ChildSymbols)
-                {
-                    var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName).ConvertAndValidate();
-                    var value = CreateDynamic(childSymbolInfo, valueEnumerator);
-                    var indices = childSymbolInfo.Indices;
-                    array.SetValue(value, indices);
-                }
-
-                return array;
-            }
-
-            var collection = new ExpandoObject() as IDictionary<string, object>;
-            foreach (var childSymbolName in symbolInfo.ChildSymbols)
-            {
-                var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName).ConvertAndValidate();
-                var value = CreateDynamic(childSymbolInfo, valueEnumerator);
-                var shortName = childSymbolInfo.ShortName;
-                collection.Add(shortName, value);
-            }
-
-            return collection;
-        }
-
-        private object FixType(object value, Type targetType)
-        {
-            if (value.GetType() == targetType)
-            {
-                return value;
-            }
-
-            if (targetType == typeof(DateTimeOffset) && value is DateTime dateTime)
-            {
-                var specified = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
-                return new DateTimeOffset(specified);
-            }
-
-            if (targetType == typeof(TimeSpan))
-            {
-                return CreateTimeSpan(value);
-            }
-
-            if (value is Matrix matrix)
-            {
-                return matrix.ToArray();
-            }
-
-            if (value.GetType().IsArray
-                && targetType.IsArray
-                && value is Array array)
-            {
-                return CreateArray(targetType, array);
-            }
-
-            if (value is ExpandoObject keyValues)
-            {
-                var instance = Activator.CreateInstance(targetType);
-                foreach (var keyValue in keyValues)
-                {
-                    var property = targetType.GetProperty(keyValue.Key);
-
-                    if (property == null)
-                    {
-                        logger.LogError("No property found with name: {0} on object of type: {1}", keyValue.Key, targetType.Name);
-                        continue;
-                    }
-
-                    var fixedObject = FixType(keyValue.Value, property.PropertyType);
-                    property.SetValue(instance, fixedObject);
-                }
-
-                return instance;
-            }
-
-            if (targetType.IsEnum)
-            {
-                return Enum.ToObject(targetType, value);
-            }
-
-            return Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
         }
     }
 }

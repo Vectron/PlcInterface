@@ -14,6 +14,28 @@ namespace PlcInterface.Tests
     public abstract class IMonitorTestBase : ConnectionBase
     {
         [TestMethod]
+        public void MonitorBeforeConnectDoesntMatter()
+        {
+            // Arrange
+            var connection = GetPLCConnection();
+            var monitor = GetMonitor();
+            var readWrite = GetReadWrite();
+            using var done = new ManualResetEvent(false);
+            var ioName = "MonitorTestData.BoolValue8";
+
+            // Act
+            var original = readWrite.Read<bool>(ioName);
+            connection.Disconnect();
+            using var subscription = monitor.SubscribeIO(ioName, !original, () => done.Set());
+            connection.Connect();
+            readWrite.ToggleBool(ioName);
+            var result = done.WaitOne(TimeSpan.FromSeconds(5));
+
+            // Assert
+            Assert.IsTrue(result, "Timeout");
+        }
+
+        [TestMethod]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP017:Prefer using.", Justification = "Need to dispose for test flow")]
         public async Task MultipleSubscriptions()
         {
@@ -170,6 +192,28 @@ namespace PlcInterface.Tests
             {
                 ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
             }
+        }
+
+        [TestMethod]
+        public void SubscriptionsPersistReconnects()
+        {
+            // Arrange
+            var connection = GetPLCConnection();
+            var monitor = GetMonitor();
+            var readWrite = GetReadWrite();
+            using var done = new ManualResetEvent(false);
+            var ioName = "MonitorTestData.BoolValue8";
+
+            // Act
+            var original = readWrite.Read<bool>(ioName);
+            using var subscription = monitor.SubscribeIO(ioName, !original, () => done.Set());
+            connection.Disconnect();
+            connection.Connect();
+            readWrite.ToggleBool(ioName);
+            var result = done.WaitOne(TimeSpan.FromSeconds(5));
+
+            // Assert
+            Assert.IsTrue(result, "Timeout");
         }
 
         protected void MonitorValueGenericHelper<T>(string ioName)

@@ -13,7 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="serviceDescriptors">The <see cref="IServiceCollection"/> to add the services to.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        public static IServiceCollection AddPLC(this IServiceCollection serviceDescriptors)
+        public static IServiceCollection AddOpcPLC(this IServiceCollection serviceDescriptors)
             => serviceDescriptors
                 .AddSingleton(typeof(IReadWrite), x => x.GetRequiredService<ReadWrite>())
                 .AddSingleton(typeof(ReadWrite), typeof(ReadWrite))

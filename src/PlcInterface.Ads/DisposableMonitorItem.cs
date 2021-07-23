@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using TwinCAT.Ads.Reactive;
+using TwinCAT.TypeSystem;
 
 namespace PlcInterface.Ads
 {
@@ -15,7 +19,7 @@ namespace PlcInterface.Ads
         /// Initializes a new instance of the <see cref="DisposableMonitorItem"/> class.
         /// </summary>
         /// <param name="stream">The item to dispose when the refcount is 0.</param>
-        public DisposableMonitorItem(IDisposable stream)
+        private DisposableMonitorItem(IDisposable stream)
         {
             this.stream = stream;
             Subscriptions = 1;
@@ -28,6 +32,25 @@ namespace PlcInterface.Ads
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Create a <see cref="DisposableMonitorItem"/>.
+        /// </summary>
+        /// <param name="symbolStream">The stream to publish updates to.</param>
+        /// <param name="symbolInfo">The symbol to register with.</param>
+        /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
+        /// <returns>The created <see cref="DisposableMonitorItem"/>.</returns>
+        public static DisposableMonitorItem Create(ISubject<IMonitorResult> symbolStream, SymbolInfo symbolInfo, IAdsTypeConverter typeConverter)
+        {
+            var valueSymbol = symbolInfo.Symbol as IValueSymbol;
+            var subscriptions = valueSymbol
+                  .ThrowIfNull()
+                  .WhenValueChanged()
+                  .Select(x => new MonitorResult(symbolInfo.Name, typeConverter.Convert(x, valueSymbol!)))
+                  .SubscribeSafe(symbolStream);
+
+            return new DisposableMonitorItem(subscriptions);
         }
 
         /// <inheritdoc/>

@@ -85,14 +85,8 @@ namespace PlcInterface.Ads
             }
 
             var symbolInfo = symbolHandler.GetSymbolinfo(ioName) as SymbolInfo;
-            symbolInfo.ThrowIfNull(nameof(symbolInfo));
-            var adsSymbol = symbolInfo?.Symbol as IValueSymbol;
-            var subscription = adsSymbol
-                   .WhenValueChanged()
-                   .Select(x => new MonitorResult(ioName, x))
-                   .Subscribe(x => symbolStream.OnNext(x));
-
-            streams.Add(ioName, new DisposableMonitorItem(subscription));
+            _ = symbolInfo.ThrowIfNull(nameof(symbolInfo));
+            streams.Add(ioName, DisposableMonitorItem.Create(symbolStream, symbolInfo!, typeConverter));
         }
 
         /// <inheritdoc/>

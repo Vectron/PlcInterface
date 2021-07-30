@@ -16,7 +16,7 @@ namespace PlcInterface.OpcUa
     /// <summary>
     /// Implementation of <see cref="IPlcConnection{T}"/> for the <see cref="Session"/>.
     /// </summary>
-    public class PlcConnection : IPlcConnection<Session>, IDisposable
+    public class PlcConnection : IOpcPlcConnection, IDisposable
     {
         private readonly BehaviorSubject<IConnected<Session>> connectionState = new(Connected.No<Session>());
         private readonly CompositeDisposable disposables = new();

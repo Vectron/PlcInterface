@@ -12,12 +12,12 @@ namespace PlcInterface.OpcUa
     /// <summary>
     /// A implementation of <see cref="IMonitor"/>.
     /// </summary>
-    public class Monitor : IMonitor, IDisposable
+    public class Monitor : IOpcMonitor, IDisposable
     {
         private readonly ILogger<Monitor> logger;
         private readonly Dictionary<string, RegisteredSymbol> registeredSymbols = new(StringComparer.OrdinalIgnoreCase);
         private readonly IDisposable sesionStream;
-        private readonly ISymbolHandler symbolHandler;
+        private readonly IOpcSymbolHandler symbolHandler;
         private readonly Subject<IMonitorResult> symbolStream = new();
         private readonly IOpcTypeConverter typeConverter;
         private bool disposedValue;
@@ -30,7 +30,7 @@ namespace PlcInterface.OpcUa
         /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
         /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
         /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-        public Monitor(IPlcConnection<Session> connection, ISymbolHandler symbolHandler, IOpcTypeConverter typeConverter, ILogger<Monitor> logger)
+        public Monitor(IOpcPlcConnection connection, IOpcSymbolHandler symbolHandler, IOpcTypeConverter typeConverter, ILogger<Monitor> logger)
         {
             this.symbolHandler = symbolHandler;
             this.typeConverter = typeConverter;

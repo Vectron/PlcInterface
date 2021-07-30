@@ -8,19 +8,18 @@ using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Opc.Ua;
-using Opc.Ua.Client;
 
 namespace PlcInterface.OpcUa
 {
     /// <summary>
     /// Implementation of <see cref="IReadWrite"/>.
     /// </summary>
-    public class ReadWrite : IDisposable, IReadWrite
+    public class ReadWrite : IOpcReadWrite, IDisposable
     {
-        private readonly IPlcConnection<Session> connection;
+        private readonly IOpcPlcConnection connection;
         private readonly CompositeDisposable disposables = new();
         private readonly ILogger logger;
-        private readonly ISymbolHandler symbolHandler;
+        private readonly IOpcSymbolHandler symbolHandler;
         private readonly IOpcTypeConverter typeConverter;
         private bool disposedValue;
 
@@ -31,7 +30,7 @@ namespace PlcInterface.OpcUa
         /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
         /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
         /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-        public ReadWrite(IPlcConnection<Session> connection, ISymbolHandler symbolHandler, IOpcTypeConverter typeConverter, ILogger<ReadWrite> logger)
+        public ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHandler, IOpcTypeConverter typeConverter, ILogger<ReadWrite> logger)
         {
             this.connection = connection;
             this.symbolHandler = symbolHandler;

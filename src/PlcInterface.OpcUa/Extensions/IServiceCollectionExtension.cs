@@ -15,17 +15,21 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>A reference to this instance after the operation has completed.</returns>
         public static IServiceCollection AddOpcPLC(this IServiceCollection serviceDescriptors)
             => serviceDescriptors
-                .AddSingleton(typeof(IReadWrite), x => x.GetRequiredService<ReadWrite>())
-                .AddSingleton(typeof(ReadWrite), typeof(ReadWrite))
-                .AddSingleton(typeof(IMonitor), x => x.GetRequiredService<Monitor>())
-                .AddSingleton(typeof(Monitor), typeof(Monitor))
-                .AddSingleton(typeof(ISymbolHandler), x => x.GetRequiredService<SymbolHandler>())
-                .AddSingleton(typeof(SymbolHandler), typeof(SymbolHandler))
-                .AddSingleton(typeof(PlcConnection), typeof(PlcConnection))
-                .AddSingleton(typeof(IPlcConnection<Opc.Ua.Client.Session>), x => x.GetRequiredService<PlcConnection>())
-                .AddSingleton(typeof(IPlcConnection), x => x.GetRequiredService<IPlcConnection<Opc.Ua.Client.Session>>())
+                .AddSingletonFactory<ReadWrite, IReadWrite, IOpcReadWrite>()
+                .AddSingletonFactory<Monitor, IMonitor, IOpcMonitor>()
+                .AddSingletonFactory<SymbolHandler, ISymbolHandler, IOpcSymbolHandler>()
+                .AddSingletonFactory<PlcConnection, IPlcConnection<Opc.Ua.Client.Session>, IOpcPlcConnection>()
+                .AddSingleton<IPlcConnection>(x => x.GetRequiredService<IOpcPlcConnection>())
                 .AddTransient<IOpcTypeConverter, OpcTypeConverter>(x => x.GetRequiredService<OpcTypeConverter>())
                 .AddTransient<OpcTypeConverter, OpcTypeConverter>()
                 .ConfigureOptions<DefaultOPCSettingsConfigureOptions>();
+
+        private static IServiceCollection AddSingletonFactory<TImplementation, TService1, TService2>(this IServiceCollection serviceDescriptors)
+            where TService1 : class
+            where TService2 : class, TService1
+            where TImplementation : class, TService1, TService2
+            => serviceDescriptors
+                .AddSingleton<TService1, TImplementation>()
+                .AddSingleton(x => (TService2)x.GetRequiredService<TService1>());
     }
 }

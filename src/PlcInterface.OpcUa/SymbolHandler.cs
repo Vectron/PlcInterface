@@ -12,10 +12,10 @@ namespace PlcInterface.OpcUa
     /// <summary>
     /// Implementation of <see cref="ISymbolHandler"/>.
     /// </summary>
-    public class SymbolHandler : ISymbolHandler, IDisposable
+    public class SymbolHandler : IOpcSymbolHandler, IDisposable
     {
         private readonly Dictionary<string, SymbolInfo> allSymbols = new(StringComparer.OrdinalIgnoreCase);
-        private readonly IPlcConnection<Session> connection;
+        private readonly IOpcPlcConnection connection;
         private readonly CompositeDisposable disposables = new();
         private readonly ILogger logger;
         private bool disposedValue;
@@ -26,7 +26,7 @@ namespace PlcInterface.OpcUa
         /// </summary>
         /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
         /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-        public SymbolHandler(IPlcConnection<Session> connection, ILogger<SymbolHandler> logger)
+        public SymbolHandler(IOpcPlcConnection connection, ILogger<SymbolHandler> logger)
         {
             this.connection = connection;
             this.logger = logger;

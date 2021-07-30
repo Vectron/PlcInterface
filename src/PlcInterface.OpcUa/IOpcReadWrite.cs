@@ -3,7 +3,7 @@
     /// <summary>
     /// The Ads implementation of a <see cref="IReadWrite"/>.
     /// </summary>
-    internal interface IOpcReadWrite : IReadWrite
+    public interface IOpcReadWrite : IReadWrite
     {
     }
 }

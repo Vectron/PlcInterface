@@ -3,19 +3,18 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
-using TwinCAT.Ads;
 
 namespace PlcInterface.Ads
 {
     /// <summary>
     /// A implementation of <see cref="IMonitor"/>.
     /// </summary>
-    public class Monitor : IMonitor, IDisposable
+    public class Monitor : IAdsMonitor, IDisposable
     {
         private readonly ILogger logger;
         private readonly IDisposable sesionStream;
         private readonly Dictionary<string, DisposableMonitorItem> streams = new(StringComparer.OrdinalIgnoreCase);
-        private readonly ISymbolHandler symbolHandler;
+        private readonly IAdsSymbolHandler symbolHandler;
         private readonly Subject<IMonitorResult> symbolStream = new();
         private readonly IAdsTypeConverter typeConverter;
         private bool disposedValue;
@@ -27,7 +26,7 @@ namespace PlcInterface.Ads
         /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
         /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
         /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-        public Monitor(IPlcConnection<IAdsConnection> connection, ISymbolHandler symbolHandler, IAdsTypeConverter typeConverter, ILogger<Monitor> logger)
+        public Monitor(IAdsPlcConnection connection, IAdsSymbolHandler symbolHandler, IAdsTypeConverter typeConverter, ILogger<Monitor> logger)
         {
             this.symbolHandler = symbolHandler;
             this.typeConverter = typeConverter;

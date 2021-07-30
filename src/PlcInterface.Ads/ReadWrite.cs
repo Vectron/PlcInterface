@@ -4,7 +4,6 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TwinCAT.Ads;
 using TwinCAT.Ads.SumCommand;
 using TwinCAT.TypeSystem;
 
@@ -13,10 +12,10 @@ namespace PlcInterface.Ads
     /// <summary>
     /// Implementation of <see cref="IReadWrite"/>.
     /// </summary>
-    public class ReadWrite : IReadWrite
+    public class ReadWrite : IAdsReadWrite
     {
-        private readonly IPlcConnection<IAdsConnection> connection;
-        private readonly ISymbolHandler symbolHandler;
+        private readonly IAdsPlcConnection connection;
+        private readonly IAdsSymbolHandler symbolHandler;
         private readonly IAdsTypeConverter typeConverter;
 
         /// <summary>
@@ -25,7 +24,7 @@ namespace PlcInterface.Ads
         /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
         /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
         /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
-        public ReadWrite(IPlcConnection<IAdsConnection> connection, ISymbolHandler symbolHandler, IAdsTypeConverter typeConverter)
+        public ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHandler, IAdsTypeConverter typeConverter)
         {
             this.connection = connection;
             this.symbolHandler = symbolHandler;

@@ -20,7 +20,7 @@ namespace PlcInterface.Ads
     /// <summary>
     /// Implementation of <see cref="ISymbolHandler"/>.
     /// </summary>
-    public class SymbolHandler : ISymbolHandler, IDisposable
+    public class SymbolHandler : IAdsSymbolHandler, IDisposable
     {
         private readonly Dictionary<string, ISymbolInfo> allSymbols = new(StringComparer.OrdinalIgnoreCase);
         private readonly CompositeDisposable disposables = new();
@@ -34,7 +34,7 @@ namespace PlcInterface.Ads
         /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
         /// <param name="settings">A <see cref="IOptions{TOptions}"/> of <see cref="SymbolHandlerSettings"/> implementation.</param>
         /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-        public SymbolHandler(IPlcConnection<IAdsConnection> connection, IOptions<SymbolHandlerSettings> settings, ILogger<SymbolHandler> logger)
+        public SymbolHandler(IAdsPlcConnection connection, IOptions<SymbolHandlerSettings> settings, ILogger<SymbolHandler> logger)
         {
             this.settings = settings;
             this.logger = logger;

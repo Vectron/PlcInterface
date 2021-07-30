@@ -11,7 +11,7 @@ namespace PlcInterface.Ads
     /// <summary>
     /// Implementation of <see cref="IPlcConnection{T}"/> for the <see cref="IAdsConnection"/>.
     /// </summary>
-    public class PlcConnection : IPlcConnection<IAdsConnection>, IDisposable
+    public class PlcConnection : IAdsPlcConnection, IDisposable
     {
         private readonly BehaviorSubject<IConnected<AdsClient>> connectionState = new(Connected.No<AdsClient>());
         private readonly ILogger logger;

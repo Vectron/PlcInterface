@@ -1,6 +1,5 @@
 ﻿using PlcInterface;
 using PlcInterface.Ads;
-using TwinCAT.Ads;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -16,18 +15,22 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>A reference to this instance after the operation has completed.</returns>
         public static IServiceCollection AddAdsPLC(this IServiceCollection serviceDescriptors)
             => serviceDescriptors
-                .AddSingleton(typeof(ReadWrite), typeof(ReadWrite))
-                .AddSingleton(typeof(IReadWrite), x => x.GetRequiredService<ReadWrite>())
-                .AddSingleton(typeof(Monitor), typeof(Monitor))
-                .AddSingleton(typeof(IMonitor), x => x.GetRequiredService<Monitor>())
-                .AddSingleton(typeof(SymbolHandler), typeof(SymbolHandler))
-                .AddSingleton(typeof(ISymbolHandler), x => x.GetRequiredService<SymbolHandler>())
-                .AddSingleton(typeof(PlcConnection), typeof(PlcConnection))
-                .AddSingleton(typeof(IPlcConnection<IAdsConnection>), x => x.GetRequiredService<PlcConnection>())
-                .AddSingleton(typeof(IPlcConnection), x => x.GetRequiredService<IPlcConnection<IAdsConnection>>())
+                .AddSingletonFactory<ReadWrite, IReadWrite, IAdsReadWrite>()
+                .AddSingletonFactory<Monitor, IMonitor, IAdsMonitor>()
+                .AddSingletonFactory<SymbolHandler, ISymbolHandler, IAdsSymbolHandler>()
+                .AddSingletonFactory<PlcConnection, IPlcConnection<TwinCAT.Ads.IAdsConnection>, IAdsPlcConnection>()
+                .AddSingleton<IPlcConnection>(x => x.GetRequiredService<IAdsPlcConnection>())
                 .AddTransient<IAdsTypeConverter, AdsTypeConverter>(x => x.GetRequiredService<AdsTypeConverter>())
                 .AddTransient<AdsTypeConverter, AdsTypeConverter>()
                 .ConfigureOptions<DefaultConnectionSettingsConfigureOptions>()
                 .ConfigureOptions<DefaultSymbolHandlerSettingsConfigureOptions>();
+
+        private static IServiceCollection AddSingletonFactory<TImplementation, TService1, TService2>(this IServiceCollection serviceDescriptors)
+            where TService1 : class
+            where TService2 : class, TService1
+            where TImplementation : class, TService1, TService2
+            => serviceDescriptors
+                .AddSingleton<TService1, TImplementation>()
+                .AddSingleton(x => (TService2)x.GetRequiredService<TService1>());
     }
 }

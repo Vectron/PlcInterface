@@ -26,6 +26,11 @@ namespace PlcInterface.Ads
                 return System.Convert.ToInt32(value, CultureInfo.InvariantCulture);
             }
 
+            if (value is DateTime dateTime)
+            {
+                return new DateTimeOffset(dateTime);
+            }
+
             return value;
         }
 
@@ -35,6 +40,11 @@ namespace PlcInterface.Ads
             if (value is DynamicObject dynamicObject)
             {
                 return ConvertFrom(dynamicObject, targetType);
+            }
+
+            if (value is DateTime dateTime && targetType == typeof(DateTimeOffset))
+            {
+                return new DateTimeOffset(dateTime);
             }
 
             return base.Convert(value, targetType);
@@ -117,7 +127,14 @@ namespace PlcInterface.Ads
                 }
                 else if (result is TwinCAT.PlcOpen.DateBase dateBase)
                 {
-                    property.SetValue(destination, dateBase.Date);
+                    if (property.PropertyType == typeof(DateTimeOffset))
+                    {
+                        property.SetValue(destination, new DateTimeOffset(dateBase.Value));
+                    }
+                    else
+                    {
+                        property.SetValue(destination, dateBase.Value);
+                    }
                 }
                 else if (result is TwinCAT.PlcOpen.TimeBase timeBase)
                 {

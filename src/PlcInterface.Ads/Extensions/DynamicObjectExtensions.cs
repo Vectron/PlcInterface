@@ -99,7 +99,7 @@ namespace System.Dynamic
                 expando[name] = childValue switch
                 {
                     DynamicValue dynamicObject => CleanDynamic(dynamicObject),
-                    TwinCAT.PlcOpen.DateBase dateBase => dateBase.Date,
+                    TwinCAT.PlcOpen.DateBase dateBase => dateBase.Value,
                     TwinCAT.PlcOpen.TimeBase timeBase => timeBase.Time,
                     TwinCAT.PlcOpen.LTimeBase lTimeBase => lTimeBase.Time,
                     _ => childValue,

@@ -361,6 +361,33 @@ namespace PlcInterface.Tests
         public static IEnumerable<object[]> GetReadData()
             => ReadMultipleData.Select(kv => new object[] { kv.Key, kv.Value });
 
+        public static IEnumerable<object[]> GetWaitForValueData()
+        {
+            yield return new object[] { "ReadTestData.BoolValue", true };
+            yield return new object[] { "ReadTestData.ByteValue", byte.MaxValue };
+            yield return new object[] { "ReadTestData.WordValue", ushort.MaxValue };
+            yield return new object[] { "ReadTestData.DWordValue", uint.MaxValue };
+            yield return new object[] { "ReadTestData.LWordValue", ulong.MaxValue };
+            yield return new object[] { "ReadTestData.ShortValue", sbyte.MinValue };
+            yield return new object[] { "ReadTestData.IntValue", short.MinValue };
+            yield return new object[] { "ReadTestData.DIntValue", int.MinValue };
+            yield return new object[] { "ReadTestData.LongValue", long.MinValue };
+            yield return new object[] { "ReadTestData.UShortValue", byte.MaxValue };
+            yield return new object[] { "ReadTestData.UIntValue", ushort.MaxValue };
+            yield return new object[] { "ReadTestData.UDIntValue", uint.MaxValue };
+            yield return new object[] { "ReadTestData.ULongValue", ulong.MaxValue };
+            yield return new object[] { "ReadTestData.FloatValue", -3.402823E+38F };
+            yield return new object[] { "ReadTestData.DoubleValue", -1.79769313486231E+308 };
+            yield return new object[] { "ReadTestData.TimeValue", TimeSpan.FromSeconds(1) };
+            yield return new object[] { "ReadTestData.TimeOfDay", TimeSpan.FromHours(1) };
+            yield return new object[] { "ReadTestData.LTimeValue", TimeSpan.FromTicks(10) };
+            yield return new object[] { "ReadTestData.DateValue", new DateTimeOffset(2106, 02, 05, 0, 0, 0, TimeSpan.FromHours(1)) };
+            yield return new object[] { "ReadTestData.DateAndTimeValue", new DateTimeOffset(2106, 02, 05, 06, 28, 15, TimeSpan.FromHours(1)) };
+            yield return new object[] { "ReadTestData.StringValue", "Test String" };
+            yield return new object[] { "ReadTestData.WStringValue", "Test WString" };
+            yield return new object[] { "ReadTestData.EnumValue", (int)TestEnum.Second };
+        }
+
         public static IEnumerable<object[]> GetWriteData()
         {
             foreach (var keyValue in WriteMultipleData)

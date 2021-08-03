@@ -157,6 +157,33 @@ namespace PlcInterface.Tests
             Assert.That.ObjectEquals(expectedValue, value, ioName);
         }
 
+        [TestMethod]
+        public void WaitForValueThrowsExceptionOnTimeout()
+        {
+            var readWrite = GetReadWrite();
+            var ioName = "ReadTestData.BoolValue";
+
+            _ = Assert.ThrowsException<TimeoutException>(() => readWrite.WaitForValue(ioName, false, TimeSpan.FromSeconds(1)));
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(Settings.GetWaitForValueData), typeof(Settings), DynamicDataSourceType.Method)]
+        public void WaitsForValueToChange(string ioName, object readValue)
+        {
+            var instanceType = readValue.GetType();
+            var method = typeof(IReadValueTestBase)
+                .GetMethod(nameof(WaitsForValueToChange), BindingFlags.NonPublic | BindingFlags.Instance)
+                .MakeGenericMethod(instanceType);
+            try
+            {
+                _ = method.Invoke(this, new object[] { ioName, readValue });
+            }
+            catch (TargetInvocationException ex)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            }
+        }
+
         protected override IMonitor GetMonitor()
             => throw new NotSupportedException();
 
@@ -186,6 +213,18 @@ namespace PlcInterface.Tests
             Assert.IsNotNull(expectedValue);
             Assert.IsNotNull(value);
             Assert.That.ObjectEquals(expectedValue, value, ioName);
+        }
+
+        protected void WaitsForValueToChange<T>(string ioName, T readValue)
+            where T : notnull
+        {
+            // Arrange
+            var readWrite = GetReadWrite();
+
+            // Act
+            readWrite.WaitForValue(ioName, readValue, TimeSpan.FromMilliseconds(1000));
+
+            // Assert
         }
     }
 }

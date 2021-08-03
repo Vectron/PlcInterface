@@ -403,16 +403,15 @@ namespace PlcInterface.OpcUa
 
             if (value is TimeSpan timeSpan)
             {
-                var ticks = timeSpan.Ticks;
-                var seconds = timeSpan.TotalSeconds;
+                var ticks = timeSpan.Ticks * 100;
                 return builtInType switch
                 {
-                    BuiltInType.Int32 => new Variant((int)seconds),
-                    BuiltInType.UInt32 => new Variant((uint)seconds),
+                    BuiltInType.Int32 => new Variant(timeSpan.TotalMilliseconds),
+                    BuiltInType.UInt32 => new Variant((uint)timeSpan.TotalMilliseconds),
                     BuiltInType.Int64 => new Variant(ticks),
                     BuiltInType.UInt64 => new Variant((ulong)ticks),
-                    BuiltInType.Float => new Variant((float)seconds),
-                    BuiltInType.Double => new Variant(seconds),
+                    BuiltInType.Float => new Variant((float)timeSpan.TotalSeconds),
+                    BuiltInType.Double => new Variant(timeSpan.TotalSeconds),
                     BuiltInType.Null => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
                     BuiltInType.Boolean => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
                     BuiltInType.SByte => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),

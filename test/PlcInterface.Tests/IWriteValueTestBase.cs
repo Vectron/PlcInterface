@@ -74,7 +74,7 @@ namespace PlcInterface.Tests
         public void WriteGeneric(string ioName, object newValue, object readValue)
         {
             var methodInfo = GetType().GetMethod(nameof(WriteValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance);
-            var method = methodInfo.MakeGenericMethod(newValue.GetType());
+            var method = methodInfo.MakeGenericMethod(newValue.GetType(), readValue.GetType());
             try
             {
                 _ = method.Invoke(this, new[] { ioName, newValue, readValue });
@@ -90,7 +90,7 @@ namespace PlcInterface.Tests
         public async Task WriteGenericAsync(string ioName, object newValue, object readValue)
         {
             var methodInfo = GetType().GetMethod(nameof(WriteValueGenericHelperAsync), BindingFlags.NonPublic | BindingFlags.Instance);
-            var method = methodInfo.MakeGenericMethod(newValue.GetType());
+            var method = methodInfo.MakeGenericMethod(newValue.GetType(), readValue.GetType());
             try
             {
                 await (Task)method.Invoke(this, new[] { ioName, newValue, readValue });
@@ -172,32 +172,34 @@ namespace PlcInterface.Tests
         protected override IMonitor GetMonitor()
             => throw new NotSupportedException();
 
-        protected void WriteValueGenericHelper<T>(string ioName, T newValue, object readValue)
-            where T : notnull
+        protected void WriteValueGenericHelper<T1, T2>(string ioName, T1 newValue, T2 readValue)
+            where T1 : notnull
+            where T2 : notnull
         {
             // Arrange
             var readWrite = GetReadWrite();
 
             // Act
-            var original = readWrite.Read(ioName);
+            var original = readWrite.Read<T2>(ioName);
             readWrite.Write(ioName, newValue);
-            var newValueRead = readWrite.Read(ioName);
+            var newValueRead = readWrite.Read<T2>(ioName);
 
             // Assert
             Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
             Assert.That.ObjectEquals(readValue, newValueRead, ioName);
         }
 
-        protected async Task WriteValueGenericHelperAsync<T>(string ioName, T newValue, object readValue)
-            where T : notnull
+        protected async Task WriteValueGenericHelperAsync<T1, T2>(string ioName, T1 newValue, T2 readValue)
+            where T1 : notnull
+            where T2 : notnull
         {
             // Arrange
             var readWrite = GetReadWrite();
 
             // Act
-            var original = await readWrite.ReadAsync(ioName).ConfigureAwait(false);
+            var original = await readWrite.ReadAsync<T2>(ioName).ConfigureAwait(false);
             await readWrite.WriteAsync(ioName, newValue).ConfigureAwait(false);
-            var newValueRead = await readWrite.ReadAsync(ioName).ConfigureAwait(false);
+            var newValueRead = await readWrite.ReadAsync<T2>(ioName).ConfigureAwait(false);
 
             // Assert
             Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");

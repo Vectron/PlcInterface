@@ -1,10 +1,9 @@
 ﻿using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests.DataTypes
 {
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
-    internal sealed class DUT_TestClass2
+    internal sealed class DUT_TestClass2 : System.IEquatable<DUT_TestClass2?>
     {
         public static DUT_TestClass2 Default => new()
         {
@@ -42,21 +41,15 @@ namespace PlcInterface.Tests.DataTypes
             get; set;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is not DUT_TestClass2)
-            {
-                return false;
-            }
+        public override bool Equals(object? obj)
+            => Equals(obj as DUT_TestClass2);
 
-            var other = (DUT_TestClass2)obj;
-            Assert.AreEqual(ByteValue, other.ByteValue);
-            Assert.AreEqual(WordValue, other.WordValue);
-            Assert.AreEqual(DWordValue, other.DWordValue);
-            Assert.AreEqual(LWordValue, other.LWordValue);
-
-            return true;
-        }
+        public bool Equals(DUT_TestClass2? other)
+            => other != null
+                && ByteValue == other.ByteValue
+                && WordValue == other.WordValue
+                && DWordValue == other.DWordValue
+                && LWordValue == other.LWordValue;
 
         public override int GetHashCode()
         {

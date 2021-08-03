@@ -258,12 +258,11 @@ namespace PlcInterface.Tests.DataTypes
             set;
         }
 
-        public override readonly bool Equals(object obj) => obj is DUT_TestStruct @struct && Equals(@struct);
+        public override readonly bool Equals(object obj)
+            => obj is DUT_TestStruct @struct && Equals(@struct);
 
         public readonly bool Equals(DUT_TestStruct other)
-        {
-            AssertExtension.DUT_TestStructEquals(this, other);
-            return BoolValue == other.BoolValue
+            => BoolValue == other.BoolValue
                 && ByteValue == other.ByteValue
                 && WordValue == other.WordValue
                 && DWordValue == other.DWordValue
@@ -290,7 +289,6 @@ namespace PlcInterface.Tests.DataTypes
                 && MultiDimensionArray.SequenceEqual<short>(other.MultiDimensionArray)
                 && ComplexArray.SequenceEqual(other.ComplexArray)
                 && MultiDimensionComplexArray.SequenceEqual<DUT_TestStruct2>(other.MultiDimensionComplexArray);
-        }
 
         public override readonly int GetHashCode()
         {

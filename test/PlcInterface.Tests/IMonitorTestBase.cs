@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
-using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -36,7 +36,7 @@ namespace PlcInterface.Tests
         }
 
         [TestMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP017:Prefer using.", Justification = "Need to dispose for test flow")]
+        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP017:Prefer using.", Justification = "Need to dispose for test flow")]
         public async Task MultipleSubscriptions()
         {
             // Arrange
@@ -184,14 +184,7 @@ namespace PlcInterface.Tests
             var method = typeof(IMonitorTestBase)
                 .GetMethod(nameof(MonitorValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
                 .MakeGenericMethod(instanceType);
-            try
-            {
-                _ = method.Invoke(this, new object[] { ioName });
-            }
-            catch (TargetInvocationException ex)
-            {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-            }
+            _ = method.InvokeUnwrappedException(this, new object[] { ioName });
         }
 
         [TestMethod]
@@ -215,6 +208,10 @@ namespace PlcInterface.Tests
             // Assert
             Assert.IsTrue(result, "Timeout");
         }
+
+        [ExcludeFromCodeCoverage]
+        protected override ISymbolHandler GetSymbolHandler()
+            => throw new NotSupportedException();
 
         protected void MonitorValueGenericHelper<T>(string ioName)
         {

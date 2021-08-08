@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests
@@ -33,9 +34,15 @@ namespace PlcInterface.Tests
             Assert.IsTrue(count > 0);
         }
 
+        [ExcludeFromCodeCoverage]
         protected override IMonitor GetMonitor()
             => throw new NotSupportedException();
 
+        [ExcludeFromCodeCoverage]
+        protected override IPlcConnection GetPLCConnection()
+            => throw new NotSupportedException();
+
+        [ExcludeFromCodeCoverage]
         protected override IReadWrite GetReadWrite()
             => throw new NotSupportedException();
     }

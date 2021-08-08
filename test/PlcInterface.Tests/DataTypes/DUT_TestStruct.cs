@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -290,6 +291,7 @@ namespace PlcInterface.Tests.DataTypes
                 && ComplexArray.SequenceEqual(other.ComplexArray)
                 && MultiDimensionComplexArray.SequenceEqual<DUT_TestStruct2>(other.MultiDimensionComplexArray);
 
+        [ExcludeFromCodeCoverage]
         public override readonly int GetHashCode()
         {
             var hashCode = 1307849462;

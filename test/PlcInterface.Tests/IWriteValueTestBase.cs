@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -75,14 +75,7 @@ namespace PlcInterface.Tests
         {
             var methodInfo = GetType().GetMethod(nameof(WriteValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance);
             var method = methodInfo.MakeGenericMethod(newValue.GetType(), readValue.GetType());
-            try
-            {
-                _ = method.Invoke(this, new[] { ioName, newValue, readValue });
-            }
-            catch (TargetInvocationException ex)
-            {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-            }
+            _ = method.InvokeUnwrappedException(this, new[] { ioName, newValue, readValue });
         }
 
         [DataTestMethod]
@@ -91,14 +84,7 @@ namespace PlcInterface.Tests
         {
             var methodInfo = GetType().GetMethod(nameof(WriteValueGenericHelperAsync), BindingFlags.NonPublic | BindingFlags.Instance);
             var method = methodInfo.MakeGenericMethod(newValue.GetType(), readValue.GetType());
-            try
-            {
-                await (Task)method.Invoke(this, new[] { ioName, newValue, readValue });
-            }
-            catch (TargetInvocationException ex)
-            {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-            }
+            await (Task)method.InvokeUnwrappedException(this, new[] { ioName, newValue, readValue });
         }
 
         [TestMethod]
@@ -169,7 +155,16 @@ namespace PlcInterface.Tests
             multiAssert.Assert();
         }
 
+        [ExcludeFromCodeCoverage]
         protected override IMonitor GetMonitor()
+            => throw new NotSupportedException();
+
+        [ExcludeFromCodeCoverage]
+        protected override IPlcConnection GetPLCConnection()
+            => throw new NotSupportedException();
+
+        [ExcludeFromCodeCoverage]
+        protected override ISymbolHandler GetSymbolHandler()
             => throw new NotSupportedException();
 
         protected void WriteValueGenericHelper<T1, T2>(string ioName, T1 newValue, T2 readValue)

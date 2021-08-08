@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests
 {
+    [ExcludeFromCodeCoverage]
     public class MultiAssert
     {
         private readonly List<AssertFailedException> exceptions = new();

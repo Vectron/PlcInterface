@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 
 namespace PlcInterface.Tests.DataTypes
 {
@@ -50,6 +51,7 @@ namespace PlcInterface.Tests.DataTypes
             && DWordValue == other.DWordValue
             && LWordValue == other.LWordValue;
 
+        [ExcludeFromCodeCoverage]
         public override readonly int GetHashCode()
         {
             var hashCode = -1110352730;

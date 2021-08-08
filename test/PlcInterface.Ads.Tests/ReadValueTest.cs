@@ -34,13 +34,7 @@ namespace PlcInterface.Ads.Tests
             symbolHandler?.Dispose();
         }
 
-        protected override IPlcConnection GetPLCConnection()
-            => connection ?? throw new NotSupportedException();
-
         protected override IReadWrite GetReadWrite()
-            => readWrite ?? throw new NotSupportedException();
-
-        protected override ISymbolHandler GetSymbolHandler()
-            => symbolHandler ?? throw new NotSupportedException();
+            => readWrite!;
     }
 }

@@ -34,22 +34,19 @@ namespace PlcInterface.OpcUa.Tests
         [ClassCleanup]
         public static void Disconnect()
         {
-            connection?.Dispose();
-            symbolHandler?.Dispose();
-            readWrite?.Dispose();
-            monitor?.Dispose();
+            connection!.Dispose();
+            symbolHandler!.Dispose();
+            readWrite!.Dispose();
+            monitor!.Dispose();
         }
 
         protected override IMonitor GetMonitor()
-            => monitor ?? throw new NotSupportedException();
+            => monitor!;
 
         protected override IPlcConnection GetPLCConnection()
-            => connection ?? throw new NotSupportedException();
+            => connection!;
 
         protected override IReadWrite GetReadWrite()
-            => readWrite ?? throw new NotSupportedException();
-
-        protected override ISymbolHandler GetSymbolHandler()
-            => symbolHandler ?? throw new NotSupportedException();
+            => readWrite!;
     }
 }

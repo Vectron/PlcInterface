@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.Tests.DataTypes;
@@ -46,14 +46,7 @@ namespace PlcInterface.Tests
             var method = typeof(IReadValueTestBase)
                 .GetMethod(nameof(ReadValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
                 .MakeGenericMethod(instanceType);
-            try
-            {
-                _ = method.Invoke(this, new object[] { ioName, value });
-            }
-            catch (TargetInvocationException ex)
-            {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-            }
+            _ = method.InvokeUnwrappedException(this, new object[] { ioName, value });
         }
 
         [DataTestMethod]
@@ -65,14 +58,7 @@ namespace PlcInterface.Tests
             var method = typeof(IReadValueTestBase)
                 .GetMethod(nameof(ReadValueGenericHelperAsync), BindingFlags.NonPublic | BindingFlags.Instance)
                 .MakeGenericMethod(instanceType);
-            try
-            {
-                await (Task)method.Invoke(this, new object[] { ioName, value });
-            }
-            catch (TargetInvocationException ex)
-            {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-            }
+            await (Task)method.InvokeUnwrappedException(this, new object[] { ioName, value });
         }
 
         [TestMethod]
@@ -183,14 +169,7 @@ namespace PlcInterface.Tests
             var method = typeof(IReadValueTestBase)
                 .GetMethod(nameof(WaitsForValueToChange), BindingFlags.NonPublic | BindingFlags.Instance)
                 .MakeGenericMethod(instanceType);
-            try
-            {
-                _ = method.Invoke(this, new object[] { ioName, readValue });
-            }
-            catch (TargetInvocationException ex)
-            {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-            }
+            _ = method.InvokeUnwrappedException(this, new object[] { ioName, readValue });
         }
 
         [DataTestMethod]
@@ -201,17 +180,19 @@ namespace PlcInterface.Tests
             var method = typeof(IReadValueTestBase)
                 .GetMethod(nameof(WaitsForValueToChangeAsync), BindingFlags.NonPublic | BindingFlags.Instance)
                 .MakeGenericMethod(instanceType);
-            try
-            {
-                await (Task)method.Invoke(this, new object[] { ioName, readValue });
-            }
-            catch (TargetInvocationException ex)
-            {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-            }
+            await (Task)method.InvokeUnwrappedException(this, new object[] { ioName, readValue });
         }
 
+        [ExcludeFromCodeCoverage]
         protected override IMonitor GetMonitor()
+            => throw new NotSupportedException();
+
+        [ExcludeFromCodeCoverage]
+        protected override IPlcConnection GetPLCConnection()
+            => throw new NotSupportedException();
+
+        [ExcludeFromCodeCoverage]
+        protected override ISymbolHandler GetSymbolHandler()
             => throw new NotSupportedException();
 
         protected void ReadValueGenericHelper<T>(string ioName, T expectedValue)

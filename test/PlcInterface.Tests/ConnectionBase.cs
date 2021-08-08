@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
 namespace PlcInterface.Tests
@@ -16,19 +15,7 @@ namespace PlcInterface.Tests
                       It.IsAny<EventId>(),
                       It.IsAny<object>(),
                       It.IsAny<Exception>(),
-                      It.IsAny<Func<object, Exception, string>>()))
-                .Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((l, e, s, ex, f) =>
-                {
-                    if (ex != null)
-                    {
-                        Console.WriteLine($"{Enum.GetName(typeof(LogLevel), l)}: {f(s, ex)}\n{ex.StackTrace}");
-                        Assert.Fail($"{ex.Message} \n {ex.StackTrace}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"{Enum.GetName(typeof(LogLevel), l)}: {f(s, ex!)}");
-                    }
-                });
+                      It.IsAny<Func<object, Exception, string>>()));
             return mock.Object;
         }
 

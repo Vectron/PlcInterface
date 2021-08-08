@@ -260,6 +260,8 @@ namespace PlcInterface.Tests
                     DUT_TestStructEquals(testClass2, dynamic);
                     return;
                 }
+
+                Assert.Fail("Unknown type");
             }
             else if (expectedValue is System.Collections.ICollection expectedCollection
                 && value is System.Collections.ICollection valueCollection)
@@ -310,6 +312,8 @@ namespace PlcInterface.Tests
                     DUT_TestStructNotEquals(testClass2, dynamic);
                     return;
                 }
+
+                Assert.Fail("Unknown type");
             }
             else if (expectedValue is System.Collections.ICollection expectedCollection
                 && value is System.Collections.ICollection valueCollection)

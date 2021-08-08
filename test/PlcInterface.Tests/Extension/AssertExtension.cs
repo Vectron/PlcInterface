@@ -98,15 +98,15 @@ namespace PlcInterface.Tests
                 () => Assert.IsNotNull(current.ComplexArray, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.ComplexArray)}"),
                 () =>
                 {
-                    for (var i = 0; i < expected.ComplexArray?.Length - 1; i++)
+                    for (var i = 0; i < expected.ComplexArray!.Length - 1; i++)
                     {
-                        DUT_TestStructEquals(expected.ComplexArray?[i], current.ComplexArray[i]);
+                        DUT_TestStructEquals(expected.ComplexArray[i], current.ComplexArray[i]);
                     }
                 },
                 () => Assert.IsNotNull(current.MultiDimensionComplexArray, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.MultiDimensionComplexArray)}"),
                 () =>
                 {
-                    for (var i = 0; i < expected.MultiDimensionComplexArray?.GetLength(0); i++)
+                    for (var i = 0; i < expected.MultiDimensionComplexArray!.GetLength(0); i++)
                     {
                         for (var j = 0; j < expected.MultiDimensionComplexArray.GetLength(1); j++)
                         {

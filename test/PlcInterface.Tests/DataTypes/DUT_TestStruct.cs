@@ -92,14 +92,14 @@ namespace PlcInterface.Tests.DataTypes
             MultiDimensionArray = new short[,,]
             {
                 {
-                    { 0100, 0200, 0300, 0400 },
-                    { 0500, 0600, 0700, 0800 },
-                    { 0900, 1000, 1100, 1200 },
+                    { 0101, 0201, 0301, 0401 },
+                    { 0501, 0600, 0701, 0801 },
+                    { 0901, 1000, 1101, 1201 },
                 },
                 {
-                    { 1300, 1400, 1500, 1600 },
-                    { 1700, 1800, 1900, 2000 },
-                    { 2100, 2200, 2300, 2400 },
+                    { 1301, 1401, 1501, 1601 },
+                    { 1701, 1801, 1901, 2001 },
+                    { 2101, 2201, 2301, 2401 },
                 },
             },
             ComplexArray = new DUT_TestStruct2[] { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },

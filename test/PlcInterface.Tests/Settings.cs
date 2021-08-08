@@ -287,10 +287,14 @@ namespace PlcInterface.Tests
                         },
                     }
                 },
-
-                // TODO not supported by ADS (nesting problem)
-                // { "WriteTestData.StructValue", DUT_TestStruct.Write },
-                // { "WriteTestData.StructValue2", DUT_TestClass.Write },
+                {
+                    "WriteTestData.StructValue",
+                    DUT_TestStruct.Write
+                },
+                {
+                    "WriteTestData.StructValue2",
+                    DUT_TestClass.Write
+                },
                 {
                     "WriteTestData.Nested",
                     DUT_TestStruct2.Write

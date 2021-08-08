@@ -151,8 +151,22 @@ namespace PlcInterface.Ads
                 .Cast<SymbolInfo>()
                 .Select(x => x.Symbol)
                 .ToList();
-            var sumReader = new SumSymbolWrite(client, tcSymbols);
-            sumReader.Write(namesValues.Values.ToArray());
+
+            try
+            {
+                var sumReader = new SumSymbolWrite(client, tcSymbols);
+                sumReader.Write(namesValues.Values.ToArray());
+            }
+            catch (ArgumentException)
+            {
+                // When a object can't be marshalled then ArgumentException will be thrown, if this happens we try to write all objects individually
+                var flattened = namesValues
+                    .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
+                    .Select(x => (x.SymbolInfo.CastAndValidate().Symbol, x.Value));
+
+                var sumReader = new SumSymbolWrite(client, flattened.Select(x => x.Symbol).ToList());
+                sumReader.Write(flattened.Select(x => x.Value).ToArray());
+            }
         }
 
         /// <inheritdoc/>
@@ -161,7 +175,17 @@ namespace PlcInterface.Ads
         {
             var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
-            adsSymbol.WriteValue(value);
+
+            try
+            {
+                adsSymbol.WriteValue(value);
+            }
+            catch (ArgumentException)
+            {
+                // When a object can't be marshalled then ArgumentException will be thrown, if this happens we try to write all objects individually
+                var flattenItems = symbolInfo.FlattenWithValue(symbolHandler, value).ToDictionary(x => x.SymbolInfo.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);
+                Write(flattenItems);
+            }
         }
 
         /// <inheritdoc/>
@@ -173,17 +197,39 @@ namespace PlcInterface.Ads
                 .Cast<SymbolInfo>()
                 .Select(x => x.Symbol)
                 .ToList();
-            var sumReader = new SumSymbolWrite(client, tcSymbols);
-            _ = await sumReader.WriteAsync(namesValues.Values.ToArray(), CancellationToken.None).ConfigureAwait(false);
+            try
+            {
+                var sumReader = new SumSymbolWrite(client, tcSymbols);
+                _ = await sumReader.WriteAsync(namesValues.Values.ToArray(), CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (ArgumentException)
+            {
+                // When a object can't be marshalled then ArgumentException will be thrown, if this happens we try to write all objects individually
+                var flattened = namesValues
+                    .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
+                    .Select(x => (x.SymbolInfo.CastAndValidate().Symbol, x.Value));
+
+                var sumReader = new SumSymbolWrite(client, flattened.Select(x => x.Symbol).ToList());
+                _ = await sumReader.WriteAsync(flattened.Select(x => x.Value).ToArray(), CancellationToken.None).ConfigureAwait(false);
+            }
         }
 
         /// <inheritdoc/>
-        public Task WriteAsync<T>(string ioName, T value)
+        public async Task WriteAsync<T>(string ioName, T value)
             where T : notnull
         {
             var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
-            return adsSymbol.WriteValueAsync(value, CancellationToken.None);
+            try
+            {
+                _ = await adsSymbol.WriteValueAsync(value, CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (ArgumentException)
+            {
+                // When a object can't be marshalled then ArgumentException will be thrown, if this happens we try to write all objects individually
+                var flattenItems = symbolInfo.FlattenWithValue(symbolHandler, value).ToDictionary(x => x.SymbolInfo.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);
+                await WriteAsync(flattenItems).ConfigureAwait(false);
+            }
         }
     }
 }

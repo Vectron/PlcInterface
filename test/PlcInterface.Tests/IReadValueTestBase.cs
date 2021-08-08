@@ -166,6 +166,15 @@ namespace PlcInterface.Tests
             _ = Assert.ThrowsException<TimeoutException>(() => readWrite.WaitForValue(ioName, false, TimeSpan.FromSeconds(1)));
         }
 
+        [TestMethod]
+        public void WaitForValueThrowsExceptionOnTimeoutAsync()
+        {
+            var readWrite = GetReadWrite();
+            var ioName = "ReadTestData.BoolValue";
+
+            _ = Assert.ThrowsExceptionAsync<TimeoutException>(async () => await readWrite.WaitForValueAsync(ioName, false, TimeSpan.FromSeconds(1)).ConfigureAwait(false));
+        }
+
         [DataTestMethod]
         [DynamicData(nameof(Settings.GetWaitForValueData), typeof(Settings), DynamicDataSourceType.Method)]
         public void WaitsForValueToChange(string ioName, object readValue)
@@ -177,6 +186,24 @@ namespace PlcInterface.Tests
             try
             {
                 _ = method.Invoke(this, new object[] { ioName, readValue });
+            }
+            catch (TargetInvocationException ex)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            }
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(Settings.GetWaitForValueData), typeof(Settings), DynamicDataSourceType.Method)]
+        public async Task WaitsForValueToChangeAsync(string ioName, object readValue)
+        {
+            var instanceType = readValue.GetType();
+            var method = typeof(IReadValueTestBase)
+                .GetMethod(nameof(WaitsForValueToChangeAsync), BindingFlags.NonPublic | BindingFlags.Instance)
+                .MakeGenericMethod(instanceType);
+            try
+            {
+                await (Task)method.Invoke(this, new object[] { ioName, readValue });
             }
             catch (TargetInvocationException ex)
             {
@@ -223,6 +250,18 @@ namespace PlcInterface.Tests
 
             // Act
             readWrite.WaitForValue(ioName, readValue, TimeSpan.FromMilliseconds(1000));
+
+            // Assert
+        }
+
+        protected async Task WaitsForValueToChangeAsync<T>(string ioName, T readValue)
+            where T : notnull
+        {
+            // Arrange
+            var readWrite = GetReadWrite();
+
+            // Act
+            await readWrite.WaitForValueAsync(ioName, readValue, TimeSpan.FromMilliseconds(1000)).ConfigureAwait(false);
 
             // Assert
         }

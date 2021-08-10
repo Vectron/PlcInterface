@@ -36,6 +36,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{BACAAE27-5D5D-4513-97FF-0FED82FEF961}") = "PlcInterface.OpcUa.OpcServer", "test\PlcInterface.OpcUa.OpcServer\PlcInterface.OpcUa.OpcServer.tcconnproj", "{C6B6E391-A9DA-4BAD-A62E-89651A65103D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlcInterface.Abstraction.Tests", "test\PlcInterface.Abstraction\PlcInterface.Abstraction.Tests.csproj", "{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -220,6 +222,26 @@ Global
 		{79CDEB50-D4A4-4BCD-B53E-FA403D43DC46}.Release|TwinCAT RT (x64).Build.0 = Release|TwinCAT RT (x64)
 		{79CDEB50-D4A4-4BCD-B53E-FA403D43DC46}.Release|TwinCAT RT (x86).ActiveCfg = Release|TwinCAT RT (x86)
 		{79CDEB50-D4A4-4BCD-B53E-FA403D43DC46}.Release|TwinCAT RT (x86).Build.0 = Release|TwinCAT RT (x86)
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Debug|TwinCAT CE7 (ARMV7).ActiveCfg = Debug|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Debug|TwinCAT CE7 (ARMV7).Build.0 = Debug|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Debug|TwinCAT OS (ARMT2).ActiveCfg = Debug|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Debug|TwinCAT OS (ARMT2).Build.0 = Debug|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Debug|TwinCAT RT (x64).ActiveCfg = Debug|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Debug|TwinCAT RT (x64).Build.0 = Debug|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Debug|TwinCAT RT (x86).ActiveCfg = Debug|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Debug|TwinCAT RT (x86).Build.0 = Debug|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Release|TwinCAT CE7 (ARMV7).ActiveCfg = Release|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Release|TwinCAT CE7 (ARMV7).Build.0 = Release|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Release|TwinCAT OS (ARMT2).ActiveCfg = Release|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Release|TwinCAT OS (ARMT2).Build.0 = Release|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Release|TwinCAT RT (x64).ActiveCfg = Release|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Release|TwinCAT RT (x64).Build.0 = Release|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Release|TwinCAT RT (x86).ActiveCfg = Release|Any CPU
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF}.Release|TwinCAT RT (x86).Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -233,6 +255,7 @@ Global
 		{58D6B92E-B1EB-47DC-AEF1-D477D3A9D0E8} = {51750A27-B993-4FDA-9B03-DF95D59A7C6F}
 		{71FFF78E-DD02-44DC-9153-208EC22C15C2} = {51750A27-B993-4FDA-9B03-DF95D59A7C6F}
 		{C6B6E391-A9DA-4BAD-A62E-89651A65103D} = {51750A27-B993-4FDA-9B03-DF95D59A7C6F}
+		{54C196D2-4BD2-4D3B-805B-7BB0D9D9DFBF} = {51750A27-B993-4FDA-9B03-DF95D59A7C6F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A497AA4-8CE0-40C3-91EF-F344A9E130D5}

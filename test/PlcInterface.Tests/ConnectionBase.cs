@@ -1,10 +1,12 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
 namespace PlcInterface.Tests
 {
+    [TestCategory("Integration")]
     public abstract class ConnectionBase
     {
         protected static ILogger<T> GetLoggerMock<T>()

@@ -37,7 +37,7 @@ namespace PlcInterface
                 .GetAwaiter()
                 .GetResult()
                 .Value
-                .ThrowIfNull();
+                .ThrowIfNull(nameof(IConnected<T>.Value));
 
         /// <summary>
         /// Gets the PLC Connection asynchronous.
@@ -60,7 +60,7 @@ namespace PlcInterface
         public static async Task<T> GetConnectedClientAsync<T>(this IPlcConnection<T> plcConnection, TimeSpan timeout)
         {
             var connection = await plcConnection.SessionStream.FirstAsync(x => x.IsConnected).Timeout(timeout);
-            return connection.Value.ThrowIfNull();
+            return connection.Value.ThrowIfNull(nameof(IConnected<T>.Value));
         }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests
 {
+    [DoNotParallelize]
     public abstract class IWriteValueTestBase : ConnectionBase
     {
         [TestInitialize]

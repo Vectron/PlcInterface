@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests
 {
-    [TestClass]
+    [DoNotParallelize]
     public abstract class IMonitorTestBase : ConnectionBase
     {
         [TestMethod]

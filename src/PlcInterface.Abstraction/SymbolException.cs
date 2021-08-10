@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace PlcInterface
 {
@@ -6,15 +7,8 @@ namespace PlcInterface
     /// Represents error that occur during symbol handeling.
     /// </summary>
     [Serializable]
-    public class SymbolException : Exception
+    public sealed class SymbolException : Exception
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SymbolException"/> class.
-        /// </summary>
-        public SymbolException()
-        {
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SymbolException"/> class.
         /// </summary>
@@ -27,19 +21,9 @@ namespace PlcInterface
         /// <summary>
         /// Initializes a new instance of the <see cref="SymbolException"/> class.
         /// </summary>
-        /// <param name="message">The message that describes the error.</param>
-        /// <param name="inner">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
-        public SymbolException(string message, Exception inner)
-            : base(message, inner)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SymbolException"/> class.
-        /// </summary>
-        /// <param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
-        /// <param name="context">The <see cref="System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
-        protected SymbolException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        /// <param name="info">The <see cref="SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="StreamingContext"/> that contains contextual information about the source or destination.</param>
+        private SymbolException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }

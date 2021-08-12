@@ -29,7 +29,7 @@ namespace Microsoft.Extensions.DependencyInjection
             where TService2 : class, TService1
             where TImplementation : class, TService1, TService2
             => serviceDescriptors
-                .AddSingleton<TService1, TImplementation>()
-                .AddSingleton(x => (TService2)x.GetRequiredService<TService1>());
+                .AddSingleton<TService2, TImplementation>()
+                .AddSingleton(x => (TService1)x.GetRequiredService<TService2>());
     }
 }

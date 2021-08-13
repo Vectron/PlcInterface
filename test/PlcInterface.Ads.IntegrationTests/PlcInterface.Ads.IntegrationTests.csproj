@@ -16,5 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\PlcInterface.Ads\PlcInterface.Ads.csproj" />
+    <ProjectReference Include="..\PlcInterface.Tests\PlcInterface.Tests.csproj" />
   </ItemGroup>
 </Project>

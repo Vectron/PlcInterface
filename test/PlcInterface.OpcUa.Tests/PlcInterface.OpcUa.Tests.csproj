@@ -17,6 +17,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\PlcInterface.OpcUa\PlcInterface.OpcUa.csproj" />
-    <ProjectReference Include="..\PlcInterface.Tests\PlcInterface.Tests.csproj" />
   </ItemGroup>
 </Project>

@@ -2,11 +2,12 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
-namespace PlcInterface.Ads.Tests
+namespace PlcInterface.OpcUa.Tests
 {
     [TestClass]
-    public class DiTest
+    public class IServiceCollectionExtensionTest
     {
         private static ServiceProvider? provider;
 
@@ -18,23 +19,27 @@ namespace PlcInterface.Ads.Tests
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public Api")]
         public static void SetupDI(TestContext testContext)
             => provider = new ServiceCollection()
-               .AddOptions()
-               .AddSingleton<ILoggerFactory, NullLoggerFactory>()
-               .AddSingleton(typeof(ILogger<>), typeof(NullLogger<>))
-               .AddAdsPLC()
-               .BuildServiceProvider(new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true });
+            .AddOptions()
+            .AddSingleton<ILoggerFactory, NullLoggerFactory>()
+            .AddSingleton(typeof(ILogger<>), typeof(NullLogger<>))
+            .AddOpcPLC()
+            .AddSingleton(x => Mock.Of<IPlcConnection>())
+            .AddSingleton(x => Mock.Of<ISymbolHandler>())
+            .AddSingleton(x => Mock.Of<IMonitor>())
+            .AddSingleton(x => Mock.Of<IReadWrite>())
+            .BuildServiceProvider(new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true });
 
         [TestMethod]
         public void MonitorIsregisterCorrect()
         {
             Assert.IsNotNull(provider);
 
-            var adsMonitor = provider.GetRequiredService<IAdsMonitor>();
+            var opcMonitor = provider.GetRequiredService<IOpcMonitor>();
             var monitor = provider.GetRequiredService<IMonitor>();
             using var concrete = provider.GetService<Monitor>();
 
             Assert.IsNull(concrete);
-            Assert.AreSame(adsMonitor, monitor);
+            Assert.AreSame(opcMonitor, monitor);
         }
 
         [TestMethod]
@@ -42,14 +47,14 @@ namespace PlcInterface.Ads.Tests
         {
             Assert.IsNotNull(provider);
 
-            var adsConnection = provider.GetRequiredService<IAdsPlcConnection>();
+            var opcConnection = provider.GetRequiredService<IOpcPlcConnection>();
             var connection = provider.GetRequiredService<IPlcConnection>();
-            var genericConnection = provider.GetRequiredService<IPlcConnection<TwinCAT.Ads.IAdsConnection>>();
+            var genericConnection = provider.GetRequiredService<IPlcConnection<Opc.Ua.Client.Session>>();
             using var concrete = provider.GetService<PlcConnection>();
 
             Assert.IsNull(concrete);
-            Assert.AreSame(adsConnection, connection);
-            Assert.AreSame(adsConnection, genericConnection);
+            Assert.AreSame(opcConnection, connection);
+            Assert.AreSame(opcConnection, genericConnection);
         }
 
         [TestMethod]
@@ -57,12 +62,12 @@ namespace PlcInterface.Ads.Tests
         {
             Assert.IsNotNull(provider);
 
-            var adsReadWrite = provider.GetRequiredService<IAdsReadWrite>();
+            var opcReadWrite = provider.GetRequiredService<IOpcReadWrite>();
             var readWrite = provider.GetRequiredService<IReadWrite>();
-            var concrete = provider.GetService<ReadWrite>();
+            using var concrete = provider.GetService<ReadWrite>();
 
             Assert.IsNull(concrete);
-            Assert.AreSame(adsReadWrite, readWrite);
+            Assert.AreSame(opcReadWrite, readWrite);
         }
 
         [TestMethod]
@@ -70,12 +75,12 @@ namespace PlcInterface.Ads.Tests
         {
             Assert.IsNotNull(provider);
 
-            var adsSymbolHandler = provider.GetRequiredService<IAdsSymbolHandler>();
+            var opcSymbolHandler = provider.GetRequiredService<IOpcSymbolHandler>();
             var symbolHandler = provider.GetRequiredService<ISymbolHandler>();
             using var concrete = provider.GetService<SymbolHandler>();
 
             Assert.IsNull(concrete);
-            Assert.AreSame(adsSymbolHandler, symbolHandler);
+            Assert.AreSame(opcSymbolHandler, symbolHandler);
         }
     }
 }

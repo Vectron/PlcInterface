@@ -3,10 +3,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PlcInterface.OpcUa.Tests
+namespace PlcInterface.Ads.Tests
 {
     [TestClass]
-    public class DiTest
+    public class IServiceCollectionExtensionTests
     {
         private static ServiceProvider? provider;
 
@@ -21,7 +21,7 @@ namespace PlcInterface.OpcUa.Tests
                .AddOptions()
                .AddSingleton<ILoggerFactory, NullLoggerFactory>()
                .AddSingleton(typeof(ILogger<>), typeof(NullLogger<>))
-               .AddOpcPLC()
+               .AddAdsPLC()
                .BuildServiceProvider(new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true });
 
         [TestMethod]
@@ -29,12 +29,12 @@ namespace PlcInterface.OpcUa.Tests
         {
             Assert.IsNotNull(provider);
 
-            var opcMonitor = provider.GetRequiredService<IOpcMonitor>();
+            var adsMonitor = provider.GetRequiredService<IAdsMonitor>();
             var monitor = provider.GetRequiredService<IMonitor>();
             using var concrete = provider.GetService<Monitor>();
 
             Assert.IsNull(concrete);
-            Assert.AreSame(opcMonitor, monitor);
+            Assert.AreSame(adsMonitor, monitor);
         }
 
         [TestMethod]
@@ -42,14 +42,14 @@ namespace PlcInterface.OpcUa.Tests
         {
             Assert.IsNotNull(provider);
 
-            var opcConnection = provider.GetRequiredService<IOpcPlcConnection>();
+            var adsConnection = provider.GetRequiredService<IAdsPlcConnection>();
             var connection = provider.GetRequiredService<IPlcConnection>();
-            var genericConnection = provider.GetRequiredService<IPlcConnection<Opc.Ua.Client.Session>>();
+            var genericConnection = provider.GetRequiredService<IPlcConnection<TwinCAT.Ads.IAdsConnection>>();
             using var concrete = provider.GetService<PlcConnection>();
 
             Assert.IsNull(concrete);
-            Assert.AreSame(opcConnection, connection);
-            Assert.AreSame(opcConnection, genericConnection);
+            Assert.AreSame(adsConnection, connection);
+            Assert.AreSame(adsConnection, genericConnection);
         }
 
         [TestMethod]
@@ -57,12 +57,12 @@ namespace PlcInterface.OpcUa.Tests
         {
             Assert.IsNotNull(provider);
 
-            var opcReadWrite = provider.GetRequiredService<IOpcReadWrite>();
+            var adsReadWrite = provider.GetRequiredService<IAdsReadWrite>();
             var readWrite = provider.GetRequiredService<IReadWrite>();
-            using var concrete = provider.GetService<ReadWrite>();
+            var concrete = provider.GetService<ReadWrite>();
 
             Assert.IsNull(concrete);
-            Assert.AreSame(opcReadWrite, readWrite);
+            Assert.AreSame(adsReadWrite, readWrite);
         }
 
         [TestMethod]
@@ -70,12 +70,12 @@ namespace PlcInterface.OpcUa.Tests
         {
             Assert.IsNotNull(provider);
 
-            var opcSymbolHandler = provider.GetRequiredService<IOpcSymbolHandler>();
+            var adsSymbolHandler = provider.GetRequiredService<IAdsSymbolHandler>();
             var symbolHandler = provider.GetRequiredService<ISymbolHandler>();
             using var concrete = provider.GetService<SymbolHandler>();
 
             Assert.IsNull(concrete);
-            Assert.AreSame(opcSymbolHandler, symbolHandler);
+            Assert.AreSame(adsSymbolHandler, symbolHandler);
         }
     }
 }

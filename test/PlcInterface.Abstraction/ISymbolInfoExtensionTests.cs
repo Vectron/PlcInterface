@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using PlcInterface.Extensions;
 
-namespace PlcInterface.Ads.Tests
+namespace PlcInterface.Abstraction.Tests
 {
     [TestClass]
     public class ISymbolInfoExtensionTests

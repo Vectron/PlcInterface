@@ -30,6 +30,24 @@ namespace PlcInterface.Ads.Tests
             .BuildServiceProvider(new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true });
 
         [TestMethod]
+        public void IPlCConnectionReturnsAAdsConnectionWhenNoothersAreRegistered()
+        {
+            // Arrange
+            using var serviceProvider = new ServiceCollection()
+            .AddOptions()
+            .AddSingleton<ILoggerFactory, NullLoggerFactory>()
+            .AddSingleton(typeof(ILogger<>), typeof(NullLogger<>))
+            .AddAdsPLC()
+            .BuildServiceProvider(new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true });
+
+            // Act
+            var plcConnection = serviceProvider.GetService<IPlcConnection>();
+
+            // Assert
+            Assert.IsInstanceOfType(plcConnection, typeof(PlcConnection));
+        }
+
+        [TestMethod]
         public void MonitorIsregisterCorrect()
         {
             Assert.IsNotNull(provider);

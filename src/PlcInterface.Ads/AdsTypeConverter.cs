@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Dynamic;
 using System.Globalization;
-using System.Reflection;
 using TwinCAT.Ads.TypeSystem;
 using TwinCAT.TypeSystem;
 
@@ -15,7 +14,7 @@ namespace PlcInterface.Ads
         /// <inheritdoc/>
         public object Convert(object value, IValueSymbol valueSymbol)
         {
-            if (value is DynamicValue dynamicObject)
+            if (value is DynamicObject dynamicObject)
             {
                 return dynamicObject.CleanDynamic();
             }
@@ -52,12 +51,12 @@ namespace PlcInterface.Ads
 
         private Array ConvertArray(DynamicObject dynamicObject, Type type)
         {
-            if (dynamicObject is not DynamicValue valueObject)
+            if (dynamicObject is not IDynamicValue valueObject)
             {
-                throw new NotSupportedException($"dynamic object is not a {typeof(DynamicValue)}");
+                throw new NotSupportedException($"dynamic object is not a {typeof(IDynamicValue)}");
             }
 
-            if (valueObject.DataType is not ArrayType dataType)
+            if (valueObject.DataType is not IArrayType dataType)
             {
                 throw new NotSupportedException($"Data Type is not a {typeof(ArrayType)}");
             }
@@ -73,7 +72,7 @@ namespace PlcInterface.Ads
                     throw new SymbolException($"No value found at index {indices}");
                 }
 
-                if (result is DynamicValue resultDynamicObject)
+                if (result is DynamicObject resultDynamicObject)
                 {
                     var value = ConvertFrom(resultDynamicObject, ellementType);
                     destination.SetValue(value, indices);
@@ -95,17 +94,22 @@ namespace PlcInterface.Ads
         {
             if (type.IsArray)
             {
-                var arrayValue = ConvertArray(dynamicObject, type);
-                return arrayValue;
+                return ConvertArray(dynamicObject, type);
             }
 
             var destination = Activator.CreateInstance(type);
-            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach (var property in properties)
+
+            foreach (var memberName in dynamicObject.GetDynamicMemberNames())
             {
+                var property = type.GetProperty(memberName);
+                if (property == null)
+                {
+                    throw new InvalidOperationException($"{memberName} not found as a property");
+                }
+
                 if (!property.CanWrite)
                 {
-                    continue;
+                    throw new InvalidOperationException($"{property.Name} is not writable");
                 }
 
                 if (!dynamicObject.TryGetMember(new MemberBinder(property.Name, true), out var result))
@@ -113,15 +117,8 @@ namespace PlcInterface.Ads
                     throw new InvalidOperationException($"{property.Name} is not found in the PLC type");
                 }
 
-                if (result is DynamicValue resultDynamicObject)
+                if (result is DynamicObject resultDynamicObject)
                 {
-                    if (property.PropertyType.IsArray)
-                    {
-                        var arrayValue = ConvertArray(resultDynamicObject, property.PropertyType);
-                        property.SetValue(destination, arrayValue);
-                        continue;
-                    }
-
                     var value = ConvertFrom(resultDynamicObject, property.PropertyType);
                     property.SetValue(destination, value);
                 }

@@ -46,9 +46,10 @@ namespace PlcInterface
                 .SelectMany(x =>
                 {
                     object childValue;
-                    if (value is Array array && x is SymbolInfo symb)
+                    if (value is Array array)
                     {
-                        childValue = array.GetValue(symb.Name.AsSpan().GetIndices());
+                        var indices = x.Name.AsSpan().GetIndices();
+                        childValue = array.GetValue(indices);
                     }
                     else
                     {

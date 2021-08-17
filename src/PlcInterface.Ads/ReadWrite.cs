@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using PlcInterface.Extensions;
 using TwinCAT.Ads.SumCommand;
 using TwinCAT.TypeSystem;
 

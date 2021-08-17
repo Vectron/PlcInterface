@@ -1,11 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
-namespace System.Threading.Tasks
+namespace PlcInterface.Extensions
 {
     /// <summary>
     /// Extension methods for <see cref="Task"/>.
     /// </summary>
-    internal static class TaskExtensions
+    public static class TaskExtensions
     {
         /// <summary>
         /// Log exceptions async.

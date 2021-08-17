@@ -4,6 +4,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PlcInterface.Extensions;
 using TwinCAT.Ads;
 
 namespace PlcInterface.Ads

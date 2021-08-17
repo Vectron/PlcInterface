@@ -11,6 +11,7 @@
 # This file is the top-most EditorConfig file
 root =false
 
+csharp_style_prefer_index_operator = false:none
 
 ##########################################
 # StyleCop rules

@@ -1,4 +1,5 @@
 ﻿using PlcInterface;
+using PlcInterface.Extensions;
 using PlcInterface.OpcUa;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -23,13 +24,5 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddTransient<IOpcTypeConverter, OpcTypeConverter>(x => x.GetRequiredService<OpcTypeConverter>())
                 .AddTransient<OpcTypeConverter, OpcTypeConverter>()
                 .ConfigureOptions<DefaultOPCSettingsConfigureOptions>();
-
-        private static IServiceCollection AddSingletonFactory<TImplementation, TService1, TService2>(this IServiceCollection serviceDescriptors)
-            where TService1 : class
-            where TService2 : class, TService1
-            where TImplementation : class, TService1, TService2
-            => serviceDescriptors
-                .AddSingleton<TService2, TImplementation>()
-                .AddSingleton(x => (TService1)x.GetRequiredService<TService2>());
     }
 }

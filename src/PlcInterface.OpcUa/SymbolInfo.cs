@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Opc.Ua;
+using PlcInterface.Extensions;
 
 namespace PlcInterface.OpcUa
 {
@@ -31,7 +32,7 @@ namespace PlcInterface.OpcUa
             ShortName = Name.Substring(Name.LastIndexOf(".", StringComparison.OrdinalIgnoreCase) + 1);
             ChildSymbols = new List<string>();
             IsBigType = symbol.NodeClass is NodeClass.Object or NodeClass.ObjectType;
-            Indices = Name.AsSpan().GetIndices();
+            Indices = Name.GetIndices();
             arrayBounds = new Lazy<int[]>(CalculateBounds, false);
             Comment = string.Empty;
         }

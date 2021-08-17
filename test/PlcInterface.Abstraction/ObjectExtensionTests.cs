@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PlcInterface.Extensions;
 
 namespace PlcInterface.Abstraction.Tests
 {
@@ -29,6 +31,20 @@ namespace PlcInterface.Abstraction.Tests
 
             // Assert
             _ = Assert.ThrowsException<ArgumentNullException>(() => ObjectExtension.ThrowIfNull<object>(genericParameterHelper));
+        }
+
+        [TestMethod]
+        public void YieldReturnsTheGivenItemInAIEnumerable()
+        {
+            // Arrange
+            var data = 5;
+
+            // Act
+            var enumerable = data.Yield();
+
+            // Assert
+            Assert.AreEqual(1, enumerable.Count());
+            Assert.AreEqual(data, enumerable.First());
         }
     }
 }

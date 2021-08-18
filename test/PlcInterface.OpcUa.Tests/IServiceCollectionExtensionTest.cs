@@ -23,11 +23,44 @@ namespace PlcInterface.OpcUa.Tests
             .AddSingleton<ILoggerFactory, NullLoggerFactory>()
             .AddSingleton(typeof(ILogger<>), typeof(NullLogger<>))
             .AddOpcPLC()
-            .AddSingleton(x => Mock.Of<IPlcConnection>())
-            .AddSingleton(x => Mock.Of<ISymbolHandler>())
-            .AddSingleton(x => Mock.Of<IMonitor>())
-            .AddSingleton(x => Mock.Of<IReadWrite>())
             .BuildServiceProvider(new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true });
+
+        [TestMethod]
+        public void IfBaseInterfaceRegistrationIsOverwrittenSpecificStillResolvesCorrectly()
+        {
+            // Arrange
+            using var serviceProvider = new ServiceCollection()
+                  .AddOptions()
+                  .AddSingleton<ILoggerFactory, NullLoggerFactory>()
+                  .AddSingleton(typeof(ILogger<>), typeof(NullLogger<>))
+                  .AddOpcPLC()
+                  .AddSingleton(x => Mock.Of<IPlcConnection>())
+                  .AddSingleton(x => Mock.Of<ISymbolHandler>())
+                  .AddSingleton(x => Mock.Of<IMonitor>())
+                  .AddSingleton(x => Mock.Of<IReadWrite>())
+                  .AddSingleton(x => Mock.Of<ITypeConverter>())
+                  .BuildServiceProvider(new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true });
+
+            // Act
+            var opcPlcConnection = serviceProvider.GetService<IOpcPlcConnection>();
+            var opcSymbolHandler = serviceProvider.GetService<IOpcSymbolHandler>();
+            var opcReadWrite = serviceProvider.GetService<IOpcReadWrite>();
+            var opcMonitor = serviceProvider.GetService<IOpcMonitor>();
+            var plcConnection = serviceProvider.GetService<IPlcConnection>();
+            var symbolHandler = serviceProvider.GetService<ISymbolHandler>();
+            var readWrite = serviceProvider.GetService<IReadWrite>();
+            var monitor = serviceProvider.GetService<IMonitor>();
+
+            // Assert
+            Assert.IsInstanceOfType(opcPlcConnection, typeof(PlcConnection));
+            Assert.IsInstanceOfType(opcSymbolHandler, typeof(SymbolHandler));
+            Assert.IsInstanceOfType(opcReadWrite, typeof(ReadWrite));
+            Assert.IsInstanceOfType(opcMonitor, typeof(Monitor));
+            Assert.AreNotSame(opcPlcConnection, plcConnection);
+            Assert.AreNotSame(opcSymbolHandler, symbolHandler);
+            Assert.AreNotSame(opcReadWrite, readWrite);
+            Assert.AreNotSame(opcMonitor, monitor);
+        }
 
         [TestMethod]
         public void MonitorIsregisterCorrect()
@@ -40,6 +73,21 @@ namespace PlcInterface.OpcUa.Tests
 
             Assert.IsNull(concrete);
             Assert.AreSame(opcMonitor, monitor);
+            Assert.IsInstanceOfType(opcMonitor, typeof(Monitor));
+        }
+
+        [TestMethod]
+        public void OpcTypeConverterIsRegisteredCorrect()
+        {
+            Assert.IsNotNull(provider);
+
+            var opcTypeConverter = provider.GetRequiredService<IOpcTypeConverter>();
+            var typeConverter = provider.GetService<ITypeConverter>();
+            var concrete = provider.GetService<OpcTypeConverter>();
+
+            Assert.IsNull(concrete);
+            Assert.IsNull(typeConverter);
+            Assert.IsInstanceOfType(opcTypeConverter, typeof(OpcTypeConverter));
         }
 
         [TestMethod]
@@ -55,6 +103,7 @@ namespace PlcInterface.OpcUa.Tests
             Assert.IsNull(concrete);
             Assert.AreSame(opcConnection, connection);
             Assert.AreSame(opcConnection, genericConnection);
+            Assert.IsInstanceOfType(opcConnection, typeof(PlcConnection));
         }
 
         [TestMethod]
@@ -68,6 +117,7 @@ namespace PlcInterface.OpcUa.Tests
 
             Assert.IsNull(concrete);
             Assert.AreSame(opcReadWrite, readWrite);
+            Assert.IsInstanceOfType(opcReadWrite, typeof(ReadWrite));
         }
 
         [TestMethod]
@@ -81,6 +131,7 @@ namespace PlcInterface.OpcUa.Tests
 
             Assert.IsNull(concrete);
             Assert.AreSame(opcSymbolHandler, symbolHandler);
+            Assert.IsInstanceOfType(opcSymbolHandler, typeof(SymbolHandler));
         }
     }
 }

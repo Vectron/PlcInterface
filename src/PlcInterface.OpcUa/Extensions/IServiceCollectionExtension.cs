@@ -21,8 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingletonFactory<SymbolHandler, ISymbolHandler, IOpcSymbolHandler>()
                 .AddSingletonFactory<PlcConnection, IPlcConnection<Opc.Ua.Client.Session>, IOpcPlcConnection>()
                 .AddSingleton<IPlcConnection>(x => x.GetRequiredService<IOpcPlcConnection>())
-                .AddTransient<IOpcTypeConverter, OpcTypeConverter>(x => x.GetRequiredService<OpcTypeConverter>())
-                .AddTransient<OpcTypeConverter, OpcTypeConverter>()
+                .AddTransient<IOpcTypeConverter, OpcTypeConverter>()
                 .ConfigureOptions<DefaultOPCSettingsConfigureOptions>();
     }
 }

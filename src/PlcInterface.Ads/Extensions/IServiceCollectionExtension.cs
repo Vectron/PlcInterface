@@ -21,8 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingletonFactory<SymbolHandler, ISymbolHandler, IAdsSymbolHandler>()
                 .AddSingletonFactory<PlcConnection, IPlcConnection<TwinCAT.Ads.IAdsConnection>, IAdsPlcConnection>()
                 .AddSingleton<IPlcConnection>(x => x.GetRequiredService<IAdsPlcConnection>())
-                .AddTransient<IAdsTypeConverter, AdsTypeConverter>(x => x.GetRequiredService<AdsTypeConverter>())
-                .AddTransient<AdsTypeConverter, AdsTypeConverter>()
+                .AddTransient<IAdsTypeConverter, AdsTypeConverter>()
                 .ConfigureOptions<DefaultConnectionSettingsConfigureOptions>()
                 .ConfigureOptions<DefaultSymbolHandlerSettingsConfigureOptions>();
     }

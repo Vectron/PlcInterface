@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Globalization;
 using TwinCAT.Ads.TypeSystem;
@@ -158,6 +159,7 @@ namespace PlcInterface.Ads
             {
             }
 
+            [ExcludeFromCodeCoverage]
             public override DynamicMetaObject FallbackGetMember(DynamicMetaObject target, DynamicMetaObject errorSuggestion)
                 => throw new NotSupportedException();
         }

@@ -16,7 +16,6 @@ namespace PlcInterface.Ads
     {
         private readonly IAdsDisposableConnection adsDisposableConnection;
         private readonly BehaviorSubject<IConnected<IAdsDisposableConnection>> connectionState = new(Connected.No<IAdsDisposableConnection>());
-        private readonly ILogger logger;
         private readonly IOptions<ConnectionSettings> settings;
         private bool disposedValue;
 
@@ -29,7 +28,6 @@ namespace PlcInterface.Ads
         public PlcConnection(IOptions<ConnectionSettings> settings, ILogger<PlcConnection> logger, IAdsDisposableConnection adsDisposableConnection)
         {
             this.settings = settings;
-            this.logger = logger;
             this.adsDisposableConnection = adsDisposableConnection;
             if (settings.Value.AutoConnect)
             {
@@ -63,7 +61,6 @@ namespace PlcInterface.Ads
                 }
 
                 var address = new AmsAddress(settings.Value.AmsNetId, settings.Value.Port);
-                adsDisposableConnection.RouterStateChanged += AdsClient_RouterStateChanged;
                 adsDisposableConnection.ConnectionStateChanged += AdsDisposableConnection_ConnectionStateChanged;
                 adsDisposableConnection.Connect(address);
             });
@@ -77,7 +74,6 @@ namespace PlcInterface.Ads
             => Task.Run(() =>
             {
                 _ = adsDisposableConnection.Disconnect();
-                adsDisposableConnection.RouterStateChanged -= AdsClient_RouterStateChanged;
                 adsDisposableConnection.ConnectionStateChanged -= AdsDisposableConnection_ConnectionStateChanged;
             });
 
@@ -100,16 +96,12 @@ namespace PlcInterface.Ads
                 {
                     Disconnect();
                     connectionState.OnCompleted();
-                    connectionState?.Dispose();
+                    connectionState.Dispose();
                 }
 
                 disposedValue = true;
             }
         }
-
-        // TODO, this might indicate that we need to reconnect
-        private void AdsClient_RouterStateChanged(object sender, AmsRouterNotificationEventArgs e) =>
-            logger.LogDebug("Ads Router Notification gotten {0}", e.State);
 
         private void AdsDisposableConnection_ConnectionStateChanged(object sender, TwinCAT.ConnectionStateChangedEventArgs e)
         {

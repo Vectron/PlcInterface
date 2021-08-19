@@ -3,33 +3,54 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.Tests;
 using TestUtilities;
+using TwinCAT.Ads;
 
 namespace PlcInterface.Ads.Tests
 {
     [TestClass]
     public class PlcConnectionTest : IPlcConnectionTestBase
     {
+        private static AdsClient? adsClient;
+        private static PlcConnection? plcConnection;
+
+        [ClassInitialize]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public Api")]
+        public static async Task ConnectAsync(TestContext testContext)
+        {
+            var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
+            adsClient = new AdsClient();
+
+            plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
+            await plcConnection.ConnectAsync();
+            _ = await plcConnection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
+        }
+
+        [ClassCleanup]
+        public static void Disconnect()
+        {
+            plcConnection!.Dispose();
+            adsClient!.Dispose();
+        }
+
         [TestMethod]
         public void GetConnectedClient()
         {
             // Arrange
-            using var connection = GetPLCConnection() as PlcConnection;
+            Assert.IsNotNull(plcConnection);
 
             // Act
-            Assert.IsNotNull(connection);
-            _ = Assert.ThrowsException<TimeoutException>(() => connection.GetConnectedClient());
+            _ = Assert.ThrowsException<TimeoutException>(() => plcConnection.GetConnectedClient());
         }
 
         [TestMethod]
         public void GetConnectedClientReturnsTheActiveConnection()
         {
             // Arrange
-            using var connection = GetPLCConnection() as PlcConnection;
-            Assert.IsNotNull(connection);
+            Assert.IsNotNull(plcConnection);
 
             // Act
-            var connectionTask = connection.ConnectAsync();
-            var client = connection.GetConnectedClient(TimeSpan.FromSeconds(10));
+            var connectionTask = plcConnection.ConnectAsync();
+            var client = plcConnection.GetConnectedClient(TimeSpan.FromSeconds(10));
             connectionTask.GetAwaiter().GetResult();
 
             // Assert
@@ -41,12 +62,11 @@ namespace PlcInterface.Ads.Tests
         public async Task GetConnectedClientReturnsTheActiveConnectionAsync()
         {
             // Arrange
-            using var connection = GetPLCConnection() as PlcConnection;
-            Assert.IsNotNull(connection);
+            Assert.IsNotNull(plcConnection);
 
             // Act
-            var connectionTask = connection.ConnectAsync();
-            var client = await connection.GetConnectedClientAsync();
+            var connectionTask = plcConnection.ConnectAsync();
+            var client = await plcConnection.GetConnectedClientAsync();
             await connectionTask;
 
             // Assert
@@ -54,11 +74,7 @@ namespace PlcInterface.Ads.Tests
             Assert.IsTrue(client.IsConnected);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP005:Return type should indicate that the value should be disposed.", Justification = "Can't mark interface as IDisposable")]
         protected override IPlcConnection GetPLCConnection()
-        {
-            var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
-            return new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
-        }
+            => plcConnection!;
     }
 }

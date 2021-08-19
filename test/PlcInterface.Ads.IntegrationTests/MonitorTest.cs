@@ -1,14 +1,18 @@
 ﻿using System;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using PlcInterface.Tests;
 using TestUtilities;
+using TwinCAT.Ads;
 
 namespace PlcInterface.Ads.Tests
 {
     [TestClass]
     public class MonitorTest : IMonitorTestBase
     {
+        private static AdsClient? adsClient;
         private static PlcConnection? connection;
         private static Monitor? monitor;
         private static ReadWrite? readWrite;
@@ -21,9 +25,10 @@ namespace PlcInterface.Ads.Tests
             var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
             var symbolhandlersettings = new SymbolHandlerSettings() { StoreSymbolsToDisk = false };
             var typeConverter = new AdsTypeConverter();
+            adsClient = new AdsClient();
 
-            connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
-            symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolhandlersettings), MockHelpers.GetLoggerMock<SymbolHandler>());
+            connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
+            symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolhandlersettings), MockHelpers.GetLoggerMock<SymbolHandler>(), Mock.Of<IFileSystem>());
             readWrite = new ReadWrite(connection, symbolHandler, typeConverter);
             monitor = new Monitor(connection, symbolHandler, typeConverter, MockHelpers.GetLoggerMock<Monitor>());
             await connection.ConnectAsync();
@@ -36,6 +41,7 @@ namespace PlcInterface.Ads.Tests
             connection?.Dispose();
             symbolHandler?.Dispose();
             monitor?.Dispose();
+            adsClient?.Dispose();
         }
 
         protected override IMonitor GetMonitor()

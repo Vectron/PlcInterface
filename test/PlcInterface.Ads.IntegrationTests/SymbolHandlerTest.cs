@@ -1,14 +1,18 @@
 ﻿using System;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using PlcInterface.Tests;
 using TestUtilities;
+using TwinCAT.Ads;
 
 namespace PlcInterface.Ads.Tests
 {
     [TestClass]
     public class SymbolHandlerTest : ISymbolHandlerTestBase
     {
+        private static AdsClient? adsClient;
         private static PlcConnection? connection;
         private static SymbolHandler? symbolHandler;
 
@@ -18,9 +22,10 @@ namespace PlcInterface.Ads.Tests
         {
             var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
             var symbolhandlersettings = new SymbolHandlerSettings() { StoreSymbolsToDisk = false };
+            adsClient = new AdsClient();
 
-            connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
-            symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolhandlersettings), MockHelpers.GetLoggerMock<SymbolHandler>());
+            connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
+            symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolhandlersettings), MockHelpers.GetLoggerMock<SymbolHandler>(), Mock.Of<IFileSystem>());
             await connection.ConnectAsync();
             _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
         }
@@ -29,6 +34,7 @@ namespace PlcInterface.Ads.Tests
         public static void Disconnect()
         {
             connection!.Dispose();
+            adsClient!.Dispose();
             symbolHandler!.Dispose();
         }
 

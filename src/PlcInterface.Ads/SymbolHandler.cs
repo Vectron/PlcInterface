@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TwinCAT;
@@ -24,6 +23,7 @@ namespace PlcInterface.Ads
     {
         private readonly Dictionary<string, ISymbolInfo> allSymbols = new(StringComparer.OrdinalIgnoreCase);
         private readonly CompositeDisposable disposables = new();
+        private readonly IFileSystem fileSystem;
         private readonly ILogger<SymbolHandler> logger;
         private readonly IOptions<SymbolHandlerSettings> settings;
         private bool disposedValue;
@@ -34,11 +34,12 @@ namespace PlcInterface.Ads
         /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
         /// <param name="settings">A <see cref="IOptions{TOptions}"/> of <see cref="SymbolHandlerSettings"/> implementation.</param>
         /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-        public SymbolHandler(IAdsPlcConnection connection, IOptions<SymbolHandlerSettings> settings, ILogger<SymbolHandler> logger)
+        /// <param name="fileSystem">A <see cref="IFileSystem"/> for interacting with the file system.</param>
+        public SymbolHandler(IAdsPlcConnection connection, IOptions<SymbolHandlerSettings> settings, ILogger<SymbolHandler> logger, IFileSystem fileSystem)
         {
             this.settings = settings;
             this.logger = logger;
-
+            this.fileSystem = fileSystem;
             var session = connection.SessionStream
                 .Where(x => x.IsConnected)
                 .Select(x => x.Value)
@@ -50,24 +51,6 @@ namespace PlcInterface.Ads
         /// <inheritdoc/>
         public IReadOnlyCollection<ISymbolInfo> AllSymbols
             => allSymbols.Values;
-
-        private static string AssemblyDirectory
-        {
-            get
-            {
-                var assembly = Assembly.GetEntryAssembly();
-
-                if (assembly == null)
-                {
-                    return string.Empty;
-                }
-
-                var codeBase = assembly.CodeBase;
-                var uri = new UriBuilder(codeBase);
-                var path = Uri.UnescapeDataString(uri.Path);
-                return Path.GetDirectoryName(path);
-            }
-        }
 
         /// <inheritdoc/>
         public void Dispose()
@@ -131,15 +114,12 @@ namespace PlcInterface.Ads
 
             if (string.IsNullOrWhiteSpace(outputPath))
             {
-                outputPath = Path.Combine(AssemblyDirectory, "logs");
+                outputPath = fileSystem.Path.Combine("logs");
             }
 
-            _ = Directory.CreateDirectory(outputPath);
-            using var streamWriter = new StreamWriter(Path.Combine(outputPath, "vars.txt"), false);
-            foreach (var symbol in allSymbols.Values)
-            {
-                streamWriter.WriteLine("{0}", symbol.Name);
-            }
+            _ = fileSystem.Directory.CreateDirectory(outputPath);
+            var filePath = fileSystem.Path.Combine(outputPath, "vars.txt");
+            fileSystem.File.WriteAllLines(filePath, allSymbols.Values.Select(x => x.Name), System.Text.Encoding.UTF8);
         }
 
         private void UpdateSymbols(IAdsConnection client)

@@ -1,4 +1,6 @@
-﻿using PlcInterface;
+﻿using System.IO.Abstractions;
+using Microsoft.Extensions.Logging;
+using PlcInterface;
 using PlcInterface.Ads;
 using PlcInterface.Extensions;
 
@@ -22,6 +24,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingletonFactory<PlcConnection, IPlcConnection<TwinCAT.Ads.IAdsConnection>, IAdsPlcConnection>()
                 .AddSingleton<IPlcConnection>(x => x.GetRequiredService<IAdsPlcConnection>())
                 .AddTransient<IAdsTypeConverter, AdsTypeConverter>()
+                .AddSingleton<TwinCAT.Ads.IAdsDisposableConnection, TwinCAT.Ads.AdsClient>(x => new TwinCAT.Ads.AdsClient(x.GetRequiredService<ILogger<TwinCAT.Ads.AdsClient>>()))
+                .AddSingleton<IFileSystem, FileSystem>()
                 .ConfigureOptions<DefaultConnectionSettingsConfigureOptions>()
                 .ConfigureOptions<DefaultSymbolHandlerSettingsConfigureOptions>();
     }

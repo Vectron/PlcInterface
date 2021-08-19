@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.Tests;
+using TestUtilities;
 
 namespace PlcInterface.Ads.Tests
 {
@@ -20,8 +21,8 @@ namespace PlcInterface.Ads.Tests
             var symbolhandlersettings = new SymbolHandlerSettings() { StoreSymbolsToDisk = false };
             var typeConverter = new AdsTypeConverter();
 
-            connection = new PlcConnection(GetOptionsMoq(connectionsettings), GetLoggerMock<PlcConnection>());
-            symbolHandler = new SymbolHandler(connection, GetOptionsMoq(symbolhandlersettings), GetLoggerMock<SymbolHandler>());
+            connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
+            symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolhandlersettings), MockHelpers.GetLoggerMock<SymbolHandler>());
             readWrite = new ReadWrite(connection, symbolHandler, typeConverter);
             await connection.ConnectAsync();
             _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));

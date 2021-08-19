@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.Tests;
+using TestUtilities;
 
 namespace PlcInterface.OpcUa.Tests
 {
@@ -19,8 +20,8 @@ namespace PlcInterface.OpcUa.Tests
             new DefaultOPCSettingsConfigureOptions().Configure(connectionsettings);
             connectionsettings.Address = Settings.PLCUri;
 
-            connection = new PlcConnection(GetOptionsMoq(connectionsettings), GetLoggerMock<PlcConnection>());
-            symbolHandler = new SymbolHandler(connection, GetLoggerMock<SymbolHandler>());
+            connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
+            symbolHandler = new SymbolHandler(connection, MockHelpers.GetLoggerMock<SymbolHandler>());
             await connection.ConnectAsync();
             _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
         }

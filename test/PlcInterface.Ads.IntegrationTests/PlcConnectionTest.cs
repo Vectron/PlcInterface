@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.Tests;
+using TestUtilities;
 
 namespace PlcInterface.Ads.Tests
 {
@@ -57,7 +58,7 @@ namespace PlcInterface.Ads.Tests
         protected override IPlcConnection GetPLCConnection()
         {
             var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
-            return new PlcConnection(GetOptionsMoq(connectionsettings), GetLoggerMock<PlcConnection>());
+            return new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
         }
     }
 }

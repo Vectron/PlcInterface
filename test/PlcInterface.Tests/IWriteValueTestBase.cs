@@ -1,13 +1,11 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests
 {
     [DoNotParallelize]
-    public abstract class IWriteValueTestBase : ConnectionBase
+    public abstract class IWriteValueTestBase
     {
         [TestInitialize]
         public void ResetPLCValues()
@@ -156,17 +154,7 @@ namespace PlcInterface.Tests
             multiAssert.Assert();
         }
 
-        [ExcludeFromCodeCoverage]
-        protected override IMonitor GetMonitor()
-            => throw new NotSupportedException();
-
-        [ExcludeFromCodeCoverage]
-        protected override IPlcConnection GetPLCConnection()
-            => throw new NotSupportedException();
-
-        [ExcludeFromCodeCoverage]
-        protected override ISymbolHandler GetSymbolHandler()
-            => throw new NotSupportedException();
+        protected abstract IReadWrite GetReadWrite();
 
         protected void WriteValueGenericHelper<T1, T2>(string ioName, T1 newValue, T2 readValue)
             where T1 : notnull

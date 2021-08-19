@@ -1,10 +1,8 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests
 {
-    public abstract class ISymbolHandlerTestBase : ConnectionBase
+    public abstract class ISymbolHandlerTestBase
     {
         [TestMethod]
         [DynamicData(nameof(Settings.GetMonitorData), typeof(Settings), DynamicDataSourceType.Method)]
@@ -34,16 +32,6 @@ namespace PlcInterface.Tests
             Assert.IsTrue(count > 0);
         }
 
-        [ExcludeFromCodeCoverage]
-        protected override IMonitor GetMonitor()
-            => throw new NotSupportedException();
-
-        [ExcludeFromCodeCoverage]
-        protected override IPlcConnection GetPLCConnection()
-            => throw new NotSupportedException();
-
-        [ExcludeFromCodeCoverage]
-        protected override IReadWrite GetReadWrite()
-            => throw new NotSupportedException();
+        protected abstract ISymbolHandler GetSymbolHandler();
     }
 }

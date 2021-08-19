@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Tests
 {
-    public abstract class IPlcConnectionTestBase : ConnectionBase
+    public abstract class IPlcConnectionTestBase
     {
         [TestMethod]
         public void OpenCloseConnection()
@@ -62,16 +61,6 @@ namespace PlcInterface.Tests
             await connection.DisconnectAsync();
         }
 
-        [ExcludeFromCodeCoverage]
-        protected override IMonitor GetMonitor()
-            => throw new NotSupportedException();
-
-        [ExcludeFromCodeCoverage]
-        protected override IReadWrite GetReadWrite()
-            => throw new NotSupportedException();
-
-        [ExcludeFromCodeCoverage]
-        protected override ISymbolHandler GetSymbolHandler()
-            => throw new NotSupportedException();
+        protected abstract IPlcConnection GetPLCConnection();
     }
 }

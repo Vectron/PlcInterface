@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -7,7 +6,7 @@ using PlcInterface.Tests.DataTypes;
 
 namespace PlcInterface.Tests
 {
-    public abstract class IReadValueTestBase : ConnectionBase
+    public abstract class IReadValueTestBase
     {
         [TestMethod]
         public void ReadDynamic()
@@ -183,17 +182,7 @@ namespace PlcInterface.Tests
             await (Task)method.InvokeUnwrappedException(this, new object[] { ioName, readValue });
         }
 
-        [ExcludeFromCodeCoverage]
-        protected override IMonitor GetMonitor()
-            => throw new NotSupportedException();
-
-        [ExcludeFromCodeCoverage]
-        protected override IPlcConnection GetPLCConnection()
-            => throw new NotSupportedException();
-
-        [ExcludeFromCodeCoverage]
-        protected override ISymbolHandler GetSymbolHandler()
-            => throw new NotSupportedException();
+        protected abstract IReadWrite GetReadWrite();
 
         protected void ReadValueGenericHelper<T>(string ioName, T expectedValue)
         {

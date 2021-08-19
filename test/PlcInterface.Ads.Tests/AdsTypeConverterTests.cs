@@ -46,7 +46,7 @@ namespace PlcInterface.Ads.Tests
             var sourceMock = new Mock<DynamicObject>();
             var result = new object();
             _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(TestType3.Date), nameof(TestType3.Time), nameof(TestType3.LTime), nameof(TestType3.DateTimeOffset) });
-            _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result)).Returns(new MoqDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+            _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result)).Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
             {
                 value = binder.Name switch
                 {
@@ -120,7 +120,7 @@ namespace PlcInterface.Ads.Tests
             var sourceMock = new Mock<DynamicObject>();
             var result = new object();
             _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(TestType.IntValue), nameof(TestType.IntArray), nameof(TestType.SubType) });
-            _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result)).Returns(new MoqDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+            _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result)).Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
             {
                 value = binder.Name switch
                 {
@@ -189,7 +189,7 @@ namespace PlcInterface.Ads.Tests
             var dynamicValue = sourceMock.As<IDynamicValue>();
             _ = dynamicValue.SetupGet(x => x.DataType).Returns(ComplexArrayType(new[] { 2 }));
             var dummy = new object();
-            _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(new MoqDelegates.OutFunction<int[], object?, bool>((int[] indices, out object? value) =>
+            _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(new MockDelegates.OutFunction<int[], object?, bool>((int[] indices, out object? value) =>
             {
                 value = ((NestedType)expected.GetValue(indices)!).GetDynamicObjectMock();
                 return true;
@@ -213,7 +213,7 @@ namespace PlcInterface.Ads.Tests
             var dynamicValue = sourceMock.As<IDynamicValue>();
             _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType(new[] { 9 }));
             var dummy = new object();
-            _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(new MoqDelegates.OutFunction<int[], object?, bool>((int[] indices, out object? value) =>
+            _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(new MockDelegates.OutFunction<int[], object?, bool>((int[] indices, out object? value) =>
             {
                 value = expected.GetValue(indices);
                 return true;
@@ -362,7 +362,7 @@ namespace PlcInterface.Ads.Tests
                 var sourceMock = new Mock<DynamicObject>();
                 var result = new object();
                 _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(IntValue) });
-                _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result)).Returns(new MoqDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+                _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result)).Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
                 {
                     value = binder.Name switch
                     {

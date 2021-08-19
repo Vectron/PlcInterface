@@ -1,6 +1,6 @@
 ﻿namespace PlcInterface.Ads.Tests
 {
-    public static class MoqDelegates
+    public static class MockDelegates
     {
         public delegate void OutAction<TOut>(out TOut outVal);
 

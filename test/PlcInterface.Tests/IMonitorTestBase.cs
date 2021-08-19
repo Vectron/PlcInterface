@@ -11,7 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace PlcInterface.Tests
 {
     [DoNotParallelize]
-    public abstract class IMonitorTestBase : ConnectionBase
+    public abstract class IMonitorTestBase
     {
         [TestMethod]
         public void MonitorBeforeConnectDoesntMatter()
@@ -209,9 +209,11 @@ namespace PlcInterface.Tests
             Assert.IsTrue(result, "Timeout");
         }
 
-        [ExcludeFromCodeCoverage]
-        protected override ISymbolHandler GetSymbolHandler()
-            => throw new NotSupportedException();
+        protected abstract IMonitor GetMonitor();
+
+        protected abstract IPlcConnection GetPLCConnection();
+
+        protected abstract IReadWrite GetReadWrite();
 
         protected void MonitorValueGenericHelper<T>(string ioName)
         {

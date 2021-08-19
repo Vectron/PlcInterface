@@ -1,15 +1,13 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace PlcInterface.Tests
+namespace TestUtilities
 {
-    [TestCategory("Integration")]
-    public abstract class ConnectionBase
+    public static class MockHelpers
     {
-        protected static ILogger<T> GetLoggerMock<T>()
+        public static ILogger<T> GetLoggerMock<T>()
         {
             var mock = new Mock<ILogger<T>>();
             _ = mock.Setup(x => x.Log(
@@ -21,20 +19,12 @@ namespace PlcInterface.Tests
             return mock.Object;
         }
 
-        protected static IOptions<T> GetOptionsMoq<T>(T options)
+        public static IOptions<T> GetOptionsMoq<T>(T options)
             where T : class, new()
         {
             var connectionSettingsMoq = new Mock<IOptions<T>>();
             _ = connectionSettingsMoq.Setup(x => x.Value).Returns(options);
             return connectionSettingsMoq.Object;
         }
-
-        protected abstract IMonitor GetMonitor();
-
-        protected abstract IPlcConnection GetPLCConnection();
-
-        protected abstract IReadWrite GetReadWrite();
-
-        protected abstract ISymbolHandler GetSymbolHandler();
     }
 }

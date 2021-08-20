@@ -99,9 +99,9 @@ namespace PlcInterface.Ads
         {
             var symbolInfo = new SymbolInfo(symbol);
 
-            if (!allSymbols.ContainsKey(symbolInfo.NameLower))
+            if (!allSymbols.ContainsKey(symbolInfo.Name))
             {
-                allSymbols.Add(symbolInfo.NameLower, symbolInfo);
+                allSymbols.Add(symbolInfo.Name, symbolInfo);
             }
 
             foreach (var subSymbol in symbol.SubSymbols)

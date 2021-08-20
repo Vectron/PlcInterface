@@ -56,41 +56,5 @@ END_VAR
 	Reset := FALSE;
 END_IF]]></ST>
     </Implementation>
-    <LineIds Name="MAIN">
-      <LineId Id="7" Count="0" />
-      <LineId Id="15" Count="0" />
-      <LineId Id="18" Count="0" />
-      <LineId Id="72" Count="0" />
-      <LineId Id="20" Count="0" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="24" Count="1" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="29" Count="0" />
-      <LineId Id="31" Count="0" />
-      <LineId Id="33" Count="1" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="38" Count="0" />
-      <LineId Id="40" Count="0" />
-      <LineId Id="42" Count="1" />
-      <LineId Id="45" Count="0" />
-      <LineId Id="47" Count="1" />
-      <LineId Id="50" Count="0" />
-      <LineId Id="52" Count="0" />
-      <LineId Id="54" Count="0" />
-      <LineId Id="56" Count="0" />
-      <LineId Id="58" Count="1" />
-      <LineId Id="61" Count="0" />
-      <LineId Id="63" Count="1" />
-      <LineId Id="66" Count="1" />
-      <LineId Id="69" Count="0" />
-      <LineId Id="97" Count="2" />
-      <LineId Id="96" Count="0" />
-      <LineId Id="109" Count="1" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="95" Count="0" />
-      <LineId Id="107" Count="0" />
-      <LineId Id="87" Count="0" />
-      <LineId Id="12" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

@@ -26,6 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddTransient<IAdsTypeConverter, AdsTypeConverter>()
                 .AddSingleton<TwinCAT.Ads.IAdsDisposableConnection, TwinCAT.Ads.AdsClient>(x => new TwinCAT.Ads.AdsClient(x.GetRequiredService<ILogger<TwinCAT.Ads.AdsClient>>()))
                 .AddSingleton<IFileSystem, FileSystem>()
+                .AddSingleton<ISymbolLoaderFactory, SymbolLoaderFactoryAbstraction>()
                 .ConfigureOptions<DefaultConnectionSettingsConfigureOptions>()
                 .ConfigureOptions<DefaultSymbolHandlerSettingsConfigureOptions>();
     }

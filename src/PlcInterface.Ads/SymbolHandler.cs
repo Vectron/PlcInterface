@@ -26,6 +26,7 @@ namespace PlcInterface.Ads
         private readonly IFileSystem fileSystem;
         private readonly ILogger<SymbolHandler> logger;
         private readonly IOptions<SymbolHandlerSettings> settings;
+        private readonly ISymbolLoaderFactory symbolLoaderFactory;
         private bool disposedValue;
 
         /// <summary>
@@ -35,11 +36,13 @@ namespace PlcInterface.Ads
         /// <param name="settings">A <see cref="IOptions{TOptions}"/> of <see cref="SymbolHandlerSettings"/> implementation.</param>
         /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
         /// <param name="fileSystem">A <see cref="IFileSystem"/> for interacting with the file system.</param>
-        public SymbolHandler(IAdsPlcConnection connection, IOptions<SymbolHandlerSettings> settings, ILogger<SymbolHandler> logger, IFileSystem fileSystem)
+        /// <param name="symbolLoaderFactory">A factory for creating a <see cref="SymbolLoaderFactory"/>.</param>
+        public SymbolHandler(IAdsPlcConnection connection, IOptions<SymbolHandlerSettings> settings, ILogger<SymbolHandler> logger, IFileSystem fileSystem, ISymbolLoaderFactory symbolLoaderFactory)
         {
             this.settings = settings;
             this.logger = logger;
             this.fileSystem = fileSystem;
+            this.symbolLoaderFactory = symbolLoaderFactory;
             var session = connection.SessionStream
                 .Where(x => x.IsConnected)
                 .Select(x => x.Value)
@@ -139,7 +142,7 @@ namespace PlcInterface.Ads
                     ValueCreation = ValueCreationModes.Primitives,
                 };
 
-                var symbolLoader = SymbolLoaderFactory.Create(client, symbolLoaderSettings);
+                var symbolLoader = symbolLoaderFactory.Create(client, symbolLoaderSettings);
                 allSymbols.Clear();
 
                 foreach (var symbol in symbolLoader.Symbols)

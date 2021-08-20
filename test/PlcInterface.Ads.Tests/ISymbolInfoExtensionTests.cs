@@ -17,7 +17,8 @@ namespace PlcInterface.Ads.Tests
             var actual = symbolInfo.CastAndValidate();
 
             // Assert
-            Assert.IsInstanceOfType(actual, typeof(SymbolInfo));
+            Assert.IsInstanceOfType(actual, typeof(IAdsSymbolInfo));
+            Assert.IsInstanceOfType(actual, typeof(ISymbolInfo));
             Assert.AreSame(symbolInfo, actual);
         }
 

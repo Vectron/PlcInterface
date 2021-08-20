@@ -38,7 +38,6 @@ namespace PlcInterface.Ads
             var client = connection.GetConnectedClient();
             var tcSymbols = ioNames
                 .Select(x => symbolHandler.GetSymbolinfo(x))
-                .Cast<SymbolInfo>()
                 .Select(x => x.Symbol)
                 .ToList();
 
@@ -47,7 +46,7 @@ namespace PlcInterface.Ads
             return ioNames
                 .Zip(result, (ioName, value) =>
                 {
-                    if (symbolHandler.GetSymbolinfo(ioName).CastAndValidate().Symbol is not IValueSymbol adsSymbol)
+                    if (symbolHandler.GetSymbolinfo(ioName).Symbol is not IValueSymbol adsSymbol)
                     {
                         throw new SymbolException($"{ioName} is not a value symbol.");
                     }
@@ -61,7 +60,7 @@ namespace PlcInterface.Ads
         /// <inheritdoc/>
         public object Read(string ioName)
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
             var value = adsSymbol.ReadValue().ThrowIfNull();
             return typeConverter.Convert(value, adsSymbol);
@@ -70,7 +69,7 @@ namespace PlcInterface.Ads
         /// <inheritdoc/>
         public T Read<T>(string ioName)
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
             var value = adsSymbol.ReadValue().ThrowIfNull();
             return typeConverter.Convert<T>(value);
@@ -79,7 +78,7 @@ namespace PlcInterface.Ads
         /// <inheritdoc/>
         public async Task<object> ReadAsync(string ioName)
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
             var resultReadValue = await adsSymbol.ReadValueAsync(CancellationToken.None).ConfigureAwait(false);
             return typeConverter.Convert(resultReadValue.Value.ThrowIfNull(), adsSymbol);
@@ -88,7 +87,7 @@ namespace PlcInterface.Ads
         /// <inheritdoc/>
         public async Task<T> ReadAsync<T>(string ioName)
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
             var resultReadValue = await adsSymbol.ReadValueAsync(CancellationToken.None).ConfigureAwait(false);
             return typeConverter.Convert<T>(resultReadValue.Value.ThrowIfNull());
@@ -100,7 +99,6 @@ namespace PlcInterface.Ads
             var client = await connection.GetConnectedClientAsync().ConfigureAwait(false);
             var tcSymbols = ioNames
                 .Select(x => symbolHandler.GetSymbolinfo(x))
-                .Cast<SymbolInfo>()
                 .Select(x => x.Symbol)
                 .ToList();
 
@@ -109,7 +107,7 @@ namespace PlcInterface.Ads
             var dictionary = ioNames
                     .Zip(resultSum.Values, (ioName, value) =>
                     {
-                        var adsSymbol = symbolHandler.GetSymbolinfo(ioName).CastAndValidate().Symbol.CastAndValidate();
+                        var adsSymbol = symbolHandler.GetSymbolinfo(ioName).Symbol.CastAndValidate();
                         var fixedValue = typeConverter.Convert(value, adsSymbol);
                         return (ioName, fixedValue);
                     })
@@ -149,7 +147,6 @@ namespace PlcInterface.Ads
             var client = connection.GetConnectedClient();
             var tcSymbols = namesValues
                 .Select(x => symbolHandler.GetSymbolinfo(x.Key))
-                .Cast<SymbolInfo>()
                 .Select(x => x.Symbol)
                 .ToList();
 
@@ -174,7 +171,7 @@ namespace PlcInterface.Ads
         public void Write<T>(string ioName, T value)
             where T : notnull
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
 
             try
@@ -195,7 +192,6 @@ namespace PlcInterface.Ads
             var client = await connection.GetConnectedClientAsync().ConfigureAwait(false);
             var tcSymbols = namesValues
                 .Select(x => symbolHandler.GetSymbolinfo(x.Key))
-                .Cast<SymbolInfo>()
                 .Select(x => x.Symbol)
                 .ToList();
             try
@@ -219,7 +215,7 @@ namespace PlcInterface.Ads
         public async Task WriteAsync<T>(string ioName, T value)
             where T : notnull
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).CastAndValidate();
+            var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
             var adsSymbol = symbolInfo.Symbol.CastAndValidate();
             try
             {

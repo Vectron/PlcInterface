@@ -13,11 +13,11 @@ namespace PlcInterface
         /// <param name="symbolInfo">The <see cref="ISymbolInfo"/> to change.</param>
         /// <returns>The cast object.</returns>
         /// <exception cref="SymbolException">If the cast fails.</exception>
-        public static SymbolInfo CastAndValidate(this ISymbolInfo symbolInfo)
+        public static IAdsSymbolInfo CastAndValidate(this ISymbolInfo symbolInfo)
         {
-            if (symbolInfo is not SymbolInfo symbol)
+            if (symbolInfo is not IAdsSymbolInfo symbol)
             {
-                throw new SymbolException($"Symbol is not a {typeof(SymbolInfo)}");
+                throw new SymbolException($"Symbol is not a {typeof(IAdsSymbolInfo)}");
             }
 
             return symbol;

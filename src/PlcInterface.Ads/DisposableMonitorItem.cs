@@ -51,21 +51,15 @@ namespace PlcInterface.Ads
         /// <param name="symbolStream">The stream to subscribe to.</param>
         /// <param name="typeConverter">A <see cref="ITypeConverter"/>.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "Dont need a cancelation token.")]
-        public void Update(ISymbolHandler symbolHandler, ISubject<IMonitorResult> symbolStream, IAdsTypeConverter typeConverter)
+        public void Update(IAdsSymbolHandler symbolHandler, ISubject<IMonitorResult> symbolStream, IAdsTypeConverter typeConverter)
         {
-            if (symbolHandler.GetSymbolinfo(name) is SymbolInfo symbolInfo
-                && symbolInfo.Symbol is IValueSymbol valueSymbol
+            var symbolInfo = symbolHandler.GetSymbolinfo(name);
+
+            if (symbolInfo.Symbol is IValueSymbol valueSymbol
                 && valueSymbol.Connection != null
                 && valueSymbol.Connection.IsConnected)
             {
-                try
-                {
-                    stream.Dispose();
-                }
-                catch (Exception)
-                {
-                }
-
+                stream.Dispose();
                 stream = valueSymbol
                     .WhenValueChanged()
                     .Select(x => new MonitorResult(name, typeConverter.Convert(x, valueSymbol)))
@@ -83,7 +77,7 @@ namespace PlcInterface.Ads
             {
                 if (disposing)
                 {
-                    stream?.Dispose();
+                    stream.Dispose();
                 }
 
                 disposedValue = true;

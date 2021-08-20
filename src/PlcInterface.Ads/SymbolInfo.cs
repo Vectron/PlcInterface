@@ -9,7 +9,7 @@ namespace PlcInterface.Ads
     /// Stores data about a PLC symbol.
     /// </summary>
     [DebuggerDisplay("{Name}")]
-    internal sealed class SymbolInfo : ISymbolInfo
+    internal sealed class SymbolInfo : IAdsSymbolInfo
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SymbolInfo"/> class.
@@ -26,15 +26,11 @@ namespace PlcInterface.Ads
         public string Comment
             => Symbol.Comment;
 
-        /// <summary>
-        /// Gets a value indicating whether this symbol represents a array.
-        /// </summary>
+        /// <inheritdoc/>
         public bool IsArray
             => Symbol.DataType?.Category == DataTypeCategory.Array;
 
-        /// <summary>
-        /// Gets a value indicating whether this symbol represents a complex type.
-        /// </summary>
+        /// <inheritdoc/>
         public bool IsBigType
             => Symbol.DataType?.Category == DataTypeCategory.Struct;
 
@@ -50,9 +46,7 @@ namespace PlcInterface.Ads
         public string ShortName
             => Symbol.InstanceName;
 
-        /// <summary>
-        /// Gets the PLC symbol this encapsules.
-        /// </summary>
+        /// <inheritdoc/>
         public ISymbol Symbol
         {
             get;

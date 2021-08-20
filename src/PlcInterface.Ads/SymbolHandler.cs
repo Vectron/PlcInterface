@@ -21,7 +21,7 @@ namespace PlcInterface.Ads
     /// </summary>
     public class SymbolHandler : IAdsSymbolHandler, IDisposable
     {
-        private readonly Dictionary<string, ISymbolInfo> allSymbols = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, IAdsSymbolInfo> allSymbols = new(StringComparer.OrdinalIgnoreCase);
         private readonly CompositeDisposable disposables = new();
         private readonly IFileSystem fileSystem;
         private readonly ILogger<SymbolHandler> logger;
@@ -60,7 +60,11 @@ namespace PlcInterface.Ads
         }
 
         /// <inheritdoc/>
-        public ISymbolInfo GetSymbolinfo(string ioName)
+        ISymbolInfo ISymbolHandler.GetSymbolinfo(string ioName)
+            => GetSymbolinfo(ioName);
+
+        /// <inheritdoc/>
+        public IAdsSymbolInfo GetSymbolinfo(string ioName)
         {
             if (!allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out var value))
             {

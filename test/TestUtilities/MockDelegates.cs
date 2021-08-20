@@ -1,4 +1,4 @@
-﻿namespace PlcInterface.Ads.Tests
+﻿namespace TestUtilities
 {
     public static class MockDelegates
     {

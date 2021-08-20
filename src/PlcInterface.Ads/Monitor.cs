@@ -32,7 +32,7 @@ namespace PlcInterface.Ads
             this.typeConverter = typeConverter;
             this.logger = logger;
 
-            sesionStream = connection.SessionStream.Where(x => x.IsConnected).Select(x => x.Value).WhereNotNull().Subscribe(x =>
+            sesionStream = connection.SessionStream.Where(x => x.IsConnected).Subscribe(x =>
             {
                 foreach (var keyValue in streams)
                 {
@@ -103,11 +103,7 @@ namespace PlcInterface.Ads
                 return;
             }
 
-            if (!streams.Remove(ioName))
-            {
-                logger.LogError("Unable to unregister {0}", ioName);
-            }
-
+            _ = streams.Remove(ioName);
             disposableMonitorItem.Dispose();
         }
 

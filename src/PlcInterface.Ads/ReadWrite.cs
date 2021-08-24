@@ -4,8 +4,8 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using PlcInterface.Ads.TwincatAbstractions;
 using PlcInterface.Extensions;
-using TwinCAT.Ads.SumCommand;
 using TwinCAT.TypeSystem;
 
 namespace PlcInterface.Ads
@@ -16,6 +16,7 @@ namespace PlcInterface.Ads
     public class ReadWrite : IAdsReadWrite
     {
         private readonly IAdsPlcConnection connection;
+        private readonly ISumSymbolFactory sumSymbolFactory;
         private readonly IAdsSymbolHandler symbolHandler;
         private readonly IAdsTypeConverter typeConverter;
 
@@ -25,11 +26,13 @@ namespace PlcInterface.Ads
         /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
         /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
         /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
-        public ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHandler, IAdsTypeConverter typeConverter)
+        /// <param name="sumSymbolFactory">A <see cref="ISumSymbolFactory"/> implementation.</param>
+        public ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHandler, IAdsTypeConverter typeConverter, ISumSymbolFactory sumSymbolFactory)
         {
             this.connection = connection;
             this.symbolHandler = symbolHandler;
             this.typeConverter = typeConverter;
+            this.sumSymbolFactory = sumSymbolFactory;
         }
 
         /// <inheritdoc/>
@@ -37,20 +40,15 @@ namespace PlcInterface.Ads
         {
             var client = connection.GetConnectedClient();
             var tcSymbols = ioNames
-                .Select(x => symbolHandler.GetSymbolinfo(x))
-                .Select(x => x.Symbol)
+                .Select(x => symbolHandler.GetSymbolinfo(x).Symbol)
                 .ToList();
 
-            var sumReader = new SumSymbolRead(client, tcSymbols);
+            var sumReader = sumSymbolFactory.CreateSumSymbolRead(client, tcSymbols);
             var result = sumReader.Read();
             return ioNames
                 .Zip(result, (ioName, value) =>
                 {
-                    if (symbolHandler.GetSymbolinfo(ioName).Symbol is not IValueSymbol adsSymbol)
-                    {
-                        throw new SymbolException($"{ioName} is not a value symbol.");
-                    }
-
+                    var adsSymbol = symbolHandler.GetSymbolinfo(ioName).Symbol.CastAndValidate();
                     var fixedValue = typeConverter.Convert(value, adsSymbol);
                     return (ioName, fixedValue);
                 })
@@ -102,10 +100,10 @@ namespace PlcInterface.Ads
                 .Select(x => x.Symbol)
                 .ToList();
 
-            var sumReader = new SumSymbolRead(client, tcSymbols);
+            var sumReader = sumSymbolFactory.CreateSumSymbolRead(client, tcSymbols);
             var resultSum = await sumReader.ReadAsync(CancellationToken.None).ConfigureAwait(false);
             var dictionary = ioNames
-                    .Zip(resultSum.Values, (ioName, value) =>
+                    .Zip(resultSum, (ioName, value) =>
                     {
                         var adsSymbol = symbolHandler.GetSymbolinfo(ioName).Symbol.CastAndValidate();
                         var fixedValue = typeConverter.Convert(value, adsSymbol);
@@ -152,8 +150,8 @@ namespace PlcInterface.Ads
 
             try
             {
-                var sumReader = new SumSymbolWrite(client, tcSymbols);
-                sumReader.Write(namesValues.Values.ToArray());
+                var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, tcSymbols);
+                sumWriter.Write(namesValues.Values.ToArray());
             }
             catch (ArgumentException)
             {
@@ -162,8 +160,8 @@ namespace PlcInterface.Ads
                     .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
                     .Select(x => (x.SymbolInfo.CastAndValidate().Symbol, x.Value));
 
-                var sumReader = new SumSymbolWrite(client, flattened.Select(x => x.Symbol).ToList());
-                sumReader.Write(flattened.Select(x => x.Value).ToArray());
+                var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, flattened.Select(x => x.Symbol).ToList());
+                sumWriter.Write(flattened.Select(x => x.Value).ToArray());
             }
         }
 
@@ -196,8 +194,8 @@ namespace PlcInterface.Ads
                 .ToList();
             try
             {
-                var sumReader = new SumSymbolWrite(client, tcSymbols);
-                _ = await sumReader.WriteAsync(namesValues.Values.ToArray(), CancellationToken.None).ConfigureAwait(false);
+                var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, tcSymbols);
+                await sumWriter.WriteAsync(namesValues.Values.ToArray(), CancellationToken.None).ConfigureAwait(false);
             }
             catch (ArgumentException)
             {
@@ -206,8 +204,8 @@ namespace PlcInterface.Ads
                     .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
                     .Select(x => (x.SymbolInfo.CastAndValidate().Symbol, x.Value));
 
-                var sumReader = new SumSymbolWrite(client, flattened.Select(x => x.Symbol).ToList());
-                _ = await sumReader.WriteAsync(flattened.Select(x => x.Value).ToArray(), CancellationToken.None).ConfigureAwait(false);
+                var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, flattened.Select(x => x.Symbol).ToList());
+                await sumWriter.WriteAsync(flattened.Select(x => x.Value).ToArray(), CancellationToken.None).ConfigureAwait(false);
             }
         }
 

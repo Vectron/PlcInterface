@@ -3,6 +3,7 @@ using System.IO.Abstractions;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using PlcInterface.Ads.TwincatAbstractions;
 using PlcInterface.Tests;
 using TestUtilities;
 using TwinCAT.Ads;
@@ -28,7 +29,8 @@ namespace PlcInterface.Ads.Tests
 
             connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
             symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolhandlersettings), MockHelpers.GetLoggerMock<SymbolHandler>(), Mock.Of<IFileSystem>(), new SymbolLoaderFactoryAbstraction());
-            readWrite = new ReadWrite(connection, symbolHandler, typeConverter);
+            var sumSymbolFactory = new SumSymbolFactory();
+            readWrite = new ReadWrite(connection, symbolHandler, typeConverter, sumSymbolFactory);
             await connection.ConnectAsync();
             _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
         }

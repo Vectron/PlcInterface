@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PlcInterface;
 using PlcInterface.Ads;
+using PlcInterface.Ads.TwincatAbstractions;
 using PlcInterface.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -27,6 +28,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton<TwinCAT.Ads.IAdsDisposableConnection, TwinCAT.Ads.AdsClient>(x => new TwinCAT.Ads.AdsClient(x.GetRequiredService<ILogger<TwinCAT.Ads.AdsClient>>()))
                 .AddSingleton<IFileSystem, FileSystem>()
                 .AddSingleton<ISymbolLoaderFactory, SymbolLoaderFactoryAbstraction>()
+                .AddSingleton<ISumSymbolFactory, SumSymbolFactory>()
                 .ConfigureOptions<DefaultConnectionSettingsConfigureOptions>()
                 .ConfigureOptions<DefaultSymbolHandlerSettingsConfigureOptions>();
     }

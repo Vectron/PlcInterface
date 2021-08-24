@@ -15,7 +15,6 @@ namespace PlcInterface.OpcUa.Tests
         private static SymbolHandler? symbolHandler;
 
         [ClassInitialize]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public Api")]
         public static async Task ConnectAsync(TestContext testContext)
         {
             var connectionsettings = new OPCSettings();

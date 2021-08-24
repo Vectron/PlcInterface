@@ -11,7 +11,6 @@ namespace PlcInterface.Abstraction.Tests
     public class TaskExtensionsTests
     {
         [TestMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "Need to wait the task to check if it worked")]
         public void LogExceptionsAsyncLogsExceptionsToErrorStream()
         {
             // Arrange

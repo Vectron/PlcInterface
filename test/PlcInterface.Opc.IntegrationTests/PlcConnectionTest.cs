@@ -9,27 +9,41 @@ namespace PlcInterface.OpcUa.Tests
     [TestClass]
     public class PlcConnectionTest : IPlcConnectionTestBase
     {
+        private static PlcConnection? plcConnection;
+
+        [ClassInitialize]
+        public static void ConnectAsync(TestContext testContext)
+        {
+            var connectionsettings = new OPCSettings();
+            new DefaultOPCSettingsConfigureOptions().Configure(connectionsettings);
+            connectionsettings.Address = Settings.PLCUriNoRoot;
+
+            plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
+        }
+
+        [ClassCleanup]
+        public static void Disconnect()
+            => plcConnection!.Dispose();
+
         [TestMethod]
         public void GetConnectedClient()
         {
             // Arrange
-            using var connection = GetPLCConnection() as PlcConnection;
+            Assert.IsNotNull(plcConnection);
 
             // Act
-            Assert.IsNotNull(connection);
-            _ = Assert.ThrowsException<TimeoutException>(() => connection.GetConnectedClient());
+            _ = Assert.ThrowsException<TimeoutException>(() => plcConnection.GetConnectedClient());
         }
 
         [TestMethod]
         public void GetConnectedClientReturnsTheActiveConnection()
         {
             // Arrange
-            using var connection = GetPLCConnection() as PlcConnection;
-            Assert.IsNotNull(connection);
+            Assert.IsNotNull(plcConnection);
 
             // Act
-            var connectionTask = connection.ConnectAsync();
-            var client = connection.GetConnectedClient(TimeSpan.FromSeconds(10));
+            var connectionTask = plcConnection.ConnectAsync();
+            var client = plcConnection.GetConnectedClient(TimeSpan.FromSeconds(10));
             connectionTask.GetAwaiter().GetResult();
 
             // Assert
@@ -41,12 +55,11 @@ namespace PlcInterface.OpcUa.Tests
         public async Task GetConnectedClientReturnsTheActiveConnectionAsync()
         {
             // Arrange
-            using var connection = GetPLCConnection() as PlcConnection;
-            Assert.IsNotNull(connection);
+            Assert.IsNotNull(plcConnection);
 
             // Act
-            var connectionTask = connection.ConnectAsync();
-            var client = await connection.GetConnectedClientAsync();
+            var connectionTask = plcConnection.ConnectAsync();
+            var client = await plcConnection.GetConnectedClientAsync();
             await connectionTask;
 
             // Assert
@@ -54,14 +67,7 @@ namespace PlcInterface.OpcUa.Tests
             Assert.IsTrue(client.Connected);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP005:Return type should indicate that the value should be disposed.", Justification = "Can't mark interface as IDisposable")]
         protected override IPlcConnection GetPLCConnection()
-        {
-            var connectionsettings = new OPCSettings();
-            new DefaultOPCSettingsConfigureOptions().Configure(connectionsettings);
-            connectionsettings.Address = Settings.PLCUriNoRoot;
-
-            return new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
-        }
+            => plcConnection!;
     }
 }

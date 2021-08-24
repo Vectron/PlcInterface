@@ -15,8 +15,6 @@ using TwinCAT.ValueAccess;
 namespace PlcInterface.Ads.Tests
 {
     [TestClass]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "MA0042:Do not use blocking calls in an async method", Justification = "No need for this check here.")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "MA0045:Do not use blocking call in a sync method (need to make containing method async)", Justification = "No need for this check here.")]
     public class ReadWriteTests
     {
         [TestMethod]

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Subjects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -7,7 +6,6 @@ using Moq;
 namespace PlcInterface.Abstraction.Tests
 {
     [TestClass]
-    [SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "We dont want to use the overload with cancelation token")]
     public class IMonitorExtensionTests
     {
         [TestMethod]

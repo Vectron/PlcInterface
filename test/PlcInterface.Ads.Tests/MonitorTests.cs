@@ -190,7 +190,6 @@ namespace PlcInterface.Ads.Tests
         }
 
         [TestMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "Don't use cancelation token with subscriptions.")]
         public void ValueChangedEventsArePostedOnTheStream()
         {
             // Arrange

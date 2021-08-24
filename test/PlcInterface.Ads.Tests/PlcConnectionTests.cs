@@ -77,7 +77,6 @@ namespace PlcInterface.Ads.Tests
         }
 
         [TestMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "Ignore this for subscriptions")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created.", Justification = "Already disposed")]
         public void ConnectionStateChangesArePushedToSessionStream()
         {
@@ -171,7 +170,6 @@ namespace PlcInterface.Ads.Tests
         }
 
         [TestMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "Ignore this for subscriptions")]
         public void ExceptionsInSessionStreamDontDestroyTheStream()
         {
             // Arrange
@@ -226,7 +224,6 @@ namespace PlcInterface.Ads.Tests
         }
 
         [TestMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "Ignore this for subscriptions")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created.", Justification = "Already disposed")]
         public void SesionstreamIsStoppedWhenDisposed()
         {
@@ -278,7 +275,6 @@ namespace PlcInterface.Ads.Tests
         }
 
         [TestMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "Ignore this for subscriptions")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created.", Justification = "Already disposed")]
         public void WhenSubscribingToSessionStreamGetCurrentState()
         {

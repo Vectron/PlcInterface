@@ -16,7 +16,6 @@ namespace PlcInterface.OpcUa.Tests
             => provider?.Dispose();
 
         [ClassInitialize]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public Api")]
         public static void SetupDI(TestContext testContext)
             => provider = new ServiceCollection()
             .AddOptions()

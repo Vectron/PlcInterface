@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -26,7 +25,6 @@ namespace PlcInterface.Abstraction.Tests
         }
 
         [TestMethod]
-        [SuppressMessage("Design", "MA0045:Do not use blocking call in a sync method (need to make containing method async)", Justification = "No need for async")]
         public void WaitForValueBlocksUntillValueIsTriggered()
         {
             // Arrange
@@ -60,7 +58,6 @@ namespace PlcInterface.Abstraction.Tests
         }
 
         [TestMethod]
-        [SuppressMessage("Design", "MA0045:Do not use blocking call in a sync method (need to make containing method async)", Justification = "No need for async")]
         public void WaitForValueIgnoresNullValuesAsync()
         {
             // Arrange

@@ -12,7 +12,6 @@ namespace PlcInterface.Tests
         {
             // Arrange
             var connection = GetPLCConnection();
-            using var disposable = connection as IDisposable;
 
             // Act
             connection.Connect();
@@ -43,7 +42,6 @@ namespace PlcInterface.Tests
         {
             // Arrange
             var connection = GetPLCConnection();
-            using var disposable = connection as IDisposable;
 
             // Act
             await connection.ConnectAsync();

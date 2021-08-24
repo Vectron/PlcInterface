@@ -14,15 +14,12 @@ namespace PlcInterface.Ads.Tests
         private static PlcConnection? plcConnection;
 
         [ClassInitialize]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Public Api")]
-        public static async Task ConnectAsync(TestContext testContext)
+        public static void ConnectAsync(TestContext testContext)
         {
             var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
             adsClient = new AdsClient();
 
             plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
-            await plcConnection.ConnectAsync();
-            _ = await plcConnection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
         }
 
         [ClassCleanup]

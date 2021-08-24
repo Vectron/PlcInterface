@@ -9,7 +9,7 @@
 ##########################################
 
 # This file is the top-most EditorConfig file
-root =false
+root = false
 
 csharp_style_prefer_index_operator = false:none
 
@@ -21,16 +21,24 @@ csharp_style_prefer_index_operator = false:none
 #dotnet_diagnostic.SA0001.severity =silent
 
 # SA1101: Prefix local calls with this
-dotnet_diagnostic.SA1101.severity =none
+dotnet_diagnostic.SA1101.severity = none
 
 # SA1200: Using directives should be placed correctly
-dotnet_diagnostic.SA1200.severity =none
+dotnet_diagnostic.SA1200.severity = none
 
 # SA1633: The file header is missing or not located at the top of the file
-dotnet_diagnostic.SA1633.severity =none
+dotnet_diagnostic.SA1633.severity = none
 
 # SA1600: Elements must be documented
-dotnet_diagnostic.SA1600.severity =none
+dotnet_diagnostic.SA1600.severity = none
 
 # SA1602: Enumeration items should be documented
-dotnet_diagnostic.SA1602.severity =none
+dotnet_diagnostic.SA1602.severity = none
+
+csharp_style_prefer_index_operator = false
+dotnet_code_quality_unused_parameters = non_public
+dotnet_diagnostic.IDISP001.severity = none
+
+dotnet_diagnostic.MA0032.severity = none    # MA0032: Use an overload with a CancellationToken argument
+dotnet_diagnostic.MA0042.severity = none    # MA0042: Do not use blocking calls in an async method
+dotnet_diagnostic.MA0045.severity = none    # MA0045: Do not use blocking call in a sync method (need to make containing method async)

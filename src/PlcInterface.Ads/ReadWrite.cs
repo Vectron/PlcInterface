@@ -153,7 +153,7 @@ namespace PlcInterface.Ads
                 var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, tcSymbols);
                 sumWriter.Write(namesValues.Values.ToArray());
             }
-            catch (ArgumentException)
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
             {
                 // When a object can't be marshalled then ArgumentException will be thrown, if this happens we try to write all objects individually
                 var flattened = namesValues
@@ -176,7 +176,7 @@ namespace PlcInterface.Ads
             {
                 adsSymbol.WriteValue(value);
             }
-            catch (ArgumentException)
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
             {
                 // When a object can't be marshalled then ArgumentException will be thrown, if this happens we try to write all objects individually
                 var flattenItems = symbolInfo.FlattenWithValue(symbolHandler, value).ToDictionary(x => x.SymbolInfo.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);
@@ -197,7 +197,7 @@ namespace PlcInterface.Ads
                 var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, tcSymbols);
                 await sumWriter.WriteAsync(namesValues.Values.ToArray(), CancellationToken.None).ConfigureAwait(false);
             }
-            catch (ArgumentException)
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
             {
                 // When a object can't be marshalled then ArgumentException will be thrown, if this happens we try to write all objects individually
                 var flattened = namesValues
@@ -219,7 +219,7 @@ namespace PlcInterface.Ads
             {
                 _ = await adsSymbol.WriteValueAsync(value, CancellationToken.None).ConfigureAwait(false);
             }
-            catch (ArgumentException)
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
             {
                 // When a object can't be marshalled then ArgumentException will be thrown, if this happens we try to write all objects individually
                 var flattenItems = symbolInfo.FlattenWithValue(symbolHandler, value).ToDictionary(x => x.SymbolInfo.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);

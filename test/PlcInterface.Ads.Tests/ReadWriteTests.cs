@@ -20,7 +20,7 @@ namespace PlcInterface.Ads.Tests
     public class ReadWriteTests
     {
         [TestMethod]
-        public void ReadDynamicReturnsAExpandoObject()
+        public async Task ReadDynamicReturnsAExpandoObjectAsync()
         {
             // Arrange
             var ioTag = "dummyVar";
@@ -37,7 +37,7 @@ namespace PlcInterface.Ads.Tests
 
             // Act
             var value1 = readWrite.ReadDynamic(ioTag);
-            var value2 = readWrite.ReadDynamicAsync(ioTag);
+            var value2 = await readWrite.ReadDynamicAsync(ioTag);
 
             // Assert
             Assert.AreSame(dummyValue, value1);

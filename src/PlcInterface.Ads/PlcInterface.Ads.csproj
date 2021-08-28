@@ -6,12 +6,12 @@
     
     <ItemGroup>
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-        <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="5.0.442" NoWarn="NU1701" />
-        <PackageReference Include="Beckhoff.TwinCAT.Ads.Reactive" Version="5.0.442" NoWarn="NU1701" />
+        <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="5.0.458" NoWarn="NU1701" />
+        <PackageReference Include="Beckhoff.TwinCAT.Ads.Reactive" Version="5.0.458" NoWarn="NU1701" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
         <PackageReference Condition="'$(Configuration)' == 'Release'" Include="PlcInterface.Abstraction" Version="2.2.*" />
-        <PackageReference Include="System.IO.Abstractions" Version="13.2.43" />
+        <PackageReference Include="System.IO.Abstractions" Version="13.2.47" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Debug'">

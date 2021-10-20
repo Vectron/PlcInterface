@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using Microsoft.Extensions.Logging;
 using Opc.Ua;
 using Opc.Ua.Client;
+using PlcInterface.OpcUa.Extensions;
 
 namespace PlcInterface.OpcUa
 {
@@ -159,6 +160,8 @@ namespace PlcInterface.OpcUa
 
         private void BuildSymbolList(IDictionary<SymbolInfo, ReferenceDescriptionCollection> items, Browser browser, SymbolInfo rootNode)
         {
+            var operationLimits = browser.Session.ReadOperationLimits();
+
             foreach (var kv in items)
             {
                 var parrent = kv.Key;
@@ -176,8 +179,19 @@ namespace PlcInterface.OpcUa
 
                 if (itemsToBrowseNext.Count > 0)
                 {
-                    var browseResult = browser.Browse(itemsToBrowseNext);
-                    BuildSymbolList(browseResult, browser, rootNode);
+                    if (itemsToBrowseNext.Count > operationLimits.MaxNodesPerBrowse)
+                    {
+                        foreach (var chunk in itemsToBrowseNext.Chunk(operationLimits.MaxNodesPerBrowse))
+                        {
+                            var browseResult = browser.Browse(chunk.ToList());
+                            BuildSymbolList(browseResult, browser, rootNode);
+                        }
+                    }
+                    else
+                    {
+                        var browseResult = browser.Browse(itemsToBrowseNext);
+                        BuildSymbolList(browseResult, browser, rootNode);
+                    }
                 }
             }
         }

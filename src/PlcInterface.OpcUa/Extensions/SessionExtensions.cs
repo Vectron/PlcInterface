@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using PlcInterface.OpcUa;
 
 namespace Opc.Ua.Client
 {
@@ -26,19 +25,35 @@ namespace Opc.Ua.Client
                 ContinueUntilDone = false,
             };
 
-            var operationLimits = browser.Browse(ObjectIds.Server_ServerCapabilities_OperationLimits);
+            var operationLimitsValues = browser.Browse(ObjectIds.Server_ServerCapabilities_OperationLimits);
             var limits = new Dictionary<string, uint>(StringComparer.Ordinal);
 
-            foreach (var item in operationLimits)
+            foreach (var item in operationLimitsValues)
             {
                 var dataValue = session?.ReadValue((NodeId)item.NodeId);
-                if (dataValue?.Value is uint value)
+                if (dataValue?.Value is uint uintValue)
                 {
-                    limits.Add(item.BrowseName.Name, value);
+                    limits.Add(item.BrowseName.Name, uintValue);
                 }
             }
 
-            return new OperationLimits(limits);
+            var operationLimits = new OperationLimits
+            {
+                MaxMonitoredItemsPerCall = limits.TryGetValue(nameof(OperationLimits.MaxMonitoredItemsPerCall), out var value) ? value : uint.MaxValue,
+                MaxNodesPerBrowse = limits.TryGetValue(nameof(OperationLimits.MaxNodesPerBrowse), out value) ? value : uint.MaxValue,
+                MaxNodesPerHistoryReadData = limits.TryGetValue(nameof(OperationLimits.MaxNodesPerHistoryReadData), out value) ? value : uint.MaxValue,
+                MaxNodesPerHistoryReadEvents = limits.TryGetValue(nameof(OperationLimits.MaxNodesPerHistoryReadEvents), out value) ? value : uint.MaxValue,
+                MaxNodesPerHistoryUpdateData = limits.TryGetValue(nameof(OperationLimits.MaxNodesPerHistoryUpdateData), out value) ? value : uint.MaxValue,
+                MaxNodesPerHistoryUpdateEvents = limits.TryGetValue(nameof(OperationLimits.MaxNodesPerHistoryUpdateEvents), out value) ? value : uint.MaxValue,
+                MaxNodesPerMethodCall = limits.TryGetValue(nameof(OperationLimits.MaxNodesPerMethodCall), out value) ? value : uint.MaxValue,
+                MaxNodesPerNodeManagement = limits.TryGetValue(nameof(OperationLimits.MaxNodesPerNodeManagement), out value) ? value : uint.MaxValue,
+                MaxNodesPerRead = limits.TryGetValue(nameof(OperationLimits.MaxNodesPerRead), out value) ? value : uint.MaxValue,
+                MaxNodesPerRegisterNodes = limits.TryGetValue(nameof(OperationLimits.MaxNodesPerRegisterNodes), out value) ? value : uint.MaxValue,
+                MaxNodesPerTranslateBrowsePathsToNodeIds = limits.TryGetValue(nameof(OperationLimits.MaxNodesPerTranslateBrowsePathsToNodeIds), out value) ? value : uint.MaxValue,
+                MaxNodesPerWrite = limits.TryGetValue(nameof(OperationLimits.MaxNodesPerWrite), out value) ? value : uint.MaxValue,
+            };
+
+            return operationLimits;
         }
     }
 }

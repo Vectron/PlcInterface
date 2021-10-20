@@ -190,7 +190,7 @@ namespace PlcInterface.OpcUa
                 throw new InvalidOperationException("No vallid settings found");
             }
 
-            var path = settings.Address?.AbsolutePath.Trim('/');
+            var path = settings.Address?.AbsolutePath.Trim('/').Replace("%20", " ");
             var rootNodeName = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(path))

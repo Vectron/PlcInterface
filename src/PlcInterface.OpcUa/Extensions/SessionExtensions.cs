@@ -34,8 +34,7 @@ namespace Opc.Ua.Client
 
             ClientBase.ValidateResponse(results, nodesToRead);
             ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
-            var nodeInfo = NodeInfoFromDataValue(results);
-            session.UpdateDataType(new[] { nodeInfo });
+            var nodeInfo = NodeInfoFromDataValue(results, session);
             return nodeInfo;
         }
 
@@ -68,8 +67,7 @@ namespace Opc.Ua.Client
                 out var diagnosticInfos);
             ClientBase.ValidateResponse(results, nodesToRead);
             ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
-            var nodeInfos = results.Chunk(3).Select(NodeInfoFromDataValue).ToList();
-            session.UpdateDataType(nodeInfos);
+            var nodeInfos = results.Chunk(3).Select(x => NodeInfoFromDataValue(x, session));
             return nodeInfos;
         }
 
@@ -142,62 +140,17 @@ namespace Opc.Ua.Client
             };
         }
 
-        private static NodeInfo NodeInfoFromDataValue(IList<DataValue> dataValues)
+        private static NodeInfo NodeInfoFromDataValue(IList<DataValue> dataValues, Session session)
         {
             if (dataValues.Count != 3)
             {
                 throw new ArgumentException("Collection needs 3 items", nameof(dataValues));
             }
 
-            return new NodeInfo
-            {
-                Description = dataValues[0].GetValue(LocalizedText.Null).Text,
-                DataType = dataValues[1].GetValue(NodeId.Null),
-                ValueRank = dataValues[2].GetValue(ValueRanks.Any),
-            };
-        }
-
-        private static void UpdateDataType(this Session session, IEnumerable<NodeInfo> nodeInfos)
-        {
-            foreach (var nodeInfo in nodeInfos)
-            {
-                if (NodeId.IsNull(nodeInfo.DataType))
-                {
-                    continue;
-                }
-
-                nodeInfo.BuiltInType = DataTypes.GetBuiltInType(nodeInfo.DataType, session.TypeTree);
-                nodeInfo.DataTypeDisplayText = session.NodeCache.GetDisplayText(nodeInfo.DataType);
-
-                if (nodeInfo.ValueRank >= 0)
-                {
-                    nodeInfo.DataTypeDisplayText += "[]";
-                }
-
-                // TODO: Create enum from loaded data
-                if (nodeInfo.BuiltInType == BuiltInType.Enumeration && false)
-                {
-                    var nodesToRead = new ReadValueIdCollection()
-                    {
-                        new ReadValueId
-                        {
-                            NodeId = nodeInfo.DataType,
-                            AttributeId = Attributes.DataTypeDefinition,
-                        },
-                    };
-
-                    _ = session.Read(
-                        null,
-                        0,
-                        TimestampsToReturn.Neither,
-                        nodesToRead,
-                        out var results,
-                        out var diagnosticInfos);
-
-                    ClientBase.ValidateResponse(results, nodesToRead);
-                    ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
-                }
-            }
+            var description = dataValues[0].GetValue(LocalizedText.Null).Text;
+            var dataType = dataValues[1].GetValue(NodeId.Null);
+            var valueRank = dataValues[2].GetValue(ValueRanks.Any);
+            return new NodeInfo(session, dataType, description, valueRank);
         }
     }
 }

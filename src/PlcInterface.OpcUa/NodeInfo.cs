@@ -1,4 +1,6 @@
-﻿using Opc.Ua;
+﻿using System;
+using Opc.Ua;
+using Opc.Ua.Client;
 
 namespace PlcInterface.OpcUa
 {
@@ -7,49 +9,100 @@ namespace PlcInterface.OpcUa
     /// </summary>
     internal sealed class NodeInfo
     {
+        private readonly Lazy<BuiltInType> builtInType;
+        private readonly Lazy<string> dataTypeDisplayText;
+        private readonly Session session;
+
         /// <summary>
-        /// Gets or sets the build in data type of this node.
+        /// Initializes a new instance of the <see cref="NodeInfo"/> class.
+        /// </summary>
+        /// <param name="session">The session to get the data from.</param>
+        /// <param name="dataType">The data type of this node.</param>
+        /// <param name="description">The description text of this node.</param>
+        /// <param name="valueRank">The value rank of this node.</param>
+        public NodeInfo(Session session, NodeId dataType, string description, int valueRank)
+        {
+            Description = description;
+            ValueRank = valueRank;
+            this.session = session;
+            DataType = dataType;
+
+            if (NodeId.IsNull(dataType))
+            {
+                builtInType = new Lazy<BuiltInType>(() => BuiltInType.Null, false);
+                dataTypeDisplayText = new Lazy<string>(() => string.Empty, false);
+            }
+            else
+            {
+                builtInType = new Lazy<BuiltInType>(() => DataTypes.GetBuiltInType(dataType, session.TypeTree), false);
+                dataTypeDisplayText = new Lazy<string>(() => session.NodeCache.GetDisplayText(dataType), false);
+            }
+        }
+
+        /// <summary>
+        /// Gets the build in data type of this node.
         /// </summary>
         public BuiltInType BuiltInType
-        {
-            get;
-            internal set;
-        }
+            => builtInType.Value;
 
         /// <summary>
-        /// Gets or sets the <see cref="NodeId"/> for the data type.
+        /// Gets the <see cref="NodeId"/> for the data type.
         /// </summary>
-        public NodeId? DataType
+        public NodeId DataType
         {
             get;
-            internal set;
         }
 
         /// <summary>
-        /// Gets or sets the display text of the <see cref="NodeId"/>.
+        /// Gets the display text of the <see cref="NodeId"/>.
         /// </summary>
-        public string? DataTypeDisplayText
-        {
-            get;
-            internal set;
-        }
+        public string DataTypeDisplayText
+            => ValueRank >= 0 ? dataTypeDisplayText.Value + "[]" : dataTypeDisplayText.Value;
 
         /// <summary>
-        /// Gets or sets the description text of the <see cref="NodeId"/>.
+        /// Gets the description text of the <see cref="NodeId"/>.
         /// </summary>
-        public string? Description
+        public string Description
         {
             get;
-            internal set;
         }
 
         /// <summary>
-        /// Gets or sets the rank if this node represents a array.
+        /// Gets the rank if this node represents a array.
         /// </summary>
         public int ValueRank
         {
             get;
-            internal set;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "TODO")]
+        private void GetEnumInfo()
+        {
+            // TODO: Create enum from loaded data
+            if (BuiltInType != BuiltInType.Enumeration)
+            {
+                return;
+            }
+
+            var nodesToRead = new ReadValueIdCollection()
+            {
+                new ReadValueId
+                {
+                    NodeId = DataType,
+                    AttributeId = Attributes.DataTypeDefinition,
+                },
+            };
+
+            _ = session.Read(
+                null,
+                0,
+                TimestampsToReturn.Neither,
+                nodesToRead,
+                out var results,
+                out var diagnosticInfos);
+
+            ClientBase.ValidateResponse(results, nodesToRead);
+            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
         }
     }
 }

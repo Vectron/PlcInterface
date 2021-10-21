@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using PlcInterface.OpcUa;
 
 namespace Opc.Ua.Client
 {
@@ -8,6 +10,69 @@ namespace Opc.Ua.Client
     /// </summary>
     internal static class SessionExtensions
     {
+        /// <summary>
+        /// Gets the datatype of an OPC tag.
+        /// </summary>
+        /// /// <param name="session">The <see cref="Session"/> to read from.</param>
+        /// <param name="nodeId"><see cref="NodeId"/> to get datatype of.</param>
+        /// <returns>System Type.</returns>
+        public static NodeInfo ReadNodeInfo(this Session session, NodeId nodeId)
+        {
+            if (session == null)
+            {
+                throw new InvalidOperationException("Session is null");
+            }
+
+            var nodesToRead = new ReadValueIdCollection(GetReadValueIds(nodeId));
+            _ = session.Read(
+                null,
+                0,
+                TimestampsToReturn.Neither,
+                nodesToRead,
+                out var results,
+                out var diagnosticInfos);
+
+            ClientBase.ValidateResponse(results, nodesToRead);
+            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
+            var nodeInfo = NodeInfoFromDataValue(results);
+            session.UpdateDataType(new[] { nodeInfo });
+            return nodeInfo;
+        }
+
+        /// <summary>
+        /// Gets the datatype of an OPC tag.
+        /// </summary>
+        /// <param name="session">The <see cref="Session"/> to read from.</param>
+        /// <param name="nodeIds">The <see cref="NodeId"/> to get datatype of.</param>
+        /// <returns>System Type.</returns>
+        public static IEnumerable<NodeInfo> ReadNodeInfo(this Session session, IEnumerable<NodeId> nodeIds)
+        {
+            if (session == null)
+            {
+                throw new InvalidOperationException("Session is null");
+            }
+
+            var nodesToRead = new ReadValueIdCollection(nodeIds.SelectMany(GetReadValueIds));
+
+            if (nodesToRead.Count <= 0)
+            {
+                return Enumerable.Empty<NodeInfo>();
+            }
+
+            _ = session.Read(
+                null,
+                0,
+                TimestampsToReturn.Neither,
+                nodesToRead,
+                out var results,
+                out var diagnosticInfos);
+            ClientBase.ValidateResponse(results, nodesToRead);
+            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
+            var nodeInfos = results.Chunk(3).Select(NodeInfoFromDataValue).ToList();
+            session.UpdateDataType(nodeInfos);
+            return nodeInfos;
+        }
+
         /// <summary>
         /// Reads the Operation Limits from the server.
         /// </summary>
@@ -54,6 +119,85 @@ namespace Opc.Ua.Client
             };
 
             return operationLimits;
+        }
+
+        private static IEnumerable<ReadValueId> GetReadValueIds(NodeId nodeId)
+        {
+            yield return new ReadValueId
+            {
+                NodeId = nodeId,
+                AttributeId = Attributes.Description,
+            };
+
+            yield return new ReadValueId
+            {
+                NodeId = nodeId,
+                AttributeId = Attributes.DataType,
+            };
+
+            yield return new ReadValueId
+            {
+                NodeId = nodeId,
+                AttributeId = Attributes.ValueRank,
+            };
+        }
+
+        private static NodeInfo NodeInfoFromDataValue(IList<DataValue> dataValues)
+        {
+            if (dataValues.Count != 3)
+            {
+                throw new ArgumentException("Collection needs 3 items", nameof(dataValues));
+            }
+
+            return new NodeInfo
+            {
+                Description = dataValues[0].GetValue(LocalizedText.Null).Text,
+                DataType = dataValues[1].GetValue(NodeId.Null),
+                ValueRank = dataValues[2].GetValue(ValueRanks.Any),
+            };
+        }
+
+        private static void UpdateDataType(this Session session, IEnumerable<NodeInfo> nodeInfos)
+        {
+            foreach (var nodeInfo in nodeInfos)
+            {
+                if (NodeId.IsNull(nodeInfo.DataType))
+                {
+                    continue;
+                }
+
+                nodeInfo.BuiltInType = DataTypes.GetBuiltInType(nodeInfo.DataType, session.TypeTree);
+                nodeInfo.DataTypeDisplayText = session.NodeCache.GetDisplayText(nodeInfo.DataType);
+
+                if (nodeInfo.ValueRank >= 0)
+                {
+                    nodeInfo.DataTypeDisplayText += "[]";
+                }
+
+                // TODO: Create enum from loaded data
+                if (nodeInfo.BuiltInType == BuiltInType.Enumeration && false)
+                {
+                    var nodesToRead = new ReadValueIdCollection()
+                    {
+                        new ReadValueId
+                        {
+                            NodeId = nodeInfo.DataType,
+                            AttributeId = Attributes.DataTypeDefinition,
+                        },
+                    };
+
+                    _ = session.Read(
+                        null,
+                        0,
+                        TimestampsToReturn.Neither,
+                        nodesToRead,
+                        out var results,
+                        out var diagnosticInfos);
+
+                    ClientBase.ValidateResponse(results, nodesToRead);
+                    ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
+                }
+            }
         }
     }
 }

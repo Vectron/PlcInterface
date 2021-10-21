@@ -69,7 +69,7 @@ namespace PlcInterface.Sandbox.Commands
 
             if (string.Equals(parameters[0], VallidParameters[4], StringComparison.OrdinalIgnoreCase))
             {
-                var tags = string.Join(Environment.NewLine, symbolHandler.AllSymbols.Select(x => x.Name));
+                var tags = string.Join(Environment.NewLine, symbolHandler.AllSymbols.Select(x => x.Name).OrderBy(x => x));
                 return new Response(tags);
             }
 

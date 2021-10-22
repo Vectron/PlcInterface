@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Opc.Ua;
 using Opc.Ua.Client;
 
@@ -91,14 +92,37 @@ namespace PlcInterface.OpcUa
 
         private static SymbolInfo CreateSymbol(ReferenceDescription description, NodeInfo nodeInfo, SymbolInfo? parent, string rootName)
         {
+            var nameBuilder = new StringBuilder();
+            var parentName = parent == null ? ReadOnlySpan<char>.Empty : parent.Name.AsSpan();
             var arrayIndex = description.BrowseName.Name.IndexOf('[');
-            var itemName = parent == null
-                ? arrayIndex == -1 ? $"{description.BrowseName.Name}" : $"{description.BrowseName.Name.Substring(arrayIndex)}"
-                : arrayIndex == -1 ? $"{parent.Name}.{description.BrowseName.Name}" : $"{parent.Name}{description.BrowseName.Name.Substring(arrayIndex)}";
+            ReadOnlySpan<char> itemName;
+            ReadOnlySpan<char> arrayIndexString;
+            if (arrayIndex == -1)
+            {
+                itemName = description.BrowseName.Name.AsSpan();
+                arrayIndexString = ReadOnlySpan<char>.Empty;
+            }
+            else
+            {
+                itemName = description.BrowseName.Name.AsSpan(0, arrayIndex);
+                arrayIndexString = description.BrowseName.Name.AsSpan(arrayIndex);
+            }
 
-            itemName = CleanName(itemName, rootName).Replace("\"", string.Empty);
-            parent?.ChildSymbols.Add(itemName);
-            return new SymbolInfo(description, itemName, nodeInfo);
+            _ = nameBuilder.Append(parentName.ToString());
+            if (!parentName.EndsWith(itemName, StringComparison.Ordinal))
+            {
+                if (!parentName.IsEmpty)
+                {
+                    _ = nameBuilder.Append('.');
+                }
+
+                _ = nameBuilder.Append(itemName.ToString());
+            }
+
+            var fullName = nameBuilder.Append(arrayIndexString.ToString()).ToString();
+            fullName = CleanName(fullName, rootName).Replace("\"", string.Empty);
+            parent?.ChildSymbols.Add(fullName);
+            return new SymbolInfo(description, fullName, nodeInfo);
         }
 
         private BrowseDescription BrowseDescriptionFromNodeId(NodeId nodeId)

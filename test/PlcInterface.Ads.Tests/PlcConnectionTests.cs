@@ -77,7 +77,6 @@ public class PlcConnectionTests
     }
 
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created.", Justification = "Already disposed")]
     public void ConnectionStateChangesArePushedToSessionStream()
     {
         // Arrange
@@ -224,7 +223,6 @@ public class PlcConnectionTests
     }
 
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created.", Justification = "Already disposed")]
     public void SesionstreamIsStoppedWhenDisposed()
     {
         // Arrange
@@ -275,7 +273,6 @@ public class PlcConnectionTests
     }
 
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created.", Justification = "Already disposed")]
     public void WhenSubscribingToSessionStreamGetCurrentState()
     {
         // Arrange

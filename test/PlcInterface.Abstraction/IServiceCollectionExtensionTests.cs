@@ -23,7 +23,7 @@ public class IServiceCollectionExtensionTests
         var provider = new Mock<IServiceCollection>();
 
         // Act
-        provider.Object.AddSingletonFactory<DummyType, IDummyInterface2, IDummyInterface>();
+        _ = provider.Object.AddSingletonFactory<DummyType, IDummyInterface2, IDummyInterface>();
 
         // Assert
         provider.Verify(

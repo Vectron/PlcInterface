@@ -86,13 +86,13 @@ namespace PlcInterface.OpcUa
                 var settings = options.Value;
                 var config = settings.ApplicationConfiguration ?? throw new InvalidOperationException("No vallid application configuration given.");
                 Utils.SetTraceOutput(Utils.TraceOutput.DebugAndFile);
-                logger.LogInformation("Opening connection to {0}", settings.Address);
+                logger.LogInformation("Opening connection to {Adress}", settings.Address);
                 logger.LogDebug("Creating an Application Configuration.");
                 await config.Validate(ApplicationType.Client).ConfigureAwait(false);
                 var usesSecurity = SetupSecurity(config);
-                logger.LogDebug("Discover endpoints of {0}.", settings.DiscoveryAdress);
+                logger.LogDebug("Discover endpoints of {DiscoveryAdress}.", settings.DiscoveryAdress);
                 var selectedEndpoint = CoreClientUtils.SelectEndpoint(settings.DiscoveryAdress.ToString(), usesSecurity, 15000);
-                logger.LogDebug("Selected endpoint uses: {0}", selectedEndpoint.SecurityPolicyUri.Substring(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1));
+                logger.LogDebug("Selected endpoint uses: {Security}", selectedEndpoint.SecurityPolicyUri.Substring(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1));
                 logger.LogDebug("Create a session with OPC UA server.");
                 var endpointConfiguration = EndpointConfiguration.Create(config);
                 var endpoint = new ConfiguredEndpoint(null, selectedEndpoint, endpointConfiguration);
@@ -102,13 +102,13 @@ namespace PlcInterface.OpcUa
 
                 if (!session.Connected)
                 {
-                    logger.LogError("Failed to connect to {0}", endpoint);
+                    logger.LogError("Failed to connect to {Endpoint}", endpoint);
                     session.Dispose();
                     session = null;
                     return;
                 }
 
-                logger.LogInformation("Connected to {0}", endpoint);
+                logger.LogInformation("Connected to {Endpoint}", endpoint);
                 disposables.Add(Observable.FromEventPattern<KeepAliveEventHandler, Session, KeepAliveEventArgs>(
                     h => session.KeepAlive += h,
                     h => session.KeepAlive -= h)
@@ -139,7 +139,7 @@ namespace PlcInterface.OpcUa
                         break;
 
                     default:
-                        logger.LogError(ex, "Unproccesed error {0}", StatusCodes.GetBrowseName(ex.Result.StatusCode.Code));
+                        logger.LogError(ex, "Unproccesed error {BrowseName}", StatusCodes.GetBrowseName(ex.Result.StatusCode.Code));
                         break;
                 }
             }
@@ -213,7 +213,7 @@ namespace PlcInterface.OpcUa
         {
             var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
 
-            logger.LogDebug("Creating new application certificate for: {0}", applicationConfiguration.ApplicationName);
+            logger.LogDebug("Creating new application certificate for: {ApplicationName}", applicationConfiguration.ApplicationName);
 
             using var certificate = CertificateFactory.CreateCertificate(applicationConfiguration.ApplicationUri, applicationConfiguration.ApplicationName, applicationCertificate.SubjectName, null)
                  .SetNotBefore(DateTime.UtcNow - TimeSpan.FromDays(1))
@@ -230,7 +230,7 @@ namespace PlcInterface.OpcUa
             if (!string.IsNullOrEmpty(settings.UserName)
                 && tokenType != null)
             {
-                logger.LogDebug("Logging in with user: {0}", settings.UserName);
+                logger.LogDebug("Logging in with user: {UserName}", settings.UserName);
                 return new UserIdentity(settings.UserName, settings.Password);
             }
 
@@ -240,7 +240,7 @@ namespace PlcInterface.OpcUa
         private void KeepAliveSubscription(EventPattern<Session, KeepAliveEventArgs> x)
         {
             connectionState.OnNext(Connected.No<Session>());
-            logger.LogError("{0}, Reconnecting to {1}", x.EventArgs.Status, x.Sender?.ConfiguredEndpoint);
+            logger.LogError("{Status}, Reconnecting to {Endpoint}", x.EventArgs.Status, x.Sender?.ConfiguredEndpoint);
             var sessionReconnectHandler = new SessionReconnectHandler();
             sessionReconnectHandler.BeginReconnect(x.Sender, (int)reconnectDelay.TotalMilliseconds, (s, e) =>
             {
@@ -251,7 +251,7 @@ namespace PlcInterface.OpcUa
                 }
 
                 var sender = s as SessionReconnectHandler;
-                logger.LogInformation("Connected to {0}", sender?.Session.ConfiguredEndpoint);
+                logger.LogInformation("Connected to {Endpoint}", sender?.Session.ConfiguredEndpoint);
                 connectionState.OnNext(Connected.Yes(sessionReconnectHandler.Session));
                 sessionReconnectHandler.Dispose();
             });
@@ -272,12 +272,12 @@ namespace PlcInterface.OpcUa
 
                 if (applicationConfiguration.SecurityConfiguration.AutoAcceptUntrustedCertificates)
                 {
-                    logger.LogDebug("Accepted Certificate: {0} (errorcode: {1})", certificate.Subject, StatusCodes.GetBrowseName(eventArgs.Error.Code));
+                    logger.LogDebug("Accepted Certificate: {CertificateSubject} (errorcode: {BrowseName})", certificate.Subject, StatusCodes.GetBrowseName(eventArgs.Error.Code));
                     eventArgs.Accept = true;
                     return;
                 }
 
-                logger.LogDebug("Rejected Certificate: {0} (errorcode: {1})", certificate.Subject, StatusCodes.GetBrowseName(eventArgs.Error.Code));
+                logger.LogDebug("Rejected Certificate: {CertificateSubject} (errorcode: {BrowseName})", certificate.Subject, StatusCodes.GetBrowseName(eventArgs.Error.Code));
             }));
         }
 

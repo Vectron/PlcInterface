@@ -167,7 +167,7 @@ namespace PlcInterface.OpcUa
                 return;
             }
 
-            logger.LogDebug($"Registered {name} for monitoring");
+            logger.LogDebug("Registered {Name} for monitoring", name);
             registeredSymbol = RegisteredSymbol.Create(name, updateInterval, symbolStream, typeConverter);
             registeredSymbols.Add(name, registeredSymbol);
             subscription.AddItem(registeredSymbol.MonitoredItem);
@@ -186,7 +186,7 @@ namespace PlcInterface.OpcUa
                 return;
             }
 
-            logger.LogDebug($"Unregistered {name} from monitoring");
+            logger.LogDebug("Unregistered {Name} from monitoring", name);
             registeredSymbol.Subscriptions--;
 
             if (registeredSymbol.Subscriptions == 0)
@@ -194,7 +194,7 @@ namespace PlcInterface.OpcUa
                 subscription.RemoveItem(registeredSymbol.MonitoredItem);
                 _ = registeredSymbols.Remove(name);
                 registeredSymbol.Dispose();
-                logger.LogDebug($"Removed {name} from monitoring");
+                logger.LogDebug("Removed {Name} from monitoring", name);
             }
         }
 

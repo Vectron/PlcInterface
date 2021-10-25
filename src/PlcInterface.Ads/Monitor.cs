@@ -79,7 +79,7 @@ namespace PlcInterface.Ads
             disposableMonitorItem = DisposableMonitorItem.Create(ioName);
             disposableMonitorItem.Update(symbolHandler, symbolStream, typeConverter);
             streams.Add(ioName, disposableMonitorItem);
-            logger.LogDebug("Registered IO {ioName} with {updateInterval}", ioName, updateInterval);
+            logger.LogDebug("Registered IO {IOName} with {UpdateInterval}", ioName, updateInterval);
         }
 
         /// <inheritdoc/>
@@ -96,20 +96,20 @@ namespace PlcInterface.Ads
         {
             if (!streams.TryGetValue(ioName, out var disposableMonitorItem))
             {
-                logger.LogDebug("{ioName} was not registered.", ioName);
+                logger.LogDebug("{IOName} was not registered.", ioName);
                 return;
             }
 
             disposableMonitorItem.Subscriptions -= 1;
             if (disposableMonitorItem.Subscriptions != 0)
             {
-                logger.LogDebug("{ioName} has {subscriptions} subscriptions left.", ioName, disposableMonitorItem.Subscriptions);
+                logger.LogDebug("{IOName} has {Subscriptions} subscriptions left.", ioName, disposableMonitorItem.Subscriptions);
                 return;
             }
 
             _ = streams.Remove(ioName);
             disposableMonitorItem.Dispose();
-            logger.LogDebug("{ioName} subscription remove.", ioName);
+            logger.LogDebug("{IOName} subscription remove.", ioName);
         }
 
         /// <summary>

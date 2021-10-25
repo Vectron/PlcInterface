@@ -83,7 +83,7 @@ namespace PlcInterface.Sandbox.Interactive
         {
             while (text.EndsWith(Environment.NewLine, StringComparison.OrdinalIgnoreCase))
             {
-                text = text.Substring(0, text.Length - Environment.NewLine.Length);
+                text = text[..^Environment.NewLine.Length];
             }
 
             return text;

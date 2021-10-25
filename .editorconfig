@@ -1,4 +1,4 @@
-﻿# Version: 3.0.0 (Using https://semver.org/)
+﻿# Version: 4.0.0 (Using https://semver.org/)
 # Updated: 2021-08-09
 # See https://github.com/RehanSaeed/EditorConfig/releases for release notes.
 # See https://github.com/RehanSaeed/EditorConfig for updates to this file.
@@ -170,6 +170,8 @@ dotnet_diagnostic.IDE0063.severity = warning
 csharp_using_directive_placement=outside_namespace:warning
 # Modifier preferences
 csharp_prefer_static_local_function = true:warning
+# Undocumented
+csharp_style_namespace_declarations = file_scoped:warning
 
 ##########################################
 # Unnecessary Code Rules
@@ -573,3 +575,4 @@ dotnet_diagnostic.MA0101.severity = warning     # MA0101: String contains an imp
 dotnet_diagnostic.MA0102.severity = warning    # MA0102: Make member readonly
 dotnet_diagnostic.MA0103.severity = warning    # MA0103: Use SequenceEqual instead of equality operator
 dotnet_diagnostic.IDE0130.severity=silent
+dotnet_diagnostic.CA1848.severity = silent

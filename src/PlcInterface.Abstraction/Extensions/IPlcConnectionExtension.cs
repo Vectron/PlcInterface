@@ -4,7 +4,10 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using PlcInterface.Extensions;
 
+#pragma warning disable IDE0130 // Namespace does not match folder structure
+
 namespace PlcInterface;
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 
 /// <summary>
 /// Extension methods for <see cref="IPlcConnection{T}"/>.

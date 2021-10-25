@@ -1,6 +1,4 @@
-﻿using PlcInterface.Ads;
-
-namespace PlcInterface;
+﻿namespace PlcInterface.Ads.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="ISymbolInfo"/>.

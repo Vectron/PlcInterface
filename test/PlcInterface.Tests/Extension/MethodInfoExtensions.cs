@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Runtime.ExceptionServices;
 
-namespace System.Reflection;
+namespace PlcInterface.Tests.Extension;
 
 internal static class MethodInfoExtensions
 {

@@ -2,6 +2,7 @@
 using System.Reactive.Subjects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using PlcInterface.Extensions;
 
 namespace PlcInterface.Abstraction.Tests;
 

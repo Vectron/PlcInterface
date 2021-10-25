@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PlcInterface.Tests.Extension;
 
 namespace PlcInterface.Tests;
 

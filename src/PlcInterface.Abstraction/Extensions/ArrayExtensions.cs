@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-namespace System;
+namespace PlcInterface.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="Array"/>.
@@ -18,7 +19,7 @@ public static class ArrayExtensions
         var indices = new int[array.Rank];
         indices[indices.Length - 1]--;
 
-        while (IncrementIndices(array, ref indices))
+        while (array.IncrementIndices(ref indices))
         {
             yield return indices;
         }

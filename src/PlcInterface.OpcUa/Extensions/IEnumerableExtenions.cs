@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 // Chunk method will be implemented in net6
-namespace System.Linq;
+namespace PlcInterface.OpcUa.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="IEnumerable{T}"/>.

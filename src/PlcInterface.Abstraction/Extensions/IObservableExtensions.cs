@@ -1,6 +1,7 @@
-﻿using System.Reactive.Linq;
+﻿using System;
+using System.Reactive.Linq;
 
-namespace System;
+namespace PlcInterface.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="IObservable{T}"/>.

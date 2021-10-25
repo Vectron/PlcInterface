@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PlcInterface.OpcUa;
 using PlcInterface.Tests;
 using TestUtilities;
 
-namespace PlcInterface.OpcUa.Tests;
+namespace PlcInterface.Opc.IntegrationTests;
 
 [TestClass]
 public class SymbolHandlerTest : ISymbolHandlerTestBase

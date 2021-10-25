@@ -4,9 +4,9 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using PlcInterface.Ads.Extensions;
 using PlcInterface.Ads.TwincatAbstractions;
 using PlcInterface.Extensions;
-using TwinCAT.TypeSystem;
 
 namespace PlcInterface.Ads;
 

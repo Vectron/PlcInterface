@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using PlcInterface.Extensions;
 using TwinCAT.Ads.TypeSystem;
 using TwinCAT.TypeSystem;
 
-namespace System.Dynamic;
+namespace PlcInterface.Ads.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="DynamicObject"/>.
@@ -81,7 +84,7 @@ internal static class DynamicObjectExtensions
                     continue;
                 }
 
-                var cleaned = CleanDynamic(dynamicObject);
+                var cleaned = dynamicObject.CleanDynamic();
                 destination.SetValue(cleaned, indices);
             }
 
@@ -108,7 +111,7 @@ internal static class DynamicObjectExtensions
 
             expando[name] = childValue switch
             {
-                DynamicObject dynamicObject => CleanDynamic(dynamicObject),
+                DynamicObject dynamicObject => dynamicObject.CleanDynamic(),
                 TwinCAT.PlcOpen.DateBase dateBase => dateBase.Value,
                 TwinCAT.PlcOpen.TimeBase timeBase => timeBase.Time,
                 TwinCAT.PlcOpen.LTimeBase lTimeBase => lTimeBase.Time,

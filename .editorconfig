@@ -574,5 +574,4 @@ dotnet_diagnostic.MA0100.severity = warning    # MA0100: Await task before dispo
 dotnet_diagnostic.MA0101.severity = warning     # MA0101: String contains an implicit end of line character
 dotnet_diagnostic.MA0102.severity = warning    # MA0102: Make member readonly
 dotnet_diagnostic.MA0103.severity = warning    # MA0103: Use SequenceEqual instead of equality operator
-dotnet_diagnostic.IDE0130.severity=silent
 dotnet_diagnostic.CA1848.severity = silent

@@ -1,6 +1,6 @@
-﻿using PlcInterface.Ads;
+﻿using TwinCAT.TypeSystem;
 
-namespace TwinCAT.TypeSystem;
+namespace PlcInterface.Ads.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="IValueSymbol"/>.
@@ -17,7 +17,7 @@ internal static class IValueSymbolExtensions
     {
         if (symbolInfo is not IValueSymbol symbol)
         {
-            throw new PlcInterface.SymbolException($"Symbol is not a {typeof(IValueSymbol)}");
+            throw new SymbolException($"Symbol is not a {typeof(IValueSymbol)}");
         }
 
         return symbol;

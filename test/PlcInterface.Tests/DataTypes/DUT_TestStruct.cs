@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
+using PlcInterface.Tests.Extension;
 
 namespace PlcInterface.Tests.DataTypes;
 

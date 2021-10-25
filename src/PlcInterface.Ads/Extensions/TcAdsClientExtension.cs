@@ -1,6 +1,7 @@
 ﻿using System;
+using TwinCAT.Ads;
 
-namespace TwinCAT.Ads;
+namespace PlcInterface.Ads.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="AdsClient"/>.

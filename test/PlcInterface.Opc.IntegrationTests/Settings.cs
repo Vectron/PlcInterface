@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PlcInterface.OpcUa.Tests;
+namespace PlcInterface.Opc.IntegrationTests;
 
 internal static class Settings
 {

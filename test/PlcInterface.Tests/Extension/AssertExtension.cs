@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.Tests.DataTypes;
 
-namespace PlcInterface.Tests;
+namespace PlcInterface.Tests.Extension;
 
 internal static class AssertExtension
 {

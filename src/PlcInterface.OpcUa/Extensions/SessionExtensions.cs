@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PlcInterface.OpcUa;
+using Opc.Ua;
+using Opc.Ua.Client;
 
-namespace Opc.Ua.Client;
+namespace PlcInterface.OpcUa.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="Session"/>.

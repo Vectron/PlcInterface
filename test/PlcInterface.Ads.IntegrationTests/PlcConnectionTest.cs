@@ -5,7 +5,7 @@ using PlcInterface.Tests;
 using TestUtilities;
 using TwinCAT.Ads;
 
-namespace PlcInterface.Ads.Tests;
+namespace PlcInterface.Ads.IntegrationTests;
 
 [TestClass]
 public class PlcConnectionTest : IPlcConnectionTestBase

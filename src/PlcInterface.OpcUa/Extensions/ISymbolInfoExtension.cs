@@ -1,6 +1,4 @@
-﻿using PlcInterface.OpcUa;
-
-namespace PlcInterface;
+﻿namespace PlcInterface.OpcUa.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="ISymbolInfo"/>.

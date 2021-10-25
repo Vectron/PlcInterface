@@ -8,41 +8,40 @@ using PlcInterface.Tests;
 using TestUtilities;
 using TwinCAT.Ads;
 
-namespace PlcInterface.Ads.Tests
+namespace PlcInterface.Ads.Tests;
+
+[TestClass]
+public class ReadValueTest : IReadValueTestBase
 {
-    [TestClass]
-    public class ReadValueTest : IReadValueTestBase
+    private static AdsClient? adsClient;
+    private static PlcConnection? connection;
+    private static ReadWrite? readWrite;
+    private static SymbolHandler? symbolHandler;
+
+    [ClassInitialize]
+    public static async Task ConnectAsync(TestContext testContext)
     {
-        private static AdsClient? adsClient;
-        private static PlcConnection? connection;
-        private static ReadWrite? readWrite;
-        private static SymbolHandler? symbolHandler;
+        var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
+        var symbolhandlersettings = new SymbolHandlerSettings() { StoreSymbolsToDisk = false };
+        var typeConverter = new AdsTypeConverter();
+        adsClient = new AdsClient();
 
-        [ClassInitialize]
-        public static async Task ConnectAsync(TestContext testContext)
-        {
-            var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
-            var symbolhandlersettings = new SymbolHandlerSettings() { StoreSymbolsToDisk = false };
-            var typeConverter = new AdsTypeConverter();
-            adsClient = new AdsClient();
-
-            connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
-            symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolhandlersettings), MockHelpers.GetLoggerMock<SymbolHandler>(), Mock.Of<IFileSystem>(), new SymbolLoaderFactoryAbstraction());
-            var sumSymbolFactory = new SumSymbolFactory();
-            readWrite = new ReadWrite(connection, symbolHandler, typeConverter, sumSymbolFactory);
-            await connection.ConnectAsync();
-            _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
-        }
-
-        [ClassCleanup]
-        public static void Disconnect()
-        {
-            connection!.Dispose();
-            adsClient!.Dispose();
-            symbolHandler!.Dispose();
-        }
-
-        protected override IReadWrite GetReadWrite()
-            => readWrite!;
+        connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
+        symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolhandlersettings), MockHelpers.GetLoggerMock<SymbolHandler>(), Mock.Of<IFileSystem>(), new SymbolLoaderFactoryAbstraction());
+        var sumSymbolFactory = new SumSymbolFactory();
+        readWrite = new ReadWrite(connection, symbolHandler, typeConverter, sumSymbolFactory);
+        await connection.ConnectAsync();
+        _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
     }
+
+    [ClassCleanup]
+    public static void Disconnect()
+    {
+        connection!.Dispose();
+        adsClient!.Dispose();
+        symbolHandler!.Dispose();
+    }
+
+    protected override IReadWrite GetReadWrite()
+        => readWrite!;
 }

@@ -3,38 +3,37 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using PlcInterface.Sandbox.Interactive;
 
-namespace PlcInterface.Sandbox.Commands
+namespace PlcInterface.Sandbox.Commands;
+
+/// <summary>
+/// A <see cref="IApplicationCommand" /> that prints a help text.
+/// </summary>
+internal sealed class HelpCommand : CommandBase
 {
+    private const string CommandName = "help";
+    private readonly IServiceProvider serviceProvider;
+
     /// <summary>
-    /// A <see cref="IApplicationCommand" /> that prints a help text.
+    /// Initializes a new instance of the <see cref="HelpCommand" /> class.
     /// </summary>
-    internal sealed class HelpCommand : CommandBase
+    /// <param name="serviceProvider">A <see cref="IServiceProvider" /> implementation.</param>
+    public HelpCommand(IServiceProvider serviceProvider)
+        : base(CommandName)
     {
-        private const string CommandName = "help";
-        private readonly IServiceProvider serviceProvider;
+        HelpTekst = CommandName + ": prints this information";
+        this.serviceProvider = serviceProvider;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HelpCommand" /> class.
-        /// </summary>
-        /// <param name="serviceProvider">A <see cref="IServiceProvider" /> implementation.</param>
-        public HelpCommand(IServiceProvider serviceProvider)
-            : base(CommandName)
+    /// <inheritdoc />
+    public override Response Execute(string[] parameters)
+    {
+        var builder = new StringBuilder();
+        var consoleCommands = serviceProvider.GetServices<IApplicationCommand>();
+        foreach (var comm in consoleCommands)
         {
-            HelpTekst = CommandName + ": prints this information";
-            this.serviceProvider = serviceProvider;
+            _ = builder.AppendLine(comm.HelpTekst);
         }
 
-        /// <inheritdoc />
-        public override Response Execute(string[] parameters)
-        {
-            var builder = new StringBuilder();
-            var consoleCommands = serviceProvider.GetServices<IApplicationCommand>();
-            foreach (var comm in consoleCommands)
-            {
-                _ = builder.AppendLine(comm.HelpTekst);
-            }
-
-            return new Response(builder.ToString());
-        }
+        return new Response(builder.ToString());
     }
 }

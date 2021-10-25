@@ -1,9 +1,8 @@
-﻿namespace PlcInterface.OpcUa
+﻿namespace PlcInterface.OpcUa;
+
+/// <summary>
+/// The Ads implementation of a <see cref="IReadWrite"/>.
+/// </summary>
+public interface IOpcReadWrite : IReadWrite
 {
-    /// <summary>
-    /// The Ads implementation of a <see cref="IReadWrite"/>.
-    /// </summary>
-    public interface IOpcReadWrite : IReadWrite
-    {
-    }
 }

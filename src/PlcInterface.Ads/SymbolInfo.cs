@@ -3,53 +3,52 @@ using System.Diagnostics;
 using System.Linq;
 using TwinCAT.TypeSystem;
 
-namespace PlcInterface.Ads
+namespace PlcInterface.Ads;
+
+/// <summary>
+/// Stores data about a PLC symbol.
+/// </summary>
+[DebuggerDisplay("{Name}")]
+internal sealed class SymbolInfo : IAdsSymbolInfo
 {
     /// <summary>
-    /// Stores data about a PLC symbol.
+    /// Initializes a new instance of the <see cref="SymbolInfo"/> class.
     /// </summary>
-    [DebuggerDisplay("{Name}")]
-    internal sealed class SymbolInfo : IAdsSymbolInfo
+    /// <param name="symbol">The plc symbol.</param>
+    public SymbolInfo(ISymbol symbol)
+        => Symbol = symbol;
+
+    /// <inheritdoc/>
+    public IList<string> ChildSymbols
+        => Symbol.SubSymbols.Select(x => x.InstancePath).ToList();
+
+    /// <inheritdoc/>
+    public string Comment
+        => Symbol.Comment;
+
+    /// <inheritdoc/>
+    public bool IsArray
+        => Symbol.DataType?.Category == DataTypeCategory.Array;
+
+    /// <inheritdoc/>
+    public bool IsBigType
+        => Symbol.DataType?.Category == DataTypeCategory.Struct;
+
+    /// <inheritdoc/>
+    public string Name
+        => Symbol.InstancePath;
+
+    /// <inheritdoc/>
+    public string NameLower
+        => Name.ToLower(System.Globalization.CultureInfo.InvariantCulture);
+
+    /// <inheritdoc/>
+    public string ShortName
+        => Symbol.InstanceName;
+
+    /// <inheritdoc/>
+    public ISymbol Symbol
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SymbolInfo"/> class.
-        /// </summary>
-        /// <param name="symbol">The plc symbol.</param>
-        public SymbolInfo(ISymbol symbol)
-            => Symbol = symbol;
-
-        /// <inheritdoc/>
-        public IList<string> ChildSymbols
-            => Symbol.SubSymbols.Select(x => x.InstancePath).ToList();
-
-        /// <inheritdoc/>
-        public string Comment
-            => Symbol.Comment;
-
-        /// <inheritdoc/>
-        public bool IsArray
-            => Symbol.DataType?.Category == DataTypeCategory.Array;
-
-        /// <inheritdoc/>
-        public bool IsBigType
-            => Symbol.DataType?.Category == DataTypeCategory.Struct;
-
-        /// <inheritdoc/>
-        public string Name
-            => Symbol.InstancePath;
-
-        /// <inheritdoc/>
-        public string NameLower
-            => Name.ToLower(System.Globalization.CultureInfo.InvariantCulture);
-
-        /// <inheritdoc/>
-        public string ShortName
-            => Symbol.InstanceName;
-
-        /// <inheritdoc/>
-        public ISymbol Symbol
-        {
-            get;
-        }
+        get;
     }
 }

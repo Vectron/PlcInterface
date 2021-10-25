@@ -1,9 +1,8 @@
-﻿namespace PlcInterface.Tests.DataTypes
+﻿namespace PlcInterface.Tests.DataTypes;
+
+internal enum TestEnum
 {
-    internal enum TestEnum
-    {
-        First = 0,
-        Second = 1,
-        Third = 2,
-    }
+    First = 0,
+    Second = 1,
+    Third = 2,
 }

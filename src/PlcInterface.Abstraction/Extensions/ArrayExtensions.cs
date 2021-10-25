@@ -1,52 +1,51 @@
 ﻿using System.Collections.Generic;
 
-namespace System
+namespace System;
+
+/// <summary>
+/// Extension methods for <see cref="Array"/>.
+/// </summary>
+public static class ArrayExtensions
 {
     /// <summary>
-    /// Extension methods for <see cref="Array"/>.
+    /// Itterate over all array indices.
     /// </summary>
-    public static class ArrayExtensions
+    /// <remarks>only one array will be made and updated every itteration.</remarks>
+    /// <param name="array">The <see cref="Array"/> to get indices from.</param>
+    /// <returns>A <see cref="IEnumerable{T}"/> with the array indeces.</returns>
+    public static IEnumerable<int[]> Indices(this Array array)
     {
-        /// <summary>
-        /// Itterate over all array indices.
-        /// </summary>
-        /// <remarks>only one array will be made and updated every itteration.</remarks>
-        /// <param name="array">The <see cref="Array"/> to get indices from.</param>
-        /// <returns>A <see cref="IEnumerable{T}"/> with the array indeces.</returns>
-        public static IEnumerable<int[]> Indices(this Array array)
-        {
-            var indices = new int[array.Rank];
-            indices[indices.Length - 1]--;
+        var indices = new int[array.Rank];
+        indices[indices.Length - 1]--;
 
-            while (IncrementIndices(array, ref indices))
+        while (IncrementIndices(array, ref indices))
+        {
+            yield return indices;
+        }
+    }
+
+    /// <summary>
+    /// A helper function for incrementing indices of a multi demensional <see cref="Array"/>.
+    /// </summary>
+    /// <param name="array">The array being itterated.</param>
+    /// <param name="indices">The indices array that has to be incremented.</param>
+    /// <returns><see langword="true"/> if the new indices is vallid, else <see langword="false"/>.</returns>
+    private static bool IncrementIndices(this Array array, ref int[] indices)
+    {
+        for (var i = array.Rank - 1; i >= 0; i--)
+        {
+            indices[i]++;
+            if (indices[i] <= array.GetUpperBound(i))
             {
-                yield return indices;
+                return true;
+            }
+
+            if (i != 0)
+            {
+                indices[i] = 0;
             }
         }
 
-        /// <summary>
-        /// A helper function for incrementing indices of a multi demensional <see cref="Array"/>.
-        /// </summary>
-        /// <param name="array">The array being itterated.</param>
-        /// <param name="indices">The indices array that has to be incremented.</param>
-        /// <returns><see langword="true"/> if the new indices is vallid, else <see langword="false"/>.</returns>
-        private static bool IncrementIndices(this Array array, ref int[] indices)
-        {
-            for (var i = array.Rank - 1; i >= 0; i--)
-            {
-                indices[i]++;
-                if (indices[i] <= array.GetUpperBound(i))
-                {
-                    return true;
-                }
-
-                if (i != 0)
-                {
-                    indices[i] = 0;
-                }
-            }
-
-            return false;
-        }
+        return false;
     }
 }

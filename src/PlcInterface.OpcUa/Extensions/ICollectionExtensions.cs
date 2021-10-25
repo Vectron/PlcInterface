@@ -2,40 +2,39 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace PlcInterface.OpcUa.Extensions
+namespace PlcInterface.OpcUa.Extensions;
+
+/// <summary>
+/// Extension methods for <see cref="ICollection{T}"/>.
+/// </summary>
+internal static class ICollectionExtensions
 {
     /// <summary>
-    /// Extension methods for <see cref="ICollection{T}"/>.
+    /// Convert a <see cref="ICollection{T}"/> in a <see cref="IReadOnlyCollection{T}"/>.
     /// </summary>
-    internal static class ICollectionExtensions
+    /// <typeparam name="T">The type of the elements in this collection.</typeparam>
+    /// <param name="source">The source <see cref="ICollection{T}"/>.</param>
+    /// <returns>A <see cref="IReadOnlyCollection{T}"/>.</returns>
+    public static IReadOnlyCollection<T> AsReadOnly<T>(this ICollection<T> source)
     {
-        /// <summary>
-        /// Convert a <see cref="ICollection{T}"/> in a <see cref="IReadOnlyCollection{T}"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of the elements in this collection.</typeparam>
-        /// <param name="source">The source <see cref="ICollection{T}"/>.</param>
-        /// <returns>A <see cref="IReadOnlyCollection{T}"/>.</returns>
-        public static IReadOnlyCollection<T> AsReadOnly<T>(this ICollection<T> source)
+        if (source == null)
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            return source as IReadOnlyCollection<T> ?? new ReadOnlyCollectionAdapter<T>(source);
+            throw new ArgumentNullException(nameof(source));
         }
 
-        private sealed class ReadOnlyCollectionAdapter<T> : IReadOnlyCollection<T>
-        {
-            private readonly ICollection<T> source;
+        return source as IReadOnlyCollection<T> ?? new ReadOnlyCollectionAdapter<T>(source);
+    }
 
-            public ReadOnlyCollectionAdapter(ICollection<T> source) => this.source = source;
+    private sealed class ReadOnlyCollectionAdapter<T> : IReadOnlyCollection<T>
+    {
+        private readonly ICollection<T> source;
 
-            public int Count => source.Count;
+        public ReadOnlyCollectionAdapter(ICollection<T> source) => this.source = source;
 
-            public IEnumerator<T> GetEnumerator() => source.GetEnumerator();
+        public int Count => source.Count;
 
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        }
+        public IEnumerator<T> GetEnumerator() => source.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

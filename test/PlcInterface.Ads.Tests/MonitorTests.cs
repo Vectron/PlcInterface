@@ -7,217 +7,216 @@ using TwinCAT;
 using TwinCAT.Ads;
 using TwinCAT.TypeSystem;
 
-namespace PlcInterface.Ads.Tests
+namespace PlcInterface.Ads.Tests;
+
+[TestClass]
+public class MonitorTests
 {
-    [TestClass]
-    public class MonitorTests
+    [TestMethod]
+    public void AllTagsAreRegisteredWhenPlcConnects()
     {
-        [TestMethod]
-        public void AllTagsAreRegisteredWhenPlcConnects()
-        {
-            // Arrange
-            var ioTags = new[] { "TestVar1", "TestVar2", "TestVar3", "TestVar1" };
-            var connectionMock = new Mock<IAdsPlcConnection>();
-            using var session = new Subject<IConnected<IAdsConnection>>();
-            _ = connectionMock.SetupGet(x => x.SessionStream).Returns(session);
-            var twincatConnectionMock = new Mock<IConnection>();
-            var valueSymbolMock = new Mock<IValueSymbol>();
-            _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
-            var symbolInfoMock = new Mock<IAdsSymbolInfo>();
-            _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
-            var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-            _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfoMock.Object);
-            var typeConverterMock = new Mock<IAdsTypeConverter>();
-            using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
-            var connectedMock = new Mock<IConnected<IAdsConnection>>();
-            _ = connectedMock.Setup(x => x.IsConnected).Returns(true);
+        // Arrange
+        var ioTags = new[] { "TestVar1", "TestVar2", "TestVar3", "TestVar1" };
+        var connectionMock = new Mock<IAdsPlcConnection>();
+        using var session = new Subject<IConnected<IAdsConnection>>();
+        _ = connectionMock.SetupGet(x => x.SessionStream).Returns(session);
+        var twincatConnectionMock = new Mock<IConnection>();
+        var valueSymbolMock = new Mock<IValueSymbol>();
+        _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
+        var symbolInfoMock = new Mock<IAdsSymbolInfo>();
+        _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
+        var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
+        _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfoMock.Object);
+        var typeConverterMock = new Mock<IAdsTypeConverter>();
+        using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
+        var connectedMock = new Mock<IConnected<IAdsConnection>>();
+        _ = connectedMock.Setup(x => x.IsConnected).Returns(true);
 
-            // Act
-            monitor.RegisterIO(ioTags);
-            valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Never);
-            _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
-            session.OnNext(connectedMock.Object);
+        // Act
+        monitor.RegisterIO(ioTags);
+        valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Never);
+        _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        session.OnNext(connectedMock.Object);
 
-            // Assert
-            valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Exactly(3));
-        }
+        // Assert
+        valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Exactly(3));
+    }
 
-        [TestMethod]
-        public void MultipleIOCanBeRegisteredAtOnce()
-        {
-            // Arrange
-            var ioTags = new[] { "TestVar1", "TestVar2", "TestVar3", "TestVar1" };
-            var connectionMock = new Mock<IAdsPlcConnection>();
-            _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
-            var twincatConnectionMock = new Mock<IConnection>();
-            _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
-            var valueSymbolMock = new Mock<IValueSymbol>();
-            _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
-            var symbolInfoMock = new Mock<IAdsSymbolInfo>();
-            _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
-            var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-            _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfoMock.Object);
-            var typeConverterMock = new Mock<IAdsTypeConverter>();
-            using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
+    [TestMethod]
+    public void MultipleIOCanBeRegisteredAtOnce()
+    {
+        // Arrange
+        var ioTags = new[] { "TestVar1", "TestVar2", "TestVar3", "TestVar1" };
+        var connectionMock = new Mock<IAdsPlcConnection>();
+        _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
+        var twincatConnectionMock = new Mock<IConnection>();
+        _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        var valueSymbolMock = new Mock<IValueSymbol>();
+        _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
+        var symbolInfoMock = new Mock<IAdsSymbolInfo>();
+        _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
+        var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
+        _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfoMock.Object);
+        var typeConverterMock = new Mock<IAdsTypeConverter>();
+        using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
 
-            // Act
-            monitor.RegisterIO(ioTags);
+        // Act
+        monitor.RegisterIO(ioTags);
 
-            // Assert
-            valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Exactly(3));
-        }
+        // Assert
+        valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Exactly(3));
+    }
 
-        [TestMethod]
-        public void MultipleIOCanBeUnregisteredAtOnce()
-        {
-            // Arrange
-            var ioTags = new[] { "TestVar1", "TestVar2", "TestVar3", "TestVar1" };
-            var connectionMock = new Mock<IAdsPlcConnection>();
-            _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
-            var twincatConnectionMock = new Mock<IConnection>();
-            _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
-            var valueSymbolMock = new Mock<IValueSymbol>();
-            _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
-            var symbolInfoMock = new Mock<IAdsSymbolInfo>();
-            _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
-            var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-            _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfoMock.Object);
-            var typeConverterMock = new Mock<IAdsTypeConverter>();
-            using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
+    [TestMethod]
+    public void MultipleIOCanBeUnregisteredAtOnce()
+    {
+        // Arrange
+        var ioTags = new[] { "TestVar1", "TestVar2", "TestVar3", "TestVar1" };
+        var connectionMock = new Mock<IAdsPlcConnection>();
+        _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
+        var twincatConnectionMock = new Mock<IConnection>();
+        _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        var valueSymbolMock = new Mock<IValueSymbol>();
+        _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
+        var symbolInfoMock = new Mock<IAdsSymbolInfo>();
+        _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
+        var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
+        _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfoMock.Object);
+        var typeConverterMock = new Mock<IAdsTypeConverter>();
+        using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
 
-            // Act
-            monitor.UnregisterIO(ioTags);
+        // Act
+        monitor.UnregisterIO(ioTags);
 
-            // Assert
-            valueSymbolMock.VerifyRemove(x => x.ValueChanged -= It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Never);
-        }
+        // Assert
+        valueSymbolMock.VerifyRemove(x => x.ValueChanged -= It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Never);
+    }
 
-        [TestMethod]
-        public void RegisterSubscribesToValueUpdateEventsOnlyOnce()
-        {
-            // Arrange
-            var ioTag = "TestVar";
-            var connectionMock = new Mock<IAdsPlcConnection>();
-            _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
-            var twincatConnectionMock = new Mock<IConnection>();
-            _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
-            var valueSymbolMock = new Mock<IValueSymbol>();
-            _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
-            var symbolInfoMock = new Mock<IAdsSymbolInfo>();
-            _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
-            var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-            _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.Is<string>(x => x.Equals(ioTag, StringComparison.Ordinal)))).Returns(symbolInfoMock.Object);
-            var typeConverterMock = new Mock<IAdsTypeConverter>();
-            using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
+    [TestMethod]
+    public void RegisterSubscribesToValueUpdateEventsOnlyOnce()
+    {
+        // Arrange
+        var ioTag = "TestVar";
+        var connectionMock = new Mock<IAdsPlcConnection>();
+        _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
+        var twincatConnectionMock = new Mock<IConnection>();
+        _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        var valueSymbolMock = new Mock<IValueSymbol>();
+        _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
+        var symbolInfoMock = new Mock<IAdsSymbolInfo>();
+        _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
+        var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
+        _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.Is<string>(x => x.Equals(ioTag, StringComparison.Ordinal)))).Returns(symbolInfoMock.Object);
+        var typeConverterMock = new Mock<IAdsTypeConverter>();
+        using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
 
-            // Act
-            monitor.RegisterIO(ioTag);
-            monitor.RegisterIO(ioTag);
+        // Act
+        monitor.RegisterIO(ioTag);
+        monitor.RegisterIO(ioTag);
 
-            // Assert
-            valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Once);
-        }
+        // Assert
+        valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Once);
+    }
 
-        [TestMethod]
-        public void TypeconverterPropertyContainsPassedInTypeconverter()
-        {
-            // Arrange
-            var connectionMock = new Mock<IAdsPlcConnection>();
-            _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
-            var symbolHandler = new Mock<IAdsSymbolHandler>();
-            var typeConverterMock = new Mock<IAdsTypeConverter>();
-            using var monitor = new Monitor(connectionMock.Object, symbolHandler.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
+    [TestMethod]
+    public void TypeconverterPropertyContainsPassedInTypeconverter()
+    {
+        // Arrange
+        var connectionMock = new Mock<IAdsPlcConnection>();
+        _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
+        var symbolHandler = new Mock<IAdsSymbolHandler>();
+        var typeConverterMock = new Mock<IAdsTypeConverter>();
+        using var monitor = new Monitor(connectionMock.Object, symbolHandler.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
 
-            // Act
-            // Assert
-            Assert.AreSame(typeConverterMock.Object, monitor.TypeConverter);
-        }
+        // Act
+        // Assert
+        Assert.AreSame(typeConverterMock.Object, monitor.TypeConverter);
+    }
 
-        [TestMethod]
-        public void UnregisterANotRegisteredTagDoesntDoAnything()
-        {
-            // Arrange
-            var ioTag = "TestVar";
-            var connectionMock = new Mock<IAdsPlcConnection>();
-            _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
-            var twincatConnectionMock = new Mock<IConnection>();
-            _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
-            var valueSymbolMock = new Mock<IValueSymbol>();
-            _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
-            var symbolInfoMock = new Mock<IAdsSymbolInfo>();
-            _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
-            var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-            _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.Is<string>(x => x.Equals(ioTag, StringComparison.Ordinal)))).Returns(symbolInfoMock.Object);
-            var typeConverterMock = new Mock<IAdsTypeConverter>();
-            using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
+    [TestMethod]
+    public void UnregisterANotRegisteredTagDoesntDoAnything()
+    {
+        // Arrange
+        var ioTag = "TestVar";
+        var connectionMock = new Mock<IAdsPlcConnection>();
+        _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
+        var twincatConnectionMock = new Mock<IConnection>();
+        _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        var valueSymbolMock = new Mock<IValueSymbol>();
+        _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
+        var symbolInfoMock = new Mock<IAdsSymbolInfo>();
+        _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
+        var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
+        _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.Is<string>(x => x.Equals(ioTag, StringComparison.Ordinal)))).Returns(symbolInfoMock.Object);
+        var typeConverterMock = new Mock<IAdsTypeConverter>();
+        using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
 
-            // Act
-            monitor.UnregisterIO(ioTag);
+        // Act
+        monitor.UnregisterIO(ioTag);
 
-            // Assert
-            valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Never);
-            valueSymbolMock.VerifyRemove(x => x.ValueChanged -= It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Never);
-        }
+        // Assert
+        valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Never);
+        valueSymbolMock.VerifyRemove(x => x.ValueChanged -= It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Never);
+    }
 
-        [TestMethod]
-        public void UnregisterDoesntUnregisterEventUntillAllRegistrationsAreUnregistered()
-        {
-            // Arrange
-            var ioTag = "TestVar";
-            var connectionMock = new Mock<IAdsPlcConnection>();
-            _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
-            var twincatConnectionMock = new Mock<IConnection>();
-            _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
-            var valueSymbolMock = new Mock<IValueSymbol>();
-            _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
-            var symbolInfoMock = new Mock<IAdsSymbolInfo>();
-            _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
-            var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-            _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.Is<string>(x => x.Equals(ioTag, StringComparison.Ordinal)))).Returns(symbolInfoMock.Object);
-            var typeConverterMock = new Mock<IAdsTypeConverter>();
-            using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
+    [TestMethod]
+    public void UnregisterDoesntUnregisterEventUntillAllRegistrationsAreUnregistered()
+    {
+        // Arrange
+        var ioTag = "TestVar";
+        var connectionMock = new Mock<IAdsPlcConnection>();
+        _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
+        var twincatConnectionMock = new Mock<IConnection>();
+        _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        var valueSymbolMock = new Mock<IValueSymbol>();
+        _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
+        var symbolInfoMock = new Mock<IAdsSymbolInfo>();
+        _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
+        var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
+        _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.Is<string>(x => x.Equals(ioTag, StringComparison.Ordinal)))).Returns(symbolInfoMock.Object);
+        var typeConverterMock = new Mock<IAdsTypeConverter>();
+        using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
 
-            // Act
-            // Assert
-            monitor.RegisterIO(ioTag);
-            valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Once);
-            monitor.RegisterIO(ioTag);
-            valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Once);
-            monitor.UnregisterIO(ioTag);
-            valueSymbolMock.VerifyRemove(x => x.ValueChanged -= It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Never);
-            monitor.UnregisterIO(ioTag);
-            valueSymbolMock.VerifyRemove(x => x.ValueChanged -= It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Once);
-        }
+        // Act
+        // Assert
+        monitor.RegisterIO(ioTag);
+        valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Once);
+        monitor.RegisterIO(ioTag);
+        valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Once);
+        monitor.UnregisterIO(ioTag);
+        valueSymbolMock.VerifyRemove(x => x.ValueChanged -= It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Never);
+        monitor.UnregisterIO(ioTag);
+        valueSymbolMock.VerifyRemove(x => x.ValueChanged -= It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Once);
+    }
 
-        [TestMethod]
-        public void ValueChangedEventsArePostedOnTheStream()
-        {
-            // Arrange
-            var ioTag = "TestVar";
-            var connectionMock = new Mock<IAdsPlcConnection>();
-            _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
-            var twincatConnectionMock = new Mock<IConnection>();
-            _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
-            var valueSymbolMock = new Mock<IValueSymbol>();
-            _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
-            var symbolInfoMock = new Mock<IAdsSymbolInfo>();
-            _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
-            var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-            _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfoMock.Object);
-            var typeConverterMock = new Mock<IAdsTypeConverter>();
-            _ = typeConverterMock.Setup(x => x.Convert(It.IsAny<object>(), It.IsAny<IValueSymbol>())).Returns<object, IValueSymbol>((o, v) => o);
-            using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
-            var connectedMock = new Mock<IConnected<IAdsConnection>>();
-            _ = connectedMock.Setup(x => x.IsConnected).Returns(true);
-            var observerMock = new Mock<IObserver<IMonitorResult>>();
+    [TestMethod]
+    public void ValueChangedEventsArePostedOnTheStream()
+    {
+        // Arrange
+        var ioTag = "TestVar";
+        var connectionMock = new Mock<IAdsPlcConnection>();
+        _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
+        var twincatConnectionMock = new Mock<IConnection>();
+        _ = twincatConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        var valueSymbolMock = new Mock<IValueSymbol>();
+        _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
+        var symbolInfoMock = new Mock<IAdsSymbolInfo>();
+        _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
+        var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
+        _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfoMock.Object);
+        var typeConverterMock = new Mock<IAdsTypeConverter>();
+        _ = typeConverterMock.Setup(x => x.Convert(It.IsAny<object>(), It.IsAny<IValueSymbol>())).Returns<object, IValueSymbol>((o, v) => o);
+        using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
+        var connectedMock = new Mock<IConnected<IAdsConnection>>();
+        _ = connectedMock.Setup(x => x.IsConnected).Returns(true);
+        var observerMock = new Mock<IObserver<IMonitorResult>>();
 
-            // Act
-            using var subscription = monitor.SymbolStream.Subscribe(observerMock.Object);
-            monitor.RegisterIO(ioTag);
-            valueSymbolMock.Raise(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), new ValueChangedEventArgs(valueSymbolMock.Object, true, DateTimeOffset.UtcNow));
+        // Act
+        using var subscription = monitor.SymbolStream.Subscribe(observerMock.Object);
+        monitor.RegisterIO(ioTag);
+        valueSymbolMock.Raise(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), new ValueChangedEventArgs(valueSymbolMock.Object, true, DateTimeOffset.UtcNow));
 
-            // Assert
-            observerMock.Verify(x => x.OnNext(It.Is<IMonitorResult>(x => x.Name.Equals(ioTag, StringComparison.Ordinal) && ((bool)x.Value))), Times.Once);
-        }
+        // Assert
+        observerMock.Verify(x => x.OnNext(It.Is<IMonitorResult>(x => x.Name.Equals(ioTag, StringComparison.Ordinal) && ((bool)x.Value))), Times.Once);
     }
 }

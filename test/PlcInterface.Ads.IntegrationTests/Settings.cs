@@ -1,11 +1,10 @@
-﻿namespace PlcInterface.Ads.Tests
-{
-    internal static class Settings
-    {
-        public static string AmsNetId
-            => "local";
+﻿namespace PlcInterface.Ads.Tests;
 
-        public static int Port
-            => 851;
-    }
+internal static class Settings
+{
+    public static string AmsNetId
+        => "local";
+
+    public static int Port
+        => 851;
 }

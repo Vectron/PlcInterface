@@ -5,153 +5,152 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using PlcInterface.Extensions;
 
-namespace PlcInterface.Abstraction.Tests
+namespace PlcInterface.Abstraction.Tests;
+
+[TestClass]
+public class ISymbolInfoExtensionTests
 {
-    [TestClass]
-    public class ISymbolInfoExtensionTests
+    [TestMethod]
+    public void FlattenReturnsAIenumerableOfISymbolInfoWithAllChildSymbols()
     {
-        [TestMethod]
-        public void FlattenReturnsAIenumerableOfISymbolInfoWithAllChildSymbols()
+        // Arrange
+        var symbolInfo = new Mock<ISymbolInfo>();
+        _ = symbolInfo.SetupGet(x => x.Name).Returns("FlattenObject");
+        _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.BoolValue", "FlattenObject.IntValue", "FlattenObject.ChildArray" });
+        var symbolHandler = new Mock<ISymbolHandler>();
+        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns<string>(s =>
         {
-            // Arrange
             var symbolInfo = new Mock<ISymbolInfo>();
-            _ = symbolInfo.SetupGet(x => x.Name).Returns("FlattenObject");
-            _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.BoolValue", "FlattenObject.IntValue", "FlattenObject.ChildArray" });
-            var symbolHandler = new Mock<ISymbolHandler>();
-            _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns<string>(s =>
-            {
-                var symbolInfo = new Mock<ISymbolInfo>();
-                _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>());
-                _ = symbolInfo.SetupGet(x => x.Name).Returns(s);
-                var splitName = s.Split('.');
-                _ = symbolInfo.SetupGet(x => x.ShortName).Returns(splitName[splitName.Length - 1]);
-
-                if (s.Equals("FlattenObject.ChildArray", StringComparison.Ordinal))
-                {
-                    _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.ChildArray[0]", "FlattenObject.ChildArray[1]", "FlattenObject.ChildArray[2]", "FlattenObject.ChildArray[3]" });
-                }
-
-                return symbolInfo.Object;
-            });
-
-            // Act
-            var linked = symbolInfo.Object.Flatten(symbolHandler.Object).ToList();
-
-            // Assert
-            Assert.AreEqual(6, linked.Count);
-            Assert.AreEqual("FlattenObject.BoolValue", linked[0].Name);
-            Assert.AreEqual("FlattenObject.IntValue", linked[1].Name);
-            Assert.AreEqual("FlattenObject.ChildArray[0]", linked[2].Name);
-            Assert.AreEqual("FlattenObject.ChildArray[1]", linked[3].Name);
-            Assert.AreEqual("FlattenObject.ChildArray[2]", linked[4].Name);
-            Assert.AreEqual("FlattenObject.ChildArray[3]", linked[5].Name);
-        }
-
-        [TestMethod]
-        public void FlattenReturnsSourceISymbolInfoWhenNoChildren()
-        {
-            // Arrange
-            var symbolInfo = new Mock<ISymbolInfo>();
-            _ = symbolInfo.SetupGet(x => x.Name).Returns("FlattenObject");
             _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>());
-            var symbolHandler = new Mock<ISymbolHandler>();
+            _ = symbolInfo.SetupGet(x => x.Name).Returns(s);
+            var splitName = s.Split('.');
+            _ = symbolInfo.SetupGet(x => x.ShortName).Returns(splitName[splitName.Length - 1]);
 
-            // Act
-            var linked = symbolInfo.Object.Flatten(symbolHandler.Object).ToList();
-
-            // Assert
-            Assert.AreEqual(1, linked.Count);
-            Assert.AreEqual(symbolInfo.Object, linked[0]);
-        }
-
-        [TestMethod]
-        public void FlattenWithValueFlattensAISymbolinfoChildHirachyAndAddsValues()
-        {
-            // Arrange
-            var symbolInfo = new Mock<ISymbolInfo>();
-            _ = symbolInfo.SetupGet(x => x.Name).Returns("FlattenObject");
-            _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.BoolValue", "FlattenObject.IntValue", "FlattenObject.ChildArray" });
-            var symbolHandler = new Mock<ISymbolHandler>();
-            _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns<string>(s =>
+            if (s.Equals("FlattenObject.ChildArray", StringComparison.Ordinal))
             {
-                var symbolInfo = new Mock<ISymbolInfo>();
-                _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>());
-                _ = symbolInfo.SetupGet(x => x.Name).Returns(s);
-                var splitName = s.Split('.');
-                _ = symbolInfo.SetupGet(x => x.ShortName).Returns(splitName[splitName.Length - 1]);
+                _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.ChildArray[0]", "FlattenObject.ChildArray[1]", "FlattenObject.ChildArray[2]", "FlattenObject.ChildArray[3]" });
+            }
 
-                if (s.Equals("FlattenObject.ChildArray", StringComparison.Ordinal))
-                {
-                    _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.ChildArray[0]", "FlattenObject.ChildArray[1]", "FlattenObject.ChildArray[2]", "FlattenObject.ChildArray[3]" });
-                }
+            return symbolInfo.Object;
+        });
 
-                return symbolInfo.Object;
-            });
+        // Act
+        var linked = symbolInfo.Object.Flatten(symbolHandler.Object).ToList();
 
-            var data = new FlattenObject() { BoolValue = true, IntValue = 5, ChildArray = new int[] { 9, 8, 7, 6 } };
+        // Assert
+        Assert.AreEqual(6, linked.Count);
+        Assert.AreEqual("FlattenObject.BoolValue", linked[0].Name);
+        Assert.AreEqual("FlattenObject.IntValue", linked[1].Name);
+        Assert.AreEqual("FlattenObject.ChildArray[0]", linked[2].Name);
+        Assert.AreEqual("FlattenObject.ChildArray[1]", linked[3].Name);
+        Assert.AreEqual("FlattenObject.ChildArray[2]", linked[4].Name);
+        Assert.AreEqual("FlattenObject.ChildArray[3]", linked[5].Name);
+    }
 
-            // Act
-            var linked = symbolInfo.Object.FlattenWithValue(symbolHandler.Object, data).ToList();
+    [TestMethod]
+    public void FlattenReturnsSourceISymbolInfoWhenNoChildren()
+    {
+        // Arrange
+        var symbolInfo = new Mock<ISymbolInfo>();
+        _ = symbolInfo.SetupGet(x => x.Name).Returns("FlattenObject");
+        _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>());
+        var symbolHandler = new Mock<ISymbolHandler>();
 
-            // Assert
-            Assert.AreEqual(6, linked.Count);
-            Assert.AreEqual("FlattenObject.BoolValue", linked[0].SymbolInfo.Name);
-            Assert.AreEqual(data.BoolValue, linked[0].Value);
-            Assert.AreEqual("FlattenObject.IntValue", linked[1].SymbolInfo.Name);
-            Assert.AreEqual(data.IntValue, linked[1].Value);
-            Assert.AreEqual("FlattenObject.ChildArray[0]", linked[2].SymbolInfo.Name);
-            Assert.AreEqual(data.ChildArray[0], linked[2].Value);
-            Assert.AreEqual("FlattenObject.ChildArray[1]", linked[3].SymbolInfo.Name);
-            Assert.AreEqual(data.ChildArray[1], linked[3].Value);
-            Assert.AreEqual("FlattenObject.ChildArray[2]", linked[4].SymbolInfo.Name);
-            Assert.AreEqual(data.ChildArray[2], linked[4].Value);
-            Assert.AreEqual("FlattenObject.ChildArray[3]", linked[5].SymbolInfo.Name);
-            Assert.AreEqual(data.ChildArray[3], linked[5].Value);
-        }
+        // Act
+        var linked = symbolInfo.Object.Flatten(symbolHandler.Object).ToList();
 
-        [TestMethod]
-        public void FlattenWithValueReturnsTheObjectWhenNoChildren()
+        // Assert
+        Assert.AreEqual(1, linked.Count);
+        Assert.AreEqual(symbolInfo.Object, linked[0]);
+    }
+
+    [TestMethod]
+    public void FlattenWithValueFlattensAISymbolinfoChildHirachyAndAddsValues()
+    {
+        // Arrange
+        var symbolInfo = new Mock<ISymbolInfo>();
+        _ = symbolInfo.SetupGet(x => x.Name).Returns("FlattenObject");
+        _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.BoolValue", "FlattenObject.IntValue", "FlattenObject.ChildArray" });
+        var symbolHandler = new Mock<ISymbolHandler>();
+        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns<string>(s =>
         {
-            // Arrange
-            var ioName = "FlattenObject";
             var symbolInfo = new Mock<ISymbolInfo>();
-            _ = symbolInfo.SetupGet(x => x.Name).Returns(ioName);
             _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>());
-            var symbolHandler = new Mock<ISymbolHandler>();
-            var data = new FlattenObject() { BoolValue = true, IntValue = 5 };
+            _ = symbolInfo.SetupGet(x => x.Name).Returns(s);
+            var splitName = s.Split('.');
+            _ = symbolInfo.SetupGet(x => x.ShortName).Returns(splitName[splitName.Length - 1]);
 
-            // Act
-            var linked = symbolInfo.Object.FlattenWithValue(symbolHandler.Object, data).ToList();
+            if (s.Equals("FlattenObject.ChildArray", StringComparison.Ordinal))
+            {
+                _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.ChildArray[0]", "FlattenObject.ChildArray[1]", "FlattenObject.ChildArray[2]", "FlattenObject.ChildArray[3]" });
+            }
 
-            // Assert
-            Assert.AreEqual(1, linked.Count);
-            Assert.AreEqual(data, linked[0].Value);
-            Assert.AreSame(data, linked[0].Value);
-            Assert.AreEqual(symbolInfo.Object, linked[0].SymbolInfo);
+            return symbolInfo.Object;
+        });
+
+        var data = new FlattenObject() { BoolValue = true, IntValue = 5, ChildArray = new int[] { 9, 8, 7, 6 } };
+
+        // Act
+        var linked = symbolInfo.Object.FlattenWithValue(symbolHandler.Object, data).ToList();
+
+        // Assert
+        Assert.AreEqual(6, linked.Count);
+        Assert.AreEqual("FlattenObject.BoolValue", linked[0].SymbolInfo.Name);
+        Assert.AreEqual(data.BoolValue, linked[0].Value);
+        Assert.AreEqual("FlattenObject.IntValue", linked[1].SymbolInfo.Name);
+        Assert.AreEqual(data.IntValue, linked[1].Value);
+        Assert.AreEqual("FlattenObject.ChildArray[0]", linked[2].SymbolInfo.Name);
+        Assert.AreEqual(data.ChildArray[0], linked[2].Value);
+        Assert.AreEqual("FlattenObject.ChildArray[1]", linked[3].SymbolInfo.Name);
+        Assert.AreEqual(data.ChildArray[1], linked[3].Value);
+        Assert.AreEqual("FlattenObject.ChildArray[2]", linked[4].SymbolInfo.Name);
+        Assert.AreEqual(data.ChildArray[2], linked[4].Value);
+        Assert.AreEqual("FlattenObject.ChildArray[3]", linked[5].SymbolInfo.Name);
+        Assert.AreEqual(data.ChildArray[3], linked[5].Value);
+    }
+
+    [TestMethod]
+    public void FlattenWithValueReturnsTheObjectWhenNoChildren()
+    {
+        // Arrange
+        var ioName = "FlattenObject";
+        var symbolInfo = new Mock<ISymbolInfo>();
+        _ = symbolInfo.SetupGet(x => x.Name).Returns(ioName);
+        _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>());
+        var symbolHandler = new Mock<ISymbolHandler>();
+        var data = new FlattenObject() { BoolValue = true, IntValue = 5 };
+
+        // Act
+        var linked = symbolInfo.Object.FlattenWithValue(symbolHandler.Object, data).ToList();
+
+        // Assert
+        Assert.AreEqual(1, linked.Count);
+        Assert.AreEqual(data, linked[0].Value);
+        Assert.AreSame(data, linked[0].Value);
+        Assert.AreEqual(symbolInfo.Object, linked[0].SymbolInfo);
+    }
+
+    private sealed class FlattenObject
+    {
+        public FlattenObject()
+            => ChildArray = Array.Empty<int>();
+
+        public bool BoolValue
+        {
+            get;
+            set;
         }
 
-        private sealed class FlattenObject
+        public int[] ChildArray
         {
-            public FlattenObject()
-                => ChildArray = Array.Empty<int>();
+            get;
+            set;
+        }
 
-            public bool BoolValue
-            {
-                get;
-                set;
-            }
-
-            public int[] ChildArray
-            {
-                get;
-                set;
-            }
-
-            public int IntValue
-            {
-                get;
-                set;
-            }
+        public int IntValue
+        {
+            get;
+            set;
         }
     }
 }

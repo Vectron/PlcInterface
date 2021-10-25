@@ -1,31 +1,30 @@
-﻿namespace PlcInterface
+﻿namespace PlcInterface;
+
+/// <summary>
+/// A generic implementation of <see cref="IConnected"/>.
+/// </summary>
+/// <typeparam name="T">The type that is connected.</typeparam>
+public interface IConnected<out T> : IConnected
 {
     /// <summary>
-    /// A generic implementation of <see cref="IConnected"/>.
+    /// Gets the value containing the lost or opened connection.
     /// </summary>
-    /// <typeparam name="T">The type that is connected.</typeparam>
-    public interface IConnected<out T> : IConnected
+    T? Value
     {
-        /// <summary>
-        /// Gets the value containing the lost or opened connection.
-        /// </summary>
-        T? Value
-        {
-            get;
-        }
+        get;
     }
+}
 
+/// <summary>
+/// Represents a type containing a opened or closed connection.
+/// </summary>
+public interface IConnected
+{
     /// <summary>
-    /// Represents a type containing a opened or closed connection.
+    /// Gets a value indicating whether a value indicating of the connection is open.
     /// </summary>
-    public interface IConnected
+    bool IsConnected
     {
-        /// <summary>
-        /// Gets a value indicating whether a value indicating of the connection is open.
-        /// </summary>
-        bool IsConnected
-        {
-            get;
-        }
+        get;
     }
 }

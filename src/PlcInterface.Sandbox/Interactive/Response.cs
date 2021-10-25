@@ -1,28 +1,27 @@
-﻿namespace PlcInterface.Sandbox.Interactive
+﻿namespace PlcInterface.Sandbox.Interactive;
+
+/// <summary>
+/// A response from doing a action.
+/// </summary>
+public class Response
 {
     /// <summary>
-    /// A response from doing a action.
+    /// Initializes a new instance of the <see cref="Response" /> class.
     /// </summary>
-    public class Response
+    /// <param name="message">The message that has to be responded.</param>
+    public Response(string message)
+        => Message = message;
+
+    /// <summary>
+    /// Gets a empty response.
+    /// </summary>
+    public static Response Empty => new(string.Empty);
+
+    /// <summary>
+    /// Gets the response message.
+    /// </summary>
+    public string Message
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Response" /> class.
-        /// </summary>
-        /// <param name="message">The message that has to be responded.</param>
-        public Response(string message)
-            => Message = message;
-
-        /// <summary>
-        /// Gets a empty response.
-        /// </summary>
-        public static Response Empty => new(string.Empty);
-
-        /// <summary>
-        /// Gets the response message.
-        /// </summary>
-        public string Message
-        {
-            get;
-        }
+        get;
     }
 }

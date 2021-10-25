@@ -1,24 +1,23 @@
-﻿namespace PlcInterface
+﻿namespace PlcInterface;
+
+/// <summary>
+/// Represents a type containing results from a monitoring event.
+/// </summary>
+public interface IMonitorResult
 {
     /// <summary>
-    /// Represents a type containing results from a monitoring event.
+    /// Gets the name of the tag.
     /// </summary>
-    public interface IMonitorResult
+    string Name
     {
-        /// <summary>
-        /// Gets the name of the tag.
-        /// </summary>
-        string Name
-        {
-            get;
-        }
+        get;
+    }
 
-        /// <summary>
-        /// Gets the new value of the tag.
-        /// </summary>
-        object Value
-        {
-            get;
-        }
+    /// <summary>
+    /// Gets the new value of the tag.
+    /// </summary>
+    object Value
+    {
+        get;
     }
 }

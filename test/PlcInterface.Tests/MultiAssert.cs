@@ -4,44 +4,43 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PlcInterface.Tests
+namespace PlcInterface.Tests;
+
+[ExcludeFromCodeCoverage]
+public class MultiAssert
 {
-    [ExcludeFromCodeCoverage]
-    public class MultiAssert
+    private readonly List<AssertFailedException> exceptions = new();
+
+    public static void Aggregate(params Action[] actions)
     {
-        private readonly List<AssertFailedException> exceptions = new();
+        var multiAssert = new MultiAssert();
 
-        public static void Aggregate(params Action[] actions)
+        foreach (var action in actions)
         {
-            var multiAssert = new MultiAssert();
-
-            foreach (var action in actions)
-            {
-                multiAssert.Check(action);
-            }
-
-            multiAssert.Assert();
+            multiAssert.Check(action);
         }
 
-        public void Assert()
-        {
-            var assertionTexts = exceptions.Select(assertFailedException => assertFailedException.Message);
-            if (assertionTexts.Any())
-            {
-                throw new AssertFailedException(assertionTexts.Aggregate((aggregatedMessage, next) => aggregatedMessage + Environment.NewLine + next));
-            }
-        }
+        multiAssert.Assert();
+    }
 
-        public void Check(Action action)
+    public void Assert()
+    {
+        var assertionTexts = exceptions.Select(assertFailedException => assertFailedException.Message);
+        if (assertionTexts.Any())
         {
-            try
-            {
-                action();
-            }
-            catch (AssertFailedException ex)
-            {
-                exceptions.Add(ex);
-            }
+            throw new AssertFailedException(assertionTexts.Aggregate((aggregatedMessage, next) => aggregatedMessage + Environment.NewLine + next));
+        }
+    }
+
+    public void Check(Action action)
+    {
+        try
+        {
+            action();
+        }
+        catch (AssertFailedException ex)
+        {
+            exceptions.Add(ex);
         }
     }
 }

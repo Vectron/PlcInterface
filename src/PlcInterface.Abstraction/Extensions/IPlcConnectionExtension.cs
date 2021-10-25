@@ -4,64 +4,63 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using PlcInterface.Extensions;
 
-namespace PlcInterface
+namespace PlcInterface;
+
+/// <summary>
+/// Extension methods for <see cref="IPlcConnection{T}"/>.
+/// </summary>
+public static class IPlcConnectionExtension
 {
     /// <summary>
-    /// Extension methods for <see cref="IPlcConnection{T}"/>.
+    /// Gets the PLC Connection.
     /// </summary>
-    public static class IPlcConnectionExtension
+    /// <typeparam name="T">The connection type to return.</typeparam>
+    /// <param name="plcConnection">The <see cref="IPlcConnection{T}"/> implementation.</param>
+    /// <returns>The gotten <typeparamref name="T"/>.</returns>
+    /// <exception cref="TimeoutException">If no client is returned in 2 seconds.</exception>
+    public static T GetConnectedClient<T>(this IPlcConnection<T> plcConnection)
+        => plcConnection.GetConnectedClient(TimeSpan.FromSeconds(2));
+
+    /// <summary>
+    /// Gets the PLC Connection.
+    /// </summary>
+    /// <typeparam name="T">The connection type to return.</typeparam>
+    /// <param name="plcConnection">The <see cref="IPlcConnection{T}"/> implementation.</param>
+    /// <param name="timeout">A <see cref="TimeSpan"/> indicating how long to wait for getting the connection.</param>
+    /// <returns>The gotten <typeparamref name="T"/>.</returns>
+    /// <exception cref="TimeoutException">If no client is returned after <paramref name="timeout"/>.</exception>
+    public static T GetConnectedClient<T>(this IPlcConnection<T> plcConnection, TimeSpan timeout)
+        => plcConnection
+            .SessionStream
+            .FirstAsync(x => x.IsConnected)
+            .Timeout(timeout)
+            .ToTask()
+            .GetAwaiter()
+            .GetResult()
+            .Value
+            .ThrowIfNull(nameof(IConnected<T>.Value));
+
+    /// <summary>
+    /// Gets the PLC Connection asynchronous.
+    /// </summary>
+    /// <typeparam name="T">The connection type to return.</typeparam>
+    /// <param name="plcConnection">The <see cref="IPlcConnection{T}"/> implementation.</param>
+    /// <returns>The gotten <typeparamref name="T"/>.</returns>
+    /// <exception cref="TimeoutException">If no client is returned in 2 seconds.</exception>
+    public static Task<T> GetConnectedClientAsync<T>(this IPlcConnection<T> plcConnection)
+        => plcConnection.GetConnectedClientAsync(TimeSpan.FromSeconds(2));
+
+    /// <summary>
+    /// Gets the PLC Connection asynchronous.
+    /// </summary>
+    /// <typeparam name="T">The connection type to return.</typeparam>
+    /// <param name="plcConnection">The <see cref="IPlcConnection{T}"/> implementation.</param>
+    /// <param name="timeout">A <see cref="TimeSpan"/> indicating how long to wait for getting the connection.</param>
+    /// <returns>The gotten <typeparamref name="T"/>.</returns>
+    /// <exception cref="TimeoutException">If no client is returned after <paramref name="timeout"/>.</exception>
+    public static async Task<T> GetConnectedClientAsync<T>(this IPlcConnection<T> plcConnection, TimeSpan timeout)
     {
-        /// <summary>
-        /// Gets the PLC Connection.
-        /// </summary>
-        /// <typeparam name="T">The connection type to return.</typeparam>
-        /// <param name="plcConnection">The <see cref="IPlcConnection{T}"/> implementation.</param>
-        /// <returns>The gotten <typeparamref name="T"/>.</returns>
-        /// <exception cref="TimeoutException">If no client is returned in 2 seconds.</exception>
-        public static T GetConnectedClient<T>(this IPlcConnection<T> plcConnection)
-            => plcConnection.GetConnectedClient(TimeSpan.FromSeconds(2));
-
-        /// <summary>
-        /// Gets the PLC Connection.
-        /// </summary>
-        /// <typeparam name="T">The connection type to return.</typeparam>
-        /// <param name="plcConnection">The <see cref="IPlcConnection{T}"/> implementation.</param>
-        /// <param name="timeout">A <see cref="TimeSpan"/> indicating how long to wait for getting the connection.</param>
-        /// <returns>The gotten <typeparamref name="T"/>.</returns>
-        /// <exception cref="TimeoutException">If no client is returned after <paramref name="timeout"/>.</exception>
-        public static T GetConnectedClient<T>(this IPlcConnection<T> plcConnection, TimeSpan timeout)
-            => plcConnection
-                .SessionStream
-                .FirstAsync(x => x.IsConnected)
-                .Timeout(timeout)
-                .ToTask()
-                .GetAwaiter()
-                .GetResult()
-                .Value
-                .ThrowIfNull(nameof(IConnected<T>.Value));
-
-        /// <summary>
-        /// Gets the PLC Connection asynchronous.
-        /// </summary>
-        /// <typeparam name="T">The connection type to return.</typeparam>
-        /// <param name="plcConnection">The <see cref="IPlcConnection{T}"/> implementation.</param>
-        /// <returns>The gotten <typeparamref name="T"/>.</returns>
-        /// <exception cref="TimeoutException">If no client is returned in 2 seconds.</exception>
-        public static Task<T> GetConnectedClientAsync<T>(this IPlcConnection<T> plcConnection)
-            => plcConnection.GetConnectedClientAsync(TimeSpan.FromSeconds(2));
-
-        /// <summary>
-        /// Gets the PLC Connection asynchronous.
-        /// </summary>
-        /// <typeparam name="T">The connection type to return.</typeparam>
-        /// <param name="plcConnection">The <see cref="IPlcConnection{T}"/> implementation.</param>
-        /// <param name="timeout">A <see cref="TimeSpan"/> indicating how long to wait for getting the connection.</param>
-        /// <returns>The gotten <typeparamref name="T"/>.</returns>
-        /// <exception cref="TimeoutException">If no client is returned after <paramref name="timeout"/>.</exception>
-        public static async Task<T> GetConnectedClientAsync<T>(this IPlcConnection<T> plcConnection, TimeSpan timeout)
-        {
-            var connection = await plcConnection.SessionStream.FirstAsync(x => x.IsConnected).Timeout(timeout);
-            return connection.Value.ThrowIfNull(nameof(IConnected<T>.Value));
-        }
+        var connection = await plcConnection.SessionStream.FirstAsync(x => x.IsConnected).Timeout(timeout);
+        return connection.Value.ThrowIfNull(nameof(IConnected<T>.Value));
     }
 }

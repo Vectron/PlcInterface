@@ -2,15 +2,14 @@
 using TwinCAT.Ads.TypeSystem;
 using TwinCAT.TypeSystem;
 
-namespace PlcInterface.Ads.TwincatAbstractions
+namespace PlcInterface.Ads.TwincatAbstractions;
+
+/// <summary>
+/// A implementation of <see cref="ISymbolLoaderFactory"/>.
+/// </summary>
+public class SymbolLoaderFactoryAbstraction : ISymbolLoaderFactory
 {
-    /// <summary>
-    /// A implementation of <see cref="ISymbolLoaderFactory"/>.
-    /// </summary>
-    public class SymbolLoaderFactoryAbstraction : ISymbolLoaderFactory
-    {
-        /// <inheritdoc/>
-        public ISymbolLoader Create(IConnection connection, ISymbolLoaderSettings settings)
-            => SymbolLoaderFactory.Create(connection, settings);
-    }
+    /// <inheritdoc/>
+    public ISymbolLoader Create(IConnection connection, ISymbolLoaderSettings settings)
+        => SymbolLoaderFactory.Create(connection, settings);
 }

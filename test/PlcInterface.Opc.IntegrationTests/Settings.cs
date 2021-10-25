@@ -1,22 +1,21 @@
 ﻿using System;
 
-namespace PlcInterface.OpcUa.Tests
+namespace PlcInterface.OpcUa.Tests;
+
+internal static class Settings
 {
-    internal static class Settings
-    {
-        public static string OpcIp
-            => "localhost";
+    public static string OpcIp
+        => "localhost";
 
-        public static int OpcPort
-            => 4840;
+    public static int OpcPort
+        => 4840;
 
-        public static Uri PLCUri
-            => new UriBuilder("opc.tcp", OpcIp, OpcPort, RootNode).Uri;
+    public static Uri PLCUri
+        => new UriBuilder("opc.tcp", OpcIp, OpcPort, RootNode).Uri;
 
-        public static Uri PLCUriNoRoot
-            => new UriBuilder("opc.tcp", OpcIp, OpcPort, string.Empty).Uri;
+    public static Uri PLCUriNoRoot
+        => new UriBuilder("opc.tcp", OpcIp, OpcPort, string.Empty).Uri;
 
-        public static string RootNode
-            => "PLC1";
-    }
+    public static string RootNode
+        => "PLC1";
 }

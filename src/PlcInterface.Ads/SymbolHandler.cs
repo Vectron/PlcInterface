@@ -14,148 +14,147 @@ using TwinCAT.Ads.ValueAccess;
 using TwinCAT.TypeSystem;
 using TwinCAT.ValueAccess;
 
-namespace PlcInterface.Ads
+namespace PlcInterface.Ads;
+
+/// <summary>
+/// Implementation of <see cref="ISymbolHandler"/>.
+/// </summary>
+public class SymbolHandler : IAdsSymbolHandler, IDisposable
 {
+    private readonly Dictionary<string, IAdsSymbolInfo> allSymbols = new(StringComparer.OrdinalIgnoreCase);
+    private readonly CompositeDisposable disposables = new();
+    private readonly IFileSystem fileSystem;
+    private readonly ILogger<SymbolHandler> logger;
+    private readonly IOptions<SymbolHandlerSettings> settings;
+    private readonly ISymbolLoaderFactory symbolLoaderFactory;
+    private bool disposedValue;
+
     /// <summary>
-    /// Implementation of <see cref="ISymbolHandler"/>.
+    /// Initializes a new instance of the <see cref="SymbolHandler"/> class.
     /// </summary>
-    public class SymbolHandler : IAdsSymbolHandler, IDisposable
+    /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
+    /// <param name="settings">A <see cref="IOptions{TOptions}"/> of <see cref="SymbolHandlerSettings"/> implementation.</param>
+    /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
+    /// <param name="fileSystem">A <see cref="IFileSystem"/> for interacting with the file system.</param>
+    /// <param name="symbolLoaderFactory">A factory for creating a <see cref="SymbolLoaderFactory"/>.</param>
+    public SymbolHandler(IAdsPlcConnection connection, IOptions<SymbolHandlerSettings> settings, ILogger<SymbolHandler> logger, IFileSystem fileSystem, ISymbolLoaderFactory symbolLoaderFactory)
     {
-        private readonly Dictionary<string, IAdsSymbolInfo> allSymbols = new(StringComparer.OrdinalIgnoreCase);
-        private readonly CompositeDisposable disposables = new();
-        private readonly IFileSystem fileSystem;
-        private readonly ILogger<SymbolHandler> logger;
-        private readonly IOptions<SymbolHandlerSettings> settings;
-        private readonly ISymbolLoaderFactory symbolLoaderFactory;
-        private bool disposedValue;
+        this.settings = settings;
+        this.logger = logger;
+        this.fileSystem = fileSystem;
+        this.symbolLoaderFactory = symbolLoaderFactory;
+        var session = connection.SessionStream
+            .Where(x => x.IsConnected)
+            .Select(x => x.Value)
+            .WhereNotNull()
+            .Subscribe(UpdateSymbols);
+        disposables.Add(session);
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SymbolHandler"/> class.
-        /// </summary>
-        /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
-        /// <param name="settings">A <see cref="IOptions{TOptions}"/> of <see cref="SymbolHandlerSettings"/> implementation.</param>
-        /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-        /// <param name="fileSystem">A <see cref="IFileSystem"/> for interacting with the file system.</param>
-        /// <param name="symbolLoaderFactory">A factory for creating a <see cref="SymbolLoaderFactory"/>.</param>
-        public SymbolHandler(IAdsPlcConnection connection, IOptions<SymbolHandlerSettings> settings, ILogger<SymbolHandler> logger, IFileSystem fileSystem, ISymbolLoaderFactory symbolLoaderFactory)
+    /// <inheritdoc/>
+    public IReadOnlyCollection<ISymbolInfo> AllSymbols
+        => allSymbols.Values;
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <inheritdoc/>
+    ISymbolInfo ISymbolHandler.GetSymbolinfo(string ioName)
+        => GetSymbolinfo(ioName);
+
+    /// <inheritdoc/>
+    public IAdsSymbolInfo GetSymbolinfo(string ioName)
+    {
+        if (!allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out var value))
         {
-            this.settings = settings;
-            this.logger = logger;
-            this.fileSystem = fileSystem;
-            this.symbolLoaderFactory = symbolLoaderFactory;
-            var session = connection.SessionStream
-                .Where(x => x.IsConnected)
-                .Select(x => x.Value)
-                .WhereNotNull()
-                .Subscribe(UpdateSymbols);
-            disposables.Add(session);
+            throw new SymbolException($"{ioName} Does not excist in the PLC");
         }
 
-        /// <inheritdoc/>
-        public IReadOnlyCollection<ISymbolInfo> AllSymbols
-            => allSymbols.Values;
+        return value;
+    }
 
-        /// <inheritdoc/>
-        public void Dispose()
+    /// <summary>
+    /// Protected implementation of Dispose pattern.
+    /// </summary>
+    /// <param name="disposing">Value indicating if we need to cleanup managed resources.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <inheritdoc/>
-        ISymbolInfo ISymbolHandler.GetSymbolinfo(string ioName)
-            => GetSymbolinfo(ioName);
-
-        /// <inheritdoc/>
-        public IAdsSymbolInfo GetSymbolinfo(string ioName)
-        {
-            if (!allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out var value))
+            if (disposing)
             {
-                throw new SymbolException($"{ioName} Does not excist in the PLC");
-            }
-
-            return value;
-        }
-
-        /// <summary>
-        /// Protected implementation of Dispose pattern.
-        /// </summary>
-        /// <param name="disposing">Value indicating if we need to cleanup managed resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    disposables.Dispose();
-                    allSymbols.Clear();
-                }
-
-                disposedValue = true;
-            }
-        }
-
-        private void AddSymbol(ISymbol symbol)
-        {
-            var symbolInfo = new SymbolInfo(symbol);
-
-            if (!allSymbols.ContainsKey(symbolInfo.Name))
-            {
-                allSymbols.Add(symbolInfo.Name, symbolInfo);
-            }
-
-            foreach (var subSymbol in symbol.SubSymbols)
-            {
-                AddSymbol(subSymbol);
-            }
-        }
-
-        private void StoreSymbolListOnDisk()
-        {
-            if (!settings.Value.StoreSymbolsToDisk)
-            {
-                return;
-            }
-
-            var outputPath = settings.Value.OutputPath;
-
-            if (string.IsNullOrWhiteSpace(outputPath))
-            {
-                outputPath = fileSystem.Path.Combine("logs");
-            }
-
-            _ = fileSystem.Directory.CreateDirectory(outputPath);
-            var filePath = fileSystem.Path.Combine(outputPath, "vars.txt");
-            fileSystem.File.WriteAllLines(filePath, allSymbols.Values.Select(x => x.Name), System.Text.Encoding.UTF8);
-        }
-
-        private void UpdateSymbols(IAdsConnection client)
-        {
-            logger.LogInformation("Updating Symbols");
-            try
-            {
-                var symbolLoaderSettings = new SymbolLoaderSettings(SymbolsLoadMode.DynamicTree)
-                {
-                    AutomaticReconnection = false,
-                    NonCachedArrayElements = true,
-                    ValueAccessMode = ValueAccessMode.IndexGroupOffsetPreferred,
-                    ValueCreation = ValueCreationModes.Primitives,
-                };
-
-                var symbolLoader = symbolLoaderFactory.Create(client, symbolLoaderSettings);
+                disposables.Dispose();
                 allSymbols.Clear();
-
-                foreach (var symbol in symbolLoader.Symbols)
-                {
-                    AddSymbol(symbol);
-                }
-
-                StoreSymbolListOnDisk();
             }
-            catch (Exception ex)
+
+            disposedValue = true;
+        }
+    }
+
+    private void AddSymbol(ISymbol symbol)
+    {
+        var symbolInfo = new SymbolInfo(symbol);
+
+        if (!allSymbols.ContainsKey(symbolInfo.Name))
+        {
+            allSymbols.Add(symbolInfo.Name, symbolInfo);
+        }
+
+        foreach (var subSymbol in symbol.SubSymbols)
+        {
+            AddSymbol(subSymbol);
+        }
+    }
+
+    private void StoreSymbolListOnDisk()
+    {
+        if (!settings.Value.StoreSymbolsToDisk)
+        {
+            return;
+        }
+
+        var outputPath = settings.Value.OutputPath;
+
+        if (string.IsNullOrWhiteSpace(outputPath))
+        {
+            outputPath = fileSystem.Path.Combine("logs");
+        }
+
+        _ = fileSystem.Directory.CreateDirectory(outputPath);
+        var filePath = fileSystem.Path.Combine(outputPath, "vars.txt");
+        fileSystem.File.WriteAllLines(filePath, allSymbols.Values.Select(x => x.Name), System.Text.Encoding.UTF8);
+    }
+
+    private void UpdateSymbols(IAdsConnection client)
+    {
+        logger.LogInformation("Updating Symbols");
+        try
+        {
+            var symbolLoaderSettings = new SymbolLoaderSettings(SymbolsLoadMode.DynamicTree)
             {
-                logger.LogError(ex, "Exception updating symbols");
+                AutomaticReconnection = false,
+                NonCachedArrayElements = true,
+                ValueAccessMode = ValueAccessMode.IndexGroupOffsetPreferred,
+                ValueCreation = ValueCreationModes.Primitives,
+            };
+
+            var symbolLoader = symbolLoaderFactory.Create(client, symbolLoaderSettings);
+            allSymbols.Clear();
+
+            foreach (var symbol in symbolLoader.Symbols)
+            {
+                AddSymbol(symbol);
             }
+
+            StoreSymbolListOnDisk();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Exception updating symbols");
         }
     }
 }

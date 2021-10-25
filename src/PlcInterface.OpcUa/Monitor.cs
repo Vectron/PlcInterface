@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Opc.Ua;
 using Opc.Ua.Client;
@@ -49,7 +51,7 @@ public class Monitor : IOpcMonitor, IDisposable
             TimestampsToReturn = TimestampsToReturn.Both,
         };
 
-        sesionStream = connection.SessionStream.Where(x => x.IsConnected).Select(x => x.Value).WhereNotNull().Subscribe(x =>
+        sesionStream = connection.SessionStream.Where(x => x.IsConnected).Select(x => x.Value).WhereNotNull().Subscribe(async x =>
          {
              foreach (var keyValue in registeredSymbols)
              {
@@ -59,7 +61,7 @@ public class Monitor : IOpcMonitor, IDisposable
 
              if (x.Subscriptions.Contains(subscription))
              {
-                 subscription.ApplyChanges();
+                 await subscription.ApplyChangesAsync(CancellationToken.None).ConfigureAwait(false);
              }
              else
              {
@@ -71,8 +73,8 @@ public class Monitor : IOpcMonitor, IDisposable
                  }
 
                  _ = x.AddSubscription(subscription);
-                 subscription.Create();
-                 subscription.ApplyChanges();
+                 await subscription.CreateAsync(CancellationToken.None).ConfigureAwait(false);
+                 await subscription.ApplyChangesAsync(CancellationToken.None).ConfigureAwait(false);
              }
          });
     }
@@ -100,14 +102,14 @@ public class Monitor : IOpcMonitor, IDisposable
             RegisterIOInternal(name, updateInterval);
         }
 
-        ApplyChanges();
+        _ = ApplyChangesAsync();
     }
 
     /// <inheritdoc/>
     public void RegisterIO(string ioName, int updateInterval = 1000)
     {
         RegisterIOInternal(ioName, updateInterval);
-        ApplyChanges();
+        _ = ApplyChangesAsync();
     }
 
     /// <inheritdoc/>
@@ -118,14 +120,14 @@ public class Monitor : IOpcMonitor, IDisposable
             UnregisterIOInternal(name);
         }
 
-        ApplyChanges();
+        _ = ApplyChangesAsync();
     }
 
     /// <inheritdoc/>
     public void UnregisterIO(string ioName)
     {
         UnregisterIOInternal(ioName);
-        ApplyChanges();
+        _ = ApplyChangesAsync();
     }
 
     /// <summary>
@@ -148,11 +150,11 @@ public class Monitor : IOpcMonitor, IDisposable
         }
     }
 
-    private void ApplyChanges()
+    private async Task ApplyChangesAsync()
     {
         if (subscription.Created && subscription.Session.Connected)
         {
-            subscription.ApplyChanges();
+            await subscription.ApplyChangesAsync(CancellationToken.None).ConfigureAwait(false);
         }
     }
 

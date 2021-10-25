@@ -150,24 +150,27 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         => DisconnectAsync().GetAwaiter().GetResult();
 
     /// <inheritdoc/>
-    public Task DisconnectAsync()
-        => Task.Run(() =>
+    public async Task DisconnectAsync()
+    {
+        if (session == null)
         {
-            if (session == null)
-            {
-                return;
-            }
+            return;
+        }
 
-            connectionState.OnNext(Connected.No<Session>());
-            if (session.Connected)
+        connectionState.OnNext(Connected.No<Session>());
+        if (session.Connected)
+        {
+            var closeSessionResponse = await session.CloseSessionAsync(null, false, CancellationToken.None).ConfigureAwait(false);
+            if (ServiceResult.IsBad(closeSessionResponse.ResponseHeader.ServiceResult))
             {
-                _ = session.CloseSession(null, false);
+                logger.LogError("Failed to close session {StatusCode}", closeSessionResponse.ResponseHeader.ServiceResult);
             }
+        }
 
-            disposables.Dispose();
-            session?.Dispose();
-            session = null;
-        });
+        disposables.Dispose();
+        session?.Dispose();
+        session = null;
+    }
 
     /// <inheritdoc/>
     public void Dispose()

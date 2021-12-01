@@ -9,7 +9,7 @@
         <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="5.0.479" NoWarn="NU1701" />
         <PackageReference Include="Beckhoff.TwinCAT.Ads.Reactive" Version="5.0.479" NoWarn="NU1701" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
         <PackageReference Condition="'$(Configuration)' == 'Release'" Include="PlcInterface.Abstraction" Version="2.3.*" />
         <PackageReference Include="System.IO.Abstractions" Version="14.0.3" />
     </ItemGroup>

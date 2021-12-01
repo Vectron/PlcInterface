@@ -21,7 +21,7 @@ public class TaskExtensionsTests
         task2.Wait();
 
         // Assert
-        loggerMock.Verify(x => x.Log(It.Is<LogLevel>(x => x == LogLevel.Error), It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<NotSupportedException>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
+        loggerMock.Verify(x => x.Log(It.Is<LogLevel>(x => x == LogLevel.Error), It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<NotSupportedException>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
     }
 
     [TestMethod]

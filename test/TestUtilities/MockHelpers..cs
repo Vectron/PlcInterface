@@ -15,7 +15,7 @@ public static class MockHelpers
                   It.IsAny<EventId>(),
                   It.IsAny<object>(),
                   It.IsAny<Exception>(),
-                  It.IsAny<Func<object, Exception, string>>()));
+                  It.IsAny<Func<object, Exception?, string>>()));
         return mock.Object;
     }
 

@@ -59,17 +59,30 @@ internal static class SessionExtensions
             return Enumerable.Empty<NodeInfo>();
         }
 
-        _ = session.Read(
-            null,
-            0,
-            TimestampsToReturn.Neither,
-            nodesToRead,
-            out var results,
-            out var diagnosticInfos);
-        ClientBase.ValidateResponse(results, nodesToRead);
-        ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
-        var nodeInfos = results.Chunk(3).Select(x => NodeInfoFromDataValue(x, session));
-        return nodeInfos;
+        try
+        {
+            _ = session.Read(
+                null,
+                0,
+                TimestampsToReturn.Neither,
+                nodesToRead,
+                out var results,
+                out var diagnosticInfos);
+            ClientBase.ValidateResponse(results, nodesToRead);
+            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
+            var nodeInfos = results.Chunk(3).Select(x => NodeInfoFromDataValue(x, session));
+            return nodeInfos;
+        }
+        catch (ServiceResultException ex)
+        {
+            if (ex.Result.StatusCode == StatusCodes.BadEncodingLimitsExceeded)
+            {
+                var chunkSize = (uint)((nodesToRead.Count / 3) >> 1) + 1u;
+                return nodeIds.Chunk(chunkSize).SelectMany(x => session.ReadNodeInfo(x));
+            }
+
+            throw;
+        }
     }
 
     /// <summary>

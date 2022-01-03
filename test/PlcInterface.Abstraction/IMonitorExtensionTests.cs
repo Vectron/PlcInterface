@@ -145,6 +145,34 @@ public class IMonitorExtensionTests
     }
 
     [TestMethod]
+    public void SubscribeIOOnlyReturnsValuesWhenNotNull()
+    {
+        // Arrange
+        var ioName = "test.var";
+        var monitorMock = new Mock<IMonitor>();
+        var typeConverterMock = new Mock<ITypeConverter>();
+        _ = typeConverterMock.Setup(x => x.Convert<string>(It.IsAny<object>())).Returns<string>(x => x);
+        using var subject = new Subject<IMonitorResult>();
+        _ = monitorMock.SetupGet(x => x.SymbolStream).Returns(subject);
+        _ = monitorMock.SetupGet(x => x.TypeConverter).Returns(typeConverterMock.Object);
+        var monitorResultMock = new Mock<IMonitorResult>();
+
+        var observerMock = new Mock<IObserver<string>>();
+
+        // Act
+        using var subscription = monitorMock.Object.SubscribeIO(ioName, "Test").Subscribe(observerMock.Object);
+        _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns(null);
+        subject.OnNext(monitorResultMock.Object);
+        _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns("Test");
+        subject.OnNext(monitorResultMock.Object);
+
+        // Assert
+        observerMock.Verify(x => x.OnNext(It.IsAny<string>()), Times.Once);
+    }
+
+    [TestMethod]
     public void SubscribeIORegistersIOForUpdates()
     {
         // Arrange

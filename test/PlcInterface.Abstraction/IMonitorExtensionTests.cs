@@ -59,16 +59,10 @@ public class IMonitorExtensionTests
 
         // Act
         using var subscription = monitorMock.Object.SubscribeIO(ioName, true, observerMock.Object);
-        _ = monitorResultMock.SetupGet(x => x.Name).Returns($"{ioName}1");
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(0);
-        subject.OnNext(monitorResultMock.Object);
-        _ = monitorResultMock.SetupGet(x => x.Name).Returns($"{ioName}2");
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(1u);
-        subject.OnNext(monitorResultMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
         _ = monitorResultMock.SetupGet(x => x.Value).Returns(true);
         subject.OnNext(monitorResultMock.Object);
-        _ = monitorResultMock.SetupGet(x => x.Name).Returns($"{ioName}3");
+        _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
         _ = monitorResultMock.SetupGet(x => x.Value).Returns(false);
         subject.OnNext(monitorResultMock.Object);
 
@@ -127,16 +121,10 @@ public class IMonitorExtensionTests
 
         // Act
         using var subscription = monitorMock.Object.SubscribeIO(ioName, true).Subscribe(observerMock.Object);
-        _ = monitorResultMock.SetupGet(x => x.Name).Returns($"{ioName}1");
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(0);
-        subject.OnNext(monitorResultMock.Object);
-        _ = monitorResultMock.SetupGet(x => x.Name).Returns($"{ioName}2");
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(1u);
-        subject.OnNext(monitorResultMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
         _ = monitorResultMock.SetupGet(x => x.Value).Returns(true);
         subject.OnNext(monitorResultMock.Object);
-        _ = monitorResultMock.SetupGet(x => x.Name).Returns($"{ioName}3");
+        _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
         _ = monitorResultMock.SetupGet(x => x.Value).Returns(false);
         subject.OnNext(monitorResultMock.Object);
 

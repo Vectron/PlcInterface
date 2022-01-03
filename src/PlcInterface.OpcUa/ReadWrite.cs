@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -252,38 +251,8 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     /// <inheritdoc/>
     public async Task<dynamic> ReadDynamicAsync(string ioName)
     {
-        var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
-
-        if (symbol.ChildSymbols.Count > 0)
-        {
-            if (symbol.IsArray)
-            {
-                var array = Array.CreateInstance(typeof(ExpandoObject), symbol.ArrayBounds);
-                foreach (var childSymbol in symbol.ChildSymbols)
-                {
-                    var value = await ReadDynamicAsync(childSymbol).ConfigureAwait(false);
-                    var indices = symbolHandler.GetSymbolinfo(childSymbol).ConvertAndValidate().Indices;
-                    array.SetValue(value, indices);
-                }
-
-                return array;
-            }
-
-            var collection = new ExpandoObject() as IDictionary<string, object>;
-            foreach (var childSymbol in symbol.ChildSymbols)
-            {
-                var value = await ReadDynamicAsync(childSymbol).ConfigureAwait(false);
-                var shortName = symbolHandler.GetSymbolinfo(childSymbol).ShortName;
-                collection.Add(shortName, value);
-            }
-
-            return collection;
-        }
-        else
-        {
-            var value = await ReadAsync(ioName).ConfigureAwait(false);
-            return value;
-        }
+        var value = await ReadAsync(new[] { ioName }).ConfigureAwait(false);
+        return value.Values.FirstOrDefault();
     }
 
     /// <inheritdoc/>

@@ -188,6 +188,7 @@ internal sealed class TreeBrowser : Browser
            .Zip(symbols, (referenceDescriptions, parent) => (referenceDescriptions, parent))
            .SelectMany(x => x.referenceDescriptions.Select(referenceDescription => (referenceDescription, x.parent)))
            .Zip(nodeInfos, (rp, nodeInfo) => (rp.referenceDescription, rp.parent, nodeInfo))
+           .Where(x => x.parent.BuiltInType != BuiltInType.String)
            .Select(x => CreateSymbol(x.referenceDescription, x.nodeInfo, x.parent, rootName))
            .ToList();
 

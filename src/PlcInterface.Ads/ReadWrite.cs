@@ -171,6 +171,17 @@ public class ReadWrite : IAdsReadWrite
     {
         var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
+        var type = value.GetType();
+
+        if ((System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase)
+                || System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
+            && !type.IsArray
+            && symbolInfo.ChildSymbols.Count > 0)
+        {
+            var flattenItems = symbolInfo.FlattenWithValue(symbolHandler, value).ToDictionary(x => x.SymbolInfo.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);
+            Write(flattenItems);
+            return;
+        }
 
         try
         {
@@ -215,6 +226,18 @@ public class ReadWrite : IAdsReadWrite
     {
         var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
+        var type = value.GetType();
+
+        if ((System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase)
+                || System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
+            && !type.IsArray
+            && symbolInfo.ChildSymbols.Count > 0)
+        {
+            var flattenItems = symbolInfo.FlattenWithValue(symbolHandler, value).ToDictionary(x => x.SymbolInfo.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);
+            await WriteAsync(flattenItems).ConfigureAwait(false);
+            return;
+        }
+
         try
         {
             _ = await adsSymbol.WriteValueAsync(value, CancellationToken.None).ConfigureAwait(false);

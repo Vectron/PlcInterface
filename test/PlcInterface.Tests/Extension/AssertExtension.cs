@@ -36,9 +36,9 @@ internal static class AssertExtension
             () => Assert.AreEqual(expected.ULongValue, current.ULongValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.ULongValue)}"),
             () => Assert.AreEqual(expected.FloatValue, current.FloatValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.FloatValue)}"),
             () => Assert.AreEqual(expected.DoubleValue, current.DoubleValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.DoubleValue)}"),
-            () => Assert.AreEqual(expected.TimeValue, current.TimeValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.TimeValue)}"),
-            () => Assert.AreEqual(expected.TimeOfDay, current.TimeOfDay, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.TimeOfDay)}"),
-            () => Assert.AreEqual(expected.LTimeValue, current.LTimeValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.LTimeValue)}"),
+            () => TimeSpanAreEqual(expected.TimeValue, current.TimeValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.TimeValue)}"),
+            () => TimeSpanAreEqual(expected.TimeOfDay, current.TimeOfDay, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.TimeOfDay)}"),
+            () => TimeSpanAreEqual(expected.LTimeValue, current.LTimeValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.LTimeValue)}"),
             () => Assert.AreEqual(expected.DateValue, current.DateValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.DateValue)}"),
             () => Assert.AreEqual(expected.DateAndTimeValue, current.DateAndTimeValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.DateAndTimeValue)}"),
             () => Assert.AreEqual(expected.StringValue, current.StringValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.StringValue)}"),
@@ -86,9 +86,9 @@ internal static class AssertExtension
             () => Assert.AreEqual(expected.ULongValue, current.ULongValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.ULongValue)}"),
             () => Assert.AreEqual(expected.FloatValue, current.FloatValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.FloatValue)}"),
             () => Assert.AreEqual(expected.DoubleValue, current.DoubleValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.DoubleValue)}"),
-            () => Assert.AreEqual(expected.TimeValue, current.TimeValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.TimeValue)}"),
-            () => Assert.AreEqual(expected.TimeOfDay, current.TimeOfDay, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.TimeOfDay)}"),
-            () => Assert.AreEqual(expected.LTimeValue, current.LTimeValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.LTimeValue)}"),
+            () => TimeSpanAreEqual(expected.TimeValue, current.TimeValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.TimeValue)}"),
+            () => TimeSpanAreEqual(expected.TimeOfDay, current.TimeOfDay, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.TimeOfDay)}"),
+            () => TimeSpanAreEqual(expected.LTimeValue, current.LTimeValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.LTimeValue)}"),
             () => Assert.AreEqual(expected.DateValue, current.DateValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.DateValue)}"),
             () => Assert.AreEqual(expected.DateAndTimeValue, current.DateAndTimeValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.DateAndTimeValue)}"),
             () => Assert.AreEqual(expected.StringValue, current.StringValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.StringValue)}"),
@@ -150,9 +150,9 @@ internal static class AssertExtension
             () => Assert.AreNotEqual(expected.ULongValue, current.ULongValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.ULongValue)}"),
             () => Assert.AreNotEqual(expected.FloatValue, current.FloatValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.FloatValue)}"),
             () => Assert.AreNotEqual(expected.DoubleValue, current.DoubleValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.DoubleValue)}"),
-            () => Assert.AreNotEqual(expected.TimeValue, current.TimeValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.TimeValue)}"),
-            () => Assert.AreNotEqual(expected.TimeOfDay, current.TimeOfDay, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.TimeOfDay)}"),
-            () => Assert.AreNotEqual(expected.LTimeValue, current.LTimeValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.LTimeValue)}"),
+            () => TimeSpanAreNotEqual(expected.TimeValue, current.TimeValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.TimeValue)}"),
+            () => TimeSpanAreNotEqual(expected.TimeOfDay, current.TimeOfDay, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.TimeOfDay)}"),
+            () => TimeSpanAreNotEqual(expected.LTimeValue, current.LTimeValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.LTimeValue)}"),
             () => Assert.AreNotEqual(expected.DateValue, current.DateValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.DateValue)}"),
             () => Assert.AreNotEqual(expected.DateAndTimeValue, current.DateAndTimeValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.DateAndTimeValue)}"),
             () => Assert.AreNotEqual(expected.StringValue, current.StringValue, $"{nameof(DUT_TestStruct)}.{nameof(DUT_TestStruct.StringValue)}"),
@@ -200,9 +200,9 @@ internal static class AssertExtension
             () => Assert.AreNotEqual(expected.ULongValue, current.ULongValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.ULongValue)}"),
             () => Assert.AreNotEqual(expected.FloatValue, current.FloatValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.FloatValue)}"),
             () => Assert.AreNotEqual(expected.DoubleValue, current.DoubleValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.DoubleValue)}"),
-            () => Assert.AreNotEqual(expected.TimeValue, current.TimeValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.TimeValue)}"),
-            () => Assert.AreNotEqual(expected.TimeOfDay, current.TimeOfDay, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.TimeOfDay)}"),
-            () => Assert.AreNotEqual(expected.LTimeValue, current.LTimeValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.LTimeValue)}"),
+            () => TimeSpanAreNotEqual(expected.TimeValue, current.TimeValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.TimeValue)}"),
+            () => TimeSpanAreNotEqual(expected.TimeOfDay, current.TimeOfDay, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.TimeOfDay)}"),
+            () => TimeSpanAreNotEqual(expected.LTimeValue, current.LTimeValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.LTimeValue)}"),
             () => Assert.AreNotEqual(expected.DateValue, current.DateValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.DateValue)}"),
             () => Assert.AreNotEqual(expected.DateAndTimeValue, current.DateAndTimeValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.DateAndTimeValue)}"),
             () => Assert.AreNotEqual(expected.StringValue, current.StringValue, $"{nameof(DUT_TestClass)}.{nameof(DUT_TestClass.StringValue)}"),
@@ -263,7 +263,14 @@ internal static class AssertExtension
 
             Assert.Fail("Unknown type");
         }
-        else if (expectedValue is System.Collections.ICollection expectedCollection
+
+        if (expectedValue is System.TimeSpan timeSpan)
+        {
+            TimeSpanAreEqual(timeSpan, value, message);
+            return;
+        }
+
+        if (expectedValue is System.Collections.ICollection expectedCollection
             && value is System.Collections.ICollection valueCollection)
         {
             if (expectedValue.GetType() == value.GetType())
@@ -315,7 +322,8 @@ internal static class AssertExtension
 
             Assert.Fail("Unknown type");
         }
-        else if (expectedValue is System.Collections.ICollection expectedCollection
+
+        if (expectedValue is System.Collections.ICollection expectedCollection
             && value is System.Collections.ICollection valueCollection)
         {
             if (expectedValue.GetType() == value.GetType())
@@ -334,6 +342,50 @@ internal static class AssertExtension
             return;
         }
 
+        if (expectedValue is System.TimeSpan timeSpan)
+        {
+            TimeSpanAreNotEqual(timeSpan, value, message);
+            return;
+        }
+
         Assert.AreNotEqual(expectedValue, value, message);
+    }
+
+    private static void TimeSpanAreEqual(System.TimeSpan expected, dynamic current, string errorText)
+    {
+        if (current is uint)
+        {
+            var timeSpan = System.TimeSpan.FromMilliseconds(current);
+            Assert.AreEqual(expected, timeSpan, errorText);
+            return;
+        }
+
+        if (current is ulong ulongValue)
+        {
+            var timeSpan = System.TimeSpan.FromTicks((long)ulongValue / 100);
+            Assert.AreEqual(expected, timeSpan, errorText);
+            return;
+        }
+
+        Assert.AreEqual(expected, current, errorText);
+    }
+
+    private static void TimeSpanAreNotEqual(System.TimeSpan expected, dynamic current, string errorText)
+    {
+        if (current is uint)
+        {
+            var timeSpan = System.TimeSpan.FromMilliseconds(current);
+            Assert.AreNotEqual(expected, timeSpan, errorText);
+            return;
+        }
+
+        if (current is ulong ulongValue)
+        {
+            var timeSpan = System.TimeSpan.FromTicks((long)ulongValue / 100);
+            Assert.AreNotEqual(expected, timeSpan, errorText);
+            return;
+        }
+
+        Assert.AreNotEqual(expected, current, errorText);
     }
 }

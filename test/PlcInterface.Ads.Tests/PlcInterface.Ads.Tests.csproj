@@ -12,7 +12,7 @@
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
-    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="16.0.1" />
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="16.1.7" />
   </ItemGroup>
 
   <ItemGroup>

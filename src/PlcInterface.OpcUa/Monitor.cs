@@ -43,7 +43,7 @@ public class Monitor : IOpcMonitor, IDisposable
         {
             DisplayName = null,
             PublishingEnabled = true,
-            PublishingInterval = 1000,
+            PublishingInterval = 50,
             Priority = 1,
             KeepAliveCount = 10,
             LifetimeCount = 100,

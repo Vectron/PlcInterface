@@ -97,19 +97,28 @@ public class Monitor : IOpcMonitor, IDisposable
     /// <inheritdoc/>
     public void RegisterIO(IEnumerable<string> ioNames, int updateInterval = 1000)
     {
+        var needApply = false;
         foreach (var name in ioNames)
         {
-            RegisterIOInternal(name, updateInterval);
+            if (RegisterIOInternal(name, updateInterval))
+            {
+                needApply = true;
+            }
         }
 
-        _ = ApplyChangesAsync();
+        if (needApply)
+        {
+            _ = ApplyChangesAsync();
+        }
     }
 
     /// <inheritdoc/>
     public void RegisterIO(string ioName, int updateInterval = 1000)
     {
-        RegisterIOInternal(ioName, updateInterval);
-        _ = ApplyChangesAsync();
+        if (RegisterIOInternal(ioName, updateInterval))
+        {
+            _ = ApplyChangesAsync();
+        }
     }
 
     /// <inheritdoc/>
@@ -158,7 +167,7 @@ public class Monitor : IOpcMonitor, IDisposable
         }
     }
 
-    private void RegisterIOInternal(string name, int updateInterval)
+    private bool RegisterIOInternal(string name, int updateInterval)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -168,7 +177,7 @@ public class Monitor : IOpcMonitor, IDisposable
         if (registeredSymbols.TryGetValue(name, out var registeredSymbol))
         {
             registeredSymbol.Subscriptions++;
-            return;
+            return false;
         }
 
         logger.LogDebug("Registered {Name} for monitoring", name);
@@ -176,6 +185,7 @@ public class Monitor : IOpcMonitor, IDisposable
         registeredSymbols.Add(name, registeredSymbol);
         subscription.AddItem(registeredSymbol.MonitoredItem);
         registeredSymbol.UpdateMonitoredItem(symbolHandler);
+        return true;
     }
 
     private void UnregisterIOInternal(string name)
@@ -234,7 +244,7 @@ public class Monitor : IOpcMonitor, IDisposable
             {
                 AttributeId = Attributes.Value,
                 SamplingInterval = updateInterval,
-                QueueSize = 1,
+                QueueSize = 0,
                 DiscardOldest = true,
                 DisplayName = name,
             };

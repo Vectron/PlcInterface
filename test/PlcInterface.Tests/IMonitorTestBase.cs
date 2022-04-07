@@ -223,7 +223,7 @@ public abstract class IMonitorTestBase
         using var done = new ManualResetEvent(false);
 
         // Act
-        using var subscription = monitor.SubscribeIO<T>(ioName, _ => done.Set());
+        using var subscription = monitor.SubscribeIO<T>(ioName, _ => done.Set(), 100);
         var result = done.WaitOne(TimeSpan.FromMilliseconds(2000));
 
         // Assert

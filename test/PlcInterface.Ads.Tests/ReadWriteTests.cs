@@ -303,8 +303,8 @@ public class ReadWriteTests
     private static IAdsSymbolInfo CreateSymbolInfoMock<T>(string name, T? value, out Mock<IValueSymbol> valueSymbolMock)
     {
         valueSymbolMock = new Mock<IValueSymbol>();
-        _ = valueSymbolMock.Setup(x => x.ReadValue()).Returns(value);
-        _ = valueSymbolMock.Setup(x => x.ReadValue(It.IsAny<int>())).Returns(value);
+        _ = valueSymbolMock.Setup(x => x.ReadValue()).Returns(value!);
+        _ = valueSymbolMock.Setup(x => x.ReadValue(It.IsAny<int>())).Returns(value!);
         _ = valueSymbolMock.Setup(x => x.ReadValueAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(new ResultReadValueAccess(value, 0)));
         _ = valueSymbolMock.Setup(x => x.WriteValueAsync(It.IsAny<object>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new ResultWriteAccess(0)));
         var symbolMock = new Mock<IAdsSymbolInfo>();

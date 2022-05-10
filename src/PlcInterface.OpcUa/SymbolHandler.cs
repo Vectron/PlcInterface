@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reactive.Disposables;
 using Microsoft.Extensions.Logging;
@@ -59,12 +60,26 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
     /// <inheritdoc/>
     public ISymbolInfo GetSymbolinfo(string ioName)
     {
-        if (!allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out var value))
+        if (TryGetSymbolinfo(ioName, out var symbolInfo) && symbolInfo != null)
         {
-            throw new SymbolException($"{ioName} Does not excist in the PLC");
+            return symbolInfo;
         }
 
-        return value;
+        throw new SymbolException($"{ioName} Does not excist in the PLC");
+    }
+
+    /// <inheritdoc/>
+    public bool TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo)
+    {
+        if (allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out var symbolInfoResult))
+        {
+            symbolInfo = symbolInfoResult;
+            return true;
+        }
+
+        logger.LogError("{IoName} Does not excist in the PLC", ioName);
+        symbolInfo = null;
+        return false;
     }
 
     /// <summary>

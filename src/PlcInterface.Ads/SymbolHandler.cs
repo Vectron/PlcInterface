@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
@@ -70,12 +71,32 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
     /// <inheritdoc/>
     public IAdsSymbolInfo GetSymbolinfo(string ioName)
     {
-        if (!allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out var value))
+        if (TryGetSymbolinfo(ioName, out var symbolInfo) && symbolInfo != null)
         {
-            throw new SymbolException($"{ioName} Does not excist in the PLC");
+            return symbolInfo;
         }
 
-        return value;
+        throw new SymbolException($"{ioName} Does not excist in the PLC");
+    }
+
+    /// <inheritdoc/>
+    bool ISymbolHandler.TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo)
+    {
+        var result = TryGetSymbolinfo(ioName, out var symbolInfoResult);
+        symbolInfo = symbolInfoResult;
+        return result;
+    }
+
+    /// <inheritdoc/>
+    public bool TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out IAdsSymbolInfo symbolInfo)
+    {
+        if (allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out symbolInfo))
+        {
+            return true;
+        }
+
+        logger.LogError("{IoName} Does not excist in the PLC", ioName);
+        return false;
     }
 
     /// <summary>

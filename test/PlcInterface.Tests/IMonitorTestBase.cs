@@ -18,17 +18,24 @@ public abstract class IMonitorTestBase
     public void MonitorBeforeConnectDoesntMatter()
     {
         // Arrange
-        var connection = GetPLCConnection();
+        var connection = GetPLCConnection(false);
         var monitor = GetMonitor();
         var readWrite = GetReadWrite();
         using var done = new ManualResetEvent(false);
         var ioName = "MonitorTestData.BoolValue8";
+        var original = false;
 
         // Act
-        var original = readWrite.Read<bool>(ioName);
-        connection.Disconnect();
-        using var subscription = monitor.SubscribeIO(ioName, !original, () => done.Set());
+        using var subscription = monitor.SubscribeIO<bool>(ioName, x =>
+        {
+            if (x != original)
+            {
+                _ = done.Set();
+            }
+        });
+
         connection.Connect();
+        original = readWrite.Read<bool>(ioName);
         readWrite.ToggleBool(ioName);
         var result = done.WaitOne(TimeSpan.FromSeconds(5));
 
@@ -41,6 +48,7 @@ public abstract class IMonitorTestBase
     public async Task MultipleSubscriptions()
     {
         // Arrange
+        var connection = GetPLCConnection();
         var monitor = GetMonitor();
         var readWrite = GetReadWrite();
         var ioName = "MonitorTestData.BoolValue8";
@@ -78,6 +86,7 @@ public abstract class IMonitorTestBase
     public void RegisterUnregisterIO()
     {
         // Arrange
+        var connection = GetPLCConnection();
         var monitor = GetMonitor();
         var readWrite = GetReadWrite();
         using var done = new ManualResetEvent(false);
@@ -119,6 +128,7 @@ public abstract class IMonitorTestBase
     public void RegisterUnregisterMultipleIO()
     {
         // Arrange
+        var connection = GetPLCConnection();
         var monitor = GetMonitor();
         var readWrite = GetReadWrite();
         using var done = new ManualResetEvent(false);
@@ -164,6 +174,7 @@ public abstract class IMonitorTestBase
     public void SubscribeIO()
     {
         // Arrange
+        var connection = GetPLCConnection();
         var monitor = GetMonitor();
         var readWrite = GetReadWrite();
         using var done = new ManualResetEvent(false);
@@ -218,13 +229,14 @@ public abstract class IMonitorTestBase
 
     protected abstract IMonitor GetMonitor();
 
-    protected abstract IPlcConnection GetPLCConnection();
+    protected abstract IPlcConnection GetPLCConnection(bool connected = true);
 
     protected abstract IReadWrite GetReadWrite();
 
     protected void MonitorValueGenericHelper<T>(string ioName)
     {
         // Arrange
+        var connection = GetPLCConnection();
         var monitor = GetMonitor();
         using var done = new ManualResetEvent(false);
 

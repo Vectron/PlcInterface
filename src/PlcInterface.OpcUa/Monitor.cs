@@ -273,8 +273,7 @@ public class Monitor : IOpcMonitor, IDisposable
 
         public void UpdateMonitoredItem(ISymbolHandler symbolHandler)
         {
-            var symbol = symbolHandler.GetSymbolinfo(name);
-            if (symbol != null)
+            if (symbolHandler.TryGetSymbolinfo(name, out var symbol))
             {
                 var symbolInfo = symbol.ConvertAndValidate();
                 MonitoredItem.StartNodeId = symbolInfo.Handle;

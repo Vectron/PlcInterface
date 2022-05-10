@@ -32,5 +32,36 @@ public abstract class ISymbolHandlerTestBase
         Assert.IsTrue(count > 0);
     }
 
+    [TestMethod]
+    public void TryGetSymbolInfoReturnsFalseWithInvallidData()
+    {
+        // Arrange
+        var symbolHandler = GetSymbolHandler();
+        var ioName = "ANonExcistingSymbol";
+
+        // Act
+        var result = symbolHandler.TryGetSymbolinfo(ioName, out var symbol);
+
+        // Assert
+        Assert.AreEqual(false, result);
+        Assert.IsNull(symbol);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(Settings.GetMonitorData), typeof(Settings), DynamicDataSourceType.Method)]
+    public void TryGetSymbolInfoReturnsTrueWithVallidData(string ioName)
+    {
+        // Arrange
+        var symbolHandler = GetSymbolHandler();
+
+        // Act
+        var result = symbolHandler.TryGetSymbolinfo(ioName, out var symbol);
+
+        // Assert
+        Assert.AreEqual(true, result);
+        Assert.IsNotNull(symbol);
+        Assert.AreEqual(ioName, symbol.Name);
+    }
+
     protected abstract ISymbolHandler GetSymbolHandler();
 }

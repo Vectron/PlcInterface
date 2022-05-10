@@ -102,6 +102,11 @@ public class ReadWrite : IAdsReadWrite
 
         var sumReader = sumSymbolFactory.CreateSumSymbolRead(client, tcSymbols);
         var resultSum = await sumReader.ReadAsync(CancellationToken.None).ConfigureAwait(false);
+        if (resultSum == null)
+        {
+            return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        }
+
         var dictionary = ioNames
                 .Zip(resultSum, (ioName, value) =>
                 {

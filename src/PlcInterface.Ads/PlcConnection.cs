@@ -103,12 +103,17 @@ public class PlcConnection : IAdsPlcConnection, IDisposable
         }
     }
 
-    private void AdsDisposableConnection_ConnectionStateChanged(object sender, TwinCAT.ConnectionStateChangedEventArgs e)
+    private void AdsDisposableConnection_ConnectionStateChanged(object? sender, TwinCAT.ConnectionStateChangedEventArgs e)
     {
+        if (sender is not IAdsDisposableConnection disposableConnection)
+        {
+            return;
+        }
+
         switch (e.NewState)
         {
             case TwinCAT.ConnectionState.Connected:
-                connectionState.OnNext(Connected.Yes((IAdsDisposableConnection)sender));
+                connectionState.OnNext(Connected.Yes(disposableConnection));
                 break;
 
             case TwinCAT.ConnectionState.None:

@@ -24,13 +24,13 @@ public static class StringExtensions
     /// <returns>An <see cref="Array"/> containing the indices of every array dimension.</returns>
     public static int[] GetIndices(this ReadOnlySpan<char> span)
     {
-        var sliced = span.Slice(span.IndexOf('[') + 1);
+        var sliced = span[(span.IndexOf('[') + 1)..];
         var end = sliced.IndexOfAny(']', ',');
         var dimensions = new List<int>();
 
         while (end != -1)
         {
-            var value = sliced.Slice(0, end);
+            var value = sliced[..end];
             var dimension = int.Parse(value.ToString(), CultureInfo.InvariantCulture);
             dimensions.Add(dimension);
             if (sliced[end] == ']')
@@ -38,7 +38,7 @@ public static class StringExtensions
                 break;
             }
 
-            sliced = sliced.Slice(end + 1);
+            sliced = sliced[(end + 1)..];
             end = sliced.IndexOfAny(']', ',');
         }
 

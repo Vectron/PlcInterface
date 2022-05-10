@@ -260,7 +260,7 @@ internal struct DUT_TestStruct : IEquatable<DUT_TestStruct>
         set;
     }
 
-    public override readonly bool Equals(object obj)
+    public override readonly bool Equals(object? obj)
         => obj is DUT_TestStruct @struct && Equals(@struct);
 
     public readonly bool Equals(DUT_TestStruct other)

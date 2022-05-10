@@ -48,7 +48,7 @@ public class OPCSettings
     /// Gets the discovery adress.
     /// </summary>
     public Uri DiscoveryAdress
-        => new UriBuilder(Address)
+        => new UriBuilder(Address ?? new Uri("127.0.0.1"))
         {
             Path = "/discovery",
         }.Uri;

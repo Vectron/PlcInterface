@@ -92,7 +92,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             var usesSecurity = SetupSecurity(config);
             logger.LogDebug("Discover endpoints of {DiscoveryAdress}.", settings.DiscoveryAdress);
             var selectedEndpoint = CoreClientUtils.SelectEndpoint(settings.DiscoveryAdress.ToString(), usesSecurity, 15000);
-            logger.LogDebug("Selected endpoint uses: {Security}", selectedEndpoint.SecurityPolicyUri.Substring(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1));
+            logger.LogDebug("Selected endpoint uses: {Security}", selectedEndpoint.SecurityPolicyUri[(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1)..]);
             logger.LogDebug("Create a session with OPC UA server.");
             var endpointConfiguration = EndpointConfiguration.Create(config);
             var endpoint = new ConfiguredEndpoint(null, selectedEndpoint, endpointConfiguration);

@@ -40,7 +40,7 @@ public static class ISymbolInfoExtension
             .Select(x => symbolHandler.GetSymbolinfo(x))
             .SelectMany(x =>
             {
-                object childValue;
+                object? childValue;
                 if (value is Array array)
                 {
                     var indices = x.Name.GetIndices();
@@ -50,7 +50,12 @@ public static class ISymbolInfoExtension
                 {
                     var type = value.GetType();
                     var property = type.GetProperty(x.ShortName);
-                    childValue = property.GetValue(value);
+                    childValue = property?.GetValue(value);
+                }
+
+                if (childValue == null)
+                {
+                    return Enumerable.Empty<(ISymbolInfo SymbolInfo, object Value)>();
                 }
 
                 return x.FlattenWithValue(symbolHandler, childValue);

@@ -52,6 +52,11 @@ internal static class DynamicObjectExtensions
         if (arrayType.ManagedType != null)
         {
             var ellementType = arrayType.ManagedType.GetElementType();
+            if (ellementType == null)
+            {
+                throw new NotSupportedException($"Unable to retrieve element type");
+            }
+
             var destination = Array.CreateInstance(ellementType, dimensionLengts);
 
             foreach (var indices in destination.Indices())
@@ -101,7 +106,7 @@ internal static class DynamicObjectExtensions
             return false;
         }
 
-        IDictionary<string, object> expando = new ExpandoObject();
+        IDictionary<string, object?> expando = new ExpandoObject();
         foreach (var name in ((DynamicObject)structValue).GetDynamicMemberNames())
         {
             if (!structValue.TryGetMemberValue(name, out var childValue))

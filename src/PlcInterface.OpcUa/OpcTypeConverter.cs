@@ -59,7 +59,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
 
         if (value is ExpandoObject keyValues)
         {
-            var instance = Activator.CreateInstance(targetType);
+            var instance = Activator.CreateInstance(targetType) ?? throw new NotSupportedException($"Unable to create a instance for type: {targetType}");
             foreach (var keyValue in keyValues)
             {
                 var property = targetType.GetProperty(keyValue.Key);
@@ -70,7 +70,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
                     continue;
                 }
 
-                var fixedObject = Convert(keyValue.Value, property.PropertyType);
+                var fixedObject = keyValue.Value == null ? null : Convert(keyValue.Value, property.PropertyType);
                 property.SetValue(instance, fixedObject);
             }
 
@@ -109,12 +109,17 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
             upperBoundsRank[dimension] = array.GetLength(dimension);
         }
 
-        var elementType = targetType.GetElementType();
+        var elementType = targetType.GetElementType() ?? throw new NotSupportedException("Unable to get element type");
         var typedArray = Array.CreateInstance(elementType, upperBoundsRank);
 
         foreach (var indices in typedArray.Indices())
         {
             var item = array.GetValue(indices);
+            if (item == null)
+            {
+                continue;
+            }
+
             var fixedObject = Convert(item, elementType);
             typedArray.SetValue(fixedObject, indices);
         }

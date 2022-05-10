@@ -29,7 +29,7 @@ internal sealed class SymbolInfo : ISymbolInfo
         Name = itemFullName;
         this.nodeInfo = nodeInfo;
         NameLower = Name.ToLower(CultureInfo.InvariantCulture);
-        ShortName = Name.Substring(Name.LastIndexOf(".", StringComparison.OrdinalIgnoreCase) + 1);
+        ShortName = Name[(Name.LastIndexOf(".", StringComparison.OrdinalIgnoreCase) + 1)..];
         ChildSymbols = new List<string>();
         IsBigType = symbol.NodeClass is NodeClass.Object or NodeClass.ObjectType;
         Indices = Name.GetIndices();

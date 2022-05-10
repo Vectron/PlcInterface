@@ -65,6 +65,11 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
         }
 
         var ellementType = type.GetElementType();
+        if (ellementType == null)
+        {
+            throw new NotSupportedException($"Unable to retrieve element type");
+        }
+
         var dimensionLengts = dataType.Dimensions.GetDimensionLengths();
         var destination = Array.CreateInstance(ellementType, dimensionLengts);
 
@@ -100,8 +105,7 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
             return ConvertArray(dynamicObject, type);
         }
 
-        var destination = Activator.CreateInstance(type);
-
+        var destination = Activator.CreateInstance(type) ?? throw new NotSupportedException($"Unable to create a instance for type: {type.Name}");
         foreach (var memberName in dynamicObject.GetDynamicMemberNames())
         {
             var property = type.GetProperty(memberName);
@@ -162,7 +166,7 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
         }
 
         [ExcludeFromCodeCoverage]
-        public override DynamicMetaObject FallbackGetMember(DynamicMetaObject target, DynamicMetaObject errorSuggestion)
+        public override DynamicMetaObject FallbackGetMember(DynamicMetaObject target, DynamicMetaObject? errorSuggestion)
             => throw new NotSupportedException();
     }
 }

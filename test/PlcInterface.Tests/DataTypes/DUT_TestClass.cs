@@ -289,10 +289,11 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
         set;
     }
 
-    public override bool Equals(object obj) => obj is DUT_TestClass @struct && Equals(@struct);
+    public override bool Equals(object? obj) => obj is DUT_TestClass @struct && Equals(@struct);
 
-    public bool Equals(DUT_TestClass other)
-        => BoolValue == other.BoolValue
+    public bool Equals(DUT_TestClass? other)
+        => other != null
+            && BoolValue == other.BoolValue
             && ByteValue == other.ByteValue
             && WordValue == other.WordValue
             && DWordValue == other.DWordValue
@@ -317,10 +318,14 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
             && Nested != null
             && other.Nested != null
             && EqualityComparer<DUT_TestClass2>.Default.Equals(Nested, other.Nested)
+            && IntArray != null
+            && other.IntArray != null
             && IntArray.SequenceEqual(other.IntArray)
             && MultiDimensionArray != null
             && other.MultiDimensionArray != null
             && MultiDimensionArray.SequenceEqual<short>(other.MultiDimensionArray)
+            && ComplexArray != null
+            && other.ComplexArray != null
             && ComplexArray.SequenceEqual(other.ComplexArray)
             && MultiDimensionComplexArray != null
             && other.MultiDimensionComplexArray != null
@@ -350,8 +355,8 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
         hashCode = (hashCode * -1521134295) + LTimeValue.GetHashCode();
         hashCode = (hashCode * -1521134295) + DateValue.GetHashCode();
         hashCode = (hashCode * -1521134295) + DateAndTimeValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + StringComparer.Ordinal.GetHashCode(StringValue);
-        hashCode = (hashCode * -1521134295) + StringComparer.Ordinal.GetHashCode(WStringValue);
+        hashCode = (hashCode * -1521134295) + StringComparer.Ordinal.GetHashCode(StringValue ?? string.Empty);
+        hashCode = (hashCode * -1521134295) + StringComparer.Ordinal.GetHashCode(WStringValue ?? string.Empty);
         hashCode = (hashCode * -1521134295) + (Nested == null ? 0 : Nested.GetHashCode());
         hashCode = (hashCode * -1521134295) + (IntArray == null ? 0 : EqualityComparer<short[]>.Default.GetHashCode(IntArray));
         hashCode = (hashCode * -1521134295) + (MultiDimensionArray == null ? 0 : EqualityComparer<short[,,]>.Default.GetHashCode(MultiDimensionArray));

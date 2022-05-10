@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO.Abstractions;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using PlcInterface.Ads.TwincatAbstractions;
@@ -19,8 +18,17 @@ public class MonitorTest : IMonitorTestBase
     private static ReadWrite? readWrite;
     private static SymbolHandler? symbolHandler;
 
+    [ClassCleanup]
+    public static void Disconnect()
+    {
+        connection?.Dispose();
+        symbolHandler?.Dispose();
+        monitor?.Dispose();
+        adsClient?.Dispose();
+    }
+
     [ClassInitialize]
-    public static async Task ConnectAsync(TestContext testContext)
+    public static void Setup(TestContext testContext)
     {
         var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
         var symbolhandlersettings = new SymbolHandlerSettings() { StoreSymbolsToDisk = false };
@@ -32,24 +40,21 @@ public class MonitorTest : IMonitorTestBase
         var sumSymbolFactory = new SumSymbolFactory();
         readWrite = new ReadWrite(connection, symbolHandler, typeConverter, sumSymbolFactory);
         monitor = new Monitor(connection, symbolHandler, typeConverter, MockHelpers.GetLoggerMock<Monitor>());
-        await connection.ConnectAsync();
-        _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
-    }
-
-    [ClassCleanup]
-    public static void Disconnect()
-    {
-        connection?.Dispose();
-        symbolHandler?.Dispose();
-        monitor?.Dispose();
-        adsClient?.Dispose();
     }
 
     protected override IMonitor GetMonitor()
         => monitor!;
 
-    protected override IPlcConnection GetPLCConnection()
-        => connection!;
+    protected override IPlcConnection GetPLCConnection(bool connected = true)
+    {
+        if (connected)
+        {
+            connection?.Connect();
+            _ = connection?.GetConnectedClient(TimeSpan.FromSeconds(1));
+        }
+
+        return connection!;
+    }
 
     protected override IReadWrite GetReadWrite()
         => readWrite!;

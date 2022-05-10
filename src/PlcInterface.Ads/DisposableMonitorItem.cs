@@ -53,9 +53,8 @@ internal sealed class DisposableMonitorItem : IDisposable
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "Dont need a cancelation token.")]
     public void Update(IAdsSymbolHandler symbolHandler, ISubject<IMonitorResult> symbolStream, IAdsTypeConverter typeConverter)
     {
-        var symbolInfo = symbolHandler.GetSymbolinfo(name);
-
-        if (symbolInfo.Symbol is IValueSymbol valueSymbol
+        if (symbolHandler.TryGetSymbolinfo(name, out var symbolInfo)
+            && symbolInfo.Symbol is IValueSymbol valueSymbol
             && valueSymbol.Connection != null
             && valueSymbol.Connection.IsConnected)
         {

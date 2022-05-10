@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reactive.Disposables;
 using Microsoft.Extensions.Logging;
@@ -68,7 +69,7 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
     }
 
     /// <inheritdoc/>
-    public bool TryGetSymbolinfo(string ioName, out ISymbolInfo? symbolInfo)
+    public bool TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo)
     {
         if (allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out var symbolInfoResult))
         {

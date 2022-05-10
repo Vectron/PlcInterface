@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
@@ -79,7 +80,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
     }
 
     /// <inheritdoc/>
-    bool ISymbolHandler.TryGetSymbolinfo(string ioName, out ISymbolInfo? symbolInfo)
+    bool ISymbolHandler.TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo)
     {
         var result = TryGetSymbolinfo(ioName, out var symbolInfoResult);
         symbolInfo = symbolInfoResult;
@@ -87,7 +88,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
     }
 
     /// <inheritdoc/>
-    public bool TryGetSymbolinfo(string ioName, out IAdsSymbolInfo? symbolInfo)
+    public bool TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out IAdsSymbolInfo symbolInfo)
     {
         if (allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out symbolInfo))
         {

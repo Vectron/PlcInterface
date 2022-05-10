@@ -1,4 +1,6 @@
-﻿namespace PlcInterface.Ads;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace PlcInterface.Ads;
 
 /// <summary>
 /// The Ads implementation of a <see cref="ISymbolHandler"/>.
@@ -18,5 +20,5 @@ public interface IAdsSymbolHandler : ISymbolHandler
     /// <param name="ioName">The tag name.</param>
     /// <param name="symbolInfo">The found <see cref="IAdsSymbolInfo"/>.</param>
     /// <returns><see langword="true"/> when the symbol was found else <see langword="false"/>.</returns>
-    bool TryGetSymbolinfo(string ioName, out IAdsSymbolInfo? symbolInfo);
+    bool TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out IAdsSymbolInfo symbolInfo);
 }

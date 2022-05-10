@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PlcInterface;
 
@@ -28,5 +29,5 @@ public interface ISymbolHandler
     /// <param name="ioName">The tag name.</param>
     /// <param name="symbolInfo">The found <see cref="ISymbolInfo"/>.</param>
     /// <returns><see langword="true"/> when the symbol was found else <see langword="false"/>.</returns>
-    bool TryGetSymbolinfo(string ioName, out ISymbolInfo? symbolInfo);
+    bool TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo);
 }

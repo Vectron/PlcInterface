@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.Tests.Extension;
@@ -74,7 +75,12 @@ public abstract class IWriteValueTestBase
     public void WriteGeneric(string ioName, object newValue, object readValue)
     {
         var methodInfo = GetType().GetMethod(nameof(WriteValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance);
-        var method = methodInfo.MakeGenericMethod(newValue.GetType(), readValue.GetType());
+        var method = methodInfo?.MakeGenericMethod(newValue.GetType(), readValue.GetType());
+        if (method == null)
+        {
+            throw new InvalidOperationException($"Unable to create the generic method {newValue.GetType().Name}.");
+        }
+
         _ = method.InvokeUnwrappedException(this, new[] { ioName, newValue, readValue });
     }
 
@@ -83,8 +89,13 @@ public abstract class IWriteValueTestBase
     public async Task WriteGenericAsync(string ioName, object newValue, object readValue)
     {
         var methodInfo = GetType().GetMethod(nameof(WriteValueGenericHelperAsync), BindingFlags.NonPublic | BindingFlags.Instance);
-        var method = methodInfo.MakeGenericMethod(newValue.GetType(), readValue.GetType());
-        await (Task)method.InvokeUnwrappedException(this, new[] { ioName, newValue, readValue });
+        var method = methodInfo?.MakeGenericMethod(newValue.GetType(), readValue.GetType());
+        if (method == null)
+        {
+            throw new InvalidOperationException($"Unable to create the generic method {newValue.GetType().Name}.");
+        }
+
+        await method.InvokeAsyncUnwrappedException(this, new[] { ioName, newValue, readValue });
     }
 
     [TestMethod]

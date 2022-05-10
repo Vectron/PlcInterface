@@ -17,7 +17,7 @@ public static class ArrayExtensions
     public static IEnumerable<int[]> Indices(this Array array)
     {
         var indices = new int[array.Rank];
-        indices[indices.Length - 1]--;
+        indices[^1]--;
 
         while (array.IncrementIndices(ref indices))
         {

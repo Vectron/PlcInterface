@@ -185,7 +185,12 @@ public abstract class IMonitorTestBase
     {
         var method = typeof(IMonitorTestBase)
             .GetMethod(nameof(MonitorValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
-            .MakeGenericMethod(instanceType);
+            ?.MakeGenericMethod(instanceType);
+        if (method == null)
+        {
+            throw new InvalidOperationException($"Unable to create the generic method {nameof(MonitorValueGenericHelper)}.");
+        }
+
         _ = method.InvokeUnwrappedException(this, new object[] { ioName });
     }
 

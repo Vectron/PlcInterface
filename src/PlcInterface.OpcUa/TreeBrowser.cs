@@ -71,7 +71,7 @@ internal sealed class TreeBrowser : Browser
     /// <returns>All found symbols on the server.</returns>
     public IDictionary<string, SymbolInfo> BrowseTree(Uri address)
     {
-        var path = address.AbsolutePath.Trim('/').Replace("%20", " ");
+        var path = address.AbsolutePath.Trim('/').Replace("%20", " ", StringComparison.OrdinalIgnoreCase);
         var rootNode = CreateRootNodeSymbol(path);
         var treeStart = new[] { rootNode };
         return treeStart
@@ -88,14 +88,14 @@ internal sealed class TreeBrowser : Browser
             return uri.Trim(splitChar);
         }
 
-        return uri.Replace(rootName, string.Empty).Trim(splitChar);
+        return uri.Replace(rootName, string.Empty, StringComparison.OrdinalIgnoreCase).Trim(splitChar);
     }
 
     private static SymbolInfo CreateSymbol(ReferenceDescription description, NodeInfo nodeInfo, SymbolInfo? parent, string rootName)
     {
         var nameBuilder = new StringBuilder();
         var parentName = parent == null ? ReadOnlySpan<char>.Empty : parent.Name.AsSpan();
-        var arrayIndex = description.BrowseName.Name.IndexOf('[');
+        var arrayIndex = description.BrowseName.Name.IndexOf('[', StringComparison.OrdinalIgnoreCase);
         ReadOnlySpan<char> itemName;
         ReadOnlySpan<char> arrayIndexString;
         if (arrayIndex == -1)
@@ -109,7 +109,7 @@ internal sealed class TreeBrowser : Browser
             arrayIndexString = description.BrowseName.Name.AsSpan(arrayIndex);
         }
 
-        _ = nameBuilder.Append(parentName.ToString());
+        _ = nameBuilder.Append(parentName);
         if (!parentName.EndsWith(itemName, StringComparison.Ordinal))
         {
             if (!parentName.IsEmpty)
@@ -117,25 +117,25 @@ internal sealed class TreeBrowser : Browser
                 _ = nameBuilder.Append('.');
             }
 
-            _ = nameBuilder.Append(itemName.ToString());
+            _ = nameBuilder.Append(itemName);
         }
 
-        var fullName = nameBuilder.Append(arrayIndexString.ToString()).ToString();
-        fullName = CleanName(fullName, rootName).Replace("\"", string.Empty);
+        var fullName = nameBuilder.Append(arrayIndexString).ToString();
+        fullName = CleanName(fullName, rootName).Replace("\"", string.Empty, StringComparison.OrdinalIgnoreCase);
         parent?.ChildSymbols.Add(fullName);
         return new SymbolInfo(description, fullName, nodeInfo);
     }
 
     private BrowseDescription BrowseDescriptionFromNodeId(NodeId nodeId)
-                => new()
-                {
-                    NodeId = nodeId,
-                    BrowseDirection = BrowseDirection,
-                    ReferenceTypeId = ReferenceTypeId,
-                    IncludeSubtypes = IncludeSubtypes,
-                    NodeClassMask = (uint)NodeClassMask,
-                    ResultMask = ResultMask,
-                };
+        => new()
+        {
+            NodeId = nodeId,
+            BrowseDirection = BrowseDirection,
+            ReferenceTypeId = ReferenceTypeId,
+            IncludeSubtypes = IncludeSubtypes,
+            NodeClassMask = (uint)NodeClassMask,
+            ResultMask = ResultMask,
+        };
 
     /// <summary>
     /// Fetches the next batch of references.
@@ -181,7 +181,7 @@ internal sealed class TreeBrowser : Browser
         var nodeInfos = browseResult
             .SelectMany(x => x)
             .Select(x => (NodeId)x.NodeId)
-            .Chunk(operationLimits.MaxNodesPerRead)
+            .Chunk((int)operationLimits.MaxNodesPerRead)
             .SelectMany(Session.ReadNodeInfo);
 
         var allSymbols = browseResult
@@ -197,7 +197,7 @@ internal sealed class TreeBrowser : Browser
             return Enumerable.Empty<SymbolInfo>();
         }
 
-        return allSymbols.Concat(allSymbols.Chunk(operationLimits.MaxNodesPerBrowse).SelectMany(x => BrowseRecursive(x, rootName)));
+        return allSymbols.Concat(allSymbols.Chunk((int)operationLimits.MaxNodesPerBrowse).SelectMany(x => BrowseRecursive(x, rootName)));
     }
 
     private SymbolInfo CreateRootNodeSymbol(string path)

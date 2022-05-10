@@ -45,7 +45,12 @@ public abstract class IReadValueTestBase
         var instanceType = value.GetType();
         var method = typeof(IReadValueTestBase)
             .GetMethod(nameof(ReadValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
-            .MakeGenericMethod(instanceType);
+            ?.MakeGenericMethod(instanceType);
+        if (method == null)
+        {
+            throw new InvalidOperationException($"Unable to create the generic method {nameof(ReadValueGenericHelper)}.");
+        }
+
         _ = method.InvokeUnwrappedException(this, new object[] { ioName, value });
     }
 
@@ -57,8 +62,13 @@ public abstract class IReadValueTestBase
         var instanceType = value.GetType();
         var method = typeof(IReadValueTestBase)
             .GetMethod(nameof(ReadValueGenericHelperAsync), BindingFlags.NonPublic | BindingFlags.Instance)
-            .MakeGenericMethod(instanceType);
-        await (Task)method.InvokeUnwrappedException(this, new object[] { ioName, value });
+            ?.MakeGenericMethod(instanceType);
+        if (method == null)
+        {
+            throw new InvalidOperationException($"Unable to create the generic method {nameof(ReadValueGenericHelperAsync)}.");
+        }
+
+        await method.InvokeAsyncUnwrappedException(this, new object[] { ioName, value });
     }
 
     [TestMethod]
@@ -168,7 +178,12 @@ public abstract class IReadValueTestBase
         var instanceType = readValue.GetType();
         var method = typeof(IReadValueTestBase)
             .GetMethod(nameof(WaitsForValueToChange), BindingFlags.NonPublic | BindingFlags.Instance)
-            .MakeGenericMethod(instanceType);
+            ?.MakeGenericMethod(instanceType);
+        if (method == null)
+        {
+            throw new InvalidOperationException($"Unable to create the generic method {nameof(WaitsForValueToChange)}.");
+        }
+
         _ = method.InvokeUnwrappedException(this, new object[] { ioName, readValue });
     }
 
@@ -179,8 +194,13 @@ public abstract class IReadValueTestBase
         var instanceType = readValue.GetType();
         var method = typeof(IReadValueTestBase)
             .GetMethod(nameof(WaitsForValueToChangeAsync), BindingFlags.NonPublic | BindingFlags.Instance)
-            .MakeGenericMethod(instanceType);
-        await (Task)method.InvokeUnwrappedException(this, new object[] { ioName, readValue });
+            ?.MakeGenericMethod(instanceType);
+        if (method == null)
+        {
+            throw new InvalidOperationException($"Unable to create the generic method {nameof(WaitsForValueToChangeAsync)}.");
+        }
+
+        await method.InvokeAsyncUnwrappedException(this, new object[] { ioName, readValue });
     }
 
     protected abstract IReadWrite GetReadWrite();

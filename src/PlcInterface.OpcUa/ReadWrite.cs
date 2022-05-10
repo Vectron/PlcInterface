@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Opc.Ua;
+using PlcInterface.Extensions;
 using PlcInterface.OpcUa.Extensions;
 
 namespace PlcInterface.OpcUa;
@@ -182,9 +183,9 @@ public class ReadWrite : IOpcReadWrite, IDisposable
                 try
                 {
                     var responseHeader = session.EndRead(ar, out var dataValues, out var diagnosticInfos);
-                    var val = dataValues.FirstOrDefault();
                     var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                     ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
+                    var val = dataValues.FirstOrDefault().ThrowIfNull();
                     taskCompletionSource.SetResult(typeConverter.Convert(val.Value));
                 }
                 catch (Exception ex)
@@ -229,9 +230,9 @@ public class ReadWrite : IOpcReadWrite, IDisposable
 
                 try
                 {
-                    var val = dataValues.FirstOrDefault();
                     var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                     ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
+                    var val = dataValues.FirstOrDefault().ThrowIfNull();
                     taskCompletionSource.SetResult(typeConverter.Convert<T>(val.Value));
                 }
                 catch (Exception ex)
@@ -252,7 +253,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     public async Task<dynamic> ReadDynamicAsync(string ioName)
     {
         var value = await ReadAsync(new[] { ioName }).ConfigureAwait(false);
-        return value.Values.FirstOrDefault();
+        return value.Values.First();
     }
 
     /// <inheritdoc/>

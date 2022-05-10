@@ -25,8 +25,9 @@ public class MonitorTests
         _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
         var symbolInfoMock = new Mock<IAdsSymbolInfo>();
         _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
+        var symbolInfo = symbolInfoMock.Object;
         var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfoMock.Object);
+        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolinfo(It.IsAny<string>(), out symbolInfo)).Returns(true);
         var typeConverterMock = new Mock<IAdsTypeConverter>();
         using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
         var connectedMock = new Mock<IConnected<IAdsConnection>>();
@@ -55,8 +56,9 @@ public class MonitorTests
         _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
         var symbolInfoMock = new Mock<IAdsSymbolInfo>();
         _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
+        var symbolInfo = symbolInfoMock.Object;
         var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfoMock.Object);
+        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolinfo(It.IsAny<string>(), out symbolInfo)).Returns(true);
         var typeConverterMock = new Mock<IAdsTypeConverter>();
         using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
 
@@ -105,8 +107,9 @@ public class MonitorTests
         _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
         var symbolInfoMock = new Mock<IAdsSymbolInfo>();
         _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
+        var symbolInfo = symbolInfoMock.Object;
         var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.Is<string>(x => x.Equals(ioTag, StringComparison.Ordinal)))).Returns(symbolInfoMock.Object);
+        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolinfo(It.IsAny<string>(), out symbolInfo)).Returns(true);
         var typeConverterMock = new Mock<IAdsTypeConverter>();
         using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
 
@@ -172,8 +175,9 @@ public class MonitorTests
         _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
         var symbolInfoMock = new Mock<IAdsSymbolInfo>();
         _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
+        var symbolInfo = symbolInfoMock.Object;
         var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.Is<string>(x => x.Equals(ioTag, StringComparison.Ordinal)))).Returns(symbolInfoMock.Object);
+        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolinfo(It.IsAny<string>(), out symbolInfo)).Returns(true);
         var typeConverterMock = new Mock<IAdsTypeConverter>();
         using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
 
@@ -202,8 +206,9 @@ public class MonitorTests
         _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twincatConnectionMock.Object);
         var symbolInfoMock = new Mock<IAdsSymbolInfo>();
         _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
+        var symbolInfo = symbolInfoMock.Object;
         var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandlerMock.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfoMock.Object);
+        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolinfo(It.IsAny<string>(), out symbolInfo)).Returns(true);
         var typeConverterMock = new Mock<IAdsTypeConverter>();
         _ = typeConverterMock.Setup(x => x.Convert(It.IsAny<object>(), It.IsAny<IValueSymbol>())).Returns<object, IValueSymbol>((o, v) => o);
         using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());

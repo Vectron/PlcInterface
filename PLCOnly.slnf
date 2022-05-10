@@ -1,0 +1,9 @@
+{
+  "solution": {
+    "path": "PlcInterface.sln",
+    "projects": [
+      "test\\PlcInterface.Ads.PLC\\PlcInterface.Ads.PLC.tsproj",
+      "test\\PlcInterface.OpcUa.OpcServer\\PlcInterface.OpcUa.OpcServer.tcconnproj"
+    ]
+  }
+}

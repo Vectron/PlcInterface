@@ -9,10 +9,9 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
         <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Client" Version="1.4.368.53" />
-        <PackageReference Condition="'$(Configuration)' == 'Release'" Include="PlcInterface.Abstraction" Version="2.4.*" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <ItemGroup>
         <ProjectReference Include="..\PlcInterface.Abstraction\PlcInterface.Abstraction.csproj" />
     </ItemGroup>
 </Project>

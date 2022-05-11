@@ -46,6 +46,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlcInterface.Opc.Integratio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestUtilities", "test\TestUtilities\TestUtilities.csproj", "{96785DFD-51DE-4F22-B13C-B0A072DEF0C3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{7CA632C5-6407-4D5A-9444-BB3D8EECE2F4}"
+	ProjectSection(SolutionItems) = preProject
+		.github\dependabot.yml = .github\dependabot.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{CD933546-74FC-4714-8E93-098A2D7E2F5E}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\BuildAndTest.yml = .github\workflows\BuildTestDeploy.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -328,6 +338,7 @@ Global
 		{ADC25E02-895A-4367-967F-EB5DA5915E67} = {51750A27-B993-4FDA-9B03-DF95D59A7C6F}
 		{891FC975-646B-4790-B68C-63DC3B04E661} = {51750A27-B993-4FDA-9B03-DF95D59A7C6F}
 		{96785DFD-51DE-4F22-B13C-B0A072DEF0C3} = {51750A27-B993-4FDA-9B03-DF95D59A7C6F}
+		{CD933546-74FC-4714-8E93-098A2D7E2F5E} = {7CA632C5-6407-4D5A-9444-BB3D8EECE2F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A497AA4-8CE0-40C3-91EF-F344A9E130D5}

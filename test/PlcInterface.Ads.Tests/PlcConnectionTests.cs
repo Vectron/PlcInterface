@@ -195,7 +195,7 @@ public class PlcConnectionTests
     }
 
     [TestMethod]
-    public void IfAutoConnectIsTrueConnectionIsMadeImmidiatly()
+    public async void IfAutoConnectIsTrueConnectionIsMadeImmidiatly()
     {
         // Arrange
         var settings = new ConnectionSettings()
@@ -205,16 +205,17 @@ public class PlcConnectionTests
             AutoConnect = true,
         };
         var adsClientMock = new Mock<IAdsDisposableConnection>();
-        using var resetEvent = new ManualResetEventSlim();
-        _ = adsClientMock.Setup(x => x.Connect(It.IsAny<AmsAddress>())).Callback((AmsAddress address) => resetEvent.Set());
+        var resetEvent = new TaskCompletionSource<bool>();
+        _ = adsClientMock.Setup(x => x.Connect(It.IsAny<AmsAddress>())).Callback((AmsAddress address) => resetEvent.SetResult(true));
         using var tokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(1000));
+        using var tokenRegestration = tokenSource.Token.Register(() => resetEvent.SetResult(false));
 
         // Act
         using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(settings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
-        resetEvent.Wait(tokenSource.Token);
+        var result = await resetEvent.Task;
 
         // Assert
-        Assert.IsTrue(resetEvent.IsSet);
+        Assert.IsTrue(result);
         adsClientMock.Verify(x => x.Connect(It.IsAny<AmsAddress>()), Times.Once);
         adsClientMock.Verify(x => x.Connect(It.IsAny<string>(), It.IsAny<int>()), Times.Never);
         adsClientMock.Verify(x => x.Connect(It.IsAny<AmsNetId>(), It.IsAny<int>()), Times.Never);

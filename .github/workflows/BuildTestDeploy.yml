@@ -54,6 +54,7 @@ jobs:
           path: ./bin/Pack/*.nupkg
 
   prerelease:
+    if: github.ref == 'refs/heads/GithubActions'
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -66,20 +67,16 @@ jobs:
         # run: dotnet nuget push ./nupkg/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
 
   deploy:
+    if: ${{ github.ref == 'refs/heads/GithubActions' && startsWith(github.ref, 'refs/tags/v') }}
     needs: build
-    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v2
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
-      - name: Create Release NuGet package
-        run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=$VERSION -o nupkg src/$PROJECT_NAME/$PROJECT_NAME.*proj
+          name: nupkg
       - name: Push to GitHub Feed
-        run: echo push github
+        run: echo push github feed
         # run: dotnet nuget push ./nupkg/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
       - name: Push to NuGet Feed
         run: echo push nuget

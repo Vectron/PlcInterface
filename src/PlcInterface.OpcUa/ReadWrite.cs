@@ -115,7 +115,9 @@ public class ReadWrite : IOpcReadWrite, IDisposable
                 AttributeId = Attributes.Value,
             });
 
+#pragma warning disable IDISP001 // Dispose created
         var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
+#pragma warning restore IDISP001 // Dispose created
         var nodesToRead = new ReadValueIdCollection(querry);
         var taskCompletionSource = new TaskCompletionSource<IDictionary<string, object>>();
 
@@ -161,8 +163,9 @@ public class ReadWrite : IOpcReadWrite, IDisposable
         {
             return await ReadDynamicAsync(ioName).ConfigureAwait(false);
         }
-
+#pragma warning disable IDISP001 // Dispose created
         var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
+#pragma warning restore IDISP001 // Dispose created
         var nodesToRead = new ReadValueIdCollection
             {
                 new ReadValueId()
@@ -207,8 +210,9 @@ public class ReadWrite : IOpcReadWrite, IDisposable
             var value = await ReadDynamicAsync(ioName).ConfigureAwait(false) as object;
             return typeConverter.Convert<T>(value);
         }
-
+#pragma warning disable IDISP001 // Dispose created
         var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
+#pragma warning restore IDISP001 // Dispose created
         var nodesToRead = new ReadValueIdCollection
             {
                 new ReadValueId()
@@ -296,7 +300,9 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     /// <inheritdoc/>
     public async Task WriteAsync(IDictionary<string, object> namesValues)
     {
+#pragma warning disable IDISP001 // Dispose created
         var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
+#pragma warning restore IDISP001 // Dispose created
         var querry = namesValues
              .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
              .Select(x => (x.SymbolInfo.ConvertAndValidate(), x.Value))

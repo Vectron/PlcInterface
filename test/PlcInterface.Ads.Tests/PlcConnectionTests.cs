@@ -195,7 +195,7 @@ public class PlcConnectionTests
     }
 
     [TestMethod]
-    public async void IfAutoConnectIsTrueConnectionIsMadeImmidiatly()
+    public async Task IfAutoConnectIsTrueConnectionIsMadeImmidiatly()
     {
         // Arrange
         var settings = new ConnectionSettings()

@@ -51,7 +51,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: nupkg
-          path: ./bin/Pack/*.nupkg
+          path: |
+            ./bin/Pack/*.nupkg
+            ./bin/Pack/*.snupkg
 
   prerelease:
     if: github.ref == 'refs/heads/GithubActions'

@@ -42,7 +42,7 @@ public class AdsTypeConverterTests
             Date = new DateTime(2021, 08, 13),
             Time = new TimeSpan(2, 5, 20, 10, 999),
             LTime = new TimeSpan(111111111),
-            DateTimeOffset = new DateTimeOffset(2021, 08, 13, 00, 00, 00, TimeSpan.FromHours(2)),
+            DateTimeOffset = new DateTimeOffset(new DateTime(2021, 08, 13, 00, 00, 00)),
         };
         var sourceMock = new Mock<DynamicObject>();
         var result = new object();

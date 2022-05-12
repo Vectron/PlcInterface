@@ -34,7 +34,6 @@ jobs:
         uses: dotnet/nbgv@v0.4.0
         with:
           setAllVars: true
-      - run: echo "NBGV_SemVer2 $NBGV_SemVer2"
       - name: Restore dependencies
         run: dotnet restore
       - name: Build

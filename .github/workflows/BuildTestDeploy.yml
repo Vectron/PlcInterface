@@ -22,7 +22,7 @@ jobs:
         dotnet-version: ['6.0.x' ]
     runs-on: ${{ matrix.os }}
     env:
-      TEST_FILTER: "${{ matrix.os == 'windows-latest' && FullyQualifiedName!~IntegrationTests || FullyQualifiedName\\!~IntegrationTests }}"
+      TEST_FILTER: "${{ matrix.os == 'windows-latest' && 'FullyQualifiedName!~IntegrationTests' || 'FullyQualifiedName\\!~IntegrationTests' }}"
     steps:
       - name: Checkout
         uses: actions/checkout@v3

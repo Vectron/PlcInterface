@@ -207,10 +207,9 @@ public class PlcConnectionTests
         var adsClientMock = new Mock<IAdsDisposableConnection>();
         using var resetEvent = new ManualResetEventSlim();
         _ = adsClientMock.Setup(x => x.Connect(It.IsAny<AmsAddress>())).Callback((AmsAddress address) => resetEvent.Set());
-        using var tokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(10));
+        using var tokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(1000));
 
         // Act
-        // System.Threading.Thread.Sleep(100);
         using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(settings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
         resetEvent.Wait(tokenSource.Token);
 

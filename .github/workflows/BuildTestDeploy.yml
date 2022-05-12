@@ -42,7 +42,7 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore
       - name: Test
-        run: dotnet test -c Release --verbosity d --no-build --nologo --filter ${TEST_FILTER}
+        run: dotnet test -c Release --verbosity normal --no-build --nologo --filter ${TEST_FILTER}
       - name: Pack
         if: matrix.os == 'ubuntu-latest'
         run: dotnet pack -v normal -c Release --no-restore --no-build /p:Version=${NBGV_SemVer2}

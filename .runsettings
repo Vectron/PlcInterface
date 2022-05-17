@@ -29,7 +29,7 @@
                         <CompanyName>.*microsoft.*</CompanyName>
                     </Exclude>
                 </CompanyNames>
-                
+
 
                 <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>
                 <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>
@@ -51,9 +51,21 @@
                 </Configuration>
             </Logger>
             <Logger friendlyName="blame" enabled="True" />
+            <Logger friendlyName="trx" enabled="True">
+                <Configuration>
+                    <LogFileName>foo.trx</LogFileName>
+                </Configuration>
+            </Logger>
+            <Logger friendlyName="html" enabled="True">
+                <Configuration>
+                    <LogFileName>foo.html</LogFileName>
+                </Configuration>
+            </Logger>
+            <Logger friendlyName="GitHubActions" enabled="True">
+            </Logger>
         </Loggers>
     </LoggerRunSettings>
-    
+
     <MSTest>
         <MapInconclusiveToFailed>True</MapInconclusiveToFailed>
         <CaptureTraceOutput>false</CaptureTraceOutput>

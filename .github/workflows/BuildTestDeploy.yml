@@ -40,10 +40,10 @@ jobs:
         run: dotnet build -c Release --no-restore
       - name: Test
         if: runner.os != 'Windows'
-        run: dotnet test -c Release -v d --no-build --nologo --filter FullyQualifiedName\!~IntegrationTests --collect "Code Coverage" -s .runsettings -r ./bin/TestResults
+        run: dotnet test -c Release -v n --no-build --nologo --filter FullyQualifiedName\!~IntegrationTests --collect "Code Coverage" -s .runsettings -r ./bin/TestResults
       - name: Test windows
         if: runner.os == 'Windows'
-        run: dotnet test -c Release -v d --no-build --nologo --filter FullyQualifiedName!~IntegrationTests --collect "Code Coverage" -s .runsettings -r .\bin\TestResults
+        run: dotnet test -c Release -v n --no-build --nologo --filter FullyQualifiedName!~IntegrationTests --collect "Code Coverage" -s .runsettings -r .\bin\TestResults
       - name: Pack
         if: matrix.os == 'ubuntu-latest'
         run: dotnet pack -v normal -c Release --no-restore --no-build /p:Version=$NBGV_SemVer2 -o ./bin/Pack/

@@ -207,7 +207,7 @@ public class PlcConnectionTests
         var adsClientMock = new Mock<IAdsDisposableConnection>();
         var resetEvent = new TaskCompletionSource<bool>();
         _ = adsClientMock.Setup(x => x.Connect(It.IsAny<AmsAddress>())).Callback((AmsAddress address) => resetEvent.SetResult(true));
-        using var tokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(1000));
+        using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         using var tokenRegestration = tokenSource.Token.Register(() => resetEvent.SetResult(false));
 
         // Act

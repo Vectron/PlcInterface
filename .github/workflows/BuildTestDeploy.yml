@@ -62,6 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifact
+        id: download
         uses: actions/download-artifact@v3
         with:
           name: nupkg
@@ -74,11 +75,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifact
+        id: download
         uses: actions/download-artifact@v3
         with:
           name: nupkg
       - name: Push to GitHub Feed
-        run: dotnet nuget push ./*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
+        run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
       - name: Push to NuGet Feed
         run: echo push nuget
-        # run: dotnet nuget push ./*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
+        # run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY

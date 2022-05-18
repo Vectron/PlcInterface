@@ -82,5 +82,4 @@ jobs:
       - name: Push to GitHub Feed
         run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
       - name: Push to NuGet Feed
-        run: echo push nuget
-        # run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
+        run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY

@@ -1,0 +1,77 @@
+﻿name: .NET
+on:
+  push:
+  pull_request:
+
+env:
+  # Stop wasting time caching packages
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  # Disable sending usage data to Microsoft
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # GitHub Packages Feed settings
+  GITHUB_FEED: https://nuget.pkg.github.com/OWNER/index.json
+  GITHUB_KEY: ${{ secrets.GITHUB_TOKEN }}
+  # Official NuGet Feed settings
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+  NUGET_KEY: ${{ secrets.NUGET_KEY }}
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        dotnet-version: ['6.0.x' ]
+    runs-on: ${{ matrix.os }}
+    outputs:
+        publicRelease: ${{ steps.get-version.outputs.publicRelease }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Nerdbank.GitVersioning
+        id: nbgv
+        uses: dotnet/nbgv@v0.4.0
+      - name: Store public release output
+        id: get-version
+        run: echo "::set-output name=publicRelease::${{ steps.nbgv.outputs.PublicRelease }}"
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build -c Release --no-restore
+      - name: Test
+        if: runner.os != 'Windows'
+        run: dotnet test -c Release -v n --no-build --nologo --filter FullyQualifiedName\!~IntegrationTests --collect "Code Coverage" -s .runsettings -r ./bin/TestResults
+      - name: Test windows
+        if: runner.os == 'Windows'
+        run: dotnet test -c Release -v n --no-build --nologo --filter FullyQualifiedName!~IntegrationTests --collect "Code Coverage" -s .runsettings -r .\bin\TestResults
+      - name: Pack
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet pack -v normal -c Release --no-restore --no-build /p:Version=${{ steps.nbgv.outputs.SemVer2 }} -o ./bin/Pack/
+      - name: Upload Artifact
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v3
+        with:
+          name: nupkg
+          path: |
+            ./bin/Pack/*.nupkg
+            ./bin/Pack/*.snupkg
+
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        id: download
+        uses: actions/download-artifact@v3
+        with:
+          name: nupkg
+      - name: Push to GitHub Feed
+        run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
+      - name: Push to NuGet Feed
+        if: ${{needs.build.outputs.publicRelease == 'true' }}
+        run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY

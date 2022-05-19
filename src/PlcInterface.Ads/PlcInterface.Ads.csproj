@@ -3,18 +3,17 @@
         <TargetFramework>net6.0</TargetFramework>
         <Description>A PLC communication implementation for Beckhoff ADS</Description>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
         <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="6.0.112" NoWarn="NU1701" />
         <PackageReference Include="Beckhoff.TwinCAT.Ads.Reactive" Version="6.0.112" NoWarn="NU1701" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-        <PackageReference Condition="'$(Configuration)' == 'Release'" Include="PlcInterface.Abstraction" Version="2.4.*" />
         <PackageReference Include="System.IO.Abstractions" Version="17.0.3" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <ItemGroup>
         <ProjectReference Include="..\PlcInterface.Abstraction\PlcInterface.Abstraction.csproj" />
     </ItemGroup>
 </Project> 

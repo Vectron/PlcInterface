@@ -40,7 +40,7 @@ jobs:
         id: get-version
         run: echo "::set-output name=publicRelease::${{ steps.nbgv.outputs.PublicRelease }}"
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore ${{ env.SOLUTION_NAME }}
       - name: Build
         run: dotnet build ${{ env.SOLUTION_NAME }} -c Release --no-restore
       - name: Test
@@ -51,7 +51,7 @@ jobs:
         run: dotnet test ${{ env.SOLUTION_NAME }} -c Release -v n --no-build --nologo --filter FullyQualifiedName!~IntegrationTests --collect "Code Coverage" -s .runsettings -r .\bin\TestResults
       - name: Pack
         if: matrix.os == 'ubuntu-latest'
-        run: dotnet pack  ${{ env.SOLUTION_NAME }} -v normal -c Release --no-restore --no-build /p:Version=${{ steps.nbgv.outputs.SemVer2 }} -o ./bin/Pack/
+        run: dotnet pack ${{ env.SOLUTION_NAME }} -v normal -c Release --no-restore --no-build /p:Version=${{ steps.nbgv.outputs.SemVer2 }} -o ./bin/Pack/
       - name: Upload Artifact
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v3

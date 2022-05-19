@@ -72,7 +72,7 @@ jobs:
         with:
           name: nupkg
       - name: Check version output
-        run: echo $needs.build.outputs.nbgv
+        run: echo ${{needs.build.outputs.nbgv}}
       - name: Push to GitHub Feed
         run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
       - name: Push to NuGet Feed

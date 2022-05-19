@@ -33,10 +33,11 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Nerdbank.GitVersioning
-        id: get-version
         uses: dotnet/nbgv@v0.4.0
         with:
           setAllVars: true
+      - name: Store public release output
+        id: get-version
         run: echo "::set-output name=publicRelease::$NBGV_PublicRelease"
       - name: Restore dependencies
         run: dotnet restore

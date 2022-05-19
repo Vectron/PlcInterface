@@ -14,6 +14,7 @@ env:
   # Official NuGet Feed settings
   NUGET_FEED: https://api.nuget.org/v3/index.json
   NUGET_KEY: ${{ secrets.NUGET_KEY }}
+  SOLUTION_NAME: PlcInterface
 jobs:
   build:
     strategy:
@@ -41,16 +42,16 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet build -c Release --no-restore
+        run: dotnet build ${{ env.SOLUTION_NAME }} -c Release --no-restore
       - name: Test
         if: runner.os != 'Windows'
-        run: dotnet test -c Release -v n --no-build --nologo --filter FullyQualifiedName\!~IntegrationTests --collect "Code Coverage" -s .runsettings -r ./bin/TestResults
+        run: dotnet test ${{ env.SOLUTION_NAME }} -c Release -v n --no-build --nologo --filter FullyQualifiedName\!~IntegrationTests --collect "Code Coverage" -s .runsettings -r ./bin/TestResults
       - name: Test windows
         if: runner.os == 'Windows'
-        run: dotnet test -c Release -v n --no-build --nologo --filter FullyQualifiedName!~IntegrationTests --collect "Code Coverage" -s .runsettings -r .\bin\TestResults
+        run: dotnet test ${{ env.SOLUTION_NAME }} -c Release -v n --no-build --nologo --filter FullyQualifiedName!~IntegrationTests --collect "Code Coverage" -s .runsettings -r .\bin\TestResults
       - name: Pack
         if: matrix.os == 'ubuntu-latest'
-        run: dotnet pack -v normal -c Release --no-restore --no-build /p:Version=${{ steps.nbgv.outputs.SemVer2 }} -o ./bin/Pack/
+        run: dotnet pack  ${{ env.SOLUTION_NAME }} -v normal -c Release --no-restore --no-build /p:Version=${{ steps.nbgv.outputs.SemVer2 }} -o ./bin/Pack/
       - name: Upload Artifact
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v3

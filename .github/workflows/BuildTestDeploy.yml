@@ -56,21 +56,8 @@ jobs:
             ./bin/Pack/*.nupkg
             ./bin/Pack/*.snupkg
 
-  prerelease:
-    if: github.ref == 'refs/heads/GithubActions'
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Artifact
-        id: download
-        uses: actions/download-artifact@v3
-        with:
-          name: nupkg
-      - name: Push to GitHub Feed
-        run: dotnet nuget push ./*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
-
   deploy:
-    if: ${{ github.ref == 'refs/heads/GithubActions' && startsWith(github.ref, 'refs/tags/v') }}
+    if: github.ref == 'refs/heads/GithubActions'
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -82,4 +69,6 @@ jobs:
       - name: Push to GitHub Feed
         run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
       - name: Push to NuGet Feed
-        run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
+        if: jobs.build.steps[*].env.NBGV_PublicRelease == true
+        run: echo push nuget
+        #run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY

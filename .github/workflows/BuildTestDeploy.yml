@@ -21,6 +21,8 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         dotnet-version: ['6.0.x' ]
     runs-on: ${{ matrix.os }}
+    outputs:
+        publicRelease: ${{ steps.get-version.outputs.publicRelease }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -31,9 +33,11 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Nerdbank.GitVersioning
+        id: get-version
         uses: dotnet/nbgv@v0.4.0
         with:
           setAllVars: true
+        run: echo "::set-output name=publicRelease::$NBGV_PublicRelease"
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
@@ -69,6 +73,6 @@ jobs:
       - name: Push to GitHub Feed
         run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
       - name: Push to NuGet Feed
-        if: jobs.build.steps[*].env.NBGV_PublicRelease == true
+        if: needs.build.outputs.nbgv == true
         run: echo push nuget
         #run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY

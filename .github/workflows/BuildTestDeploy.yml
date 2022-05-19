@@ -38,7 +38,7 @@ jobs:
           setAllVars: true
       - name: Store public release output
         id: get-version
-        run: echo "::set-output name=publicRelease::$NBGV_PublicRelease"
+        run: echo "::set-output name=publicRelease::${NBGV_PublicRelease}"
       - name: Restore dependencies
         run: dotnet restore
       - name: Build

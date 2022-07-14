@@ -2,7 +2,6 @@
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using PlcInterface.Extensions;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 
@@ -40,8 +39,7 @@ public static class IPlcConnectionExtension
             .ToTask()
             .GetAwaiter()
             .GetResult()
-            .Value
-            .ThrowIfNull(nameof(IConnected<T>.Value));
+            .Value;
 
     /// <summary>
     /// Gets the PLC Connection asynchronous.
@@ -64,6 +62,6 @@ public static class IPlcConnectionExtension
     public static async Task<T> GetConnectedClientAsync<T>(this IPlcConnection<T> plcConnection, TimeSpan timeout)
     {
         var connection = await plcConnection.SessionStream.FirstAsync(x => x.IsConnected).Timeout(timeout);
-        return connection.Value.ThrowIfNull(nameof(IConnected<T>.Value));
+        return connection.Value;
     }
 }

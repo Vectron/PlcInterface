@@ -1,7 +1,13 @@
 ﻿name: .NET
 on:
   push:
+    branches:    
+        - 'main'
+    tags:        
+      - v**
   pull_request:
+    branches:    
+        - 'main'
 
 env:
   # Stop wasting time caching packages
@@ -62,7 +68,6 @@ jobs:
             ./bin/Pack/*.snupkg
 
   deploy:
-    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -74,5 +79,5 @@ jobs:
       - name: Push to GitHub Feed
         run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
       - name: Push to NuGet Feed
-        if: ${{needs.build.outputs.publicRelease == 'true' }}
+        if: ${{needs.build.outputs.publicRelease == 'true' }} && contains(github.ref, 'refs/tags/')
         run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY

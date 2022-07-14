@@ -16,8 +16,9 @@ internal sealed class OpcPlcCommand : PlcCommandBase
     /// <param name="plcConnection">A <see cref="IOpcPlcConnection"/>.</param>
     /// <param name="readWrite">A <see cref="IOpcReadWrite"/>.</param>
     /// <param name="symbolHandler">A <see cref="IOpcSymbolHandler"/>.</param>
-    public OpcPlcCommand(IOpcPlcConnection plcConnection, IOpcReadWrite readWrite, IOpcSymbolHandler symbolHandler)
-        : base(CommandName, plcConnection, readWrite, symbolHandler)
+    /// <param name="monitor">A <see cref="IOpcMonitor"/>.</param>
+    public OpcPlcCommand(IOpcPlcConnection plcConnection, IOpcReadWrite readWrite, IOpcSymbolHandler symbolHandler, IOpcMonitor monitor)
+        : base(CommandName, plcConnection, readWrite, symbolHandler, monitor)
     {
     }
 }

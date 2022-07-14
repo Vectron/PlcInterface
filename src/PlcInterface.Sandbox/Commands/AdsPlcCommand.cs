@@ -16,8 +16,9 @@ internal sealed class AdsPlcCommand : PlcCommandBase
     /// <param name="plcConnection">A <see cref="IAdsPlcConnection"/>.</param>
     /// <param name="readWrite">A <see cref="IAdsReadWrite"/>.</param>
     /// <param name="symbolHandler">A <see cref="IAdsSymbolHandler"/>.</param>
-    public AdsPlcCommand(IAdsPlcConnection plcConnection, IAdsReadWrite readWrite, IAdsSymbolHandler symbolHandler)
-        : base(CommandName, plcConnection, readWrite, symbolHandler)
+    /// <param name="monitor">A <see cref="IAdsMonitor"/>.</param>
+    public AdsPlcCommand(IAdsPlcConnection plcConnection, IAdsReadWrite readWrite, IAdsSymbolHandler symbolHandler, IAdsMonitor monitor)
+        : base(CommandName, plcConnection, readWrite, symbolHandler, monitor)
     {
     }
 }

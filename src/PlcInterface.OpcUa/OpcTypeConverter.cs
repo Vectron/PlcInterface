@@ -110,7 +110,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
         var elementType = targetType.GetElementType() ?? throw new NotSupportedException("Unable to get element type");
         var typedArray = Array.CreateInstance(elementType, upperBoundsRank);
 
-        foreach (var indices in typedArray.Indices())
+        foreach (var indices in IndicesHelper.GetIndices(typedArray))
         {
             var item = array.GetValue(indices);
             if (item == null)

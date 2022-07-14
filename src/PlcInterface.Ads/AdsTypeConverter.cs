@@ -71,7 +71,7 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
         var dimensionLengts = dataType.Dimensions.GetDimensionLengths();
         var destination = Array.CreateInstance(ellementType, dimensionLengts);
 
-        foreach (var indices in destination.Indices())
+        foreach (var indices in IndicesHelper.GetIndices(destination))
         {
             if (!valueObject.TryGetIndexValue(indices, out var result))
             {

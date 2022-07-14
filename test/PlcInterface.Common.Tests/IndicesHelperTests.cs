@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PlcInterface.Extensions;
 
 namespace PlcInterface.Abstraction.Tests;
 
 [TestClass]
-public class ArrayExtensionsTests
+public class IndicesHelperTests
 {
     private static int[,,] Data
         => new int[,,]
@@ -29,6 +28,22 @@ public class ArrayExtensionsTests
         };
 
     [TestMethod]
+    public void GetIndicesReturnsTheValueFromString()
+    {
+        // Arrange
+        var name = "ArrayObject[5,3]";
+        var expected = new[] { 5, 3 };
+
+        // Act
+        var indeces1 = IndicesHelper.GetIndices(name);
+        var indeces2 = IndicesHelper.GetIndices(name.AsSpan());
+
+        // Assert
+        CollectionAssert.AreEqual(expected, indeces1);
+        CollectionAssert.AreEqual(indeces1, indeces2);
+    }
+
+    [TestMethod]
     public void IndicesOnlyCreatesOneArray()
     {
         // Arrange
@@ -37,7 +52,7 @@ public class ArrayExtensionsTests
 
         // Act
         // Assert
-        foreach (var indices in data.Indices())
+        foreach (var indices in IndicesHelper.GetIndices(data))
         {
             if (first == null)
             {
@@ -86,7 +101,7 @@ public class ArrayExtensionsTests
         using var expectedEnumerator = expected.GetEnumerator();
 
         // Act
-        var actual = data.Indices();
+        var actual = IndicesHelper.GetIndices(data);
         using var actualEnumerator = actual.GetEnumerator();
 
         // Assert

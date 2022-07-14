@@ -8,9 +8,8 @@
         <Compile Include="$(CommonDirectory)\IServiceCollectionExtension.cs" LinkBase="Common" />
         <Compile Include="$(CommonDirectory)\IObservableExtensions.cs" LinkBase="Common" />
         <Compile Include="$(CommonDirectory)\ISymbolInfoExtension.cs" LinkBase="Common" />
-        <Compile Include="$(CommonDirectory)\ArrayExtensions.cs" LinkBase="Common" />
-        <Compile Include="$(CommonDirectory)\ObjectExtension.cs" LinkBase="Common" />
-        <Compile Include="$(CommonDirectory)\StringExtensions.cs" LinkBase="Common" />
+        <Compile Include="$(CommonDirectory)\IndicesHelper.cs" LinkBase="Common" />
+        <Compile Include="$(CommonDirectory)\ThrowHelper.cs" LinkBase="Common" />
     </ItemGroup>
 
     <ItemGroup>

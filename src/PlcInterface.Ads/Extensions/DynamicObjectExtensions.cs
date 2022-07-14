@@ -61,7 +61,7 @@ internal static class DynamicObjectExtensions
 
             var destination = Array.CreateInstance(ellementType, dimensionLengts);
 
-            foreach (var indices in destination.Indices())
+            foreach (var indices in IndicesHelper.GetIndices(destination))
             {
                 if (!ellementEnumerator.MoveNext())
                 {
@@ -78,7 +78,7 @@ internal static class DynamicObjectExtensions
         {
             var destination = Array.CreateInstance(typeof(object), dimensionLengts);
 
-            foreach (var indices in destination.Indices())
+            foreach (var indices in IndicesHelper.GetIndices(destination))
             {
                 if (!ellementEnumerator.MoveNext())
                 {

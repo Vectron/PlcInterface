@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Opc.Ua;
 using Opc.Ua.Client;
-using PlcInterface.OpcUa.Extensions;
 
 namespace PlcInterface.OpcUa;
 

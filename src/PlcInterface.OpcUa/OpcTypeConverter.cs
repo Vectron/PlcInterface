@@ -5,7 +5,6 @@ using System.Dynamic;
 using System.Globalization;
 using Opc.Ua;
 using PlcInterface.Extensions;
-using PlcInterface.OpcUa.Extensions;
 
 namespace PlcInterface.OpcUa;
 

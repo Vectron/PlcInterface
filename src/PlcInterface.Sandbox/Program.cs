@@ -29,7 +29,7 @@ internal static class Program
             .AddAdsPLC()
             .AddOpcPLC()
             .Configure<AdsPlcConnectionOptions>(context.Configuration.GetSection("Ads"))
-            .Configure<ConnectionSettings>(context.Configuration.GetSection(nameof(ConnectionSettings)));
+            .Configure<OpcPlcConnectionOptions>(context.Configuration.GetSection("Opc"));
 
     /// <summary>
     /// The main entry point.

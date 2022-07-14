@@ -26,8 +26,8 @@ public class MonitorTest : IMonitorTestBase
     [ClassInitialize]
     public static void Setup(TestContext testContext)
     {
-        var connectionsettings = new OPCSettings();
-        new DefaultOPCSettingsConfigureOptions().Configure(connectionsettings);
+        var connectionsettings = new OpcPlcConnectionOptions();
+        new DefaultOpcPlcConnectionConfigureOptions().Configure(connectionsettings);
         connectionsettings.Address = Settings.PLCUri;
         var typeConverter = new OpcTypeConverter();
 

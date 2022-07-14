@@ -15,8 +15,8 @@ public class PlcConnectionTest : IPlcConnectionTestBase
     [ClassInitialize]
     public static void ConnectAsync(TestContext testContext)
     {
-        var connectionsettings = new OPCSettings();
-        new DefaultOPCSettingsConfigureOptions().Configure(connectionsettings);
+        var connectionsettings = new OpcPlcConnectionOptions();
+        new DefaultOpcPlcConnectionConfigureOptions().Configure(connectionsettings);
         connectionsettings.Address = Settings.PLCUriNoRoot;
 
         plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());

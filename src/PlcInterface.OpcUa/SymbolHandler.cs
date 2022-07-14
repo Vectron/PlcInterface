@@ -104,7 +104,7 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
     private void UpdateSymbols(Session session)
     {
         // create a browser to browse the node tree
-        if (connection.Settings is not OPCSettings settings)
+        if (connection.Settings is not OpcPlcConnectionOptions settings)
         {
             logger.LogCritical("No valid OPCSettings found");
             return;

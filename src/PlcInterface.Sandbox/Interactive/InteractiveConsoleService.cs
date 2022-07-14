@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace PlcInterface.Sandbox.Interactive;
 
@@ -14,6 +15,7 @@ internal class InteractiveConsoleService : IHostedService, IDisposable
 {
     private const string InteractiveModeText = "INTERACTIVE MODE - type 'help' for help or 'exit' to EXIT";
     private readonly IEnumerable<IApplicationCommand> commands;
+    private readonly ILogger logger;
     private Task? checkForInputTask;
     private bool disposedValue;
     private CancellationTokenSource? stopTokenSource;
@@ -23,9 +25,11 @@ internal class InteractiveConsoleService : IHostedService, IDisposable
     /// </summary>
     /// <param name="commands">A <see cref="IEnumerable{T}" /> of vallid <see cref="IApplicationCommand" />.</param>
     /// <param name="autoCompletionHandler">A <see cref="IAutoCompleteHandler" /> implementation.</param>
-    public InteractiveConsoleService(IEnumerable<IApplicationCommand> commands, IAutoCompleteHandler autoCompletionHandler)
+    /// <param name="logger">A <see cref="ILogger"/> instance.</param>
+    public InteractiveConsoleService(IEnumerable<IApplicationCommand> commands, IAutoCompleteHandler autoCompletionHandler, ILogger<InteractiveConsoleService> logger)
     {
         this.commands = commands;
+        this.logger = logger;
         ReadLine.AutoCompletionHandler = autoCompletionHandler;
     }
 
@@ -95,10 +99,19 @@ internal class InteractiveConsoleService : IHostedService, IDisposable
         {
             if (Console.KeyAvailable)
             {
-                var commandAndParameters = ReadLine.Read(">").Split(' ');
-                var command = commandAndParameters[0];
-                var parameters = commandAndParameters.Skip(1).ToArray();
-                ProccesCommand(command, parameters);
+                var input = ReadLine.Read(">");
+
+                try
+                {
+                    var commandAndParameters = input.Split(' ');
+                    var command = commandAndParameters[0];
+                    var parameters = commandAndParameters.Skip(1).ToArray();
+                    ProccesCommand(command, parameters);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Exception thrown when executing command '{Command}'", input);
+                }
             }
         }
     }

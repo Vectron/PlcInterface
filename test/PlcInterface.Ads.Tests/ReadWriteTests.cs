@@ -153,10 +153,10 @@ public class ReadWriteTests
 
         // Act
         // Assert
-        _ = Assert.ThrowsException<ArgumentNullException>(() => _ = readWrite.Read(ioTag));
-        _ = Assert.ThrowsException<ArgumentNullException>(() => _ = readWrite.Read<int>(ioTag));
-        _ = Assert.ThrowsExceptionAsync<ArgumentNullException>(() => _ = readWrite.ReadAsync(ioTag));
-        _ = Assert.ThrowsExceptionAsync<ArgumentNullException>(() => _ = readWrite.ReadAsync<int>(ioTag));
+        _ = Assert.ThrowsException<InvalidOperationException>(() => _ = readWrite.Read(ioTag));
+        _ = Assert.ThrowsException<InvalidOperationException>(() => _ = readWrite.Read<int>(ioTag));
+        _ = Assert.ThrowsExceptionAsync<InvalidOperationException>(() => _ = readWrite.ReadAsync(ioTag));
+        _ = Assert.ThrowsExceptionAsync<InvalidOperationException>(() => _ = readWrite.ReadAsync<int>(ioTag));
     }
 
     [TestMethod]

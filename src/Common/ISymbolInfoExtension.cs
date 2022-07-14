@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using PlcInterface.Extensions;
 
-#pragma warning disable IDE0130 // Namespace does not match folder structure
-
 namespace PlcInterface;
-#pragma warning restore IDE0130 // Namespace does not match folder structure
 
 /// <summary>
 /// Extension methods for <see cref="ISymbolInfo"/>.
 /// </summary>
-public static class ISymbolInfoExtension
+internal static class ISymbolInfoExtension
 {
     /// <summary>
     /// Flatten the type hierarchy.

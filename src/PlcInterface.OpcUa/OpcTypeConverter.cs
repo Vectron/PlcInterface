@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Globalization;
 using Opc.Ua;
-using PlcInterface.Extensions;
 
 namespace PlcInterface.OpcUa;
 

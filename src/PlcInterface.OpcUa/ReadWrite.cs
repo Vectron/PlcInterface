@@ -7,7 +7,6 @@ using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Opc.Ua;
-using PlcInterface.Extensions;
 
 namespace PlcInterface.OpcUa;
 

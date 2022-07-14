@@ -5,6 +5,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="$(CommonDirectory)\IServiceCollectionExtension.cs" LinkBase="Common" />
+        <Compile Include="$(CommonDirectory)\IObservableExtensions.cs" LinkBase="Common" />
+        <Compile Include="$(CommonDirectory)\ISymbolInfoExtension.cs" LinkBase="Common" />
+        <Compile Include="$(CommonDirectory)\ArrayExtensions.cs" LinkBase="Common" />
+        <Compile Include="$(CommonDirectory)\ObjectExtension.cs" LinkBase="Common" />
+        <Compile Include="$(CommonDirectory)\StringExtensions.cs" LinkBase="Common" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />

@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace PlcInterface.Extensions;
+namespace PlcInterface;
 
 /// <summary>
 /// Extension methods for <see cref="Task"/>.
 /// </summary>
-public static class TaskExtensions
+internal static class TaskExtensions
 {
     /// <summary>
     /// Log exceptions async.

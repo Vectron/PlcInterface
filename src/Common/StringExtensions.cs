@@ -7,7 +7,7 @@ namespace PlcInterface.Extensions;
 /// <summary>
 /// Extension methods for <see cref="string"/>.
 /// </summary>
-public static class StringExtensions
+internal static class StringExtensions
 {
     /// <summary>
     /// Gets the array indices from the given <see cref="string"/>.

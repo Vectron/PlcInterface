@@ -6,7 +6,7 @@ namespace PlcInterface.Extensions;
 /// <summary>
 /// Extension methods for <see cref="Array"/>.
 /// </summary>
-public static class ArrayExtensions
+internal static class ArrayExtensions
 {
     /// <summary>
     /// Itterate over all array indices.

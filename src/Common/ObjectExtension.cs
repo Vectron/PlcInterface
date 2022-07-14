@@ -6,7 +6,7 @@ namespace PlcInterface.Extensions;
 /// <summary>
 /// Extension methods for all classes and structs.
 /// </summary>
-public static class ObjectExtension
+internal static class ObjectExtension
 {
     /// <summary>
     /// Throw a exception when the type is <see langword="null"/>.

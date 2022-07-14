@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using PlcInterface.Extensions;
 using TwinCAT.Ads.TypeSystem;
 using TwinCAT.TypeSystem;
 

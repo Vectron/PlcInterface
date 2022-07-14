@@ -3,9 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using PlcInterface.Extensions;
 
-namespace PlcInterface.Abstraction.Tests;
+namespace PlcInterface.Common.Tests;
 
 [TestClass]
 public class TaskExtensionsTests
@@ -33,7 +32,7 @@ public class TaskExtensionsTests
 
         // Act
         // Assert
-        _ = Assert.ThrowsExceptionAsync<ArgumentNullException>(() => Extensions.TaskExtensions.LogExceptionsAsync(null!, loggerMock.Object));
+        _ = Assert.ThrowsExceptionAsync<ArgumentNullException>(() => TaskExtensions.LogExceptionsAsync(null!, loggerMock.Object));
         _ = Assert.ThrowsExceptionAsync<ArgumentNullException>(() => task.LogExceptionsAsync(null!));
     }
 }

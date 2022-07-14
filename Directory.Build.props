@@ -11,6 +11,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <CommonDirectory>$(MSBuildThisFileDirectory)\src\Common</CommonDirectory>
+  </PropertyGroup>
+
   <!--Package settings-->
   <PropertyGroup>
     <Authors>Vectron</Authors>

@@ -68,6 +68,7 @@ jobs:
             ./bin/Pack/*.snupkg
 
   deploy:
+    if: github.ref == 'refs/heads/main' || contains(github.ref, 'refs/tags/')
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -80,4 +81,5 @@ jobs:
         run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
       - name: Push to NuGet Feed
         if: ${{needs.build.outputs.publicRelease == 'true' }} && contains(github.ref, 'refs/tags/')
-        run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
+        #run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
+        run: echot pushed to nuget

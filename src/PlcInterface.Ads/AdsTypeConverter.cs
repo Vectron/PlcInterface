@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Globalization;
-using PlcInterface.Ads.Extensions;
 using PlcInterface.Extensions;
 using TwinCAT.Ads.TypeSystem;
 using TwinCAT.TypeSystem;

@@ -31,6 +31,6 @@ public static class IServiceCollectionExtension
             .AddSingleton<IFileSystem, FileSystem>()
             .AddSingleton<ISymbolLoaderFactory, SymbolLoaderFactoryAbstraction>()
             .AddSingleton<ISumSymbolFactory, SumSymbolFactory>()
-            .ConfigureOptions<DefaultConnectionSettingsConfigureOptions>()
-            .ConfigureOptions<DefaultSymbolHandlerSettingsConfigureOptions>();
+            .ConfigureOptions<DefaultAdsPlcConnectionConfigureOptions>()
+            .ConfigureOptions<DefaultAdsSymbolHandlerSettingsConfigureOptions>();
 }

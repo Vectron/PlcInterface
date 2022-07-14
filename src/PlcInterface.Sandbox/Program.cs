@@ -28,7 +28,7 @@ internal static class Program
             .AddTransient<IApplicationCommand, OpcPlcCommand>()
             .AddAdsPLC()
             .AddOpcPLC()
-            .Configure<OPCSettings>(context.Configuration.GetSection(nameof(OPCSettings)))
+            .Configure<AdsPlcConnectionOptions>(context.Configuration.GetSection("Ads"))
             .Configure<ConnectionSettings>(context.Configuration.GetSection(nameof(ConnectionSettings)));
 
     /// <summary>

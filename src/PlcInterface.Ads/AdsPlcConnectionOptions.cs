@@ -3,12 +3,12 @@
 /// <summary>
 /// Settings for the <see cref="PlcConnection"/>.
 /// </summary>
-public class ConnectionSettings
+public class AdsPlcConnectionOptions
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ConnectionSettings"/> class.
+    /// Initializes a new instance of the <see cref="AdsPlcConnectionOptions"/> class.
     /// </summary>
-    public ConnectionSettings()
+    public AdsPlcConnectionOptions()
     {
         AmsNetId = string.Empty;
         AutoConnect = false;

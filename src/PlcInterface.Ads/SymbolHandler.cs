@@ -27,7 +27,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
     private readonly CompositeDisposable disposables = new();
     private readonly IFileSystem fileSystem;
     private readonly ILogger<SymbolHandler> logger;
-    private readonly IOptions<SymbolHandlerSettings> settings;
+    private readonly AdsSymbolHandlerOptions options;
     private readonly ISymbolLoaderFactory symbolLoaderFactory;
     private bool disposedValue;
 
@@ -35,13 +35,13 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
     /// Initializes a new instance of the <see cref="SymbolHandler"/> class.
     /// </summary>
     /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
-    /// <param name="settings">A <see cref="IOptions{TOptions}"/> of <see cref="SymbolHandlerSettings"/> implementation.</param>
+    /// <param name="options">A <see cref="IOptions{TOptions}"/> of <see cref="AdsSymbolHandlerOptions"/> implementation.</param>
     /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
     /// <param name="fileSystem">A <see cref="IFileSystem"/> for interacting with the file system.</param>
     /// <param name="symbolLoaderFactory">A factory for creating a <see cref="SymbolLoaderFactory"/>.</param>
-    public SymbolHandler(IAdsPlcConnection connection, IOptions<SymbolHandlerSettings> settings, ILogger<SymbolHandler> logger, IFileSystem fileSystem, ISymbolLoaderFactory symbolLoaderFactory)
+    public SymbolHandler(IAdsPlcConnection connection, IOptions<AdsSymbolHandlerOptions> options, ILogger<SymbolHandler> logger, IFileSystem fileSystem, ISymbolLoaderFactory symbolLoaderFactory)
     {
-        this.settings = settings;
+        this.options = options.Value;
         this.logger = logger;
         this.fileSystem = fileSystem;
         this.symbolLoaderFactory = symbolLoaderFactory;
@@ -134,12 +134,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
 
     private void StoreSymbolListOnDisk()
     {
-        if (!settings.Value.StoreSymbolsToDisk)
-        {
-            return;
-        }
-
-        var outputPath = settings.Value.OutputPath;
+        var outputPath = options.OutputPath;
 
         if (string.IsNullOrWhiteSpace(outputPath))
         {
@@ -172,7 +167,10 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
                 AddSymbol(symbol);
             }
 
-            StoreSymbolListOnDisk();
+            if (options.StoreSymbolsToDisk)
+            {
+                StoreSymbolListOnDisk();
+            }
         }
         catch (Exception ex)
         {

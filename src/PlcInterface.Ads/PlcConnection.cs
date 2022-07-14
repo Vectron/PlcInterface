@@ -16,20 +16,20 @@ public class PlcConnection : IAdsPlcConnection, IDisposable
 {
     private readonly IAdsDisposableConnection adsDisposableConnection;
     private readonly BehaviorSubject<IConnected<IAdsDisposableConnection>> connectionState = new(Connected.No<IAdsDisposableConnection>());
-    private readonly IOptions<ConnectionSettings> settings;
+    private readonly AdsPlcConnectionOptions options;
     private bool disposedValue;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlcConnection"/> class.
     /// </summary>
-    /// <param name="settings">A <see cref="IOptions{TOptions}"/> implementation.</param>
+    /// <param name="options">A <see cref="IOptions{TOptions}"/> implementation.</param>
     /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
     /// <param name="adsDisposableConnection">The ads client used for connecting.</param>
-    public PlcConnection(IOptions<ConnectionSettings> settings, ILogger<PlcConnection> logger, IAdsDisposableConnection adsDisposableConnection)
+    public PlcConnection(IOptions<AdsPlcConnectionOptions> options, ILogger<PlcConnection> logger, IAdsDisposableConnection adsDisposableConnection)
     {
-        this.settings = settings;
+        this.options = options.Value;
         this.adsDisposableConnection = adsDisposableConnection;
-        if (settings.Value.AutoConnect)
+        if (this.options.AutoConnect)
         {
             _ = ConnectAsync().LogExceptionsAsync(logger);
         }
@@ -45,7 +45,7 @@ public class PlcConnection : IAdsPlcConnection, IDisposable
 
     /// <inheritdoc/>
     public object Settings
-        => settings.Value;
+        => options;
 
     /// <inheritdoc/>
     public void Connect()
@@ -60,7 +60,7 @@ public class PlcConnection : IAdsPlcConnection, IDisposable
                 return;
             }
 
-            var address = new AmsAddress(settings.Value.AmsNetId, settings.Value.Port);
+            var address = new AmsAddress(options.AmsNetId, options.Port);
             adsDisposableConnection.ConnectionStateChanged += AdsDisposableConnection_ConnectionStateChanged;
             adsDisposableConnection.Connect(address);
         });

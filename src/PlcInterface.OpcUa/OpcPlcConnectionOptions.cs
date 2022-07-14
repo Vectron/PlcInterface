@@ -6,7 +6,7 @@ namespace PlcInterface.OpcUa;
 /// <summary>
 /// Settings for the <see cref="PlcConnection"/>.
 /// </summary>
-public class OPCSettings
+public class OpcPlcConnectionOptions
 {
     /// <summary>
     /// Gets or sets the adress to connect to.

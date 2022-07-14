@@ -28,8 +28,8 @@ internal static class Program
             .AddTransient<IApplicationCommand, OpcPlcCommand>()
             .AddAdsPLC()
             .AddOpcPLC()
-            .Configure<OPCSettings>(context.Configuration.GetSection(nameof(OPCSettings)))
-            .Configure<ConnectionSettings>(context.Configuration.GetSection(nameof(ConnectionSettings)));
+            .Configure<AdsPlcConnectionOptions>(context.Configuration.GetSection("Ads"))
+            .Configure<OpcPlcConnectionOptions>(context.Configuration.GetSection("Opc"));
 
     /// <summary>
     /// The main entry point.

@@ -6,12 +6,12 @@ using Opc.Ua;
 namespace PlcInterface.OpcUa;
 
 /// <summary>
-/// A <see cref="IConfigureOptions{TOptions}"/> for configuring <see cref="OPCSettings"/> with default values.
+/// A <see cref="IConfigureOptions{TOptions}"/> for configuring <see cref="OpcPlcConnectionOptions"/> with default values.
 /// </summary>
-public class DefaultOPCSettingsConfigureOptions : IConfigureOptions<OPCSettings>
+public class DefaultOpcPlcConnectionConfigureOptions : IConfigureOptions<OpcPlcConnectionOptions>
 {
     /// <inheritdoc/>
-    public void Configure(OPCSettings options)
+    public void Configure(OpcPlcConnectionOptions options)
     {
         var builder = new UriBuilder("opc.tcp", "127.0.0.1", 48010, string.Empty);
         options.Address = builder.Uri;

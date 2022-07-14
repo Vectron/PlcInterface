@@ -20,8 +20,8 @@ public class SymbolHandlerTest : ISymbolHandlerTestBase
     [ClassInitialize]
     public static async Task ConnectAsync(TestContext testContext)
     {
-        var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
-        var symbolhandlersettings = new SymbolHandlerSettings() { StoreSymbolsToDisk = false };
+        var connectionsettings = new AdsPlcConnectionOptions() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
+        var symbolhandlersettings = new AdsSymbolHandlerOptions() { StoreSymbolsToDisk = false };
         adsClient = new AdsClient();
 
         connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);

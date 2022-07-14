@@ -16,7 +16,7 @@ public class PlcConnectionTest : IPlcConnectionTestBase
     [ClassInitialize]
     public static void ConnectAsync(TestContext testContext)
     {
-        var connectionsettings = new ConnectionSettings() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
+        var connectionsettings = new AdsPlcConnectionOptions() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
         adsClient = new AdsClient();
 
         plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);

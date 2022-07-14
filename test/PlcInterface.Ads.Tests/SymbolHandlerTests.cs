@@ -22,7 +22,7 @@ public class SymbolHandlerTests
         using var subject = new Subject<IConnected<IAdsConnection>>();
         var adsPlcConnection = new Mock<IAdsPlcConnection>();
         _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(subject);
-        var symbolHandlerSettings = new SymbolHandlerSettings();
+        var symbolHandlerSettings = new AdsSymbolHandlerOptions();
         var fileSystemMock = new Mock<IFileSystem>();
         var twincatSymbolLoader = new Mock<ISymbolLoader>();
         var symbolLoaderFactory = new Mock<ISymbolLoaderFactory>();
@@ -53,7 +53,7 @@ public class SymbolHandlerTests
         using var subject = new Subject<IConnected<IAdsConnection>>();
         var adsPlcConnection = new Mock<IAdsPlcConnection>();
         _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(subject);
-        var symbolHandlerSettings = new SymbolHandlerSettings();
+        var symbolHandlerSettings = new AdsSymbolHandlerOptions();
         var fileSystemMock = new Mock<IFileSystem>();
         var twincatSymbolLoader = new Mock<ISymbolLoader>();
         _ = twincatSymbolLoader.SetupGet(x => x.Symbols).Returns(symbols);
@@ -81,7 +81,7 @@ public class SymbolHandlerTests
         // Arrange
         var adsPlcConnection = new Mock<IAdsPlcConnection>();
         _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
-        var symbolHandlerSettings = new SymbolHandlerSettings();
+        var symbolHandlerSettings = new AdsSymbolHandlerOptions();
         var fileSystemMock = new Mock<IFileSystem>();
         var symbolLoaderFactory = new Mock<ISymbolLoaderFactory>();
         using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock.Object, symbolLoaderFactory.Object);
@@ -104,7 +104,7 @@ public class SymbolHandlerTests
         using var subject = new Subject<IConnected<IAdsConnection>>();
         var adsPlcConnection = new Mock<IAdsPlcConnection>();
         _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(subject);
-        var symbolHandlerSettings = new SymbolHandlerSettings();
+        var symbolHandlerSettings = new AdsSymbolHandlerOptions();
         var fileSystemMock = new Mock<IFileSystem>();
         var twincatSymbolLoader = new Mock<ISymbolLoader>();
         _ = twincatSymbolLoader.SetupGet(x => x.Symbols).Returns(symbols);
@@ -135,7 +135,7 @@ public class SymbolHandlerTests
         using var subject = new Subject<IConnected<IAdsConnection>>();
         var adsPlcConnection = new Mock<IAdsPlcConnection>();
         _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(subject);
-        var symbolHandlerSettings = new SymbolHandlerSettings()
+        var symbolHandlerSettings = new AdsSymbolHandlerOptions()
         {
             StoreSymbolsToDisk = true,
             OutputPath = "DummyPath",
@@ -173,7 +173,7 @@ public class SymbolHandlerTests
         using var subject = new Subject<IConnected<IAdsConnection>>();
         var adsPlcConnection = new Mock<IAdsPlcConnection>();
         _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(subject);
-        var symbolHandlerSettings = new SymbolHandlerSettings()
+        var symbolHandlerSettings = new AdsSymbolHandlerOptions()
         {
             StoreSymbolsToDisk = true,
             OutputPath = string.Empty,

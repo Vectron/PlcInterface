@@ -16,7 +16,7 @@ public class PlcConnectionTests
     public async Task ConnectAsyncCallsConnectOnClientAsync()
     {
         // Arrange
-        var settings = new ConnectionSettings()
+        var settings = new AdsPlcConnectionOptions()
         {
             AmsNetId = "local",
             Port = 851,
@@ -41,7 +41,7 @@ public class PlcConnectionTests
         // Arrange
         var adsClientMock = new Mock<IAdsDisposableConnection>();
         _ = adsClientMock.SetupGet(x => x.IsConnected).Returns(true);
-        using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(Mock.Of<ConnectionSettings>()), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
+        using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(Mock.Of<AdsPlcConnectionOptions>()), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
 
         // Act
         await connection.ConnectAsync();
@@ -57,7 +57,7 @@ public class PlcConnectionTests
     public void ConnectCallsConnectOnClient()
     {
         // Arrange
-        var settings = new ConnectionSettings()
+        var settings = new AdsPlcConnectionOptions()
         {
             AmsNetId = "local",
             Port = 851,
@@ -80,7 +80,7 @@ public class PlcConnectionTests
     public void ConnectionStateChangesArePushedToSessionStream()
     {
         // Arrange
-        var settings = new ConnectionSettings()
+        var settings = new AdsPlcConnectionOptions()
         {
             AmsNetId = "local",
             Port = 851,
@@ -116,7 +116,7 @@ public class PlcConnectionTests
         // Arrange
         var adsClientMock = new Mock<IAdsDisposableConnection>();
         _ = adsClientMock.SetupGet(x => x.IsConnected).Returns(true);
-        using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(Mock.Of<ConnectionSettings>()), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
+        using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(Mock.Of<AdsPlcConnectionOptions>()), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
 
         // Act
         connection.Connect();
@@ -132,7 +132,7 @@ public class PlcConnectionTests
     public void DisconnectCallsDisconnectOnClient()
     {
         // Arrange
-        var settings = new ConnectionSettings()
+        var settings = new AdsPlcConnectionOptions()
         {
             AmsNetId = "local",
             Port = 851,
@@ -152,7 +152,7 @@ public class PlcConnectionTests
     public async Task DisconnectCallsDisconnectOnClientAsync()
     {
         // Arrange
-        var settings = new ConnectionSettings()
+        var settings = new AdsPlcConnectionOptions()
         {
             AmsNetId = "local",
             Port = 851,
@@ -172,7 +172,7 @@ public class PlcConnectionTests
     public void ExceptionsInSessionStreamDontDestroyTheStream()
     {
         // Arrange
-        var settings = new ConnectionSettings()
+        var settings = new AdsPlcConnectionOptions()
         {
             AmsNetId = "local",
             Port = 851,
@@ -198,7 +198,7 @@ public class PlcConnectionTests
     public async Task IfAutoConnectIsTrueConnectionIsMadeImmidiatly()
     {
         // Arrange
-        var settings = new ConnectionSettings()
+        var settings = new AdsPlcConnectionOptions()
         {
             AmsNetId = "local",
             Port = 851,
@@ -226,7 +226,7 @@ public class PlcConnectionTests
     public void SesionstreamIsStoppedWhenDisposed()
     {
         // Arrange
-        var settings = new ConnectionSettings()
+        var settings = new AdsPlcConnectionOptions()
         {
             AmsNetId = "local",
             Port = 851,
@@ -257,7 +257,7 @@ public class PlcConnectionTests
     public void SettingsPropertyContainsPassedInSettings()
     {
         // Arrange
-        var settings = new ConnectionSettings()
+        var settings = new AdsPlcConnectionOptions()
         {
             AmsNetId = "local",
             Port = 851,
@@ -276,7 +276,7 @@ public class PlcConnectionTests
     public void WhenSubscribingToSessionStreamGetCurrentState()
     {
         // Arrange
-        using var adsConnection = new PlcConnection(MockHelpers.GetOptionsMoq(Mock.Of<ConnectionSettings>()), MockHelpers.GetLoggerMock<PlcConnection>(), Mock.Of<IAdsDisposableConnection>());
+        using var adsConnection = new PlcConnection(MockHelpers.GetOptionsMoq(Mock.Of<AdsPlcConnectionOptions>()), MockHelpers.GetLoggerMock<PlcConnection>(), Mock.Of<IAdsDisposableConnection>());
         var connection = (IPlcConnection)adsConnection;
         var observerMock = new Mock<IObserver<IConnected<IAdsConnection>>>();
         var observerMock2 = new Mock<IObserver<IConnected>>();

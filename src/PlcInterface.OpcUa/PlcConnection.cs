@@ -21,7 +21,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
     private readonly BehaviorSubject<IConnected<Session>> connectionState = new(Connected.No<Session>());
     private readonly CompositeDisposable disposables = new();
     private readonly ILogger logger;
-    private readonly IOptions<OPCSettings> options;
+    private readonly IOptions<OpcPlcConnectionOptions> options;
     private readonly TimeSpan reconnectDelay = TimeSpan.FromSeconds(1);
     private bool disposedValue;
     private Session? session;
@@ -31,7 +31,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
     /// </summary>
     /// <param name="options">A <see cref="IOptions{TOptions}"/> implementation.</param>
     /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-    public PlcConnection(IOptions<OPCSettings> options, ILogger<PlcConnection> logger)
+    public PlcConnection(IOptions<OpcPlcConnectionOptions> options, ILogger<PlcConnection> logger)
     {
         this.options = options;
         this.logger = logger;
@@ -227,7 +227,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
              .AddToStore(applicationCertificate.StoreType, applicationCertificate.StorePath);
     }
 
-    private UserIdentity GetUserIdentity(OPCSettings settings, EndpointDescription endpoint)
+    private UserIdentity GetUserIdentity(OpcPlcConnectionOptions settings, EndpointDescription endpoint)
     {
         var tokenType = endpoint.UserIdentityTokens.FirstOrDefault(x => x.TokenType == UserTokenType.UserName);
         if (!string.IsNullOrEmpty(settings.UserName)

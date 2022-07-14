@@ -3,12 +3,12 @@
 /// <summary>
 /// Settings for the <see cref="SymbolHandler"/>.
 /// </summary>
-public class SymbolHandlerSettings
+public class AdsSymbolHandlerOptions
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="SymbolHandlerSettings"/> class.
+    /// Initializes a new instance of the <see cref="AdsSymbolHandlerOptions"/> class.
     /// </summary>
-    public SymbolHandlerSettings()
+    public AdsSymbolHandlerOptions()
     {
         OutputPath = string.Empty;
         StoreSymbolsToDisk = false;

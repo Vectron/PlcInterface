@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PlcInterface.Ads.Extensions;
 using PlcInterface.Extensions;
 using TwinCAT;
 using TwinCAT.Ads;
 using TwinCAT.Ads.TypeSystem;
 using TwinCAT.Ads.ValueAccess;
-using TwinCAT.TypeSystem;
 using TwinCAT.ValueAccess;
 
 namespace PlcInterface.Ads;
@@ -23,12 +23,12 @@ namespace PlcInterface.Ads;
 /// </summary>
 public class SymbolHandler : IAdsSymbolHandler, IDisposable
 {
-    private readonly Dictionary<string, IAdsSymbolInfo> allSymbols = new(StringComparer.OrdinalIgnoreCase);
     private readonly CompositeDisposable disposables = new();
     private readonly IFileSystem fileSystem;
     private readonly ILogger<SymbolHandler> logger;
     private readonly IOptions<SymbolHandlerSettings> settings;
     private readonly ISymbolLoaderFactory symbolLoaderFactory;
+    private Dictionary<string, IAdsSymbolInfo> allSymbols = new(StringComparer.OrdinalIgnoreCase);
     private bool disposedValue;
 
     /// <summary>
@@ -90,7 +90,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
     /// <inheritdoc/>
     public bool TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out IAdsSymbolInfo symbolInfo)
     {
-        if (allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out symbolInfo))
+        if (allSymbols.TryGetValue(ioName, out symbolInfo))
         {
             return true;
         }
@@ -117,21 +117,6 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
         }
     }
 
-    private void AddSymbol(ISymbol symbol)
-    {
-        var symbolInfo = new SymbolInfo(symbol);
-
-        if (!allSymbols.ContainsKey(symbolInfo.Name))
-        {
-            allSymbols.Add(symbolInfo.Name, symbolInfo);
-        }
-
-        foreach (var subSymbol in symbol.SubSymbols)
-        {
-            AddSymbol(subSymbol);
-        }
-    }
-
     private void StoreSymbolListOnDisk()
     {
         if (!settings.Value.StoreSymbolsToDisk)
@@ -154,23 +139,26 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
     private void UpdateSymbols(IAdsConnection client)
     {
         logger.LogInformation("Updating Symbols");
+        var watch = Stopwatch.StartNew();
         try
         {
             var symbolLoaderSettings = new SymbolLoaderSettings(SymbolsLoadMode.DynamicTree)
             {
                 AutomaticReconnection = false,
                 NonCachedArrayElements = true,
-                ValueAccessMode = ValueAccessMode.IndexGroupOffsetPreferred,
+                ValueAccessMode = ValueAccessMode.Symbolic,
                 ValueCreation = ValueCreationModes.Primitives,
+                SymbolsLoadMode = SymbolsLoadMode.DynamicTree,
+                ValueUpdateMode = ValueUpdateMode.None,
             };
 
             var symbolLoader = symbolLoaderFactory.Create(client, symbolLoaderSettings);
-            allSymbols.Clear();
-
-            foreach (var symbol in symbolLoader.Symbols)
-            {
-                AddSymbol(symbol);
-            }
+            allSymbols = symbolLoader.Symbols
+                .DepthFirstTreeTraversal(x => x.SubSymbols)
+                .Select(x => new SymbolInfo(x))
+                .Cast<IAdsSymbolInfo>()
+                .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+            logger.LogInformation("Symbols updated in {Time} ms, found {Amount} symbols", watch.ElapsedMilliseconds, allSymbols.Count);
 
             StoreSymbolListOnDisk();
         }

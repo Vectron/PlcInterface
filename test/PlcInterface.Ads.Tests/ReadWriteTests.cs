@@ -273,7 +273,7 @@ public class ReadWriteTests
         var ioTag = "dummyVar1";
         var value = 9;
         var symbol = CreateSymbolInfoMock(ioTag, value, out var valueSymbol);
-        _ = valueSymbol.SetupSequence(x => x.WriteValueAsync(It.IsAny<object>(), It.IsAny<CancellationToken>())).Throws<ArgumentException>().Returns(Task.FromResult(new ResultWriteAccess(0)));
+        _ = valueSymbol.SetupSequence(x => x.WriteValueAsync(It.IsAny<object>(), It.IsAny<CancellationToken>())).Throws<ArgumentException>().Returns(Task.FromResult(new ResultWriteAccess(0, 0)));
         _ = valueSymbol.SetupSequence(x => x.WriteValue(It.IsAny<object>())).Throws<ArgumentException>();
 
         var connection = new Mock<IAdsPlcConnection>();
@@ -305,8 +305,8 @@ public class ReadWriteTests
         valueSymbolMock = new Mock<IValueSymbol>();
         _ = valueSymbolMock.Setup(x => x.ReadValue()).Returns(value!);
         _ = valueSymbolMock.Setup(x => x.ReadValue(It.IsAny<int>())).Returns(value!);
-        _ = valueSymbolMock.Setup(x => x.ReadValueAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(new ResultReadValueAccess(value, 0)));
-        _ = valueSymbolMock.Setup(x => x.WriteValueAsync(It.IsAny<object>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new ResultWriteAccess(0)));
+        _ = valueSymbolMock.Setup(x => x.ReadValueAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(new ResultReadValueAccess(value, 0, 0)));
+        _ = valueSymbolMock.Setup(x => x.WriteValueAsync(It.IsAny<object>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new ResultWriteAccess(0, 0)));
         var symbolMock = new Mock<IAdsSymbolInfo>();
         _ = symbolMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
         _ = symbolMock.SetupGet(x => x.Name).Returns(name);

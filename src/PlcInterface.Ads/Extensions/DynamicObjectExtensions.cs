@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using PlcInterface.Extensions;
 using TwinCAT.Ads.TypeSystem;
 using TwinCAT.TypeSystem;
 
-namespace PlcInterface.Ads.Extensions;
+#pragma warning disable IDE0130 // Namespace does not match folder structure
+
+namespace PlcInterface.Ads;
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 
 /// <summary>
 /// Extension methods for <see cref="DynamicObject"/>.
@@ -59,7 +61,7 @@ internal static class DynamicObjectExtensions
 
             var destination = Array.CreateInstance(ellementType, dimensionLengts);
 
-            foreach (var indices in destination.Indices())
+            foreach (var indices in IndicesHelper.GetIndices(destination))
             {
                 if (!ellementEnumerator.MoveNext())
                 {
@@ -76,7 +78,7 @@ internal static class DynamicObjectExtensions
         {
             var destination = Array.CreateInstance(typeof(object), dimensionLengts);
 
-            foreach (var indices in destination.Indices())
+            foreach (var indices in IndicesHelper.GetIndices(destination))
             {
                 if (!ellementEnumerator.MoveNext())
                 {

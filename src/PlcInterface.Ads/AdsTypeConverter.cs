@@ -2,8 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Globalization;
-using PlcInterface.Ads.Extensions;
-using PlcInterface.Extensions;
 using TwinCAT.Ads.TypeSystem;
 using TwinCAT.TypeSystem;
 
@@ -73,7 +71,7 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
         var dimensionLengts = dataType.Dimensions.GetDimensionLengths();
         var destination = Array.CreateInstance(ellementType, dimensionLengts);
 
-        foreach (var indices in destination.Indices())
+        foreach (var indices in IndicesHelper.GetIndices(destination))
         {
             if (!valueObject.TryGetIndexValue(indices, out var result))
             {

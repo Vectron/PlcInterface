@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Reactive.Disposables;
 using Microsoft.Extensions.Logging;
 using Opc.Ua.Client;
-using PlcInterface.OpcUa.Extensions;
 
 namespace PlcInterface.OpcUa;
 

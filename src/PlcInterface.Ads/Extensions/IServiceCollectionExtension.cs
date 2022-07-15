@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PlcInterface.Ads.TwincatAbstractions;
-using PlcInterface.Extensions;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 

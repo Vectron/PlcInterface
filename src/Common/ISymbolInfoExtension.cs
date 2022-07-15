@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PlcInterface.Extensions;
-
-#pragma warning disable IDE0130 // Namespace does not match folder structure
 
 namespace PlcInterface;
-#pragma warning restore IDE0130 // Namespace does not match folder structure
 
 /// <summary>
 /// Extension methods for <see cref="ISymbolInfo"/>.
 /// </summary>
-public static class ISymbolInfoExtension
+internal static class ISymbolInfoExtension
 {
     /// <summary>
     /// Flatten the type hierarchy.
@@ -20,7 +16,7 @@ public static class ISymbolInfoExtension
     /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
     /// <returns>A <see cref="IEnumerable{T}"/> of all child symbols.</returns>
     public static IEnumerable<ISymbolInfo> Flatten(this ISymbolInfo symbolInfo, ISymbolHandler symbolHandler)
-        => symbolInfo.ChildSymbols.Count == 0 ? symbolInfo.Yield() : symbolInfo.ChildSymbols.SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler));
+        => symbolInfo.ChildSymbols.Count == 0 ? new[] { symbolInfo } : symbolInfo.ChildSymbols.SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler));
 
     /// <summary>
     /// Flatten the type hierarchy.
@@ -33,7 +29,7 @@ public static class ISymbolInfoExtension
     {
         if (symbolInfo.ChildSymbols.Count == 0)
         {
-            return (symbolInfo, value).Yield();
+            return new[] { (symbolInfo, value) };
         }
 
         return symbolInfo.ChildSymbols
@@ -43,7 +39,7 @@ public static class ISymbolInfoExtension
                 object? childValue;
                 if (value is Array array)
                 {
-                    var indices = x.Name.GetIndices();
+                    var indices = IndicesHelper.GetIndices(x.Name);
                     childValue = array.GetValue(indices);
                 }
                 else

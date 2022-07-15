@@ -4,9 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using PlcInterface.Ads.Extensions;
 using PlcInterface.Ads.TwincatAbstractions;
-using PlcInterface.Extensions;
 
 namespace PlcInterface.Ads;
 
@@ -60,7 +58,12 @@ public class ReadWrite : IAdsReadWrite
     {
         var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
-        var value = adsSymbol.ReadValue().ThrowIfNull();
+        var value = adsSymbol.ReadValue();
+        if (value == null)
+        {
+            ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
+        }
+
         return typeConverter.Convert(value, adsSymbol);
     }
 
@@ -69,7 +72,12 @@ public class ReadWrite : IAdsReadWrite
     {
         var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
-        var value = adsSymbol.ReadValue().ThrowIfNull();
+        var value = adsSymbol.ReadValue();
+        if (value == null)
+        {
+            ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
+        }
+
         return typeConverter.Convert<T>(value);
     }
 
@@ -79,7 +87,12 @@ public class ReadWrite : IAdsReadWrite
         var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
         var resultReadValue = await adsSymbol.ReadValueAsync(CancellationToken.None).ConfigureAwait(false);
-        return typeConverter.Convert(resultReadValue.Value.ThrowIfNull(), adsSymbol);
+        if (resultReadValue.Value == null)
+        {
+            ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
+        }
+
+        return typeConverter.Convert(resultReadValue.Value, adsSymbol);
     }
 
     /// <inheritdoc/>
@@ -88,7 +101,12 @@ public class ReadWrite : IAdsReadWrite
         var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
         var resultReadValue = await adsSymbol.ReadValueAsync(CancellationToken.None).ConfigureAwait(false);
-        return typeConverter.Convert<T>(resultReadValue.Value.ThrowIfNull());
+        if (resultReadValue.Value == null)
+        {
+            ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
+        }
+
+        return typeConverter.Convert<T>(resultReadValue.Value);
     }
 
     /// <inheritdoc/>

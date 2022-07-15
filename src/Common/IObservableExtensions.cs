@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Reactive.Linq;
 
-namespace PlcInterface.Extensions;
+namespace PlcInterface;
 
 /// <summary>
 /// Extension methods for <see cref="IObservable{T}"/>.
 /// </summary>
-public static class IObservableExtensions
+internal static class IObservableExtensions
 {
     /// <summary>
     /// Filters the elements of an observable sequence based on if they are <see langword="null"/>.

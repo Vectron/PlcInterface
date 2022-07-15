@@ -8,8 +8,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using PlcInterface.Ads.Extensions;
-using PlcInterface.Extensions;
 using TwinCAT;
 using TwinCAT.Ads;
 using TwinCAT.Ads.TypeSystem;

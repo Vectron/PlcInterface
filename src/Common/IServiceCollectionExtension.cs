@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace PlcInterface.Extensions;
+namespace PlcInterface;
 
 /// <summary>
 /// Extension methods for <see cref="IServiceCollection"/>.
 /// </summary>
-public static class IServiceCollectionExtension
+internal static class IServiceCollectionExtension
 {
     /// <summary>
     /// Add <typeparamref name="TService1"/> and <typeparamref name="TService2"/> as a <typeparamref name="TImplementation"/> to the <see cref="IServiceCollection"/>.

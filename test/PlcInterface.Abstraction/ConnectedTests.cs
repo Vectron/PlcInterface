@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Abstraction.Tests;
 
@@ -32,7 +33,7 @@ public class ConnectedTests
         Assert.IsInstanceOfType(notConnected, typeof(IConnected));
         Assert.IsInstanceOfType(notConnected, typeof(IConnected<GenericParameterHelper>));
         Assert.IsFalse(notConnected.IsConnected);
-        Assert.IsNull(notConnected.Value);
+        _ = Assert.ThrowsException<InvalidOperationException>(() => notConnected.Value);
     }
 
     [TestMethod]

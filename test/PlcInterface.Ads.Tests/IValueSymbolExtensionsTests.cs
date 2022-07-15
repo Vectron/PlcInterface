@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using PlcInterface.Ads.Extensions;
 using TwinCAT.TypeSystem;
 
 namespace PlcInterface.Ads.Tests;

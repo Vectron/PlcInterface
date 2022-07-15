@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Opc.Ua;
-using PlcInterface.Extensions;
 
 namespace PlcInterface.OpcUa;
 
@@ -32,7 +31,7 @@ internal sealed class SymbolInfo : ISymbolInfo
         ShortName = Name[(Name.LastIndexOf(".", StringComparison.OrdinalIgnoreCase) + 1)..];
         ChildSymbols = new List<string>();
         IsBigType = symbol.NodeClass is NodeClass.Object or NodeClass.ObjectType;
-        Indices = Name.GetIndices();
+        Indices = IndicesHelper.GetIndices(Name);
         arrayBounds = new Lazy<int[]>(CalculateBounds, false);
         Comment = string.Empty;
     }
@@ -116,7 +115,7 @@ internal sealed class SymbolInfo : ISymbolInfo
             return Array.Empty<int>();
         }
 
-        var indices = ChildSymbols.Select(x => x.AsSpan(Name.Length).GetIndices());
+        var indices = ChildSymbols.Select(x => IndicesHelper.GetIndices(x.AsSpan(Name.Length)));
         var length = indices.First().Length;
         var lowerBounds = new int[length];
         var upperbounds = new int[length];

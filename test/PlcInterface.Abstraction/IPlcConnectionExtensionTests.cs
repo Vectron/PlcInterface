@@ -28,23 +28,6 @@ public class IPlcConnectionExtensionTests
     }
 
     [TestMethod]
-    public async Task GetConnectedClientAsyncThrowsArgumentNullException()
-    {
-        // Arrange
-        var plcConnectionMock = new Mock<IPlcConnection<GenericParameterHelper>>();
-        var iConnectedMock = new Mock<IConnected<GenericParameterHelper>>();
-        _ = iConnectedMock.SetupGet(x => x.IsConnected).Returns(true);
-        _ = plcConnectionMock.SetupGet(x => x.SessionStream).Returns(Observable.Repeat(iConnectedMock.Object));
-
-        // Act
-        // Assert
-        var exception = await Assert.ThrowsExceptionAsync<ArgumentNullException>(plcConnectionMock.Object.GetConnectedClientAsync);
-        Assert.AreEqual(nameof(IConnected<GenericParameterHelper>.Value), exception.ParamName);
-        var exception2 = await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => plcConnectionMock.Object.GetConnectedClientAsync(TimeSpan.FromMilliseconds(10)));
-        Assert.AreEqual(nameof(IConnected<GenericParameterHelper>.Value), exception2.ParamName);
-    }
-
-    [TestMethod]
     public async Task GetConnectedClientAsyncThrowsTimeoutExceptionOnTimeOut()
     {
         // Arrange
@@ -72,23 +55,6 @@ public class IPlcConnectionExtensionTests
 
         // Assert
         Assert.AreEqual(expected, connection);
-    }
-
-    [TestMethod]
-    public void GetConnectedClientThrowsArgumentNullException()
-    {
-        // Arrange
-        var plcConnectionMock = new Mock<IPlcConnection<GenericParameterHelper>>();
-        var iConnectedMock = new Mock<IConnected<GenericParameterHelper>>();
-        _ = iConnectedMock.SetupGet(x => x.IsConnected).Returns(true);
-        _ = plcConnectionMock.SetupGet(x => x.SessionStream).Returns(Observable.Repeat(iConnectedMock.Object));
-
-        // Act
-        // Assert
-        var exception = Assert.ThrowsException<ArgumentNullException>(plcConnectionMock.Object.GetConnectedClient);
-        Assert.AreEqual(nameof(IConnected<GenericParameterHelper>.Value), exception.ParamName);
-        var exception2 = Assert.ThrowsException<ArgumentNullException>(() => plcConnectionMock.Object.GetConnectedClient(TimeSpan.FromMilliseconds(10)));
-        Assert.AreEqual(nameof(IConnected<GenericParameterHelper>.Value), exception2.ParamName);
     }
 
     [TestMethod]

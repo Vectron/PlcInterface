@@ -2,9 +2,8 @@
 using System.Reactive.Subjects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using PlcInterface.Extensions;
 
-namespace PlcInterface.Abstraction.Tests;
+namespace PlcInterface.Common.Tests;
 
 [TestClass]
 public class IObservableExtensionsTests

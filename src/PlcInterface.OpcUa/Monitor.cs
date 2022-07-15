@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Opc.Ua;
 using Opc.Ua.Client;
-using PlcInterface.Extensions;
-using PlcInterface.OpcUa.Extensions;
 
 namespace PlcInterface.OpcUa;
 

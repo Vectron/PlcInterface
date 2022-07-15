@@ -7,8 +7,6 @@ using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Opc.Ua;
-using PlcInterface.Extensions;
-using PlcInterface.OpcUa.Extensions;
 
 namespace PlcInterface.OpcUa;
 
@@ -188,7 +186,12 @@ public class ReadWrite : IOpcReadWrite, IDisposable
                     var responseHeader = session.EndRead(ar, out var dataValues, out var diagnosticInfos);
                     var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                     ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
-                    var val = dataValues.FirstOrDefault().ThrowIfNull();
+                    var val = dataValues.FirstOrDefault();
+                    if (val == null)
+                    {
+                        ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
+                    }
+
                     taskCompletionSource.SetResult(typeConverter.Convert(val.Value));
                 }
                 catch (Exception ex)
@@ -236,7 +239,12 @@ public class ReadWrite : IOpcReadWrite, IDisposable
                 {
                     var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
                     ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
-                    var val = dataValues.FirstOrDefault().ThrowIfNull();
+                    var val = dataValues.FirstOrDefault();
+                    if (val == null)
+                    {
+                        ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
+                    }
+
                     taskCompletionSource.SetResult(typeConverter.Convert<T>(val.Value));
                 }
                 catch (Exception ex)

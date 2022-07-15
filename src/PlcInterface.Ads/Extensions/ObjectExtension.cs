@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PlcInterface.Ads.Extensions;
+#pragma warning disable IDE0130 // Namespace does not match folder structure
+
+namespace PlcInterface.Ads;
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 
 /// <summary>
 /// Extension methods for any object.

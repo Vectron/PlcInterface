@@ -11,15 +11,16 @@ using TwinCAT.Ads;
 namespace PlcInterface.Ads.IntegrationTests;
 
 [TestClass]
-public class ReadValueTest : IReadValueTestBase
+public sealed class ReadValueTest : IReadValueTestBase, IDisposable
 {
-    private static AdsClient? adsClient;
-    private static PlcConnection? connection;
-    private static ReadWrite? readWrite;
-    private static SymbolHandler? symbolHandler;
+    private AdsClient? adsClient;
+    private PlcConnection? connection;
+    private bool disposed;
+    private ReadWrite? readWrite;
+    private SymbolHandler? symbolHandler;
 
-    [ClassInitialize]
-    public static async Task ConnectAsync(TestContext testContext)
+    [TestInitialize]
+    public async Task ConnectAsync()
     {
         var connectionsettings = new AdsPlcConnectionOptions() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
         var symbolhandlersettings = new AdsSymbolHandlerOptions() { StoreSymbolsToDisk = false };
@@ -34,12 +35,21 @@ public class ReadValueTest : IReadValueTestBase
         _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
     }
 
-    [ClassCleanup]
-    public static void Disconnect()
+    [TestCleanup]
+    public void Disconnect()
+        => Dispose();
+
+    public void Dispose()
     {
-        connection!.Dispose();
-        adsClient!.Dispose();
-        symbolHandler!.Dispose();
+        if (disposed)
+        {
+            return;
+        }
+
+        disposed = true;
+        connection?.Dispose();
+        adsClient?.Dispose();
+        symbolHandler?.Dispose();
     }
 
     protected override IReadWrite GetReadWrite()

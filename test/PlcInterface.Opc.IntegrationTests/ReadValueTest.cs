@@ -8,19 +8,24 @@ using TestUtilities;
 namespace PlcInterface.Opc.IntegrationTests;
 
 [TestClass]
-public class ReadValueTest : IReadValueTestBase
+public sealed class ReadValueTest : IReadValueTestBase, IDisposable
 {
-    private static PlcConnection? connection;
-    private static ReadWrite? readWrite;
-    private static SymbolHandler? symbolHandler;
+    private PlcConnection? connection;
+    private bool disposed;
+    private ReadWrite? readWrite;
+    private SymbolHandler? symbolHandler;
 
-    [ClassInitialize]
-    public static async Task ConnectAsync(TestContext testContext)
+    [TestInitialize]
+    public async Task ConnectAsync()
     {
         var connectionsettings = new OpcPlcConnectionOptions();
         new DefaultOpcPlcConnectionConfigureOptions().Configure(connectionsettings);
         connectionsettings.Address = Settings.PLCUri;
         var typeConverter = new OpcTypeConverter();
+
+        connection?.Dispose();
+        symbolHandler?.Dispose();
+        readWrite?.Dispose();
 
         connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
         symbolHandler = new SymbolHandler(connection, MockHelpers.GetLoggerMock<SymbolHandler>());
@@ -30,14 +35,26 @@ public class ReadValueTest : IReadValueTestBase
         _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
     }
 
-    [ClassCleanup]
-    public static void Disconnect()
+    [TestCleanup]
+    public void Disconnect()
+        => Dispose();
+
+    public void Dispose()
     {
-        connection!.Dispose();
-        symbolHandler!.Dispose();
-        readWrite!.Dispose();
+        if (disposed)
+        {
+            return;
+        }
+
+        disposed = true;
+        connection?.Dispose();
+        symbolHandler?.Dispose();
+        readWrite?.Dispose();
     }
 
     protected override IReadWrite GetReadWrite()
-        => readWrite!;
+    {
+        Assert.IsNotNull(readWrite);
+        return readWrite;
+    }
 }

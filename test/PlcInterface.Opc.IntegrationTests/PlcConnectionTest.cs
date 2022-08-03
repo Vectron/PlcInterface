@@ -8,23 +8,36 @@ using TestUtilities;
 namespace PlcInterface.Opc.IntegrationTests;
 
 [TestClass]
-public class PlcConnectionTest : IPlcConnectionTestBase
+public sealed class PlcConnectionTest : IPlcConnectionTestBase, IDisposable
 {
-    private static PlcConnection? plcConnection;
+    private bool disposed;
+    private PlcConnection? plcConnection;
 
-    [ClassInitialize]
-    public static void ConnectAsync(TestContext testContext)
+    [TestInitialize]
+    public void ConnectAsync()
     {
         var connectionsettings = new OpcPlcConnectionOptions();
         new DefaultOpcPlcConnectionConfigureOptions().Configure(connectionsettings);
         connectionsettings.Address = Settings.PLCUriNoRoot;
 
+        plcConnection?.Dispose();
         plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
     }
 
-    [ClassCleanup]
-    public static void Disconnect()
-        => plcConnection!.Dispose();
+    [TestCleanup]
+    public void Disconnect()
+        => Dispose();
+
+    public void Dispose()
+    {
+        if (disposed)
+        {
+            return;
+        }
+
+        plcConnection?.Dispose();
+        disposed = true;
+    }
 
     [TestMethod]
     public void GetConnectedClient()
@@ -69,5 +82,8 @@ public class PlcConnectionTest : IPlcConnectionTestBase
     }
 
     protected override IPlcConnection GetPLCConnection()
-        => plcConnection!;
+    {
+        Assert.IsNotNull(plcConnection);
+        return plcConnection;
+    }
 }

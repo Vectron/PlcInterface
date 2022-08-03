@@ -8,13 +8,14 @@ using TwinCAT.Ads;
 namespace PlcInterface.Ads.IntegrationTests;
 
 [TestClass]
-public class PlcConnectionTest : IPlcConnectionTestBase
+public sealed class PlcConnectionTest : IPlcConnectionTestBase, IDisposable
 {
-    private static AdsClient? adsClient;
-    private static PlcConnection? plcConnection;
+    private AdsClient? adsClient;
+    private bool disposed;
+    private PlcConnection? plcConnection;
 
-    [ClassInitialize]
-    public static void ConnectAsync(TestContext testContext)
+    [TestInitialize]
+    public void ConnectAsync()
     {
         var connectionsettings = new AdsPlcConnectionOptions() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
         adsClient = new AdsClient();
@@ -22,11 +23,20 @@ public class PlcConnectionTest : IPlcConnectionTestBase
         plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
     }
 
-    [ClassCleanup]
-    public static void Disconnect()
+    [TestCleanup]
+    public void Disconnect()
+        => Dispose();
+
+    public void Dispose()
     {
-        plcConnection!.Dispose();
-        adsClient!.Dispose();
+        if (disposed)
+        {
+            return;
+        }
+
+        disposed = true;
+        plcConnection?.Dispose();
+        adsClient?.Dispose();
     }
 
     [TestMethod]
@@ -72,5 +82,8 @@ public class PlcConnectionTest : IPlcConnectionTestBase
     }
 
     protected override IPlcConnection GetPLCConnection()
-        => plcConnection!;
+    {
+        Assert.IsNotNull(plcConnection);
+        return plcConnection;
+    }
 }

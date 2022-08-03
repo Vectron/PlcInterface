@@ -51,10 +51,10 @@ jobs:
         run: dotnet build ${{ env.SOLUTION_NAME }} -c Release --no-restore
       - name: Test
         if: runner.os != 'Windows'
-        run: dotnet test ${{ env.SOLUTION_NAME }} -c Release -v n --no-build --nologo --filter FullyQualifiedName\!~IntegrationTests --collect "Code Coverage" -s .runsettings -r ./bin/TestResults
+        run: dotnet test ${{ env.SOLUTION_NAME }} -c Release -v n --no-build --nologo --filter FullyQualifiedName\!~IntegrationTests --collect "Code Coverage" -s .runsettings -r ./bin/TestResults --logger GitHubActions
       - name: Test windows
         if: runner.os == 'Windows'
-        run: dotnet test ${{ env.SOLUTION_NAME }} -c Release -v n --no-build --nologo --filter FullyQualifiedName!~IntegrationTests --collect "Code Coverage" -s .runsettings -r .\bin\TestResults
+        run: dotnet test ${{ env.SOLUTION_NAME }} -c Release -v n --no-build --nologo --filter FullyQualifiedName!~IntegrationTests --collect "Code Coverage" -s .runsettings -r .\bin\TestResults --logger GitHubActions
       - name: Pack
         id: pack
         if: matrix.os == 'ubuntu-latest' && (github.ref == 'refs/heads/main' || contains(github.ref, 'refs/tags/'))

@@ -55,8 +55,6 @@
             </Logger>
             <Logger friendlyName="html" enabled="True">
             </Logger>
-            <Logger friendlyName="GitHubActions" enabled="True">
-            </Logger>
         </Loggers>
     </LoggerRunSettings>
 

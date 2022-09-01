@@ -54,11 +54,7 @@ public class IndicesHelperTests
         // Assert
         foreach (var indices in IndicesHelper.GetIndices(data))
         {
-            if (first == null)
-            {
-                first = indices;
-            }
-
+            first ??= indices;
             Assert.AreSame(first, indices);
         }
     }

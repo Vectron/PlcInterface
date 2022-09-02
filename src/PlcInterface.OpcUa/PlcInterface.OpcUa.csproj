@@ -1,25 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <Description>A PLC communication implementation for OPC</Description>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Description>A PLC communication implementation for OPC</Description>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <Compile Include="$(CommonDirectory)\IServiceCollectionExtension.cs" LinkBase="Common" />
-        <Compile Include="$(CommonDirectory)\IObservableExtensions.cs" LinkBase="Common" />
-        <Compile Include="$(CommonDirectory)\ISymbolInfoExtension.cs" LinkBase="Common" />
-        <Compile Include="$(CommonDirectory)\IndicesHelper.cs" LinkBase="Common" />
-        <Compile Include="$(CommonDirectory)\ThrowHelper.cs" LinkBase="Common" />
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(CommonDirectory)\IServiceCollectionExtension.cs" LinkBase="Common" />
+    <Compile Include="$(CommonDirectory)\IObservableExtensions.cs" LinkBase="Common" />
+    <Compile Include="$(CommonDirectory)\ISymbolInfoExtension.cs" LinkBase="Common" />
+    <Compile Include="$(CommonDirectory)\IndicesHelper.cs" LinkBase="Common" />
+    <Compile Include="$(CommonDirectory)\ThrowHelper.cs" LinkBase="Common" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-        <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Client" Version="1.4.370.1" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua.Client" Version="1.4.370.1" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\PlcInterface.Abstraction\PlcInterface.Abstraction.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PlcInterface.Abstraction\PlcInterface.Abstraction.csproj" />
+  </ItemGroup>
 </Project>

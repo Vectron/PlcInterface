@@ -15,6 +15,10 @@
     <CommonDirectory>$(MSBuildThisFileDirectory)\src\Common</CommonDirectory>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <SystemIOAbstractionsVersion>17.0.24</SystemIOAbstractionsVersion>
+  </PropertyGroup>
+
   <!--Package settings-->
   <PropertyGroup>
     <Authors>Vectron</Authors>

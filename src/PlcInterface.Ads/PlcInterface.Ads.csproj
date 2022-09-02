@@ -13,13 +13,17 @@
       <Compile Include="$(CommonDirectory)\ThrowHelper.cs" LinkBase="Common" />
     </ItemGroup>
 
+    <PropertyGroup>
+        <TwinCATAdsVersion>6.0.187</TwinCATAdsVersion>
+    </PropertyGroup>
+  
     <ItemGroup>
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-        <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="6.0.187" NoWarn="NU1701" />
-        <PackageReference Include="Beckhoff.TwinCAT.Ads.Reactive" Version="6.0.187" NoWarn="NU1701" />
+        <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="$(TwinCATAdsVersion)" />
+        <PackageReference Include="Beckhoff.TwinCAT.Ads.Reactive" Version="$(TwinCATAdsVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-        <PackageReference Include="System.IO.Abstractions" Version="17.0.24" />
+        <PackageReference Include="System.IO.Abstractions" Version="$(SystemIOAbstractionsVersion)" />
     </ItemGroup>
 
     <ItemGroup>

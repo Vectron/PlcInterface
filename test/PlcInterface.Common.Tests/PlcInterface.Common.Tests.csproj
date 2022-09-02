@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
@@ -9,7 +8,7 @@
   <ItemGroup>
     <Compile Include="$(CommonDirectory)\*.cs" LinkBase="Common" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="2.0.1">
       <PrivateAssets>all</PrivateAssets>
@@ -22,9 +21,8 @@
     <PackageReference Include="Moq" Version="4.18.1" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\PlcInterface.Abstraction\PlcInterface.Abstraction.csproj" />
   </ItemGroup>
-
 </Project>

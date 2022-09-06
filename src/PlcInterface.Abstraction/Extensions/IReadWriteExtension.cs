@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,7 +35,7 @@ public static class IReadWriteExtension
             }
         }
 
-        throw new TimeoutException(FormattableString.Invariant($"Couldnt get a proper response from the PLC in {timeout.TotalSeconds} seconds"));
+        throw new TimeoutException(string.Create(CultureInfo.InvariantCulture, $"Couldnt get a proper response from the PLC in {timeout.TotalSeconds} seconds"));
     }
 
     /// <summary>
@@ -61,6 +62,6 @@ public static class IReadWriteExtension
             }
         }
 
-        throw new TimeoutException(FormattableString.Invariant($"Couldnt get a proper response from the PLC in {timeout.TotalSeconds} seconds"));
+        throw new TimeoutException(string.Create(CultureInfo.InvariantCulture, $"Couldnt get a proper response from the PLC in {timeout.TotalSeconds} seconds"));
     }
 }

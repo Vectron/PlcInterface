@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
@@ -156,7 +157,7 @@ public abstract class IMonitorTestBase
         monitor.UnregisterIO(variables);
 
         // Assert
-        Assert.IsTrue(timeoutResult, FormattableString.Invariant($"Timeout, items processed {hits}/{originals.Count}"));
+        Assert.IsTrue(timeoutResult, string.Create(CultureInfo.InvariantCulture, $"Timeout, items processed {hits}/{originals.Count}"));
         Assert.AreEqual(originals.Count, results.Count);
         using var originalsEnumerator = originals.OrderBy(x => x.Key).GetEnumerator();
         using var resultsEnumerator = results.OrderBy(x => x.Key).GetEnumerator();

@@ -139,7 +139,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
             {
                 AutomaticReconnection = false,
                 NonCachedArrayElements = true,
-                ValueAccessMode = ValueAccessMode.Symbolic,
+                ValueAccessMode = ValueAccessMode.SymbolicByHandle,
                 ValueCreation = ValueCreationModes.Primitives,
                 SymbolsLoadMode = SymbolsLoadMode.DynamicTree,
                 ValueUpdateMode = ValueUpdateMode.None,

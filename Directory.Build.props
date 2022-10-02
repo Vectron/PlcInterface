@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <SystemIOAbstractionsVersion>17.1.1</SystemIOAbstractionsVersion>
+    <SystemIOAbstractionsVersion>17.2.3</SystemIOAbstractionsVersion>
   </PropertyGroup>
 
   <!--Package settings-->

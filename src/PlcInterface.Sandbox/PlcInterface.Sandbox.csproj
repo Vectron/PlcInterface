@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
     <PackageReference Include="NLog.Extensions.Logging" Version="$(NLogVersion)" />
     <PackageReference Include="NLog.Schema" Version="$(NLogVersion)" />
     <PackageReference Include="ReadLine" Version="2.0.1" />

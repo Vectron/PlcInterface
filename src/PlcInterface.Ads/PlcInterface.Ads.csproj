@@ -22,7 +22,7 @@
     <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="$(TwinCATAdsVersion)" />
     <PackageReference Include="Beckhoff.TwinCAT.Ads.Reactive" Version="$(TwinCATAdsVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
     <PackageReference Include="System.IO.Abstractions" Version="$(SystemIOAbstractionsVersion)" />
   </ItemGroup>
 

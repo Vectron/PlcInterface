@@ -1,5 +1,6 @@
 ﻿name: .NET
 on:
+  workflow_dispatch:
   push:
     branches:
       - 'main'
@@ -29,7 +30,7 @@ jobs:
         dotnet-version: ['6.0.x' ]
     runs-on: ${{ matrix.os }}
     outputs:
-        publicRelease: ${{ steps.get-version.outputs.publicRelease }}
+        publicRelease: ${{ steps.nbgv.outputs.PublicRelease }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -42,9 +43,6 @@ jobs:
       - name: Nerdbank.GitVersioning
         id: nbgv
         uses: dotnet/nbgv@v0.4.0
-      - name: Store public release output
-        id: get-version
-        run: echo "::set-output name=publicRelease::${{ steps.nbgv.outputs.PublicRelease }}"
       - name: Restore dependencies
         run: dotnet restore ${{ env.SOLUTION_NAME }}
       - name: Build

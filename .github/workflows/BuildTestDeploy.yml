@@ -76,8 +76,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: nupkg
+      - name: Setup github remotes
+        run: dotnet nuget add source --username Vectron --password $GITHUB_KEY --store-password-in-clear-text --name github $GITHUB_FEED
       - name: Push to GitHub Feed
-        run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_KEY
+        run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source "github" --skip-duplicate --api-key $GITHUB_KEY
       - name: Push to NuGet Feed
         if: needs.build.outputs.publicRelease == 'true' && contains(github.ref, 'refs/tags/')
         run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY

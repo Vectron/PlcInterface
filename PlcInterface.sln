@@ -51,9 +51,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{CD933546-74FC-4714-8E93-098A2D7E2F5E}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\BuildTestDeploy.yml = .github\workflows\BuildTestDeploy.yml
+		updater.yaml = updater.yaml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlcInterface.Common.Tests", "test\PlcInterface.Common.Tests\PlcInterface.Common.Tests.csproj", "{EBF7A104-CCDF-4BBC-87E6-560FFCBB153F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlcInterface.Common.Tests", "test\PlcInterface.Common.Tests\PlcInterface.Common.Tests.csproj", "{EBF7A104-CCDF-4BBC-87E6-560FFCBB153F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

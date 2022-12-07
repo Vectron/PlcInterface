@@ -96,7 +96,7 @@ public class IServiceCollectionExtensionTest
 
         var opcConnection = provider.GetRequiredService<IOpcPlcConnection>();
         var connection = provider.GetRequiredService<IPlcConnection>();
-        var genericConnection = provider.GetRequiredService<IPlcConnection<Opc.Ua.Client.Session>>();
+        var genericConnection = provider.GetRequiredService<IPlcConnection<Opc.Ua.Client.ISession>>();
         using var concrete = provider.GetService<PlcConnection>();
 
         Assert.IsNull(concrete);

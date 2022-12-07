@@ -18,7 +18,7 @@ internal sealed class TreeBrowser : Browser
     /// Initializes a new instance of the <see cref="TreeBrowser"/> class.
     /// </summary>
     /// <param name="session">The session to browse.</param>
-    public TreeBrowser(Session session)
+    public TreeBrowser(ISession session)
         : base(session)
     {
         BrowseDirection = BrowseDirection.Forward;

@@ -11,7 +11,7 @@ internal sealed class NodeInfo
 {
     private readonly Lazy<BuiltInType> builtInType;
     private readonly Lazy<string> dataTypeDisplayText;
-    private readonly Session session;
+    private readonly ISession session;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NodeInfo"/> class.
@@ -20,7 +20,7 @@ internal sealed class NodeInfo
     /// <param name="dataType">The data type of this node.</param>
     /// <param name="description">The description text of this node.</param>
     /// <param name="valueRank">The value rank of this node.</param>
-    public NodeInfo(Session session, NodeId dataType, string description, int valueRank)
+    public NodeInfo(ISession session, NodeId dataType, string description, int valueRank)
     {
         Description = description;
         ValueRank = valueRank;

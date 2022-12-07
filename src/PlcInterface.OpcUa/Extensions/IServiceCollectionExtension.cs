@@ -20,7 +20,7 @@ public static class IServiceCollectionExtension
             .AddSingletonFactory<ReadWrite, IReadWrite, IOpcReadWrite>()
             .AddSingletonFactory<Monitor, IMonitor, IOpcMonitor>()
             .AddSingletonFactory<SymbolHandler, ISymbolHandler, IOpcSymbolHandler>()
-            .AddSingletonFactory<PlcConnection, IPlcConnection<Opc.Ua.Client.Session>, IOpcPlcConnection>()
+            .AddSingletonFactory<PlcConnection, IPlcConnection<Opc.Ua.Client.ISession>, IOpcPlcConnection>()
             .AddSingleton<IPlcConnection>(x => x.GetRequiredService<IOpcPlcConnection>())
             .AddTransient<IOpcTypeConverter, OpcTypeConverter>()
             .ConfigureOptions<DefaultOpcPlcConnectionConfigureOptions>();

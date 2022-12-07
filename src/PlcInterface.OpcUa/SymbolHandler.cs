@@ -19,7 +19,7 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
     private readonly ILogger logger;
     private IDictionary<string, SymbolInfo> allSymbols = new Dictionary<string, SymbolInfo>(StringComparer.OrdinalIgnoreCase);
     private bool disposedValue;
-    private Session? session;
+    private ISession? session;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SymbolHandler"/> class.
@@ -100,7 +100,7 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
         }
     }
 
-    private void UpdateSymbols(Session session)
+    private void UpdateSymbols(ISession session)
     {
         // create a browser to browse the node tree
         if (connection.Settings is not OpcPlcConnectionOptions settings)

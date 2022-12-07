@@ -14,17 +14,17 @@ using Opc.Ua.Client;
 namespace PlcInterface.OpcUa;
 
 /// <summary>
-/// Implementation of <see cref="IPlcConnection{T}"/> for the <see cref="Session"/>.
+/// Implementation of <see cref="IPlcConnection{T}"/> for the <see cref="ISession"/>.
 /// </summary>
 public class PlcConnection : IOpcPlcConnection, IDisposable
 {
-    private readonly BehaviorSubject<IConnected<Session>> connectionState = new(Connected.No<Session>());
+    private readonly BehaviorSubject<IConnected<ISession>> connectionState = new(Connected.No<ISession>());
     private readonly CompositeDisposable disposables = new();
     private readonly ILogger logger;
     private readonly IOptions<OpcPlcConnectionOptions> options;
     private readonly TimeSpan reconnectDelay = TimeSpan.FromSeconds(1);
     private bool disposedValue;
-    private Session? session;
+    private ISession? session;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlcConnection"/> class.
@@ -56,7 +56,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
     }
 
     /// <inheritdoc/>
-    public IObservable<IConnected<Session>> SessionStream
+    public IObservable<IConnected<ISession>> SessionStream
         => connectionState.AsObservable();
 
     /// <inheritdoc/>
@@ -109,7 +109,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             }
 
             logger.LogInformation("Connected to {Endpoint}", endpoint);
-            disposables.Add(Observable.FromEventPattern<KeepAliveEventHandler, Session, KeepAliveEventArgs>(
+            disposables.Add(Observable.FromEventPattern<KeepAliveEventHandler, ISession, KeepAliveEventArgs>(
                 h => session.KeepAlive += h,
                 h => session.KeepAlive -= h)
                 .Where(x => ServiceResult.IsBad(x.EventArgs.Status))
@@ -118,7 +118,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             disposables.Add(Observable.FromEventPattern(
                  h => session.SessionClosing += h,
                  h => session.SessionClosing -= h)
-                 .Subscribe(_ => connectionState.OnNext(Connected.No<Session>())));
+                 .Subscribe(_ => connectionState.OnNext(Connected.No<ISession>())));
 
             connectionState.OnNext(Connected.Yes(session));
         }
@@ -157,7 +157,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             return;
         }
 
-        connectionState.OnNext(Connected.No<Session>());
+        connectionState.OnNext(Connected.No<ISession>());
         if (session.Connected)
         {
             var closeSessionResponse = await session.CloseSessionAsync(null, false, CancellationToken.None).ConfigureAwait(false);
@@ -240,9 +240,9 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         return new UserIdentity(new AnonymousIdentityToken());
     }
 
-    private void KeepAliveSubscription(EventPattern<Session, KeepAliveEventArgs> x)
+    private void KeepAliveSubscription(EventPattern<ISession, KeepAliveEventArgs> x)
     {
-        connectionState.OnNext(Connected.No<Session>());
+        connectionState.OnNext(Connected.No<ISession>());
         logger.LogError("{Status}, Reconnecting to {Endpoint}", x.EventArgs.Status, x.Sender?.ConfiguredEndpoint);
         var sessionReconnectHandler = new SessionReconnectHandler();
         sessionReconnectHandler.BeginReconnect(x.Sender, (int)reconnectDelay.TotalMilliseconds, (s, e) =>

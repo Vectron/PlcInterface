@@ -10,17 +10,17 @@ namespace PlcInterface.OpcUa;
 #pragma warning restore IDE0130 // Namespace does not match folder structure
 
 /// <summary>
-/// Extension methods for <see cref="Session"/>.
+/// Extension methods for <see cref="ISession"/>.
 /// </summary>
 internal static class SessionExtensions
 {
     /// <summary>
     /// Gets the datatype of an OPC tag.
     /// </summary>
-    /// /// <param name="session">The <see cref="Session"/> to read from.</param>
+    /// /// <param name="session">The <see cref="ISession"/> to read from.</param>
     /// <param name="nodeId"><see cref="NodeId"/> to get datatype of.</param>
     /// <returns>System Type.</returns>
-    public static NodeInfo ReadNodeInfo(this Session session, NodeId nodeId)
+    public static NodeInfo ReadNodeInfo(this ISession session, NodeId nodeId)
     {
         if (session == null)
         {
@@ -45,10 +45,10 @@ internal static class SessionExtensions
     /// <summary>
     /// Gets the datatype of an OPC tag.
     /// </summary>
-    /// <param name="session">The <see cref="Session"/> to read from.</param>
+    /// <param name="session">The <see cref="ISession"/> to read from.</param>
     /// <param name="nodeIds">The <see cref="NodeId"/> to get datatype of.</param>
     /// <returns>System Type.</returns>
-    public static IEnumerable<NodeInfo> ReadNodeInfo(this Session session, IEnumerable<NodeId> nodeIds)
+    public static IEnumerable<NodeInfo> ReadNodeInfo(this ISession session, IEnumerable<NodeId> nodeIds)
     {
         if (session == null)
         {
@@ -91,9 +91,9 @@ internal static class SessionExtensions
     /// <summary>
     /// Reads the Operation Limits from the server.
     /// </summary>
-    /// <param name="session">The <see cref="Session"/> to read from.</param>
+    /// <param name="session">The <see cref="ISession"/> to read from.</param>
     /// <returns>The read <see cref="OperationLimits"/>.</returns>
-    public static OperationLimits ReadOperationLimits(this Session session)
+    public static OperationLimits ReadOperationLimits(this ISession session)
     {
         // create a browser to browse the node tree
         var browser = new Browser(session)
@@ -157,7 +157,7 @@ internal static class SessionExtensions
         };
     }
 
-    private static NodeInfo NodeInfoFromDataValue(IList<DataValue> dataValues, Session session)
+    private static NodeInfo NodeInfoFromDataValue(IList<DataValue> dataValues, ISession session)
     {
         if (dataValues.Count != 3)
         {

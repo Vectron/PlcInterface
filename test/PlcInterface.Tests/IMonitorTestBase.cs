@@ -56,10 +56,10 @@ public abstract class IMonitorTestBase
         var results = new List<bool>();
 
         // Act
-        using var subscription1 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x), 100);
-        using var subscription2 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x), 100);
-        using var subscription3 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x), 100);
-        using var subscription4 = monitor.SubscribeIO<bool>(ioName, x => results.Add(x), 100);
+        using var subscription1 = monitor.SubscribeIO<bool>(ioName, results.Add, 100);
+        using var subscription2 = monitor.SubscribeIO<bool>(ioName, results.Add, 100);
+        using var subscription3 = monitor.SubscribeIO<bool>(ioName, results.Add, 100);
+        using var subscription4 = monitor.SubscribeIO<bool>(ioName, results.Add, 100);
         await SubscribeCheckAsync(results, 4);
 
         // Assert

@@ -15,8 +15,9 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   # Disable sending usage data to Microsoft
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  Owner: ${{ github.repository_owner }}
   # GitHub Packages Feed settings
-  GITHUB_FEED: https://nuget.pkg.github.com/OWNER/index.json
+  GITHUB_FEED: https://nuget.pkg.github.com/$Owner/index.json
   GITHUB_KEY: ${{ secrets.GITHUB_TOKEN }}
   # Official NuGet Feed settings
   NUGET_FEED: https://api.nuget.org/v3/index.json
@@ -77,7 +78,7 @@ jobs:
         with:
           name: nupkg
       - name: Setup github remotes
-        run: dotnet nuget add source --username Vectron --password $GITHUB_KEY --store-password-in-clear-text --name github $GITHUB_FEED
+        run: dotnet nuget add source $GITHUB_FEED --username $Owner --password $GITHUB_KEY --store-password-in-clear-text --name github
       - name: Push to GitHub Feed
         run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source "github" --skip-duplicate --api-key $GITHUB_KEY
       - name: Push to NuGet Feed

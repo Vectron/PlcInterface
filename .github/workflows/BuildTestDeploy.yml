@@ -56,7 +56,7 @@ jobs:
       - name: Pack
         id: pack
         if: matrix.os == 'ubuntu-latest' && (github.ref == 'refs/heads/main' || contains(github.ref, 'refs/tags/'))
-        run: dotnet pack ${{ env.SOLUTION_NAME }} --configuration Release --verbosity normal --no-build --nologo --no-restore /p:Version=${{ steps.nbgv.outputs.SemVer2 }} --output ./bin/Pack/ --logger GitHubActions
+        run: dotnet pack ${{ env.SOLUTION_NAME }} --configuration Release --verbosity normal --no-build --nologo --no-restore /p:Version=${{ steps.nbgv.outputs.SemVer2 }} --output ./bin/Pack/
       - name: Upload Artifact
         if: steps.pack.outcome == 'success'
         uses: actions/upload-artifact@v3

@@ -81,7 +81,7 @@ internal static class SessionExtensions
             if (ex.Result.StatusCode == StatusCodes.BadEncodingLimitsExceeded)
             {
                 var chunkSize = ((nodesToRead.Count / 3) >> 1) + 1;
-                return nodeIds.Chunk(chunkSize).SelectMany(x => session.ReadNodeInfo(x));
+                return nodeIds.Chunk(chunkSize).SelectMany(session.ReadNodeInfo);
             }
 
             throw;

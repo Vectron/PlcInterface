@@ -114,7 +114,7 @@ public class ReadWrite : IAdsReadWrite
     {
         var client = await connection.GetConnectedClientAsync().ConfigureAwait(false);
         var tcSymbols = ioNames
-            .Select(x => symbolHandler.GetSymbolinfo(x))
+            .Select(symbolHandler.GetSymbolinfo)
             .Select(x => x.Symbol)
             .ToList();
 

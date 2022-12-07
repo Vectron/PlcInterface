@@ -33,7 +33,7 @@ internal static class ISymbolInfoExtension
         }
 
         return symbolInfo.ChildSymbols
-            .Select(x => symbolHandler.GetSymbolinfo(x))
+            .Select(symbolHandler.GetSymbolinfo)
             .SelectMany(x =>
             {
                 object? childValue;

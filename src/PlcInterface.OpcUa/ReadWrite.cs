@@ -438,7 +438,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
             throw new ServiceResultException($"Response header is bad");
         }
 
-        if (!statusCodes.TrueForAll(x => StatusCode.IsGood(x)))
+        if (!statusCodes.TrueForAll(StatusCode.IsGood))
         {
             var errors = statusCodes
                 .Zip(ioNames, (statusCode, name) => (statusCode, name))

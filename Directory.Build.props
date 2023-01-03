@@ -17,6 +17,7 @@
 
   <PropertyGroup>
     <SystemIOAbstractionsVersion>19.1.5</SystemIOAbstractionsVersion>
+    <MSTestVersion>3.0.2</MSTestVersion>
   </PropertyGroup>
 
   <!--Package settings-->

@@ -34,7 +34,7 @@ jobs:
         publicRelease: ${{ steps.nbgv.outputs.PublicRelease }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
       - name: Setup .NET
@@ -60,7 +60,7 @@ jobs:
         run: dotnet pack ${{ env.SOLUTION_NAME }} --configuration Release --verbosity normal --no-build --nologo --no-restore /p:Version=${{ steps.nbgv.outputs.SemVer2 }} --output ./bin/Pack/
       - name: Upload Artifact
         if: steps.pack.outcome == 'success'
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: nupkg
           path: |
@@ -74,7 +74,7 @@ jobs:
     steps:
       - name: Download Artifact
         id: download
-        uses: actions/download-artifact@v3.0.1
+        uses: actions/download-artifact@v3.0.2
         with:
           name: nupkg
       - name: Setup github remotes

@@ -113,8 +113,8 @@ public abstract class IMonitorTestBase
         // Assert
         Assert.IsTrue(timeoutResult, "Timeout");
         Assert.AreEqual(originals.Count, results.Count);
-        using var originalsEnumerator = originals.OrderBy(x => x.Key).GetEnumerator();
-        using var resultsEnumerator = results.OrderBy(x => x.Key).GetEnumerator();
+        using var originalsEnumerator = originals.OrderBy(x => x.Key, StringComparer.Ordinal).GetEnumerator();
+        using var resultsEnumerator = results.OrderBy(x => x.Key, StringComparer.Ordinal).GetEnumerator();
 
         while (originalsEnumerator.MoveNext() && resultsEnumerator.MoveNext())
         {
@@ -159,8 +159,8 @@ public abstract class IMonitorTestBase
         // Assert
         Assert.IsTrue(timeoutResult, string.Create(CultureInfo.InvariantCulture, $"Timeout, items processed {hits}/{originals.Count}"));
         Assert.AreEqual(originals.Count, results.Count);
-        using var originalsEnumerator = originals.OrderBy(x => x.Key).GetEnumerator();
-        using var resultsEnumerator = results.OrderBy(x => x.Key).GetEnumerator();
+        using var originalsEnumerator = originals.OrderBy(x => x.Key, StringComparer.Ordinal).GetEnumerator();
+        using var resultsEnumerator = results.OrderBy(x => x.Key, StringComparer.Ordinal).GetEnumerator();
 
         while (originalsEnumerator.MoveNext() && resultsEnumerator.MoveNext())
         {

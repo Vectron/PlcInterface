@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <SystemIOAbstractionsVersion>19.1.14</SystemIOAbstractionsVersion>
+    <SystemIOAbstractionsVersion>19.1.18</SystemIOAbstractionsVersion>
     <MSTestVersion>3.0.2</MSTestVersion>
   </PropertyGroup>
 

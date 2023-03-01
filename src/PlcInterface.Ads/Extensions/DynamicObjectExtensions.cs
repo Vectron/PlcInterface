@@ -53,11 +53,8 @@ internal static class DynamicObjectExtensions
 
         if (arrayType.ManagedType != null)
         {
-            var ellementType = arrayType.ManagedType.GetElementType();
-            if (ellementType == null)
-            {
-                throw new NotSupportedException($"Unable to retrieve element type");
-            }
+            var ellementType = arrayType.ManagedType.GetElementType()
+                ?? throw new NotSupportedException($"Unable to retrieve element type");
 
             var destination = Array.CreateInstance(ellementType, dimensionLengts);
 

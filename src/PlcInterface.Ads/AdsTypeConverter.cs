@@ -62,12 +62,8 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
             throw new NotSupportedException($"Data Type is not a {typeof(ArrayType)}");
         }
 
-        var ellementType = type.GetElementType();
-        if (ellementType == null)
-        {
-            throw new NotSupportedException($"Unable to retrieve element type");
-        }
-
+        var ellementType = type.GetElementType()
+            ?? throw new NotSupportedException($"Unable to retrieve element type");
         var dimensionLengts = dataType.Dimensions.GetDimensionLengths();
         var destination = Array.CreateInstance(ellementType, dimensionLengts);
 
@@ -106,11 +102,8 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
         var destination = Activator.CreateInstance(type) ?? throw new NotSupportedException($"Unable to create a instance for type: {type.Name}");
         foreach (var memberName in dynamicObject.GetDynamicMemberNames())
         {
-            var property = type.GetProperty(memberName);
-            if (property == null)
-            {
-                throw new InvalidOperationException($"{memberName} not found as a property");
-            }
+            var property = type.GetProperty(memberName)
+                ?? throw new InvalidOperationException($"{memberName} not found as a property");
 
             if (!property.CanWrite)
             {

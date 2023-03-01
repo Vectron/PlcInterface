@@ -25,11 +25,8 @@ public class DefaultOpcPlcConnectionConfigureOptions : IConfigureOptions<OpcPlcC
 
     private static ApplicationConfiguration CreateApplicationConfiguration()
     {
-        var entryAssembly = Assembly.GetEntryAssembly();
-        if (entryAssembly == null)
-        {
-            entryAssembly = Assembly.GetExecutingAssembly();
-        }
+        var entryAssembly = Assembly.GetEntryAssembly()
+            ?? Assembly.GetExecutingAssembly();
 
         var appName = entryAssembly.GetName().Name;
 

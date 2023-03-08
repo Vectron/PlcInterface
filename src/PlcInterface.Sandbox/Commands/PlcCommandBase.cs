@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Text;
 using PlcInterface.Sandbox.Interactive;
 
 namespace PlcInterface.Sandbox.Commands;
 
 /// <summary>
-/// A <see cref="IApplicationCommand" /> implementation that connects to a plc.
+/// A <see cref="IApplicationCommand"/> implementation that connects to a plc.
 /// </summary>
 internal abstract class PlcCommandBase : CommandBase, IDisposable
 {
@@ -54,7 +55,7 @@ internal abstract class PlcCommandBase : CommandBase, IDisposable
         disposables.Clear();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override Response Execute(string[] parameters)
     {
         if (parameters.Length <= 0)
@@ -74,8 +75,13 @@ internal abstract class PlcCommandBase : CommandBase, IDisposable
                 return new Response("Disconnecting from the plc");
 
             case "read":
-                var value = readWrite.Read(parameters[1]).ToString();
-                return value == null ? new Response($"Failed reading value from {parameters[1]}") : new Response(value);
+                var value = readWrite.Read(parameters[1]);
+                var result = string.Empty;
+                result = value is IDictionary<string, object?> multiValues
+                    ? FlattenExpando(multiValues)
+                    : value.ToString();
+
+                return value == null ? new Response($"Failed reading value from {parameters[1]}") : new Response(result ?? string.Empty);
 
             case "write":
                 readWrite.Write(parameters[1], true);
@@ -109,5 +115,28 @@ internal abstract class PlcCommandBase : CommandBase, IDisposable
             default:
                 return new Response("Invallid parameter");
         }
+    }
+
+    private string FlattenExpando(IDictionary<string, object?> parameters, int indentation = 0)
+    {
+        var builder = new StringBuilder();
+        var prefix = string.Join(string.Empty, Enumerable.Repeat("  ", indentation));
+        foreach (var (key, value) in parameters)
+        {
+            _ = builder.Append(prefix)
+                .Append(key)
+                .Append(": ");
+
+            if (value is IDictionary<string, object?> dictionary)
+            {
+                _ = builder.AppendLine()
+                    .Append(FlattenExpando(dictionary, indentation + 1));
+                continue;
+            }
+
+            _ = builder.AppendLine(value?.ToString());
+        }
+
+        return builder.ToString();
     }
 }

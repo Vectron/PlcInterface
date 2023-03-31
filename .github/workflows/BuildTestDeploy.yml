@@ -1,4 +1,4 @@
-﻿name: .NET
+name: .NET
 on:
   workflow_dispatch:
   push:
@@ -60,7 +60,7 @@ jobs:
         run: dotnet pack ${{ env.SOLUTION_NAME }} --configuration Release --verbosity normal --no-build --nologo --no-restore /p:Version=${{ steps.nbgv.outputs.SemVer2 }} --output ./bin/Pack/
       - name: Upload Artifact
         if: steps.pack.outcome == 'success'
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: nupkg
           path: |

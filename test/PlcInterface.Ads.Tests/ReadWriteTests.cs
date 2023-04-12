@@ -92,6 +92,7 @@ public class ReadWriteTests
     }
 
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP013:Await in using", Justification = "See https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
     public async Task ReadValuesReturnsTheExpectedValuesAsync()
     {
         // Arrange
@@ -206,6 +207,7 @@ public class ReadWriteTests
     }
 
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP013:Await in using", Justification = "See https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
     public async Task WriteMultipleCallsUnderlyingWriteMethodAsync()
     {
         // Arrange
@@ -236,6 +238,7 @@ public class ReadWriteTests
     }
 
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP013:Await in using", Justification = "See https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
     public async Task WriteMultipleWhenArgumentExceptionIsThrownFlattenTheHirachyAndWriteAgainAsync()
     {
         // Arrange
@@ -267,6 +270,7 @@ public class ReadWriteTests
     }
 
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP013:Await in using", Justification = "See https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
     public async Task WriteSingleWhenArgumentExceptionIsThrownFlattenTheHirachyAndWriteAgainAsync()
     {
         // Arrange

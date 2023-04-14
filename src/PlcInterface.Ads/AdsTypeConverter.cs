@@ -47,7 +47,62 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
             return new DateTimeOffset(dateTime);
         }
 
+        if (targetType.IsArray && value is Array dynamicObjects)
+        {
+            return ConvertArray(dynamicObjects, targetType);
+        }
+
         return base.Convert(value, targetType);
+    }
+
+    private Array ConvertArray(Array dynamicObjects, Type type)
+    {
+        var elementType = type.GetElementType() ?? throw new NotSupportedException($"Unable to retrieve element type");
+        var dimensionLengts = new int[dynamicObjects.Rank];
+        for (var i = 0; i < dynamicObjects.Rank; i++)
+        {
+            dimensionLengts[i] = dynamicObjects.GetLength(i);
+        }
+
+        var destination = Array.CreateInstance(elementType, dimensionLengts);
+        foreach (var indices in IndicesHelper.GetIndices(destination))
+        {
+            object? result;
+            try
+            {
+                result = dynamicObjects.GetValue(indices);
+            }
+            catch (Exception)
+            {
+                throw new SymbolException($"No value found at index {indices}");
+            }
+
+            if (result == null)
+            {
+                var canBeNull = !elementType.IsValueType || (Nullable.GetUnderlyingType(elementType) != null);
+                if (!canBeNull)
+                {
+                    throw new SymbolException($"Can't assign null to array");
+                }
+
+                destination.SetValue(result, indices);
+            }
+            else if (result is DynamicObject resultDynamicObject)
+            {
+                var value = ConvertFrom(resultDynamicObject, elementType);
+                destination.SetValue(value, indices);
+            }
+            else if (result.GetType() == elementType)
+            {
+                destination.SetValue(result, indices);
+            }
+            else
+            {
+                throw new SymbolException($"Unable to convert type {result}");
+            }
+        }
+
+        return destination;
     }
 
     private Array ConvertArray(DynamicObject dynamicObject, Type type)

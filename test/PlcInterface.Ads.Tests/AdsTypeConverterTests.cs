@@ -105,6 +105,39 @@ public class AdsTypeConverterTests
     }
 
     [TestMethod]
+    public void ConvertConvertsDynamicArrayToArray()
+    {
+        // Arrange
+        var typeConverter = new AdsTypeConverter();
+        var expected = new[]
+        {
+            new NestedType() { IntValue = 2 },
+            new NestedType() { IntValue = 3 },
+            new NestedType() { IntValue = 4 },
+            new NestedType() { IntValue = 5 },
+            new NestedType() { IntValue = 6 },
+        };
+        var source = new DynamicObject[]
+        {
+            expected[0].GetDynamicObjectMock(),
+            expected[1].GetDynamicObjectMock(),
+            expected[2].GetDynamicObjectMock(),
+            expected[3].GetDynamicObjectMock(),
+            expected[4].GetDynamicObjectMock(),
+        };
+
+        // Act
+        var actual = typeConverter.Convert<NestedType[]>(source);
+
+        // Assert
+        Assert.AreEqual(expected[0].IntValue, actual[0].IntValue);
+        Assert.AreEqual(expected[1].IntValue, actual[1].IntValue);
+        Assert.AreEqual(expected[2].IntValue, actual[2].IntValue);
+        Assert.AreEqual(expected[3].IntValue, actual[3].IntValue);
+        Assert.AreEqual(expected[4].IntValue, actual[4].IntValue);
+    }
+
+    [TestMethod]
     public void ConvertConvertsDynamicObjectToType()
     {
         // Arrange
@@ -276,8 +309,7 @@ public class AdsTypeConverterTests
         var expected = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         var sourceMock = new Mock<DynamicObject>();
 
-        // Act
-        // Assert
+        // Act Assert
         _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
     }
 
@@ -291,8 +323,7 @@ public class AdsTypeConverterTests
         var dynamicValue = sourceMock.As<IDynamicValue>();
         _ = dynamicValue.SetupGet(x => x.DataType).Returns(Mock.Of<IDataType>());
 
-        // Act
-        // Assert
+        // Act Assert
         _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
     }
 
@@ -308,8 +339,7 @@ public class AdsTypeConverterTests
         var dummy = new object();
         _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(true);
 
-        // Act
-        // Assert
+        // Act Assert
         _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
     }
 
@@ -325,8 +355,7 @@ public class AdsTypeConverterTests
         var dummy = new object();
         _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(false);
 
-        // Act
-        // Assert
+        // Act Assert
         _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
     }
 

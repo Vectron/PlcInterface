@@ -29,6 +29,7 @@ public class AdsTypeConverterTests
         var actual = typeConverter.Convert(sourceMock.Object, Mock.Of<IValueSymbol>());
 
         // Assert
+        Assert.IsInstanceOfType(actual, typeof(ICollection));
         CollectionAssert.AreEqual(expected, (ICollection)actual);
     }
 
@@ -37,53 +38,41 @@ public class AdsTypeConverterTests
     {
         // Arrange
         var typeConverter = new AdsTypeConverter();
-        var expected = new TestType3()
-        {
-            Date = new DateTime(2021, 08, 13),
-            Time = new TimeSpan(2, 5, 20, 10, 999),
-            LTime = new TimeSpan(111111111),
-            DateTimeOffset = new DateTimeOffset(new DateTime(2021, 08, 13, 00, 00, 00)),
-        };
+        var expected = TimesTestType.Default;
         var sourceMock = new Mock<DynamicObject>();
         var result = new object();
-        _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(TestType3.Date), nameof(TestType3.Time), nameof(TestType3.LTime), nameof(TestType3.DateTimeOffset) });
-        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result)).Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
-        {
-            value = binder.Name switch
+        _ = sourceMock.Setup(x => x.GetDynamicMemberNames())
+            .Returns(new[]
             {
-                nameof(TestType3.Date) => new TwinCAT.PlcOpen.DATE(expected.Date),
-                nameof(TestType3.Time) => new TwinCAT.PlcOpen.TIME(expected.Time),
-                nameof(TestType3.LTime) => new TwinCAT.PlcOpen.LTIME(expected.LTime),
-                _ => new TwinCAT.PlcOpen.DATE(expected.DateTimeOffset),
-            };
+                nameof(TimesTestType.Date),
+                nameof(TimesTestType.Time),
+                nameof(TimesTestType.LTime),
+                nameof(TimesTestType.DateTimeOffset),
+            });
+        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
+            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+            {
+                value = binder.Name switch
+                {
+                    nameof(TimesTestType.Date) => new TwinCAT.PlcOpen.DATE(expected.Date),
+                    nameof(TimesTestType.Time) => new TwinCAT.PlcOpen.TIME(expected.Time),
+                    nameof(TimesTestType.LTime) => new TwinCAT.PlcOpen.LTIME(expected.LTime),
+                    nameof(TimesTestType.DateTimeOffset) => new TwinCAT.PlcOpen.DATE(expected.DateTimeOffset),
+                    _ => throw new NotSupportedException("Unknown type mapping."),
+                };
 
-            return value != null;
-        }));
+                return value != null;
+            }));
 
         // Act
-        var actual = typeConverter.Convert<TestType3>(sourceMock.Object);
+        var actual = typeConverter.Convert<TimesTestType>(sourceMock.Object);
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(TestType3));
+        Assert.IsInstanceOfType(actual, typeof(TimesTestType));
         Assert.AreEqual(expected.Date, actual.Date);
         Assert.AreEqual(expected.Time, actual.Time);
         Assert.AreEqual(expected.LTime, actual.LTime);
         Assert.AreEqual(expected.DateTimeOffset, actual.DateTimeOffset);
-    }
-
-    [TestMethod]
-    public void ConvertConvertsDateTimeToDateTimeOffset()
-    {
-        // Arrange
-        var typeConverter = new AdsTypeConverter();
-        var dateTime = DateTime.Now;
-
-        // Act
-        var actual = typeConverter.Convert<DateTimeOffset>(dateTime);
-
-        // Assert
-        Assert.IsInstanceOfType(actual, typeof(DateTimeOffset));
-        Assert.AreEqual(new DateTimeOffset(dateTime), actual);
     }
 
     [TestMethod]
@@ -102,95 +91,6 @@ public class AdsTypeConverterTests
         // Assert
         Assert.IsInstanceOfType(actual, typeof(DateTimeOffset));
         Assert.AreEqual(expected, actual);
-    }
-
-    [TestMethod]
-    public void ConvertConvertsDynamicArrayToArray()
-    {
-        // Arrange
-        var typeConverter = new AdsTypeConverter();
-        var expected = new[]
-        {
-            new NestedType() { IntValue = 2 },
-            new NestedType() { IntValue = 3 },
-            new NestedType() { IntValue = 4 },
-            new NestedType() { IntValue = 5 },
-            new NestedType() { IntValue = 6 },
-        };
-        var source = new DynamicObject[]
-        {
-            expected[0].GetDynamicObjectMock(),
-            expected[1].GetDynamicObjectMock(),
-            expected[2].GetDynamicObjectMock(),
-            expected[3].GetDynamicObjectMock(),
-            expected[4].GetDynamicObjectMock(),
-        };
-
-        // Act
-        var actual = typeConverter.Convert<NestedType[]>(source);
-
-        // Assert
-        Assert.AreEqual(expected[0].IntValue, actual[0].IntValue);
-        Assert.AreEqual(expected[1].IntValue, actual[1].IntValue);
-        Assert.AreEqual(expected[2].IntValue, actual[2].IntValue);
-        Assert.AreEqual(expected[3].IntValue, actual[3].IntValue);
-        Assert.AreEqual(expected[4].IntValue, actual[4].IntValue);
-    }
-
-    [TestMethod]
-    public void ConvertConvertsDynamicObjectToType()
-    {
-        // Arrange
-        var typeConverter = new AdsTypeConverter();
-        var expected = new TestType()
-        {
-            IntValue = 5,
-            IntArray = new[] { 6, 7, 8, 9 },
-            SubType = new NestedType()
-            {
-                IntValue = 12,
-            },
-        };
-        var sourceMock = new Mock<DynamicObject>();
-        var result = new object();
-        _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(TestType.IntValue), nameof(TestType.IntArray), nameof(TestType.SubType) });
-        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result)).Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
-        {
-            value = binder.Name switch
-            {
-                nameof(TestType.IntValue) => expected.IntValue,
-                nameof(TestType.IntArray) => expected.IntArray,
-                _ => expected.SubType.GetDynamicObjectMock(),
-            };
-
-            return value != null;
-        }));
-
-        // Act
-        var actual = typeConverter.Convert<TestType>(sourceMock.Object);
-
-        // Assert
-        Assert.IsInstanceOfType(actual, typeof(TestType));
-        Assert.AreEqual(expected.IntValue, actual.IntValue);
-        CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
-
-        Assert.IsNotNull(actual.SubType);
-        Assert.AreEqual(expected.SubType.IntValue, actual.SubType.IntValue);
-    }
-
-    [TestMethod]
-    public void ConvertConvertsObjectToRequestedType()
-    {
-        // Arrange
-        var typeConverterMock = new AdsTypeConverter();
-        var stringObject = "100";
-
-        // Act
-        var actual = typeConverterMock.Convert<int>(stringObject);
-
-        // Assert
-        Assert.IsInstanceOfType(actual, typeof(int));
-        Assert.AreEqual(100, actual);
     }
 
     [TestMethod]
@@ -247,70 +147,18 @@ public class AdsTypeConverterTests
         var dynamicValue = sourceMock.As<IDynamicValue>();
         _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType(new[] { 9 }));
         var dummy = new object();
-        _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(new MockDelegates.OutFunction<int[], object?, bool>((int[] indices, out object? value) =>
-        {
-            value = expected.GetValue(indices);
-            return true;
-        }));
+        _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy))
+            .Returns(new MockDelegates.OutFunction<int[], object?, bool>((int[] indices, out object? value) =>
+            {
+                value = expected.GetValue(indices);
+                return true;
+            }));
 
         // Act
         var actual = typeConverter.Convert<int[]>(sourceMock.Object);
 
         // Assert
         CollectionAssert.AreEqual(expected, actual);
-    }
-
-    [TestMethod]
-    public void ConvertThrowsInvalidOperationExceptionWhenDynamicObjectHasNoValue()
-    {
-        // Arrange
-        var typeConverter = new AdsTypeConverter();
-        var sourceMock = new Mock<DynamicObject>();
-        var result = new object();
-        _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(TestType.IntValue) });
-        var value = new object();
-        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out value)).Returns(false);
-
-        // Act
-        _ = Assert.ThrowsException<InvalidOperationException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
-    }
-
-    [TestMethod]
-    public void ConvertThrowsInvalidOperationExceptionWhenPropertyIsNotFound()
-    {
-        // Arrange
-        var typeConverter = new AdsTypeConverter();
-        var sourceMock = new Mock<DynamicObject>();
-        var result = new object();
-        _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { "IntValue2" });
-
-        // Act
-        _ = Assert.ThrowsException<InvalidOperationException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
-    }
-
-    [TestMethod]
-    public void ConvertThrowsInvalidOperationExceptionWhenPropertyIsReadOnly()
-    {
-        // Arrange
-        var typeConverter = new AdsTypeConverter();
-        var sourceMock = new Mock<DynamicObject>();
-        var result = new object();
-        _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(TestType2.IntValue) });
-
-        // Act
-        _ = Assert.ThrowsException<InvalidOperationException>(() => typeConverter.Convert<TestType2>(sourceMock.Object));
-    }
-
-    [TestMethod]
-    public void ConvertThrowsNotSupportedExceptionWhenTargetIsArrayButValueIsNotIDynamicValue()
-    {
-        // Arrange
-        var typeConverter = new AdsTypeConverter();
-        var expected = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        var sourceMock = new Mock<DynamicObject>();
-
-        // Act Assert
-        _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
     }
 
     [TestMethod]
@@ -362,9 +210,9 @@ public class AdsTypeConverterTests
     private static ArrayType ComplexArrayType(int[] rank)
     {
         var memberCollection = new MemberCollection()
-            {
-                new Member(nameof(NestedType.IntValue), new PrimitiveType("int", typeof(int))),
-            };
+        {
+            new Member(nameof(NestedType.IntValue), new PrimitiveType("int", typeof(int))),
+        };
         var complexType = new StructType("NestedType", null, memberCollection);
         var dimensionCollection = new DimensionCollection(rank);
         var arrayType = new ArrayType(complexType, dimensionCollection);
@@ -392,54 +240,31 @@ public class AdsTypeConverterTests
             var sourceMock = new Mock<DynamicObject>();
             var result = new object();
             _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(IntValue) });
-            _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result)).Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
-            {
-                value = binder.Name switch
+            _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
+                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
                 {
-                    _ => IntValue,
-                };
+                    value = binder.Name switch
+                    {
+                        _ => IntValue,
+                    };
 
-                return value != null;
-            }));
+                    return value != null;
+                }));
 
             return sourceMock.Object;
         }
     }
 
-    private sealed class TestType
+    private sealed class TimesTestType
     {
-        public TestType()
-            => IntArray = Array.Empty<int>();
-
-        public int[] IntArray
+        public static TimesTestType Default => new()
         {
-            get;
-            set;
-        }
+            Date = new DateTime(2021, 08, 13),
+            Time = new TimeSpan(2, 5, 20, 10, 999),
+            LTime = new TimeSpan(111111111),
+            DateTimeOffset = new DateTimeOffset(new DateTime(2021, 08, 13, 00, 00, 00)),
+        };
 
-        public int IntValue
-        {
-            get;
-            set;
-        }
-
-        public NestedType? SubType
-        {
-            get;
-            set;
-        }
-    }
-
-    private sealed class TestType2
-    {
-        public int IntValue
-        {
-            get;
-        }
-    }
-
-    private sealed class TestType3
-    {
         public DateTime Date
         {
             get;

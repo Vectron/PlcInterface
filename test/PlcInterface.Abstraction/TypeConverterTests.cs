@@ -181,6 +181,47 @@ public class TypeConverterTests
     }
 
     [TestMethod]
+    public void ConvertSupportsRecordTypes()
+    {
+        // Arrange
+        var typeConverter = Converter;
+        var expected = TestRecordType.Instance;
+        var sourceMock = new Mock<DynamicObject>();
+        var result = new object();
+        _ = sourceMock.Setup(x => x.GetDynamicMemberNames())
+            .Returns(new[]
+            {
+                nameof(TestRecordType.IntValue),
+                nameof(TestRecordType.IntArray),
+                nameof(TestRecordType.SubType),
+            });
+        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
+            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+        {
+            value = binder.Name switch
+            {
+                nameof(TestRecordType.IntValue) => expected.IntValue,
+                nameof(TestRecordType.IntArray) => expected.IntArray,
+                nameof(TestRecordType.SubType) => expected.SubType.GetDynamicObjectMock(),
+                _ => throw new InvalidOperationException("Unknown member"),
+            };
+
+            return value != null;
+        }));
+
+        // Act
+        var actual = typeConverter.Convert<TestRecordType>(sourceMock.Object);
+
+        // Assert
+        Assert.IsInstanceOfType(actual, typeof(TestRecordType));
+        Assert.AreEqual(expected.IntValue, actual.IntValue);
+        CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
+
+        Assert.IsNotNull(actual.SubType);
+        Assert.AreEqual(expected.SubType.IntValue, actual.SubType.IntValue);
+    }
+
+    [TestMethod]
     public void ConvertThrowsInvalidOperationExceptionWhenDynamicObjectHasNoValue()
     {
         // Arrange
@@ -352,6 +393,34 @@ public class TypeConverterTests
         {
             get;
             set;
+        }
+    }
+
+    private sealed record TestRecordType(int IntValue, int[] IntArray, NestedRecordType SubType)
+    {
+        public static readonly TestRecordType Instance = new(5, new[] { 6, 7, 8, 9 }, new NestedRecordType(12));
+    }
+
+    private sealed record NestedRecordType(int IntValue)
+    {
+        internal DynamicObject GetDynamicObjectMock()
+        {
+            var sourceMock = new Mock<DynamicObject>();
+            var result = new object();
+            _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(IntValue) });
+            _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
+                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+                {
+                    value = binder.Name switch
+                    {
+                        nameof(IntValue) => IntValue,
+                        _ => throw new InvalidOperationException("Unknown member"),
+                    };
+
+                    return value != null;
+                }));
+
+            return sourceMock.Object;
         }
     }
 }

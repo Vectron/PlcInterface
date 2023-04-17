@@ -21,7 +21,6 @@ public sealed class ReadValueTest : IReadValueTestBase, IDisposable
         var connectionsettings = new OpcPlcConnectionOptions();
         new DefaultOpcPlcConnectionConfigureOptions().Configure(connectionsettings);
         connectionsettings.Address = Settings.PLCUri;
-        var typeConverter = new OpcTypeConverter();
 
         connection?.Dispose();
         symbolHandler?.Dispose();
@@ -29,6 +28,7 @@ public sealed class ReadValueTest : IReadValueTestBase, IDisposable
 
         connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
         symbolHandler = new SymbolHandler(connection, MockHelpers.GetLoggerMock<SymbolHandler>());
+        var typeConverter = new OpcTypeConverter(symbolHandler);
         readWrite = new ReadWrite(connection, symbolHandler, typeConverter, MockHelpers.GetLoggerMock<ReadWrite>());
 
         await connection.ConnectAsync();

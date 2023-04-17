@@ -20,10 +20,10 @@ public class WriteValueTest : IWriteValueTestBase
         var connectionsettings = new OpcPlcConnectionOptions();
         new DefaultOpcPlcConnectionConfigureOptions().Configure(connectionsettings);
         connectionsettings.Address = Settings.PLCUri;
-        var typeConverter = new OpcTypeConverter();
 
         connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
         symbolHandler = new SymbolHandler(connection, MockHelpers.GetLoggerMock<SymbolHandler>());
+        var typeConverter = new OpcTypeConverter(symbolHandler);
         readWrite = new ReadWrite(connection, symbolHandler, typeConverter, MockHelpers.GetLoggerMock<ReadWrite>());
         await connection.ConnectAsync();
         _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));

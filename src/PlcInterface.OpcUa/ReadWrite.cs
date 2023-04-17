@@ -63,8 +63,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
         var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
         foreach (var ioName in ioNames)
         {
-            var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
-            var value = typeConverter.CreateDynamic(symbolInfo, valueEnumerator, symbolHandler);
+            var value = typeConverter.CreateDynamic(ioName, valueEnumerator);
             result.Add(ioName, typeConverter.Convert(value));
         }
 
@@ -136,8 +135,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
                     var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
                     foreach (var ioName in ioNames)
                     {
-                        var symbolInfo = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
-                        var value = typeConverter.CreateDynamic(symbolInfo, valueEnumerator, symbolHandler);
+                        var value = typeConverter.CreateDynamic(ioName, valueEnumerator);
                         result.Add(ioName, typeConverter.Convert(value));
                     }
 

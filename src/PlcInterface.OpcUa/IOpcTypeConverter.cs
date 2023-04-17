@@ -18,9 +18,8 @@ public interface IOpcTypeConverter : ITypeConverter
     /// <summary>
     /// Create a dynamic type.
     /// </summary>
-    /// <param name="symbolInfo"><see cref="ISymbolInfo"/> of the type to convert.</param>
+    /// <param name="symbolName">The name of the root symbol.</param>
     /// <param name="valueEnumerator">a <see cref="IEnumerator{T}"/> to enumerate the values.</param>
-    /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> to get type info from.</param>
-    /// <returns>A dynamic object representing the <paramref name="symbolInfo"/>.</returns>
-    dynamic CreateDynamic(ISymbolInfo symbolInfo, IEnumerator<DataValue> valueEnumerator, ISymbolHandler symbolHandler);
+    /// <returns>A dynamic object representing the <paramref name="symbolName"/>.</returns>
+    dynamic CreateDynamic(string symbolName, IEnumerator<DataValue> valueEnumerator);
 }

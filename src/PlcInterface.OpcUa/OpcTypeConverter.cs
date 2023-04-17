@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Dynamic;
 using System.Globalization;
 using Opc.Ua;
@@ -12,6 +11,15 @@ namespace PlcInterface.OpcUa;
 /// </summary>
 public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
 {
+    private readonly IOpcSymbolHandler symbolHandler;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OpcTypeConverter"/> class.
+    /// </summary>
+    /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> instance.</param>
+    public OpcTypeConverter(IOpcSymbolHandler symbolHandler)
+        => this.symbolHandler = symbolHandler;
+
     /// <inheritdoc/>
     public object Convert(object value)
     {
@@ -32,7 +40,8 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
     /// <inheritdoc/>
     public override object Convert(object value, Type targetType)
     {
-        if (targetType == typeof(DateTimeOffset) && value is DateTime dateTime)
+        if (targetType == typeof(DateTimeOffset)
+            && value is DateTime dateTime)
         {
             var specified = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
             return new DateTimeOffset(specified);
@@ -48,33 +57,6 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
             return matrix.ToArray();
         }
 
-        if (value.GetType().IsArray
-            && targetType.IsArray
-            && value is Array array)
-        {
-            return CreateArray(targetType, array);
-        }
-
-        if (value is ExpandoObject keyValues)
-        {
-            var instance = Activator.CreateInstance(targetType) ?? throw new NotSupportedException($"Unable to create a instance for type: {targetType}");
-            foreach (var keyValue in keyValues)
-            {
-                var property = targetType.GetProperty(keyValue.Key);
-
-                if (property == null)
-                {
-                    Debug.Assert(property != null, "No property found with name: {0} on object of type: {1}", keyValue.Key, targetType.Name);
-                    continue;
-                }
-
-                var fixedObject = keyValue.Value == null ? null : Convert(keyValue.Value, property.PropertyType);
-                property.SetValue(instance, fixedObject);
-            }
-
-            return instance;
-        }
-
         if (targetType.IsEnum)
         {
             return Enum.ToObject(targetType, value);
@@ -84,8 +66,11 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
     }
 
     /// <inheritdoc/>
-    public dynamic CreateDynamic(ISymbolInfo symbolInfo, IEnumerator<DataValue> valueEnumerator, ISymbolHandler symbolHandler)
-        => CreateDynamic(symbolInfo.ConvertAndValidate(), valueEnumerator, symbolHandler);
+    public dynamic CreateDynamic(string symbolName, IEnumerator<DataValue> valueEnumerator)
+    {
+        var symbolInfo = symbolHandler.GetSymbolinfo(symbolName).ConvertAndValidate();
+        return CreateDynamic(symbolInfo, valueEnumerator);
+    }
 
     private static TimeSpan CreateTimeSpan(object value)
     {
@@ -99,43 +84,12 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
         return TimeSpan.FromMilliseconds(miliSeconds);
     }
 
-    private Array CreateArray(Type targetType, Array array)
-    {
-        var upperBoundsRank = new int[array.Rank];
-        for (var dimension = 0; dimension < array.Rank; dimension++)
-        {
-            upperBoundsRank[dimension] = array.GetLength(dimension);
-        }
-
-        var elementType = targetType.GetElementType() ?? throw new NotSupportedException("Unable to get element type");
-        var typedArray = Array.CreateInstance(elementType, upperBoundsRank);
-
-        foreach (var indices in IndicesHelper.GetIndices(typedArray))
-        {
-            var item = array.GetValue(indices);
-            if (item == null)
-            {
-                continue;
-            }
-
-            var fixedObject = Convert(item, elementType);
-            typedArray.SetValue(fixedObject, indices);
-        }
-
-        return typedArray;
-    }
-
-    private dynamic CreateDynamic(SymbolInfo symbolInfo, IEnumerator<DataValue> valueEnumerator, ISymbolHandler symbolHandler)
+    private dynamic CreateDynamic(SymbolInfo symbolInfo, IEnumerator<DataValue> valueEnumerator)
     {
         if (symbolInfo.ChildSymbols.Count == 0)
         {
             if (valueEnumerator.MoveNext() && ServiceResult.IsGood(valueEnumerator.Current.StatusCode))
             {
-                if (valueEnumerator.Current.Value is Matrix matrixValue)
-                {
-                    return matrixValue.ToArray();
-                }
-
                 return Convert(valueEnumerator.Current.Value);
             }
         }
@@ -146,7 +100,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
             foreach (var childSymbolName in symbolInfo.ChildSymbols)
             {
                 var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName).ConvertAndValidate();
-                var value = ((IOpcTypeConverter)this).CreateDynamic(childSymbolInfo, valueEnumerator, symbolHandler);
+                var value = CreateDynamic(childSymbolInfo, valueEnumerator);
                 var indices = childSymbolInfo.Indices;
                 array.SetValue(value, indices);
             }
@@ -158,7 +112,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
         foreach (var childSymbolName in symbolInfo.ChildSymbols)
         {
             var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName).ConvertAndValidate();
-            var value = ((IOpcTypeConverter)this).CreateDynamic(childSymbolInfo, valueEnumerator, symbolHandler);
+            var value = CreateDynamic(childSymbolInfo, valueEnumerator);
             var shortName = childSymbolInfo.ShortName;
             collection.Add(shortName, value);
         }

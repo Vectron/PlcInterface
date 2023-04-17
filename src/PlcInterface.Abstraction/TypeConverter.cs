@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Globalization;
+using System.Linq;
 
 namespace PlcInterface;
 
@@ -64,6 +66,60 @@ public abstract class TypeConverter : ITypeConverter
         }
     }
 
+    private object Convert(IEnumerable<(string Name, object? Value)> members, Type targetType)
+    {
+        var membersLookup = members.ToDictionary(x => x.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);
+        var constructors = targetType.GetConstructors()
+            .Select(constructor =>
+            {
+                var parameters = constructor.GetParameters();
+                return (constructor, parameters);
+            })
+            .Where(cp => cp.parameters.Length == membersLookup.Count
+                        && cp.parameters.All(parameter => parameter.Name != null && membersLookup.ContainsKey(parameter.Name)));
+
+        foreach (var (constructor, parameters) in constructors)
+        {
+            var arguments = parameters.Select(x =>
+            {
+                _ = x.Name ?? throw new InvalidOperationException("Parameter name is null");
+                var memberValue = membersLookup.GetValueOrDefault(x.Name)
+                    ?? throw new SymbolException($"Member: {x.Name} was null");
+                return Convert(memberValue, x.ParameterType);
+            }).ToArray();
+
+            var instance = Activator.CreateInstance(targetType, arguments);
+            if (instance != null)
+            {
+                return instance;
+            }
+        }
+
+        var destination = Activator.CreateInstance(targetType)
+            ?? throw new NotSupportedException($"Unable to create a instance for type: {targetType.Name}");
+
+        foreach (var (memberName, memberValue) in members)
+        {
+            var property = targetType.GetProperty(memberName)
+                ?? throw new InvalidOperationException($"{memberName} not found as a property");
+
+            if (!property.CanWrite)
+            {
+                throw new InvalidOperationException($"{property.Name} is not writable");
+            }
+
+            if (memberValue == null)
+            {
+                throw new SymbolException($"Member: {property.Name} was null");
+            }
+
+            var convertedValue = Convert(memberValue, property.PropertyType);
+            property.SetValue(destination, convertedValue);
+        }
+
+        return destination;
+    }
+
     private object ConvertArray(Array expandArray, Type targetType)
     {
         var elementType = targetType.GetElementType() ?? throw new NotSupportedException($"Unable to retrieve element type");
@@ -91,61 +147,23 @@ public abstract class TypeConverter : ITypeConverter
             throw new NotSupportedException($"Can't convert from {typeof(DynamicObject)} to {targetType}");
         }
 
-        var destination = Activator.CreateInstance(targetType)
-            ?? throw new NotSupportedException($"Unable to create a instance for type: {targetType.Name}");
+        var data = dynamicObject.GetDynamicMemberNames().Select(x =>
+         {
+             if (!dynamicObject.TryGetMember(new MemberBinder(x, true), out var memberValue))
+             {
+                 throw new InvalidOperationException($"{x} is not found in the PLC type");
+             }
 
-        foreach (var memberName in dynamicObject.GetDynamicMemberNames())
-        {
-            var property = targetType.GetProperty(memberName)
-                ?? throw new InvalidOperationException($"{memberName} not found as a property");
+             return (x, memberValue);
+         });
 
-            if (!property.CanWrite)
-            {
-                throw new InvalidOperationException($"{property.Name} is not writable");
-            }
-
-            if (!dynamicObject.TryGetMember(new MemberBinder(memberName, true), out var memberValue))
-            {
-                throw new InvalidOperationException($"{memberName} is not found in the PLC type");
-            }
-
-            if (memberValue == null)
-            {
-                throw new SymbolException($"Member: {property.Name} was null");
-            }
-
-            var convertedValue = Convert(memberValue, property.PropertyType);
-            property.SetValue(destination, convertedValue);
-        }
-
-        return destination;
+        return Convert(data, targetType);
     }
 
     private object ConvertExpando(ExpandoObject expandoObject, Type targetType)
     {
-        var destination = Activator.CreateInstance(targetType)
-            ?? throw new NotSupportedException($"Unable to create a instance for type: {targetType.Name}");
-
-        foreach (var (memberName, memberValue) in expandoObject)
-        {
-            var property = targetType.GetProperty(memberName)
-                ?? throw new InvalidOperationException($"{memberName} not found as a property");
-
-            if (!property.CanWrite)
-            {
-                throw new InvalidOperationException($"{property.Name} is not writable");
-            }
-
-            if (memberValue == null)
-            {
-                throw new SymbolException($"Member: {property.Name} was null");
-            }
-
-            var convertedValue = Convert(memberValue, property.PropertyType);
-            property.SetValue(destination, convertedValue);
-        }
-
-        return destination;
+        var data = expandoObject.Select(x => (x.Key, x.Value));
+        return Convert(data, targetType);
     }
 
     /// <summary>

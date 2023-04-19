@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
@@ -12,6 +13,8 @@ namespace PlcInterface;
 /// </summary>
 public abstract class TypeConverter : ITypeConverter
 {
+    private readonly ConcurrentDictionary<string, ITypeActivator[]> activatorCache = new(StringComparer.OrdinalIgnoreCase);
+
     /// <inheritdoc/>
     public virtual T Convert<T>(object value)
     {
@@ -66,58 +69,40 @@ public abstract class TypeConverter : ITypeConverter
         }
     }
 
-    private object Convert(IEnumerable<(string Name, object? Value)> members, Type targetType)
+    private object Convert(Func<string, Type, object?> memberValueGetter, int memberCount, Type targetType)
     {
-        var membersLookup = members.ToDictionary(x => x.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);
-        var constructors = targetType.GetConstructors()
-            .Select(constructor =>
+        var parameterInfos = activatorCache.GetOrAdd(
+            targetType.Name,
+            (key, targetType) =>
             {
-                var parameters = constructor.GetParameters();
-                return (constructor, parameters);
-            })
-            .Where(cp => cp.parameters.Length == membersLookup.Count
-                        && cp.parameters.All(parameter => parameter.Name != null && membersLookup.ContainsKey(parameter.Name)));
+                var constructors = targetType.GetConstructors();
+                var activators = new List<ITypeActivator>(constructors.Length);
+                if (constructors.Length == 0
+                    && targetType.IsValueType)
+                {
+                    activators.Add(new StructActivator(targetType));
+                }
 
-        foreach (var (constructor, parameters) in constructors)
+                foreach (var constructor in constructors)
+                {
+                    activators.Add(new ObjectActivator(constructor));
+                }
+
+                return activators.ToArray();
+            },
+            targetType);
+
+        foreach (var typeMapperInfo in parameterInfos)
         {
-            var arguments = parameters.Select(x =>
+            if (!typeMapperInfo.TryCreateInstance(memberValueGetter, memberCount, out var instance))
             {
-                _ = x.Name ?? throw new InvalidOperationException("Parameter name is null");
-                var memberValue = membersLookup.GetValueOrDefault(x.Name)
-                    ?? throw new SymbolException($"Member: {x.Name} was null");
-                return Convert(memberValue, x.ParameterType);
-            }).ToArray();
-
-            var instance = Activator.CreateInstance(targetType, arguments);
-            if (instance != null)
-            {
-                return instance;
+                continue;
             }
+
+            return instance;
         }
 
-        var destination = Activator.CreateInstance(targetType)
-            ?? throw new NotSupportedException($"Unable to create a instance for type: {targetType.Name}");
-
-        foreach (var (memberName, memberValue) in members)
-        {
-            var property = targetType.GetProperty(memberName)
-                ?? throw new InvalidOperationException($"{memberName} not found as a property");
-
-            if (!property.CanWrite)
-            {
-                throw new InvalidOperationException($"{property.Name} is not writable");
-            }
-
-            if (memberValue == null)
-            {
-                throw new SymbolException($"Member: {property.Name} was null");
-            }
-
-            var convertedValue = Convert(memberValue, property.PropertyType);
-            property.SetValue(destination, convertedValue);
-        }
-
-        return destination;
+        throw new NotSupportedException($"Failed to create an instance of {targetType.Name}");
     }
 
     private object ConvertArray(Array expandArray, Type targetType)
@@ -147,23 +132,35 @@ public abstract class TypeConverter : ITypeConverter
             throw new NotSupportedException($"Can't convert from {typeof(DynamicObject)} to {targetType}");
         }
 
-        var data = dynamicObject.GetDynamicMemberNames().Select(x =>
-         {
-             if (!dynamicObject.TryGetMember(new MemberBinder(x, true), out var memberValue))
-             {
-                 throw new InvalidOperationException($"{x} is not found in the PLC type");
-             }
+        object? GetValue(string name, Type targetType)
+        {
+            if (dynamicObject.TryGetMember(new MemberBinder(name, true), out var value)
+                && value != null)
+            {
+                return Convert(value, targetType);
+            }
 
-             return (x, memberValue);
-         });
+            return null;
+        }
 
-        return Convert(data, targetType);
+        return Convert(GetValue, dynamicObject.GetDynamicMemberNames().Count(), targetType);
     }
 
     private object ConvertExpando(ExpandoObject expandoObject, Type targetType)
     {
-        var data = expandoObject.Select(x => (x.Key, x.Value));
-        return Convert(data, targetType);
+        var expando = expandoObject as IDictionary<string, object>;
+        object? GetValue(string name, Type targetType)
+        {
+            if (expando.TryGetValue(name, out var value)
+                && value != null)
+            {
+                return Convert(value, targetType);
+            }
+
+            return null;
+        }
+
+        return Convert(GetValue, expando.Count, targetType);
     }
 
     /// <summary>

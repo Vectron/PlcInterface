@@ -113,7 +113,6 @@ public class TypeConverterTests
         source.Add(nameof(TestType.IntValue), expected.IntValue);
         source.Add(nameof(TestType.IntArray), expected.IntArray);
         source.Add(nameof(TestType.SubType), expected.SubType.GetDynamicObjectMock());
-        var result = new object();
 
         // Act
         var actual = typeConverter.Convert<TestType>(source);
@@ -222,7 +221,7 @@ public class TypeConverterTests
     }
 
     [TestMethod]
-    public void ConvertThrowsInvalidOperationExceptionWhenDynamicObjectHasNoValue()
+    public void ConvertThrowsNotSupportedExceptionWhenDynamicObjectHasNoValue()
     {
         // Arrange
         var typeConverter = Converter;
@@ -233,11 +232,11 @@ public class TypeConverterTests
         _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out value)).Returns(false);
 
         // Act
-        _ = Assert.ThrowsException<InvalidOperationException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
+        _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
     }
 
     [TestMethod]
-    public void ConvertThrowsInvalidOperationExceptionWhenPropertyIsNotFound()
+    public void ConvertThrowsNotSupportedExceptionWhenPropertyIsNotFound()
     {
         // Arrange
         var typeConverter = Converter;
@@ -246,11 +245,11 @@ public class TypeConverterTests
         _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { "IntValue2" });
 
         // Act
-        _ = Assert.ThrowsException<InvalidOperationException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
+        _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
     }
 
     [TestMethod]
-    public void ConvertThrowsInvalidOperationExceptionWhenPropertyIsReadOnly()
+    public void ConvertThrowsNotSupportedExceptionWhenPropertyIsReadOnly()
     {
         // Arrange
         var typeConverter = Converter;
@@ -263,8 +262,8 @@ public class TypeConverterTests
             .Returns(new[] { nameof(NoSetterTestType.IntValue) });
 
         // Act Assert
-        _ = Assert.ThrowsException<InvalidOperationException>(() => typeConverter.Convert<NoSetterTestType>(sourceMock.Object));
-        _ = Assert.ThrowsException<InvalidOperationException>(() => typeConverter.Convert<NoSetterTestType>(expandoSource));
+        _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<NoSetterTestType>(sourceMock.Object));
+        _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<NoSetterTestType>(expandoSource));
     }
 
     [TestMethod]
@@ -286,6 +285,8 @@ public class TypeConverterTests
         var typeConverter = Converter;
         var expandoSource = new ExpandoObject() as IDictionary<string, object>;
         expandoSource.Add(nameof(TestType.IntValue), null!);
+        expandoSource.Add(nameof(TestType.IntArray), null!);
+        expandoSource.Add(nameof(TestType.SubType), null!);
         var dynamicObjectsourceMock = new Mock<DynamicObject>();
         var result = new object();
         _ = dynamicObjectsourceMock.Setup(x => x.GetDynamicMemberNames())

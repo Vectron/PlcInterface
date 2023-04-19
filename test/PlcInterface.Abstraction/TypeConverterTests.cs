@@ -221,22 +221,7 @@ public class TypeConverterTests
     }
 
     [TestMethod]
-    public void ConvertThrowsNotSupportedExceptionWhenDynamicObjectHasNoValue()
-    {
-        // Arrange
-        var typeConverter = Converter;
-        var sourceMock = new Mock<DynamicObject>();
-        var result = new object();
-        _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(TestType.IntValue) });
-        var value = new object();
-        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out value)).Returns(false);
-
-        // Act
-        _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
-    }
-
-    [TestMethod]
-    public void ConvertThrowsNotSupportedExceptionWhenPropertyIsNotFound()
+    public void ConvertSymbolExceptionWhenPropertyIsNotFound()
     {
         // Arrange
         var typeConverter = Converter;
@@ -245,7 +230,7 @@ public class TypeConverterTests
         _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { "IntValue2" });
 
         // Act
-        _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
+        _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
     }
 
     [TestMethod]
@@ -276,6 +261,21 @@ public class TypeConverterTests
 
         // Act Assert
         _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
+    }
+
+    [TestMethod]
+    public void ConvertThrowsSymbolExceptionWhenDynamicObjectHasNoValue()
+    {
+        // Arrange
+        var typeConverter = Converter;
+        var sourceMock = new Mock<DynamicObject>();
+        var result = new object();
+        _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(TestType.IntValue) });
+        var value = new object();
+        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out value)).Returns(false);
+
+        // Act
+        _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
     }
 
     [TestMethod]

@@ -42,13 +42,17 @@ public interface IPlcConnection
     /// <summary>
     /// Connect to the PLC.
     /// </summary>
-    void Connect();
+    /// <returns><see langword="true"/> when connection is opened successfull, otherwise <see langword="false"/>.</returns>
+    bool Connect();
 
     /// <summary>
     /// Asynchronously connect to the PLC.
     /// </summary>
-    /// <returns>A <see cref="Task"/> that handles the connection.</returns>
-    Task ConnectAsync();
+    /// <returns>
+    /// A <see cref="Task"/> that handles the connection. <see langword="true"/> when connection is
+    /// opened successfull, otherwise <see langword="false"/>.
+    /// </returns>
+    Task<bool> ConnectAsync();
 
     /// <summary>
     /// Disconnect from the PLC.

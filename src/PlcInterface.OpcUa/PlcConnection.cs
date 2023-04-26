@@ -68,19 +68,19 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         => options.Value;
 
     /// <inheritdoc/>
-    public void Connect()
+    public bool Connect()
         => ConnectAsync().GetAwaiter().GetResult();
 
     /// <inheritdoc/>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "MA0051:Method is too long", Justification = "Unable to make it shorter.")]
-    public async Task ConnectAsync()
+    public async Task<bool> ConnectAsync()
     {
         try
         {
             if (session != null
                 && session.Connected)
             {
-                return;
+                return true;
             }
 
             var settings = options.Value;
@@ -105,7 +105,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
                 logger.LogError("Failed to connect to {Endpoint}", endpoint);
                 session.Dispose();
                 session = null;
-                return;
+                return false;
             }
 
             logger.LogInformation("Connected to {Endpoint}", endpoint);
@@ -121,6 +121,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
                  .Subscribe(_ => connectionState.OnNext(Connected.No<ISession>())));
 
             connectionState.OnNext(Connected.Yes(session));
+            return true;
         }
         catch (ServiceResultException ex)
         {
@@ -142,6 +143,8 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
                     logger.LogError(ex, "Unproccesed error {BrowseName}", StatusCodes.GetBrowseName(ex.Result.StatusCode.Code));
                     break;
             }
+
+            return false;
         }
     }
 

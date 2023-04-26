@@ -52,22 +52,21 @@ public class PlcConnection : IAdsPlcConnection, IDisposable
 
     /// <inheritdoc/>
     public bool Connect()
-        => ConnectAsync().GetAwaiter().GetResult();
+    {
+        if (IsConnected)
+        {
+            return true;
+        }
+
+        var address = new AmsAddress(options.AmsNetId, options.Port);
+        adsDisposableConnection.ConnectionStateChanged += AdsDisposableConnection_ConnectionStateChanged;
+        adsDisposableConnection.Connect(address);
+        return adsDisposableConnection.IsConnected;
+    }
 
     /// <inheritdoc/>
     public Task<bool> ConnectAsync()
-        => Task.Run(() =>
-        {
-            if (IsConnected)
-            {
-                return true;
-            }
-
-            var address = new AmsAddress(options.AmsNetId, options.Port);
-            adsDisposableConnection.ConnectionStateChanged += AdsDisposableConnection_ConnectionStateChanged;
-            adsDisposableConnection.Connect(address);
-            return adsDisposableConnection.IsConnected;
-        });
+        => Task.Run(Connect);
 
     /// <inheritdoc/>
     public void Disconnect()

@@ -35,6 +35,10 @@ public class PlcConnection : IAdsPlcConnection, IDisposable
     }
 
     /// <inheritdoc/>
+    public bool IsConnected
+        => adsDisposableConnection.IsConnected;
+
+    /// <inheritdoc/>
     public IObservable<IConnected<IAdsConnection>> SessionStream
         => connectionState.AsObservable();
 
@@ -54,7 +58,7 @@ public class PlcConnection : IAdsPlcConnection, IDisposable
     public Task<bool> ConnectAsync()
         => Task.Run(() =>
         {
-            if (adsDisposableConnection.IsConnected)
+            if (IsConnected)
             {
                 return true;
             }

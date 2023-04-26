@@ -56,6 +56,10 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
     }
 
     /// <inheritdoc/>
+    public bool IsConnected
+        => session?.Connected ?? false;
+
+    /// <inheritdoc/>
     public IObservable<IConnected<ISession>> SessionStream
         => connectionState.AsObservable();
 
@@ -77,8 +81,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
     {
         try
         {
-            if (session != null
-                && session.Connected)
+            if (IsConnected)
             {
                 return true;
             }
@@ -100,7 +103,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             session?.Dispose();
             session = await Session.Create(config, endpoint, false, config.ApplicationName, 60000, identity, null).ConfigureAwait(false);
 
-            if (!session.Connected)
+            if (!IsConnected)
             {
                 logger.LogError("Failed to connect to {Endpoint}", endpoint);
                 session.Dispose();

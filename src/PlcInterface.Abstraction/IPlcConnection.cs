@@ -24,6 +24,14 @@ public interface IPlcConnection<T> : IPlcConnection
 public interface IPlcConnection
 {
     /// <summary>
+    /// Gets a value indicating whether the connections is connected.
+    /// </summary>
+    bool IsConnected
+    {
+        get;
+    }
+
+    /// <summary>
     /// Gets the session stream.
     /// </summary>
     IObservable<IConnected> SessionStream

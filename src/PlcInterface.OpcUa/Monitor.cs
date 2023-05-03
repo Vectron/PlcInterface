@@ -235,7 +235,6 @@ public class Monitor : IOpcMonitor, IDisposable
             set;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "Dont need a cancelation token.")]
         public static RegisteredSymbol Create(string name, int updateInterval, ISubject<IMonitorResult> symbolStream, IOpcTypeConverter typeConverter)
         {
             var monitoredItem = new MonitoredItem()

@@ -11,7 +11,6 @@ internal sealed class NodeInfo
 {
     private readonly Lazy<BuiltInType> builtInType;
     private readonly Lazy<string> dataTypeDisplayText;
-    private readonly ISession session;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NodeInfo"/> class.
@@ -24,7 +23,6 @@ internal sealed class NodeInfo
     {
         Description = description;
         ValueRank = valueRank;
-        this.session = session;
         DataType = dataType;
 
         if (NodeId.IsNull(dataType))
@@ -73,35 +71,5 @@ internal sealed class NodeInfo
     public int ValueRank
     {
         get;
-    }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "TODO")]
-    private void GetEnumInfo()
-    {
-        // TODO: Create enum from loaded data
-        if (BuiltInType != BuiltInType.Enumeration)
-        {
-            return;
-        }
-
-        var nodesToRead = new ReadValueIdCollection()
-            {
-                new ReadValueId
-                {
-                    NodeId = DataType,
-                    AttributeId = Attributes.DataTypeDefinition,
-                },
-            };
-
-        _ = session.Read(
-            null,
-            0,
-            TimestampsToReturn.Neither,
-            nodesToRead,
-            out var results,
-            out var diagnosticInfos);
-
-        ClientBase.ValidateResponse(results, nodesToRead);
-        ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
     }
 }

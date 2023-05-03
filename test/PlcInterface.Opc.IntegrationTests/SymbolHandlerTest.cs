@@ -22,8 +22,10 @@ public class SymbolHandlerTest : ISymbolHandlerTestBase
 
         connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
         symbolHandler = new SymbolHandler(connection, MockHelpers.GetLoggerMock<SymbolHandler>());
-        await connection.ConnectAsync();
-        _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
+        if (!await connection.ConnectAsync())
+        {
+            throw new InvalidOperationException("Connection to PLC Failed");
+        }
     }
 
     [ClassCleanup]

@@ -30,8 +30,10 @@ public class WriteValueTest : IWriteValueTestBase
         symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolhandlersettings), MockHelpers.GetLoggerMock<SymbolHandler>(), Mock.Of<IFileSystem>(), new SymbolLoaderFactoryAbstraction());
         var sumSymbolFactory = new SumSymbolFactory();
         readWrite = new ReadWrite(connection, symbolHandler, typeConverter, sumSymbolFactory);
-        await connection.ConnectAsync();
-        _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
+        if (!await connection.ConnectAsync())
+        {
+            throw new InvalidOperationException("Connection to PLC Failed");
+        }
     }
 
     [ClassCleanup]

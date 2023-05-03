@@ -19,7 +19,6 @@ public sealed class PlcConnectionTest : IPlcConnectionTestBase, IDisposable
     {
         var connectionsettings = new AdsPlcConnectionOptions() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
         adsClient = new AdsClient();
-
         plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
     }
 
@@ -58,7 +57,7 @@ public sealed class PlcConnectionTest : IPlcConnectionTestBase, IDisposable
         // Act
         var connectionTask = plcConnection.ConnectAsync();
         var client = plcConnection.GetConnectedClient(TimeSpan.FromSeconds(10));
-        connectionTask.GetAwaiter().GetResult();
+        _ = connectionTask.GetAwaiter().GetResult();
 
         // Assert
         Assert.IsNotNull(client);
@@ -74,7 +73,7 @@ public sealed class PlcConnectionTest : IPlcConnectionTestBase, IDisposable
         // Act
         var connectionTask = plcConnection.ConnectAsync();
         var client = await plcConnection.GetConnectedClientAsync();
-        await connectionTask;
+        _ = await connectionTask;
 
         // Assert
         Assert.IsNotNull(client);

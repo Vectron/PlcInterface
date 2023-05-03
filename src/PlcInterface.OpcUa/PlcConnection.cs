@@ -38,20 +38,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
 
         if (options.Value.AutoConnect)
         {
-            _ = Task.Run(ConnectAsync, CancellationToken.None).ContinueWith(
-            t =>
-            {
-                if (t.Exception != null)
-                {
-                    var aggregateException = t.Exception.Flatten();
-                    for (var i = aggregateException.InnerExceptions.Count - 1; i >= 0; i--)
-                    {
-                        var exception = aggregateException.InnerExceptions[i];
-                        logger.LogError(exception, "Task Error");
-                    }
-                }
-            },
-            TaskContinuationOptions.OnlyOnFaulted);
+            _ = ConnectAsync().LogExceptionsAsync(logger);
         }
     }
 

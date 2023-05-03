@@ -58,8 +58,7 @@ public class ReadWriteTests
         var sumSymbolFactory = new Mock<ISumSymbolFactory>();
         var readWrite = new ReadWrite(connection.Object, symbolHandler.Object, typeConverter, sumSymbolFactory.Object);
 
-        // Act
-        // Assert
+        // Act Assert
         _ = Assert.ThrowsException<NotSupportedException>(() => _ = readWrite.ReadDynamic(ioTag));
         _ = Assert.ThrowsExceptionAsync<NotSupportedException>(() => _ = readWrite.ReadDynamicAsync(ioTag));
     }
@@ -91,8 +90,12 @@ public class ReadWriteTests
         Assert.AreEqual(dummyValue, value4);
     }
 
+    // TODO remove supression when fixed
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP013:Await in using", Justification = "See https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "IDisposableAnalyzers.Correctness",
+        "IDISP013:Await in using",
+        Justification = "Problem with expressionTrees; see https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
     public async Task ReadValuesReturnsTheExpectedValuesAsync()
     {
         // Arrange
@@ -118,7 +121,7 @@ public class ReadWriteTests
         var sumSymbolMock = new Mock<ISumSymbolRead>();
         var returnValue = dummyValues.Cast<object>().ToArray();
         _ = sumSymbolMock.Setup(x => x.Read()).Returns(returnValue);
-        _ = sumSymbolMock.Setup(x => x.ReadAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult<object[]?>(returnValue));
+        _ = sumSymbolMock.Setup(x => x.ReadAsync(It.IsAny<CancellationToken>())).ReturnsAsync(returnValue);
         var sumSymbolFactory = new Mock<ISumSymbolFactory>();
         _ = sumSymbolFactory.Setup(x => x.CreateSumSymbolRead(It.IsAny<IAdsConnection>(), It.IsAny<IList<ISymbol>>())).Returns(sumSymbolMock.Object);
         var readWrite = new ReadWrite(connection.Object, symbolHandler.Object, typeConverter, sumSymbolFactory.Object);
@@ -152,8 +155,7 @@ public class ReadWriteTests
         var sumSymbolFactory = new Mock<ISumSymbolFactory>();
         var readWrite = new ReadWrite(connection.Object, symbolHandler.Object, typeConverter, sumSymbolFactory.Object);
 
-        // Act
-        // Assert
+        // Act Assert
         _ = Assert.ThrowsException<InvalidOperationException>(() => _ = readWrite.Read(ioTag));
         _ = Assert.ThrowsException<InvalidOperationException>(() => _ = readWrite.Read<int>(ioTag));
         _ = Assert.ThrowsExceptionAsync<InvalidOperationException>(() => _ = readWrite.ReadAsync(ioTag));
@@ -206,8 +208,12 @@ public class ReadWriteTests
         valueSymbolMock.Verify(x => x.WriteValueAsync(It.Is<int>(x => dummyValue == x), It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    // TODO remove supression when fixed
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP013:Await in using", Justification = "See https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "IDisposableAnalyzers.Correctness",
+        "IDISP013:Await in using",
+        Justification = "Problem with expressionTrees; see https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
     public async Task WriteMultipleCallsUnderlyingWriteMethodAsync()
     {
         // Arrange
@@ -237,8 +243,12 @@ public class ReadWriteTests
         sumSymbolMock.Verify(x => x.WriteAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    // TODO remove supression when fixed
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP013:Await in using", Justification = "See https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "IDisposableAnalyzers.Correctness",
+        "IDISP013:Await in using",
+        Justification = "Problem with expressionTrees; see https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
     public async Task WriteMultipleWhenArgumentExceptionIsThrownFlattenTheHirachyAndWriteAgainAsync()
     {
         // Arrange

@@ -50,7 +50,6 @@ internal sealed class DisposableMonitorItem : IDisposable
     /// <param name="symbolHandler">A <see cref="ISymbolHandler"/>.</param>
     /// <param name="symbolStream">The stream to subscribe to.</param>
     /// <param name="typeConverter">A <see cref="ITypeConverter"/>.</param>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MA0032:Use an overload with a CancellationToken argument", Justification = "Dont need a cancelation token.")]
     public void Update(IAdsSymbolHandler symbolHandler, ISubject<IMonitorResult> symbolStream, IAdsTypeConverter typeConverter)
     {
         if (symbolHandler.TryGetSymbolinfo(name, out var symbolInfo)

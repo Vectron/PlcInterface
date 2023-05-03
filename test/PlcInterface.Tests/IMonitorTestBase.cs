@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
@@ -45,7 +44,10 @@ public abstract class IMonitorTestBase
     }
 
     [TestMethod]
-    [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP017:Prefer using.", Justification = "Need to dispose for test flow")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "IDisposableAnalyzers.Correctness",
+        "IDISP017:Prefer using",
+        Justification = "We want to specificly dispose the subscription")]
     public async Task MultipleSubscriptions()
     {
         // Arrange

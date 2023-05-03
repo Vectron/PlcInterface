@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Description>A PLC communication implementation for OPC</Description>
@@ -9,6 +9,7 @@
     <Compile Include="$(CommonDirectory)\IObservableExtensions.cs" LinkBase="Common" />
     <Compile Include="$(CommonDirectory)\ISymbolInfoExtension.cs" LinkBase="Common" />
     <Compile Include="$(CommonDirectory)\IndicesHelper.cs" LinkBase="Common" />
+    <Compile Include="$(CommonDirectory)\TaskExtensions.cs" LinkBase="Common" />
     <Compile Include="$(CommonDirectory)\ThrowHelper.cs" LinkBase="Common" />
   </ItemGroup>
 

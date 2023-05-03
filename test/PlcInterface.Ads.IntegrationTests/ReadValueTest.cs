@@ -31,8 +31,10 @@ public sealed class ReadValueTest : IReadValueTestBase, IDisposable
         symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolhandlersettings), MockHelpers.GetLoggerMock<SymbolHandler>(), Mock.Of<IFileSystem>(), new SymbolLoaderFactoryAbstraction());
         var sumSymbolFactory = new SumSymbolFactory();
         readWrite = new ReadWrite(connection, symbolHandler, typeConverter, sumSymbolFactory);
-        await connection.ConnectAsync();
-        _ = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(1));
+        if (!await connection.ConnectAsync())
+        {
+            throw new InvalidOperationException("Connection to PLC Failed");
+        }
     }
 
     [TestCleanup]
@@ -47,9 +49,9 @@ public sealed class ReadValueTest : IReadValueTestBase, IDisposable
         }
 
         disposed = true;
-        connection?.Dispose();
-        adsClient?.Dispose();
-        symbolHandler?.Dispose();
+        connection!.Dispose();
+        adsClient!.Dispose();
+        symbolHandler!.Dispose();
     }
 
     protected override IReadWrite GetReadWrite()

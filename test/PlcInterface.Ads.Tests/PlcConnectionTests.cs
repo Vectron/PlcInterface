@@ -26,7 +26,7 @@ public class PlcConnectionTests
         using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(settings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
 
         // Act
-        await connection.ConnectAsync();
+        _ = await connection.ConnectAsync();
 
         // Assert
         adsClientMock.Verify(x => x.Connect(It.IsAny<AmsAddress>()), Times.Once);
@@ -44,7 +44,7 @@ public class PlcConnectionTests
         using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(Mock.Of<AdsPlcConnectionOptions>()), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
 
         // Act
-        await connection.ConnectAsync();
+        _ = await connection.ConnectAsync();
 
         // Assert
         adsClientMock.Verify(x => x.Connect(It.IsAny<AmsAddress>()), Times.Never);
@@ -67,7 +67,7 @@ public class PlcConnectionTests
         using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(settings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
 
         // Act
-        connection.Connect();
+        _ = connection.Connect();
 
         // Assert
         adsClientMock.Verify(x => x.Connect(It.IsAny<AmsAddress>()), Times.Once);
@@ -93,7 +93,7 @@ public class PlcConnectionTests
         var observerMock2 = new Mock<IObserver<IConnected>>();
 
         // Act
-        adsConnection.Connect();
+        _ = adsConnection.Connect();
         using var subscription = adsConnection.SessionStream.Subscribe(observerMock.Object);
         using var subscription2 = connection.SessionStream.Subscribe(observerMock2.Object);
         adsClientMock.Raise(x => x.ConnectionStateChanged += null, new ConnectionStateChangedEventArgs(ConnectionStateChangedReason.Established, ConnectionState.Connected, ConnectionState.Disconnected));
@@ -119,7 +119,7 @@ public class PlcConnectionTests
         using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(Mock.Of<AdsPlcConnectionOptions>()), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
 
         // Act
-        connection.Connect();
+        _ = connection.Connect();
 
         // Assert
         adsClientMock.Verify(x => x.Connect(It.IsAny<AmsAddress>()), Times.Never);
@@ -183,7 +183,7 @@ public class PlcConnectionTests
         var observerMock = new Mock<IObserver<IConnected<IAdsConnection>>>();
 
         // Act
-        adsConnection.Connect();
+        _ = adsConnection.Connect();
         using var subscription2 = adsConnection.SessionStream.Subscribe(observerMock.Object);
         using var subscription = adsConnection.SessionStream.Subscribe(x => throw new NotSupportedException());
         adsClientMock.Raise(x => x.ConnectionStateChanged += null, new ConnectionStateChangedEventArgs(ConnectionStateChangedReason.Established, ConnectionState.Connected, ConnectionState.Disconnected));
@@ -266,8 +266,7 @@ public class PlcConnectionTests
         var adsClientMock = new Mock<IAdsDisposableConnection>();
         using var adsConnection = new PlcConnection(MockHelpers.GetOptionsMoq(settings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
 
-        // Act
-        // Assert
+        // Act Assert
         Assert.AreEqual(settings, adsConnection.Settings);
         Assert.AreSame(settings, adsConnection.Settings);
     }

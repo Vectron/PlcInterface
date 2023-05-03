@@ -35,7 +35,7 @@ public abstract class IMonitorTestBase
             }
         });
 
-        connection.Connect();
+        _ = connection.Connect();
         original = readWrite.Read<bool>(ioName);
         readWrite.ToggleBool(ioName);
         var result = done.WaitOne(TimeSpan.FromSeconds(5));
@@ -217,7 +217,7 @@ public abstract class IMonitorTestBase
         var original = readWrite.Read<bool>(ioName);
         using var subscription = monitor.SubscribeIO(ioName, !original, () => done.Set());
         connection.Disconnect();
-        connection.Connect();
+        _ = connection.Connect();
         readWrite.ToggleBool(ioName);
         var result = done.WaitOne(TimeSpan.FromSeconds(5));
 

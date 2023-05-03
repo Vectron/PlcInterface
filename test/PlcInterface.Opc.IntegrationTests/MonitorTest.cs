@@ -42,10 +42,15 @@ public class MonitorTest : IMonitorTestBase
 
     protected override IPlcConnection GetPLCConnection(bool connected = true)
     {
-        if (connected)
+        if (!connected)
         {
-            connection?.Connect();
-            _ = connection?.GetConnectedClient(TimeSpan.FromSeconds(1));
+            return connection!;
+        }
+
+        var isConnected = connection?.Connect();
+        if (isConnected == false)
+        {
+            throw new InvalidOperationException("Connection to PLC Failed");
         }
 
         return connection!;

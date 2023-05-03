@@ -63,7 +63,6 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         => ConnectAsync().GetAwaiter().GetResult();
 
     /// <inheritdoc/>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "MA0051:Method is too long", Justification = "Unable to make it shorter.")]
     public async Task<bool> ConnectAsync()
     {
         try
@@ -115,25 +114,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         }
         catch (ServiceResultException ex)
         {
-            switch (ex.Result.StatusCode.Code)
-            {
-                case StatusCodes.BadNotConnected:
-                    logger.LogError(ex, "Failed to connect to Opc, check network connection and Opc settings");
-                    break;
-
-                case StatusCodes.BadSecurityChecksFailed:
-                    logger.LogError(ex, "Security Checks Failed, Check if certificate is trusted");
-                    break;
-
-                case StatusCodes.BadRequestTimeout:
-                    logger.LogError(ex, "Request Timed Out");
-                    break;
-
-                default:
-                    logger.LogError(ex, "Unproccesed error {BrowseName}", StatusCodes.GetBrowseName(ex.Result.StatusCode.Code));
-                    break;
-            }
-
+            LogConnectionException(ex);
             return false;
         }
     }
@@ -251,6 +232,28 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             connectionState.OnNext(Connected.Yes(sessionReconnectHandler.Session));
             sessionReconnectHandler.Dispose();
         });
+    }
+
+    private void LogConnectionException(ServiceResultException ex)
+    {
+        switch (ex.Result.StatusCode.Code)
+        {
+            case StatusCodes.BadNotConnected:
+                logger.LogError(ex, "Failed to connect to Opc, check network connection and Opc settings");
+                break;
+
+            case StatusCodes.BadSecurityChecksFailed:
+                logger.LogError(ex, "Security Checks Failed, Check if certificate is trusted");
+                break;
+
+            case StatusCodes.BadRequestTimeout:
+                logger.LogError(ex, "Request Timed Out");
+                break;
+
+            default:
+                logger.LogError(ex, "Unproccesed error {BrowseName}", StatusCodes.GetBrowseName(ex.Result.StatusCode.Code));
+                break;
+        }
     }
 
     private void SetupCertificateSigning(ApplicationConfiguration applicationConfiguration)

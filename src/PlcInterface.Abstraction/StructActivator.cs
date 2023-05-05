@@ -61,11 +61,11 @@ internal sealed class StructActivator : ITypeActivator
 
     private static Activator GetActivator(Type type)
     {
-        // make a NewExpression that calls the ctor with the args we just created
+        // make a NewExpression that calls the ctor
         var newExp = Expression.New(type);
         var cast = Expression.Convert(newExp, typeof(object));
 
-        // create a lambda with the New Expression as body and our param object[] as arg
+        // create a lambda with the New Expression as body
         var lambda = Expression.Lambda<Activator>(cast);
 
         // compile it

@@ -5,7 +5,7 @@ using System.Reflection;
 namespace PlcInterface;
 
 /// <summary>
-/// Hellper for setting property values.
+/// Helper for setting property values.
 /// </summary>
 internal sealed class PropertySetterHelper
 {

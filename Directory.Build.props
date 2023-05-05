@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <Deterministic>true</Deterministic>
@@ -17,7 +17,6 @@
 
   <PropertyGroup>
     <SystemIOAbstractionsVersion>19.2.16</SystemIOAbstractionsVersion>
-    <MSTestVersion>3.0.2</MSTestVersion>
   </PropertyGroup>
 
   <!--Package settings-->

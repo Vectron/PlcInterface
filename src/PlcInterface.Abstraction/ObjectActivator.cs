@@ -96,9 +96,10 @@ internal sealed class ObjectActivator : ITypeActivator
 
         // make a NewExpression that calls the ctor with the args we just created
         var newExp = Expression.New(constructorInfo, argsExp);
+        var cast = Expression.Convert(newExp, typeof(object));
 
         // create a lambda with the New Expression as body and our param object[] as arg
-        var lambda = Expression.Lambda<Activator>(newExp, param);
+        var lambda = Expression.Lambda<Activator>(cast, param);
 
         // compile it
         var compiled = lambda.Compile();

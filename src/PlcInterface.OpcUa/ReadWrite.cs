@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Opc.Ua;
@@ -48,41 +49,30 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     public IDictionary<string, object> Read(IEnumerable<string> ioNames)
     {
         var nodesToRead = ioNames
-            .SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler))
-            .Where(x => x is SymbolInfo)
-            .Cast<SymbolInfo>()
-            .Select(x => x.Handle)
-            .ToList();
+          .SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler))
+          .Where(x => x.ChildSymbols.Count == 0 && x is SymbolInfo)
+          .Cast<SymbolInfo>()
+          .Select(x => x.Handle)
+          .ToList();
 
-        var nodesTypes = Enumerable.Repeat(typeof(object), nodesToRead.Count).ToList();
-
+#pragma warning disable IDISP001 // Dispose created
         var session = connection.GetConnectedClient();
-        session.ReadValues(nodesToRead, nodesTypes, out var values, out var errors);
+#pragma warning restore IDISP001 // Dispose created
+        session.ReadValues(nodesToRead, out var values, out var serviceResults);
 
-        using var valueEnumerator = values.Zip(errors, (value, error) => new DataValue(error.StatusCode) { Value = value }).GetEnumerator();
+        using var valueEnumerator = values.GetEnumerator() as IEnumerator<DataValue>;
         var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-        foreach (var ioName in ioNames)
-        {
-            var value = typeConverter.CreateDynamic(ioName, valueEnumerator);
-            result.Add(ioName, typeConverter.Convert(value));
-        }
-
-        return result;
+        return ioNames.ToDictionary(
+            name => name,
+            name => typeConverter.CreateDynamic(name, valueEnumerator),
+            StringComparer.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>
     public T Read<T>(string ioName)
     {
-        var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
-        if (symbol.ChildSymbols.Count > 0)
-        {
-            var dynamic = ReadDynamic(ioName) as object;
-            return typeConverter.Convert<T>(dynamic);
-        }
-
-        var session = connection.GetConnectedClient();
-        var dataValue = session.ReadValue(symbol.Handle);
-        return typeConverter.Convert<T>(dataValue.Value);
+        var value = Read(ioName);
+        return typeConverter.Convert<T>(value);
     }
 
     /// <inheritdoc/>
@@ -95,60 +85,32 @@ public class ReadWrite : IOpcReadWrite, IDisposable
         }
 
         var session = connection.GetConnectedClient();
-        var value = session.ReadValue(symbol.Handle);
-        return typeConverter.Convert(value.Value);
+        var readResponse = session.ReadValue(symbol.Handle);
+        ValidateDataValue(ioName, readResponse);
+        return typeConverter.Convert(readResponse.Value);
     }
 
     /// <inheritdoc/>
     public async Task<IDictionary<string, object>> ReadAsync(IEnumerable<string> ioNames)
     {
-        var querry = ioNames
+        var nodesToRead = ioNames
             .SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler))
             .Where(x => x.ChildSymbols.Count == 0 && x is SymbolInfo)
             .Cast<SymbolInfo>()
-            .Select(x => new ReadValueId()
-            {
-                NodeId = x.Handle,
-                AttributeId = Attributes.Value,
-            });
+            .Select(x => x.Handle)
+            .ToList();
 
 #pragma warning disable IDISP001 // Dispose created
         var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
 #pragma warning restore IDISP001 // Dispose created
-        var nodesToRead = new ReadValueIdCollection(querry);
-        var taskCompletionSource = new TaskCompletionSource<IDictionary<string, object>>();
+        var (dataValues, serviceResult) = await session.ReadValuesAsync(nodesToRead, CancellationToken.None)
+            .ConfigureAwait(false);
 
-        _ = session.BeginRead(
-            null,
-            0,
-            TimestampsToReturn.Neither,
-            nodesToRead,
-            ar =>
-            {
-                try
-                {
-                    var responseHeader = session.EndRead(ar, out var dataValues, out var diagnosticInfos);
-                    var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
-                    ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, ioNames);
-
-                    using var valueEnumerator = dataValues.GetEnumerator() as IEnumerator<DataValue>;
-                    var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-                    foreach (var ioName in ioNames)
-                    {
-                        var value = typeConverter.CreateDynamic(ioName, valueEnumerator);
-                        result.Add(ioName, typeConverter.Convert(value));
-                    }
-
-                    taskCompletionSource.SetResult(result);
-                }
-                catch (Exception ex)
-                {
-                    taskCompletionSource.SetException(ex);
-                }
-            },
-            null);
-
-        return await taskCompletionSource.Task.ConfigureAwait(false);
+        using var valueEnumerator = dataValues.GetEnumerator() as IEnumerator<DataValue>;
+        return ioNames.ToDictionary(
+            name => name,
+            name => typeConverter.CreateDynamic(name, valueEnumerator),
+            StringComparer.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>
@@ -159,110 +121,36 @@ public class ReadWrite : IOpcReadWrite, IDisposable
         {
             return await ReadDynamicAsync(ioName).ConfigureAwait(false);
         }
+
 #pragma warning disable IDISP001 // Dispose created
         var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
 #pragma warning restore IDISP001 // Dispose created
-        var nodesToRead = new ReadValueIdCollection
-            {
-                new ReadValueId()
-                {
-                    NodeId = symbol.Handle,
-                    AttributeId = Attributes.Value,
-                },
-            };
+        var readResponse = await session.ReadValueAsync(symbol.Handle, CancellationToken.None)
+            .ConfigureAwait(false);
+        ValidateDataValue(ioName, readResponse);
 
-        var taskCompletionSource = new TaskCompletionSource<object>();
-        _ = session.BeginRead(
-            null,
-            0,
-            TimestampsToReturn.Neither,
-            nodesToRead,
-            ar =>
-            {
-                try
-                {
-                    var responseHeader = session.EndRead(ar, out var dataValues, out var diagnosticInfos);
-                    var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
-                    ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
-                    var val = dataValues.FirstOrDefault();
-                    if (val == null)
-                    {
-                        ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
-                    }
-
-                    taskCompletionSource.SetResult(typeConverter.Convert(val.Value));
-                }
-                catch (Exception ex)
-                {
-                    taskCompletionSource.SetException(ex);
-                }
-            },
-            null);
-
-        return await taskCompletionSource.Task.ConfigureAwait(false);
+        return typeConverter.Convert(readResponse.Value);
     }
 
     /// <inheritdoc/>
     public async Task<T> ReadAsync<T>(string ioName)
     {
-        var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
-        if (symbol.ChildSymbols.Count > 0)
-        {
-            var value = await ReadDynamicAsync(ioName).ConfigureAwait(false) as object;
-            return typeConverter.Convert<T>(value);
-        }
-#pragma warning disable IDISP001 // Dispose created
-        var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
-#pragma warning restore IDISP001 // Dispose created
-        var nodesToRead = new ReadValueIdCollection
-            {
-                new ReadValueId()
-                {
-                    NodeId = symbol.Handle,
-                    AttributeId = Attributes.Value,
-                },
-            };
-
-        var taskCompletionSource = new TaskCompletionSource<T>();
-        _ = session.BeginRead(
-            null,
-            0,
-            TimestampsToReturn.Neither,
-            nodesToRead,
-            ar =>
-            {
-                var responseHeader = session.EndRead(ar, out var dataValues, out var diagnosticInfos);
-
-                try
-                {
-                    var statusCodes = new StatusCodeCollection(dataValues.Select(x => x.StatusCode));
-                    ValidateResponse(nodesToRead, responseHeader, statusCodes, diagnosticInfos, new[] { ioName });
-                    var val = dataValues.FirstOrDefault();
-                    if (val == null)
-                    {
-                        ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
-                    }
-
-                    taskCompletionSource.SetResult(typeConverter.Convert<T>(val.Value));
-                }
-                catch (Exception ex)
-                {
-                    taskCompletionSource.SetException(ex);
-                }
-            },
-            null);
-
-        return await taskCompletionSource.Task.ConfigureAwait(false);
+        var value = await ReadAsync(ioName).ConfigureAwait(false);
+        return typeConverter.Convert<T>(value);
     }
 
     /// <inheritdoc/>
     public dynamic ReadDynamic(string ioName)
-        => ReadDynamicAsync(ioName).GetAwaiter().GetResult();
+    {
+        var value = Read(new[] { ioName });
+        return value.Values.First();
+    }
 
     /// <inheritdoc/>
     public async Task<dynamic> ReadDynamicAsync(string ioName)
     {
-        var value = await ReadAsync(new[] { ioName }).ConfigureAwait(false);
+        var value = await ReadAsync(new[] { ioName })
+            .ConfigureAwait(false);
         return value.Values.First();
     }
 
@@ -288,7 +176,6 @@ public class ReadWrite : IOpcReadWrite, IDisposable
             });
 
         var nodesToWrite = new WriteValueCollection(querry);
-
         var responseHeader = session.Write(
             null,
             nodesToWrite,
@@ -320,27 +207,14 @@ public class ReadWrite : IOpcReadWrite, IDisposable
              });
 
         var nodesToWrite = new WriteValueCollection(querry);
-        var taskCompletionSource = new TaskCompletionSource<bool>();
 
-        _ = session.BeginWrite(
+        var writeResult = await session.WriteAsync(
             null,
             nodesToWrite,
-            r =>
-            {
-                var responseHeader = session.EndWrite(r, out var statusCodes, out var diagnosticInfos);
-                try
-                {
-                    ValidateResponse(nodesToWrite, responseHeader, statusCodes, diagnosticInfos, namesValues.Keys);
-                    taskCompletionSource.SetResult(true);
-                }
-                catch (Exception ex)
-                {
-                    taskCompletionSource.SetException(ex);
-                }
-            },
-            null);
+            CancellationToken.None)
+            .ConfigureAwait(false);
 
-        _ = await taskCompletionSource.Task.ConfigureAwait(false);
+        ValidateResponse(nodesToWrite, writeResult.ResponseHeader, writeResult.Results, writeResult.DiagnosticInfos, namesValues.Keys);
     }
 
     /// <inheritdoc/>
@@ -424,6 +298,23 @@ public class ReadWrite : IOpcReadWrite, IDisposable
         }
 
         return new Variant(value);
+    }
+
+    private static void ValidateDataValue(string ioName, DataValue readResponse)
+    {
+        if (StatusCode.IsNotGood(readResponse.StatusCode))
+        {
+            throw ServiceResultException.Create(
+                readResponse.StatusCode.Code,
+                "{0}: {1}",
+                StatusCode.LookupSymbolicId(readResponse.StatusCode.Code),
+                ioName);
+        }
+
+        if (readResponse.Value == null)
+        {
+            ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
+        }
     }
 
     private static void ValidateResponse(IList request, ResponseHeader responseHeader, StatusCodeCollection statusCodes, DiagnosticInfoCollection diagnosticInfos, IEnumerable<string> ioNames)

@@ -289,6 +289,7 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
         set;
     }
 
+    [ExcludeFromCodeCoverage]
     public override bool Equals(object? obj) => obj is DUT_TestClass @struct && Equals(@struct);
 
     public bool Equals(DUT_TestClass? other)

@@ -42,6 +42,7 @@ internal struct DUT_TestStruct2 : System.IEquatable<DUT_TestStruct2>
         get; set;
     }
 
+    [ExcludeFromCodeCoverage]
     public override readonly bool Equals(object? obj)
         => obj is DUT_TestStruct2 @struct && Equals(@struct);
 

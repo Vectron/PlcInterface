@@ -96,7 +96,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
 
         if (symbolInfo.IsArray)
         {
-            var array = Array.CreateInstance(typeof(ExpandoObject), symbolInfo.ArrayBounds);
+            var array = Array.CreateInstance(typeof(object), symbolInfo.ArrayBounds);
             foreach (var childSymbolName in symbolInfo.ChildSymbols)
             {
                 var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName).ConvertAndValidate();

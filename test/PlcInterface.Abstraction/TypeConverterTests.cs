@@ -221,6 +221,88 @@ public class TypeConverterTests
     }
 
     [TestMethod]
+    public void ConvertSupportsRecordValueTypes()
+    {
+        // Arrange
+        var typeConverter = Converter;
+        var expected = TestRecordStructType.Instance;
+        var sourceMock = new Mock<DynamicObject>();
+        var result = new object();
+        _ = sourceMock.Setup(x => x.GetDynamicMemberNames())
+            .Returns(new[]
+            {
+                nameof(TestRecordStructType.IntValue),
+                nameof(TestRecordStructType.IntArray),
+                nameof(TestRecordStructType.SubType),
+            });
+        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
+            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+            {
+                value = binder.Name switch
+                {
+                    nameof(TestRecordStructType.IntValue) => expected.IntValue,
+                    nameof(TestRecordStructType.IntArray) => expected.IntArray,
+                    nameof(TestRecordStructType.SubType) => expected.SubType.GetDynamicObjectMock(),
+                    _ => throw new InvalidOperationException("Unknown member"),
+                };
+
+                return value != null;
+            }));
+
+        // Act
+        var actual = typeConverter.Convert<TestRecordStructType>(sourceMock.Object);
+
+        // Assert
+        Assert.IsInstanceOfType(actual, typeof(TestRecordStructType));
+        Assert.AreEqual(expected.IntValue, actual.IntValue);
+        CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
+
+        Assert.IsNotNull(actual.SubType);
+        Assert.AreEqual(expected.SubType.IntValue, actual.SubType.IntValue);
+    }
+
+    [TestMethod]
+    public void ConvertSupportsValueTypes()
+    {
+        // Arrange
+        var typeConverter = Converter;
+        var expected = TestValueType.Instance;
+        var sourceMock = new Mock<DynamicObject>();
+        var result = new object();
+        _ = sourceMock.Setup(x => x.GetDynamicMemberNames())
+            .Returns(new[]
+            {
+                nameof(TestValueType.IntValue),
+                nameof(TestValueType.IntArray),
+                nameof(TestValueType.SubType),
+            });
+        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
+            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+            {
+                value = binder.Name switch
+                {
+                    nameof(TestValueType.IntValue) => expected.IntValue,
+                    nameof(TestValueType.IntArray) => expected.IntArray,
+                    nameof(TestValueType.SubType) => expected.SubType.GetDynamicObjectMock(),
+                    _ => throw new InvalidOperationException("Unknown member"),
+                };
+
+                return value != null;
+            }));
+
+        // Act
+        var actual = typeConverter.Convert<TestValueType>(sourceMock.Object);
+
+        // Assert
+        Assert.IsInstanceOfType(actual, typeof(TestValueType));
+        Assert.AreEqual(expected.IntValue, actual.IntValue);
+        CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
+
+        Assert.IsNotNull(actual.SubType);
+        Assert.AreEqual(expected.SubType.IntValue, actual.SubType.IntValue);
+    }
+
+    [TestMethod]
     public void ConvertSymbolExceptionWhenPropertyIsNotFound()
     {
         // Arrange
@@ -322,6 +404,95 @@ public class TypeConverterTests
 
         // Act Assert
         _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<int>(source));
+    }
+
+    private record struct TestRecordStructType(int IntValue, int[] IntArray, NestedRecordStructType SubType)
+    {
+        public static readonly TestRecordStructType Instance = new(5, new[] { 6, 7, 8, 9 }, new NestedRecordStructType(12));
+    }
+
+    private record struct NestedRecordStructType(int IntValue)
+    {
+        internal readonly DynamicObject GetDynamicObjectMock()
+        {
+            var intValue = IntValue;
+            var sourceMock = new Mock<DynamicObject>();
+            var result = new object();
+            _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(IntValue) });
+            _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
+                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+                {
+                    value = binder.Name switch
+                    {
+                        nameof(IntValue) => intValue,
+                        _ => throw new InvalidOperationException("Unknown member"),
+                    };
+
+                    return value != null;
+                }));
+
+            return sourceMock.Object;
+        }
+    }
+
+    private struct NestedValueType
+    {
+        public int IntValue
+        {
+            get;
+            set;
+        }
+
+        internal readonly DynamicObject GetDynamicObjectMock()
+        {
+            var intValue = IntValue;
+            var sourceMock = new Mock<DynamicObject>();
+            var result = new object();
+            _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(IntValue) });
+            _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
+                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+                {
+                    value = binder.Name switch
+                    {
+                        _ => intValue,
+                    };
+
+                    return value != null;
+                }));
+
+            return sourceMock.Object;
+        }
+    }
+
+    private struct TestValueType
+    {
+        public static readonly TestValueType Instance = new()
+        {
+            IntValue = 5,
+            IntArray = new[] { 6, 7, 8, 9 },
+            SubType = new NestedValueType()
+            {
+                IntValue = 12,
+            },
+        };
+
+        public int[] IntArray
+        {
+            get;
+            set;
+        }
+
+        public int IntValue
+        {
+            get;
+            set;
+        }
+
+        public NestedValueType SubType
+        {
+            get;
+            set;
+        }
     }
 
     private sealed class NestedType

@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{51750A27-B993-4FDA-9B03-DF95D59A7C6F}"
 	ProjectSection(SolutionItems) = preProject
 		test\.editorconfig = test\.editorconfig
+		test\Directory.Build.props = test\Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlcInterface.OpcUa", "src\PlcInterface.OpcUa\PlcInterface.OpcUa.csproj", "{CF609F06-F1DA-4163-9577-B887F9FE3B3A}"

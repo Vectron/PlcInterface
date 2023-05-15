@@ -25,6 +25,6 @@
     <PackageReference Include="MSTest.TestFramework" Version="$(MSTestVersion)" />
     <PackageReference Include="Moq" Version="4.18.4" />
 
-    <PackageReference Include="coverlet.msbuild" Version="2.8.1" />
+    <PackageReference Include="coverlet.msbuild" Version="3.2.0" />
   </ItemGroup>
 </Project>

@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <MSTestVersion>3.0.2</MSTestVersion>
+    <MSTestVersion>3.0.4</MSTestVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PlcInterface.Tests.DataTypes;
+using PlcInterface.IntegrationTests.DataTypes;
 
-namespace PlcInterface.Tests;
+namespace PlcInterface.IntegrationTests;
 
 internal static class Settings
 {

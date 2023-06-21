@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\PlcInterface.Ads\PlcInterface.Ads.csproj" />
-    <ProjectReference Include="..\PlcInterface.Tests\PlcInterface.Tests.csproj" />
+    <ProjectReference Include="..\PlcInterface.IntegrationTests\PlcInterface.IntegrationTests.csproj" />
     <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>
 </Project>

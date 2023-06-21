@@ -33,7 +33,7 @@ internal sealed class OpcPlcCommand : PlcCommandBase
     /// <inheritdoc/>
     protected override Response ExecuteWrite(string symbolName, string value)
     {
-        if (!symbolHandler.TryGetSymbolinfo(symbolName, out var symbolInfo))
+        if (!symbolHandler.TryGetSymbolInfo(symbolName, out var symbolInfo))
         {
             return new Response("Symbol not found");
         }

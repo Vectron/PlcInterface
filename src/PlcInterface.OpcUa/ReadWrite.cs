@@ -49,7 +49,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     public IDictionary<string, object> Read(IEnumerable<string> ioNames)
     {
         var nodesToRead = ioNames
-          .SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler))
+          .SelectMany(x => symbolHandler.GetSymbolInfo(x).Flatten(symbolHandler))
           .Where(x => x.ChildSymbols.Count == 0 && x is IOpcSymbolInfo)
           .Cast<IOpcSymbolInfo>()
           .Select(x => x.Handle)
@@ -78,7 +78,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     /// <inheritdoc/>
     public object Read(string ioName)
     {
-        var symbol = symbolHandler.GetSymbolinfo(ioName);
+        var symbol = symbolHandler.GetSymbolInfo(ioName);
         if (symbol.ChildSymbols.Count > 0)
         {
             return ReadDynamic(ioName);
@@ -94,7 +94,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     public async Task<IDictionary<string, object>> ReadAsync(IEnumerable<string> ioNames)
     {
         var nodesToRead = ioNames
-            .SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler))
+            .SelectMany(x => symbolHandler.GetSymbolInfo(x).Flatten(symbolHandler))
             .Where(x => x.ChildSymbols.Count == 0 && x is IOpcSymbolInfo)
             .Cast<IOpcSymbolInfo>()
             .Select(x => x.Handle)
@@ -116,7 +116,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     /// <inheritdoc/>
     public async Task<object> ReadAsync(string ioName)
     {
-        var symbol = symbolHandler.GetSymbolinfo(ioName);
+        var symbol = symbolHandler.GetSymbolInfo(ioName);
         if (symbol.ChildSymbols.Count > 0)
         {
             return await ReadDynamicAsync(ioName).ConfigureAwait(false);
@@ -165,8 +165,8 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     public void Write(IDictionary<string, object> namesValues)
     {
         var session = connection.GetConnectedClient();
-        var querry = namesValues
-            .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
+        var query = namesValues
+            .SelectMany(x => symbolHandler.GetSymbolInfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
             .Select(x => (x.SymbolInfo.ConvertAndValidate(), x.Value))
             .Select(x => new WriteValue()
             {
@@ -175,7 +175,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
                 Value = new DataValue(ConvertToOpcType(x.Value, x.Item1.BuiltInType)),
             });
 
-        var nodesToWrite = new WriteValueCollection(querry);
+        var nodesToWrite = new WriteValueCollection(query);
         var responseHeader = session.Write(
             null,
             nodesToWrite,
@@ -196,8 +196,8 @@ public class ReadWrite : IOpcReadWrite, IDisposable
 #pragma warning disable IDISP001 // Dispose created
         var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
 #pragma warning restore IDISP001 // Dispose created
-        var querry = namesValues
-             .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
+        var query = namesValues
+             .SelectMany(x => symbolHandler.GetSymbolInfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
              .Select(x => (x.SymbolInfo.ConvertAndValidate(), x.Value))
              .Select(x => new WriteValue()
              {
@@ -206,7 +206,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
                  Value = new DataValue(ConvertToOpcType(x.Value, x.Item1.BuiltInType)),
              });
 
-        var nodesToWrite = new WriteValueCollection(querry);
+        var nodesToWrite = new WriteValueCollection(query);
 
         var writeResult = await session.WriteAsync(
             null,
@@ -313,7 +313,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
 
         if (readResponse.Value == null)
         {
-            ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
+            ThrowHelper.ThrowInvalidOperationException_FailedToRead(ioName);
         }
     }
 

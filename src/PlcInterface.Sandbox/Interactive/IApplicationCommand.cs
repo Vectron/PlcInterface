@@ -8,15 +8,15 @@ namespace PlcInterface.Sandbox.Interactive;
 public interface IApplicationCommand
 {
     /// <summary>
-    /// Gets tekst explaining this <see cref="IApplicationCommand" />.
+    /// Gets text explaining this <see cref="IApplicationCommand"/>.
     /// </summary>
-    string HelpTekst
+    string HelpText
     {
         get;
     }
 
     /// <summary>
-    /// Gets the name of this <see cref="IApplicationCommand" />.
+    /// Gets the name of this <see cref="IApplicationCommand"/>.
     /// </summary>
     string Name
     {
@@ -24,9 +24,9 @@ public interface IApplicationCommand
     }
 
     /// <summary>
-    /// Gets a <see cref="IReadOnlyCollection{T}" /> with vallid parameters.
+    /// Gets a <see cref="IReadOnlyCollection{T}"/> with valid parameters.
     /// </summary>
-    IReadOnlyList<string> VallidParameters
+    IReadOnlyList<string> ValidParameters
     {
         get;
     }
@@ -35,6 +35,6 @@ public interface IApplicationCommand
     /// Execute this command.
     /// </summary>
     /// <param name="parameters">Collection of parameters for this command.</param>
-    /// <returns>A <see cref="Response" /> with the command result.</returns>
+    /// <returns>A <see cref="Response"/> with the command result.</returns>
     Response Execute(string[] parameters);
 }

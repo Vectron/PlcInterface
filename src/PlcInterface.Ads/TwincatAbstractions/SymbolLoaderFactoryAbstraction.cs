@@ -2,7 +2,7 @@
 using TwinCAT.Ads.TypeSystem;
 using TwinCAT.TypeSystem;
 
-namespace PlcInterface.Ads.TwincatAbstractions;
+namespace PlcInterface.Ads.TwinCATAbstractions;
 
 /// <summary>
 /// A implementation of <see cref="ISymbolLoaderFactory"/>.

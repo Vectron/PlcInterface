@@ -18,7 +18,7 @@ public class Monitor : IOpcMonitor, IDisposable
 {
     private readonly ILogger<Monitor> logger;
     private readonly Dictionary<string, RegisteredSymbol> registeredSymbols = new(StringComparer.OrdinalIgnoreCase);
-    private readonly IDisposable sesionStream;
+    private readonly IDisposable sessionStream;
     private readonly IOpcSymbolHandler symbolHandler;
     private readonly Subject<IMonitorResult> symbolStream = new();
     private readonly IOpcTypeConverter typeConverter;
@@ -49,7 +49,7 @@ public class Monitor : IOpcMonitor, IDisposable
             TimestampsToReturn = TimestampsToReturn.Both,
         };
 
-        sesionStream = connection.SessionStream.Where(x => x.IsConnected).Select(x => x.Value).WhereNotNull().Subscribe(async x =>
+        sessionStream = connection.SessionStream.Where(x => x.IsConnected).Select(x => x.Value).WhereNotNull().Subscribe(async x =>
          {
              foreach (var keyValue in registeredSymbols)
              {
@@ -149,7 +149,7 @@ public class Monitor : IOpcMonitor, IDisposable
             {
                 symbolStream.Dispose();
                 subscription.Dispose();
-                sesionStream.Dispose();
+                sessionStream.Dispose();
                 registeredSymbols?.Clear();
             }
 
@@ -252,9 +252,9 @@ public class Monitor : IOpcMonitor, IDisposable
                 .Select(x =>
                 {
                     if (x.Sender?.Handle is IOpcSymbolInfo s
-                    && x.EventArgs.NotificationValue is MonitoredItemNotification datachange)
+                    && x.EventArgs.NotificationValue is MonitoredItemNotification monitoredItemNotification)
                     {
-                        return new MonitorResult(s.Name, typeConverter.Convert(datachange.Value.Value));
+                        return new MonitorResult(s.Name, typeConverter.Convert(monitoredItemNotification.Value.Value));
                     }
 
                     return null;
@@ -270,7 +270,7 @@ public class Monitor : IOpcMonitor, IDisposable
 
         public void UpdateMonitoredItem(IOpcSymbolHandler symbolHandler)
         {
-            if (symbolHandler.TryGetSymbolinfo(name, out var symbolInfo))
+            if (symbolHandler.TryGetSymbolInfo(name, out var symbolInfo))
             {
                 MonitoredItem.StartNodeId = symbolInfo.Handle;
                 MonitoredItem.Handle = symbolInfo;

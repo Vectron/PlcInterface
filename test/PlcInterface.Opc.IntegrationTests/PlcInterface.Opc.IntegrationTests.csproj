@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\PlcInterface.OpcUa\PlcInterface.OpcUa.csproj" />
-    <ProjectReference Include="..\PlcInterface.Tests\PlcInterface.Tests.csproj" />
+    <ProjectReference Include="..\PlcInterface.IntegrationTests\PlcInterface.IntegrationTests.csproj" />
     <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>
 </Project>

@@ -7,8 +7,8 @@ using System.Reflection;
 namespace PlcInterface;
 
 /// <summary>
-/// Encapsuls the logic to create a type by constructor with parameters, or default constructor with
-/// property setters.
+/// Encapsules the logic to create a type by constructor with parameters, or default constructor
+/// with property setters.
 /// </summary>
 internal sealed class StructActivator : ITypeActivator
 {
@@ -38,8 +38,8 @@ internal sealed class StructActivator : ITypeActivator
     /// </param>
     /// <param name="memberCount">The number of members.</param>
     /// <param name="instance">The created instance.</param>
-    /// <returns><see langword="true"/> if creation was succesfull, otherwise false.</returns>
-    /// <exception cref="SymbolException">is thrown when the data is invallid.</exception>
+    /// <returns><see langword="true"/> if creation was successful, otherwise false.</returns>
+    /// <exception cref="SymbolException">is thrown when the data is invalid.</exception>
     public bool TryCreateInstance(Func<string, Type, object?> memberValueGetter, int memberCount, [MaybeNullWhen(false)] out object instance)
     {
         instance = default;

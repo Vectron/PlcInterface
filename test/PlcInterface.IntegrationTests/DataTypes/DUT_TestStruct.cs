@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
-using PlcInterface.Tests.Extension;
+using PlcInterface.IntegrationTests.Extension;
 
-namespace PlcInterface.Tests.DataTypes;
+namespace PlcInterface.IntegrationTests.DataTypes;
 
 [StructLayout(LayoutKind.Sequential, Pack = 0)]
-internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
+internal struct DUT_TestStruct : IEquatable<DUT_TestStruct>
 {
-    public static DUT_TestClass Default => new()
+    public static DUT_TestStruct Default => new()
     {
         BoolValue = true,
         ByteValue = byte.MaxValue,
@@ -34,7 +34,7 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
         DateAndTimeValue = new DateTimeOffset(2106, 02, 05, 06, 28, 15, TimeSpan.FromHours(1)),
         StringValue = "Test String",
         WStringValue = "Test WString",
-        Nested = DUT_TestClass2.Default,
+        Nested = DUT_TestStruct2.Default,
         IntArray = new short[] { 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010 },
         MultiDimensionArray = new short[,,]
         {
@@ -49,54 +49,47 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
                     { 2100, 2200, 2300, 2400 },
                 },
         },
-        ComplexArray = new DUT_TestClass2[] { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
-        MultiDimensionComplexArray = new DUT_TestClass2[,,]
+        ComplexArray = new DUT_TestStruct2[] { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
+        MultiDimensionComplexArray = new DUT_TestStruct2[,,]
         {
                 {
-                    { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
-                    { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
-                    { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
+                    { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
+                    { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
+                    { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
                 },
                 {
-                    { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
-                    { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
-                    { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
+                    { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
+                    { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
+                    { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
                 },
         },
     };
 
-    public static DUT_TestClass Write => new()
+    public static DUT_TestStruct Write => new()
     {
         BoolValue = false,
-
         ByteValue = byte.MinValue,
         WordValue = ushort.MinValue,
         DWordValue = uint.MinValue,
         LWordValue = ulong.MinValue,
-
         ShortValue = sbyte.MaxValue,
         IntValue = short.MaxValue,
         DIntValue = int.MaxValue,
         LongValue = long.MaxValue,
-
         UShortValue = byte.MinValue,
         UIntValue = ushort.MinValue,
         UDIntValue = uint.MinValue,
         ULongValue = ulong.MinValue,
-
         FloatValue = float.MaxValue,
         DoubleValue = double.MaxValue,
-
         TimeValue = TimeSpan.FromSeconds(3),
         TimeOfDay = TimeSpan.FromHours(10),
         LTimeValue = TimeSpan.FromTicks(100),
         DateValue = new DateTimeOffset(2019, 02, 21, 00, 00, 00, TimeSpan.FromHours(1)),
         DateAndTimeValue = new DateTimeOffset(2019, 02, 21, 12, 15, 10, TimeSpan.FromHours(1)),
-
         StringValue = "new Test String",
         WStringValue = "new Test WString",
-
-        Nested = DUT_TestClass2.Write,
+        Nested = DUT_TestStruct2.Write,
         IntArray = new short[] { 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010 },
         MultiDimensionArray = new short[,,]
         {
@@ -111,18 +104,18 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
                     { 2101, 2201, 2301, 2401 },
                 },
         },
-        ComplexArray = new DUT_TestClass2[] { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
-        MultiDimensionComplexArray = new DUT_TestClass2[,,]
+        ComplexArray = new DUT_TestStruct2[] { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+        MultiDimensionComplexArray = new DUT_TestStruct2[,,]
         {
                 {
-                    { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
-                    { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
-                    { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
+                    { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                    { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                    { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
                 },
                 {
-                    { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
-                    { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
-                    { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
+                    { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                    { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
+                    { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
                 },
         },
     };
@@ -135,166 +128,144 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
 
     public byte ByteValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public ushort WordValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public uint DWordValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public ulong LWordValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public sbyte ShortValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public short IntValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public int DIntValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public long LongValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public byte UShortValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public ushort UIntValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public uint UDIntValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public ulong ULongValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public float FloatValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public double DoubleValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public TimeSpan TimeValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public TimeSpan TimeOfDay
     {
-        get;
-        set;
+        get; set;
     }
 
     public TimeSpan LTimeValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public DateTimeOffset DateValue
     {
-        get;
-        set;
+        get; set;
     }
 
     public DateTimeOffset DateAndTimeValue
     {
-        get;
-        set;
+        get; set;
     }
 
-    public string? StringValue
+    public string StringValue
+    {
+        get; set;
+    }
+
+    public string WStringValue
+    {
+        get; set;
+    }
+
+    public DUT_TestStruct2 Nested
+    {
+        get; set;
+    }
+
+    public short[] IntArray
     {
         get;
         set;
     }
 
-    public string? WStringValue
+    public short[,,] MultiDimensionArray
     {
         get;
         set;
     }
 
-    public DUT_TestClass2? Nested
+    public DUT_TestStruct2[] ComplexArray
     {
         get;
         set;
     }
 
-    public short[]? IntArray
-    {
-        get;
-        set;
-    }
-
-    public short[,,]? MultiDimensionArray
-    {
-        get;
-        set;
-    }
-
-    public DUT_TestClass2[]? ComplexArray
-    {
-        get;
-        set;
-    }
-
-    public DUT_TestClass2[,,]? MultiDimensionComplexArray
+    public DUT_TestStruct2[,,] MultiDimensionComplexArray
     {
         get;
         set;
     }
 
     [ExcludeFromCodeCoverage]
-    public override bool Equals(object? obj) => obj is DUT_TestClass @struct && Equals(@struct);
+    public override readonly bool Equals(object? obj)
+        => obj is DUT_TestStruct @struct && Equals(@struct);
 
-    public bool Equals(DUT_TestClass? other)
-        => other != null
-            && BoolValue == other.BoolValue
+    public readonly bool Equals(DUT_TestStruct other)
+        => BoolValue == other.BoolValue
             && ByteValue == other.ByteValue
             && WordValue == other.WordValue
             && DWordValue == other.DWordValue
@@ -316,24 +287,14 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
             && DateAndTimeValue.Equals(other.DateAndTimeValue)
             && string.Equals(StringValue, other.StringValue, StringComparison.Ordinal)
             && string.Equals(WStringValue, other.WStringValue, StringComparison.Ordinal)
-            && Nested != null
-            && other.Nested != null
-            && EqualityComparer<DUT_TestClass2>.Default.Equals(Nested, other.Nested)
-            && IntArray != null
-            && other.IntArray != null
+            && EqualityComparer<DUT_TestStruct2>.Default.Equals(Nested, other.Nested)
             && IntArray.SequenceEqual(other.IntArray)
-            && MultiDimensionArray != null
-            && other.MultiDimensionArray != null
             && MultiDimensionArray.SequenceEqual<short>(other.MultiDimensionArray)
-            && ComplexArray != null
-            && other.ComplexArray != null
             && ComplexArray.SequenceEqual(other.ComplexArray)
-            && MultiDimensionComplexArray != null
-            && other.MultiDimensionComplexArray != null
-            && MultiDimensionComplexArray.SequenceEqual<DUT_TestClass2>(other.MultiDimensionComplexArray);
+            && MultiDimensionComplexArray.SequenceEqual<DUT_TestStruct2>(other.MultiDimensionComplexArray);
 
     [ExcludeFromCodeCoverage]
-    public override int GetHashCode()
+    public override readonly int GetHashCode()
     {
         var hashCode = 1307849462;
         hashCode = (hashCode * -1521134295) + BoolValue.GetHashCode();
@@ -356,13 +317,13 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
         hashCode = (hashCode * -1521134295) + LTimeValue.GetHashCode();
         hashCode = (hashCode * -1521134295) + DateValue.GetHashCode();
         hashCode = (hashCode * -1521134295) + DateAndTimeValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + StringComparer.Ordinal.GetHashCode(StringValue ?? string.Empty);
-        hashCode = (hashCode * -1521134295) + StringComparer.Ordinal.GetHashCode(WStringValue ?? string.Empty);
-        hashCode = (hashCode * -1521134295) + (Nested == null ? 0 : Nested.GetHashCode());
-        hashCode = (hashCode * -1521134295) + (IntArray == null ? 0 : EqualityComparer<short[]>.Default.GetHashCode(IntArray));
-        hashCode = (hashCode * -1521134295) + (MultiDimensionArray == null ? 0 : EqualityComparer<short[,,]>.Default.GetHashCode(MultiDimensionArray));
-        hashCode = (hashCode * -1521134295) + (ComplexArray == null ? 0 : EqualityComparer<DUT_TestClass2[]>.Default.GetHashCode(ComplexArray));
-        hashCode = (hashCode * -1521134295) + (MultiDimensionComplexArray == null ? 0 : EqualityComparer<DUT_TestClass2[,,]>.Default.GetHashCode(MultiDimensionComplexArray));
+        hashCode = (hashCode * -1521134295) + StringComparer.Ordinal.GetHashCode(StringValue);
+        hashCode = (hashCode * -1521134295) + StringComparer.Ordinal.GetHashCode(WStringValue);
+        hashCode = (hashCode * -1521134295) + Nested.GetHashCode();
+        hashCode = (hashCode * -1521134295) + EqualityComparer<short[]>.Default.GetHashCode(IntArray);
+        hashCode = (hashCode * -1521134295) + EqualityComparer<short[,,]>.Default.GetHashCode(MultiDimensionArray);
+        hashCode = (hashCode * -1521134295) + EqualityComparer<DUT_TestStruct2[]>.Default.GetHashCode(ComplexArray);
+        hashCode = (hashCode * -1521134295) + EqualityComparer<DUT_TestStruct2[,,]>.Default.GetHashCode(MultiDimensionComplexArray);
         return hashCode;
     }
 }

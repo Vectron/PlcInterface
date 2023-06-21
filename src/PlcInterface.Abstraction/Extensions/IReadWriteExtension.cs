@@ -14,13 +14,13 @@ namespace PlcInterface;
 public static class IReadWriteExtension
 {
     /// <summary>
-    /// Read a tag untill we get the expected value, or a timeout happens.
+    /// Read a tag until we get the expected value, or a timeout happens.
     /// </summary>
     /// <typeparam name="T">The type of the tag.</typeparam>
     /// <param name="readWrite">A <see cref="IReadWrite"/> implementation.</param>
     /// <param name="tag">Tag name to monitor.</param>
     /// <param name="filterValue">The value to wait for.</param>
-    /// <param name="timeout">Time befor <see cref="TimeoutException"/> is thrown.</param>
+    /// <param name="timeout">Time before <see cref="TimeoutException"/> is thrown.</param>
     /// <exception cref="TimeoutException">If no value is returned after <paramref name="timeout"/>.</exception>
     public static void WaitForValue<T>(this IReadWrite readWrite, string tag, T filterValue, TimeSpan timeout)
     {
@@ -35,17 +35,17 @@ public static class IReadWriteExtension
             }
         }
 
-        throw new TimeoutException(string.Create(CultureInfo.InvariantCulture, $"Couldnt get a proper response from the PLC in {timeout.TotalSeconds} seconds"));
+        throw new TimeoutException(string.Create(CultureInfo.InvariantCulture, $"Couldn't get a proper response from the PLC in {timeout.TotalSeconds} seconds"));
     }
 
     /// <summary>
-    /// Read a tag untill we get the expected value, or a timeout happens.
+    /// Read a tag until we get the expected value, or a timeout happens.
     /// </summary>
     /// <typeparam name="T">The type of the tag.</typeparam>
     /// <param name="readWrite">A <see cref="IReadWrite"/> implementation.</param>
     /// <param name="tag">Tag name to monitor.</param>
     /// <param name="filterValue">The value to wait for.</param>
-    /// <param name="timeout">Time befor <see cref="TimeoutException"/> is thrown.</param>
+    /// <param name="timeout">Time before <see cref="TimeoutException"/> is thrown.</param>
     /// <exception cref="TimeoutException">If no value is returned after <paramref name="timeout"/>.</exception>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public static async Task WaitForValueAsync<T>(this IReadWrite readWrite, string tag, T filterValue, TimeSpan timeout)
@@ -62,6 +62,6 @@ public static class IReadWriteExtension
             }
         }
 
-        throw new TimeoutException(string.Create(CultureInfo.InvariantCulture, $"Couldnt get a proper response from the PLC in {timeout.TotalSeconds} seconds"));
+        throw new TimeoutException(string.Create(CultureInfo.InvariantCulture, $"Couldn't get a proper response from the PLC in {timeout.TotalSeconds} seconds"));
     }
 }

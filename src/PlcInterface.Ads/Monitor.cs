@@ -12,7 +12,7 @@ namespace PlcInterface.Ads;
 public class Monitor : IAdsMonitor, IDisposable
 {
     private readonly ILogger logger;
-    private readonly IDisposable sesionStream;
+    private readonly IDisposable sessionStream;
     private readonly Dictionary<string, DisposableMonitorItem> streams = new(StringComparer.OrdinalIgnoreCase);
     private readonly IAdsSymbolHandler symbolHandler;
     private readonly Subject<IMonitorResult> symbolStream = new();
@@ -32,7 +32,7 @@ public class Monitor : IAdsMonitor, IDisposable
         this.typeConverter = typeConverter;
         this.logger = logger;
 
-        sesionStream = connection.SessionStream.Where(x => x.IsConnected).Subscribe(x =>
+        sessionStream = connection.SessionStream.Where(x => x.IsConnected).Subscribe(x =>
         {
             logger.LogDebug("Updating all subscriptions.");
             foreach (var keyValue in streams)
@@ -122,7 +122,7 @@ public class Monitor : IAdsMonitor, IDisposable
         {
             if (disposing)
             {
-                sesionStream.Dispose();
+                sessionStream.Dispose();
             }
 
             disposedValue = true;

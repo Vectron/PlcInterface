@@ -10,11 +10,11 @@ namespace PlcInterface;
 internal static class IndicesHelper
 {
     /// <summary>
-    /// Itterate over all array indices.
+    /// Iterate over all array indices.
     /// </summary>
-    /// <remarks>only one array will be made and updated every itteration.</remarks>
+    /// <remarks>only one array will be made and updated every iteration.</remarks>
     /// <param name="array">The <see cref="Array"/> to get indices from.</param>
-    /// <returns>A <see cref="IEnumerable{T}"/> with the array indeces.</returns>
+    /// <returns>A <see cref="IEnumerable{T}"/> with the array indices.</returns>
     public static IEnumerable<int[]> GetIndices(Array array)
     {
         var indices = new int[array.Rank];
@@ -63,11 +63,11 @@ internal static class IndicesHelper
     }
 
     /// <summary>
-    /// A helper function for incrementing indices of a multi demensional <see cref="Array"/>.
+    /// A helper function for incrementing indices of a multi dimensional <see cref="Array"/>.
     /// </summary>
-    /// <param name="array">The array being itterated.</param>
+    /// <param name="array">The array being iterated.</param>
     /// <param name="indices">The indices array that has to be incremented.</param>
-    /// <returns><see langword="true"/> if the new indices is vallid, else <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> if the new indices is valid, else <see langword="false"/>.</returns>
     private static bool IncrementIndices(this Array array, ref int[] indices)
     {
         for (var i = array.Rank - 1; i >= 0; i--)

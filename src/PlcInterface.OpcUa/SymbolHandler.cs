@@ -57,13 +57,13 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
     }
 
     /// <inheritdoc/>
-    ISymbolInfo ISymbolHandler.GetSymbolinfo(string ioName)
-        => GetSymbolinfo(ioName);
+    ISymbolInfo ISymbolHandler.GetSymbolInfo(string ioName)
+        => GetSymbolInfo(ioName);
 
     /// <inheritdoc/>
-    public IOpcSymbolInfo GetSymbolinfo(string ioName)
+    public IOpcSymbolInfo GetSymbolInfo(string ioName)
     {
-        if (TryGetSymbolinfo(ioName, out var symbolInfo) && symbolInfo != null)
+        if (TryGetSymbolInfo(ioName, out var symbolInfo) && symbolInfo != null)
         {
             return symbolInfo;
         }
@@ -72,15 +72,15 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
     }
 
     /// <inheritdoc/>
-    bool ISymbolHandler.TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo)
+    bool ISymbolHandler.TryGetSymbolInfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo)
     {
-        var result = TryGetSymbolinfo(ioName, out var symbolInfoResult);
+        var result = TryGetSymbolInfo(ioName, out var symbolInfoResult);
         symbolInfo = symbolInfoResult;
         return result;
     }
 
     /// <inheritdoc/>
-    public bool TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out IOpcSymbolInfo symbolInfo)
+    public bool TryGetSymbolInfo(string ioName, [MaybeNullWhen(false)] out IOpcSymbolInfo symbolInfo)
     {
         if (allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out var symbolInfoResult))
         {

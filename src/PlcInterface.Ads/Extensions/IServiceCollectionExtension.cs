@@ -1,7 +1,7 @@
 ﻿using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using PlcInterface.Ads.TwincatAbstractions;
+using PlcInterface.Ads.TwinCATAbstractions;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 
@@ -16,7 +16,9 @@ public static class IServiceCollectionExtension
     /// <summary>
     /// Configure the <see cref="IServiceCollection"/> for this PLC.
     /// </summary>
-    /// <param name="serviceDescriptors">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="serviceDescriptors">
+    /// The <see cref="IServiceCollection"/> to add the services to.
+    /// </param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
     public static IServiceCollection AddAdsPLC(this IServiceCollection serviceDescriptors)
         => serviceDescriptors

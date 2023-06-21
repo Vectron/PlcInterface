@@ -412,16 +412,16 @@ public class TypeConverterTests
         expandoSource.Add(nameof(TestType.IntValue), null!);
         expandoSource.Add(nameof(TestType.IntArray), null!);
         expandoSource.Add(nameof(TestType.SubType), null!);
-        var dynamicObjectsourceMock = new Mock<DynamicObject>();
+        var dynamicObjectSourceMock = new Mock<DynamicObject>();
         var result = new object();
-        _ = dynamicObjectsourceMock.Setup(x => x.GetDynamicMemberNames())
+        _ = dynamicObjectSourceMock.Setup(x => x.GetDynamicMemberNames())
             .Returns(new[]
             {
                 nameof(TestType.IntValue),
                 nameof(TestType.IntArray),
                 nameof(TestType.SubType),
             });
-        _ = dynamicObjectsourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
+        _ = dynamicObjectSourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
             .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
             {
                 value = binder.Name switch
@@ -431,10 +431,10 @@ public class TypeConverterTests
 
                 return true;
             }));
-        var dynamicObjectsource = dynamicObjectsourceMock.Object;
+        var dynamicObjectSource = dynamicObjectSourceMock.Object;
 
         // Act Assert
-        _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<TestType>(dynamicObjectsource));
+        _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<TestType>(dynamicObjectSource));
         _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<TestType>(expandoSource));
     }
 

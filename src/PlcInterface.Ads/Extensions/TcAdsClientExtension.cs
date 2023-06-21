@@ -16,7 +16,7 @@ internal static class TcAdsClientExtension
     /// </summary>
     /// <param name="client">The <see cref="AdsClient"/> to check.</param>
     /// <returns>The <see cref="AdsClient"/> for chaining.</returns>
-    /// <exception cref="InvalidOperationException">When the plc is not in a vallid state.</exception>
+    /// <exception cref="InvalidOperationException">When the plc is not in a valid state.</exception>
     public static IAdsConnection ValidateConnection(this IAdsConnection client)
     {
         if (client == null)

@@ -9,7 +9,7 @@ namespace PlcInterface.OpcUa;
 public class OpcPlcConnectionOptions
 {
     /// <summary>
-    /// Gets or sets the adress to connect to.
+    /// Gets or sets the address to connect to.
     /// </summary>
     public Uri? Address
     {
@@ -45,9 +45,9 @@ public class OpcPlcConnectionOptions
     }
 
     /// <summary>
-    /// Gets the discovery adress.
+    /// Gets the discovery address.
     /// </summary>
-    public Uri DiscoveryAdress
+    public Uri DiscoveryAddress
         => new UriBuilder(Address ?? new Uri("127.0.0.1"))
         {
             Path = "/discovery",
@@ -72,7 +72,7 @@ public class OpcPlcConnectionOptions
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether use secure connection when availible.
+    /// Gets or sets a value indicating whether use secure connection when available.
     /// </summary>
     public bool UseSecurity
     {

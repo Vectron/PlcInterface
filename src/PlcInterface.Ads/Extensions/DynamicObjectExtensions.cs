@@ -48,24 +48,24 @@ internal static class DynamicObjectExtensions
             return false;
         }
 
-        var dimensionLengts = arrayType.Dimensions.GetDimensionLengths();
-        using var ellementEnumerator = elementValues.GetEnumerator();
+        var dimensionLengths = arrayType.Dimensions.GetDimensionLengths();
+        using var elementEnumerator = elementValues.GetEnumerator();
 
         if (arrayType.ManagedType != null)
         {
-            var ellementType = arrayType.ManagedType.GetElementType()
+            var elementType = arrayType.ManagedType.GetElementType()
                 ?? throw new NotSupportedException($"Unable to retrieve element type");
 
-            var destination = Array.CreateInstance(ellementType, dimensionLengts);
+            var destination = Array.CreateInstance(elementType, dimensionLengths);
 
             foreach (var indices in IndicesHelper.GetIndices(destination))
             {
-                if (!ellementEnumerator.MoveNext())
+                if (!elementEnumerator.MoveNext())
                 {
                     break;
                 }
 
-                destination.SetValue(ellementEnumerator.Current, indices);
+                destination.SetValue(elementEnumerator.Current, indices);
             }
 
             array = destination;
@@ -73,18 +73,18 @@ internal static class DynamicObjectExtensions
         }
         else
         {
-            var destination = Array.CreateInstance(typeof(object), dimensionLengts);
+            var destination = Array.CreateInstance(typeof(object), dimensionLengths);
 
             foreach (var indices in IndicesHelper.GetIndices(destination))
             {
-                if (!ellementEnumerator.MoveNext())
+                if (!elementEnumerator.MoveNext())
                 {
                     break;
                 }
 
-                if (ellementEnumerator.Current is not DynamicObject dynamicObject)
+                if (elementEnumerator.Current is not DynamicObject dynamicObject)
                 {
-                    destination.SetValue(ellementEnumerator.Current, indices);
+                    destination.SetValue(elementEnumerator.Current, indices);
                     continue;
                 }
 

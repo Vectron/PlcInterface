@@ -66,7 +66,7 @@ internal sealed class TreeBrowser : Browser
     /// <summary>
     /// Browse the symbol tree starting from the root node.
     /// </summary>
-    /// <param name="address">The adress to start the tree at.</param>
+    /// <param name="address">The address to start the tree at.</param>
     /// <returns>All found symbols on the server.</returns>
     public IDictionary<string, IOpcSymbolInfo> BrowseTree(Uri address)
     {
@@ -222,13 +222,13 @@ internal sealed class TreeBrowser : Browser
             }
         }
 
-        var nodeinfo = Session.ReadNodeInfo((NodeId)lastNode.NodeId);
-        return CreateSymbol(lastNode, nodeinfo, null, string.Empty);
+        var nodeInfo = Session.ReadNodeInfo((NodeId)lastNode.NodeId);
+        return CreateSymbol(lastNode, nodeInfo, null, string.Empty);
     }
 
     private IEnumerable<ReferenceDescriptionCollection> DecodeResult(ResponseHeader responseHeader, BrowseResultCollection results, DiagnosticInfoCollection diagnosticInfos)
     {
-        var browseresults = new List<ReferenceDescriptionCollection>(results.Count);
+        var browseResults = new List<ReferenceDescriptionCollection>(results.Count);
 
         for (var i = 0; i < results.Count; i++)
         {
@@ -250,7 +250,7 @@ internal sealed class TreeBrowser : Browser
                 if (!ContinueUntilDone)
                 {
                     _ = BrowseNext(ref continuationPoint, true);
-                    return browseresults;
+                    return browseResults;
                 }
 
                 additionalReferences = BrowseNext(ref continuationPoint, false);
@@ -264,10 +264,10 @@ internal sealed class TreeBrowser : Browser
                 break;
             }
 
-            browseresults.Add(references);
+            browseResults.Add(references);
         }
 
         // return the results.
-        return browseresults;
+        return browseResults;
     }
 }

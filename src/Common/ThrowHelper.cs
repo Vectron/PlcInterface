@@ -11,9 +11,9 @@ internal static class ThrowHelper
     /// <summary>
     /// Throw an <see cref="InvalidOperationException"/>.
     /// </summary>
-    /// <param name="ioname">The name of the io that was being read.</param>
+    /// <param name="ioName">The name of the io that was being read.</param>
     /// <exception cref="InvalidOperationException">Throws this always.</exception>
     [DoesNotReturn]
-    internal static void ThrowInvallidOperationException_FailedToRead(string ioname)
-        => throw new InvalidOperationException($"Failed to read {ioname}");
+    internal static void ThrowInvalidOperationException_FailedToRead(string ioName)
+        => throw new InvalidOperationException($"Failed to read {ioName}");
 }

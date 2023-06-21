@@ -13,7 +13,7 @@ public class Connected<T> : IConnected<T>
     /// <summary>
     /// Initializes a new instance of the <see cref="Connected{T}"/> class.
     /// </summary>
-    /// <param name="value">A <typeparamref name="T"/> containg the connection.</param>
+    /// <param name="value">A <typeparamref name="T"/> containing the connection.</param>
     internal Connected(T value)
     {
         this.value = value;

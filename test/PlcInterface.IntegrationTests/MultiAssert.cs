@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PlcInterface.Tests;
+namespace PlcInterface.IntegrationTests;
 
 [ExcludeFromCodeCoverage]
 public class MultiAssert

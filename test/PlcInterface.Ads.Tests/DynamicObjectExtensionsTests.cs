@@ -128,7 +128,7 @@ public class DynamicObjectExtensionsTests
     }
 
     [TestMethod]
-    public void CleanDynamicConvertsStructtypeToExpando()
+    public void CleanDynamicConvertsStructTypeToExpando()
     {
         // Arrange
         object? dummy = null;
@@ -254,15 +254,14 @@ public class DynamicObjectExtensionsTests
     }
 
     [TestMethod]
-    public void CleanDynamicThrowsNotSupportedExceptionIfNotAConvertableType()
+    public void CleanDynamicThrowsNotSupportedExceptionIfNotAConvertibleType()
     {
         // Arrange
         var dynamicObjectMock = Mock.Of<DynamicObject>();
         var iDynamicValueMock = new Mock<DynamicObject>();
         var iDynamicValueDynamicObjectMock = iDynamicValueMock.As<IDynamicValue>();
 
-        // Act
-        // Assert
+        // Act Assert
         _ = Assert.ThrowsException<NotSupportedException>(dynamicObjectMock.CleanDynamic);
         _ = Assert.ThrowsException<NotSupportedException>(iDynamicValueMock.Object.CleanDynamic);
     }

@@ -30,7 +30,7 @@ public class IObservableExtensionsTests
     }
 
     [TestMethod]
-    public void WhereNotNullPassesOnCompletedThroug()
+    public void WhereNotNullPassesOnCompletedThrough()
     {
         // Arrange
         using var subject = new Subject<object?>();
@@ -49,7 +49,7 @@ public class IObservableExtensionsTests
     }
 
     [TestMethod]
-    public void WhereNotNullPassesOnErrorsThroug()
+    public void WhereNotNullPassesOnErrorsThrough()
     {
         // Arrange
         using var subject = new Subject<object?>();

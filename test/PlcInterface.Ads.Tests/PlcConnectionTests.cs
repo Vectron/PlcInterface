@@ -169,7 +169,7 @@ public class PlcConnectionTests
     }
 
     [TestMethod]
-    public void ExceptionsInSessionStreamDontDestroyTheStream()
+    public void ExceptionsInSessionStreamDoNotDestroyTheStream()
     {
         // Arrange
         var settings = new AdsPlcConnectionOptions()
@@ -195,7 +195,7 @@ public class PlcConnectionTests
     }
 
     [TestMethod]
-    public async Task IfAutoConnectIsTrueConnectionIsMadeImmidiatly()
+    public async Task IfAutoConnectIsTrueConnectionIsMadeImmediately()
     {
         // Arrange
         var settings = new AdsPlcConnectionOptions()
@@ -208,7 +208,7 @@ public class PlcConnectionTests
         var resetEvent = new TaskCompletionSource<bool>();
         _ = adsClientMock.Setup(x => x.Connect(It.IsAny<AmsAddress>())).Callback((AmsAddress address) => resetEvent.SetResult(true));
         using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-        using var tokenRegestration = tokenSource.Token.Register(() => resetEvent.SetResult(false));
+        using var tokenRegistration = tokenSource.Token.Register(() => resetEvent.SetResult(false));
 
         // Act
         using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(settings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
@@ -223,7 +223,7 @@ public class PlcConnectionTests
     }
 
     [TestMethod]
-    public void SesionstreamIsStoppedWhenDisposed()
+    public void SessionStreamIsStoppedWhenDisposed()
     {
         // Arrange
         var settings = new AdsPlcConnectionOptions()

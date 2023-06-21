@@ -7,15 +7,15 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PlcInterface.Tests.Extension;
+using PlcInterface.IntegrationTests.Extension;
 
-namespace PlcInterface.Tests;
+namespace PlcInterface.IntegrationTests;
 
 [DoNotParallelize]
 public abstract class IMonitorTestBase
 {
     [TestMethod]
-    public void MonitorBeforeConnectDoesntMatter()
+    public void MonitorBeforeConnectDoesNotMatter()
     {
         // Arrange
         var connection = GetPLCConnection(false);
@@ -47,7 +47,7 @@ public abstract class IMonitorTestBase
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
         "IDisposableAnalyzers.Correctness",
         "IDISP017:Prefer using",
-        Justification = "We want to specificly dispose the subscription")]
+        Justification = "We want to specifically dispose the subscription")]
     public async Task MultipleSubscriptions()
     {
         // Arrange

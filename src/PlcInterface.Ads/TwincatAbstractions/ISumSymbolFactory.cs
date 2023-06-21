@@ -2,7 +2,7 @@
 using TwinCAT.Ads;
 using TwinCAT.TypeSystem;
 
-namespace PlcInterface.Ads.TwincatAbstractions;
+namespace PlcInterface.Ads.TwinCATAbstractions;
 
 /// <summary>
 /// A factory for creating SumSymbol commands.

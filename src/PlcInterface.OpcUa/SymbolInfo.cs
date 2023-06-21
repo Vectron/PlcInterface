@@ -20,7 +20,7 @@ internal sealed class SymbolInfo : IOpcSymbolInfo
     /// Initializes a new instance of the <see cref="SymbolInfo"/> class.
     /// </summary>
     /// <param name="symbol">The <see cref="ReferenceDescription"/> to describe.</param>
-    /// <param name="itemFullName">The fullname of the symbol.</param>
+    /// <param name="itemFullName">The full name of the symbol.</param>
     /// <param name="nodeInfo">Extra info for this symbol.</param>
     public SymbolInfo(ReferenceDescription symbol, string itemFullName, NodeInfo nodeInfo)
     {
@@ -106,16 +106,16 @@ internal sealed class SymbolInfo : IOpcSymbolInfo
         var indices = ChildSymbols.Select(x => IndicesHelper.GetIndices(x.AsSpan(Name.Length)));
         var length = indices.First().Length;
         var lowerBounds = new int[length];
-        var upperbounds = new int[length];
+        var upperBounds = new int[length];
         var ranks = new int[length];
 
         foreach (var index in indices)
         {
             for (var i = 0; i < lowerBounds.Length; i++)
             {
-                if (upperbounds[i] < index[i])
+                if (upperBounds[i] < index[i])
                 {
-                    upperbounds[i] = index[i];
+                    upperBounds[i] = index[i];
                 }
 
                 if (lowerBounds[i] > index[i])
@@ -123,7 +123,7 @@ internal sealed class SymbolInfo : IOpcSymbolInfo
                     lowerBounds[i] = index[i];
                 }
 
-                ranks[i] = upperbounds[i] + 1 - lowerBounds[i];
+                ranks[i] = upperBounds[i] + 1 - lowerBounds[i];
             }
         }
 

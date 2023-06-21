@@ -24,9 +24,9 @@ public class SymbolHandlerTests
         _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(subject);
         var symbolHandlerSettings = new AdsSymbolHandlerOptions();
         var fileSystemMock = new Mock<IFileSystem>();
-        var twincatSymbolLoader = new Mock<ISymbolLoader>();
+        var twinCATSymbolLoader = new Mock<ISymbolLoader>();
         var symbolLoaderFactory = new Mock<ISymbolLoaderFactory>();
-        _ = symbolLoaderFactory.Setup(x => x.Create(It.IsAny<IConnection>(), It.IsAny<ISymbolLoaderSettings>())).Callback(() => throw new NotSupportedException()).Returns(twincatSymbolLoader.Object);
+        _ = symbolLoaderFactory.Setup(x => x.Create(It.IsAny<IConnection>(), It.IsAny<ISymbolLoaderSettings>())).Callback(() => throw new NotSupportedException()).Returns(twinCATSymbolLoader.Object);
         using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock.Object, symbolLoaderFactory.Object);
         var adsClient = new Mock<IAdsDisposableConnection>();
         var connected = new Mock<IConnected<IAdsConnection>>();
@@ -42,7 +42,22 @@ public class SymbolHandlerTests
     }
 
     [TestMethod]
-    public void GetSymbolInfoReturnsSymbolWhenAvailible()
+    public void GetGetSymbolInfoThrowsSymbolExceptionWhenNoSymbolsAreLoaded()
+    {
+        // Arrange
+        var adsPlcConnection = new Mock<IAdsPlcConnection>();
+        _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
+        var symbolHandlerSettings = new AdsSymbolHandlerOptions();
+        var fileSystemMock = new Mock<IFileSystem>();
+        var symbolLoaderFactory = new Mock<ISymbolLoaderFactory>();
+        using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock.Object, symbolLoaderFactory.Object);
+
+        // Act Assert
+        _ = Assert.ThrowsException<SymbolException>(() => symbolHandler.GetSymbolInfo("dummyTag"));
+    }
+
+    [TestMethod]
+    public void GetSymbolInfoReturnsSymbolWhenAvailable()
     {
         // Arrange
         var ioName = "DummyVar1";
@@ -55,10 +70,10 @@ public class SymbolHandlerTests
         _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(subject);
         var symbolHandlerSettings = new AdsSymbolHandlerOptions();
         var fileSystemMock = new Mock<IFileSystem>();
-        var twincatSymbolLoader = new Mock<ISymbolLoader>();
-        _ = twincatSymbolLoader.SetupGet(x => x.Symbols).Returns(symbols);
+        var twinCATSymbolLoader = new Mock<ISymbolLoader>();
+        _ = twinCATSymbolLoader.SetupGet(x => x.Symbols).Returns(symbols);
         var symbolLoaderFactory = new Mock<ISymbolLoaderFactory>();
-        _ = symbolLoaderFactory.Setup(x => x.Create(It.IsAny<IConnection>(), It.IsAny<ISymbolLoaderSettings>())).Returns(twincatSymbolLoader.Object);
+        _ = symbolLoaderFactory.Setup(x => x.Create(It.IsAny<IConnection>(), It.IsAny<ISymbolLoaderSettings>())).Returns(twinCATSymbolLoader.Object);
         using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock.Object, symbolLoaderFactory.Object);
         var adsClient = new Mock<IAdsDisposableConnection>();
         var connected = new Mock<IConnected<IAdsConnection>>();
@@ -67,28 +82,12 @@ public class SymbolHandlerTests
 
         // Act
         subject.OnNext(connected.Object);
-        var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
-        var symbolInfo2 = ((ISymbolHandler)symbolHandler).GetSymbolinfo(ioName);
+        var symbolInfo = symbolHandler.GetSymbolInfo(ioName);
+        var symbolInfo2 = ((ISymbolHandler)symbolHandler).GetSymbolInfo(ioName);
 
         // Assert
         Assert.AreSame(symbolInfo, symbolInfo2);
         Assert.AreEqual(ioName, symbolInfo.Name);
-    }
-
-    [TestMethod]
-    public void GetSymbolinfoThrowsSymbolExceptionWhenNoSymbolsAreLoaded()
-    {
-        // Arrange
-        var adsPlcConnection = new Mock<IAdsPlcConnection>();
-        _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
-        var symbolHandlerSettings = new AdsSymbolHandlerOptions();
-        var fileSystemMock = new Mock<IFileSystem>();
-        var symbolLoaderFactory = new Mock<ISymbolLoaderFactory>();
-        using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock.Object, symbolLoaderFactory.Object);
-
-        // Act
-        // Assert
-        _ = Assert.ThrowsException<SymbolException>(() => symbolHandler.GetSymbolinfo("dummyTag"));
     }
 
     [TestMethod]
@@ -106,10 +105,10 @@ public class SymbolHandlerTests
         _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(subject);
         var symbolHandlerSettings = new AdsSymbolHandlerOptions();
         var fileSystemMock = new Mock<IFileSystem>();
-        var twincatSymbolLoader = new Mock<ISymbolLoader>();
-        _ = twincatSymbolLoader.SetupGet(x => x.Symbols).Returns(symbols);
+        var twinCATSymbolLoader = new Mock<ISymbolLoader>();
+        _ = twinCATSymbolLoader.SetupGet(x => x.Symbols).Returns(symbols);
         var symbolLoaderFactory = new Mock<ISymbolLoaderFactory>();
-        _ = symbolLoaderFactory.Setup(x => x.Create(It.IsAny<IConnection>(), It.IsAny<ISymbolLoaderSettings>())).Returns(twincatSymbolLoader.Object);
+        _ = symbolLoaderFactory.Setup(x => x.Create(It.IsAny<IConnection>(), It.IsAny<ISymbolLoaderSettings>())).Returns(twinCATSymbolLoader.Object);
         using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock.Object, symbolLoaderFactory.Object);
         var adsClient = new Mock<IAdsDisposableConnection>();
         var connected = new Mock<IConnected<IAdsConnection>>();
@@ -142,10 +141,10 @@ public class SymbolHandlerTests
         };
         var fileSystemMock = new MockFileSystem();
 
-        var twincatSymbolLoader = new Mock<ISymbolLoader>();
-        _ = twincatSymbolLoader.SetupGet(x => x.Symbols).Returns(symbols);
+        var twinCATSymbolLoader = new Mock<ISymbolLoader>();
+        _ = twinCATSymbolLoader.SetupGet(x => x.Symbols).Returns(symbols);
         var symbolLoaderFactory = new Mock<ISymbolLoaderFactory>();
-        _ = symbolLoaderFactory.Setup(x => x.Create(It.IsAny<IConnection>(), It.IsAny<ISymbolLoaderSettings>())).Returns(twincatSymbolLoader.Object);
+        _ = symbolLoaderFactory.Setup(x => x.Create(It.IsAny<IConnection>(), It.IsAny<ISymbolLoaderSettings>())).Returns(twinCATSymbolLoader.Object);
         using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock, symbolLoaderFactory.Object);
         var adsClient = new Mock<IAdsDisposableConnection>();
         var connected = new Mock<IConnected<IAdsConnection>>();
@@ -180,10 +179,10 @@ public class SymbolHandlerTests
         };
         var fileSystemMock = new MockFileSystem();
 
-        var twincatSymbolLoader = new Mock<ISymbolLoader>();
-        _ = twincatSymbolLoader.SetupGet(x => x.Symbols).Returns(symbols);
+        var twinCATSymbolLoader = new Mock<ISymbolLoader>();
+        _ = twinCATSymbolLoader.SetupGet(x => x.Symbols).Returns(symbols);
         var symbolLoaderFactory = new Mock<ISymbolLoaderFactory>();
-        _ = symbolLoaderFactory.Setup(x => x.Create(It.IsAny<IConnection>(), It.IsAny<ISymbolLoaderSettings>())).Returns(twincatSymbolLoader.Object);
+        _ = symbolLoaderFactory.Setup(x => x.Create(It.IsAny<IConnection>(), It.IsAny<ISymbolLoaderSettings>())).Returns(twinCATSymbolLoader.Object);
         using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock, symbolLoaderFactory.Object);
         var adsClient = new Mock<IAdsDisposableConnection>();
         var connected = new Mock<IConnected<IAdsConnection>>();

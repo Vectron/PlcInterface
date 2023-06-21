@@ -10,7 +10,7 @@ namespace PlcInterface.Abstraction.Tests;
 public class IPlcConnectionExtensionTests
 {
     [TestMethod]
-    public async Task GetConnectedClientAsyncReturnsAVallidValue()
+    public async Task GetConnectedClientAsyncReturnsAValidValue()
     {
         // Arrange
         var plcConnectionMock = new Mock<IPlcConnection<GenericParameterHelper>>();
@@ -34,13 +34,12 @@ public class IPlcConnectionExtensionTests
         var mock = new Mock<IPlcConnection<GenericParameterHelper>>();
         _ = mock.SetupGet(x => x.SessionStream).Returns(Observable.Repeat(Mock.Of<IConnected<GenericParameterHelper>>()));
 
-        // Act
-        // Assert
+        // Act Assert
         _ = await Assert.ThrowsExceptionAsync<TimeoutException>(() => mock.Object.GetConnectedClientAsync(TimeSpan.FromMilliseconds(10)));
     }
 
     [TestMethod]
-    public void GetConnectedClientReturnsAVallidValue()
+    public void GetConnectedClientReturnsAValidValue()
     {
         // Arrange
         var plcConnectionMock = new Mock<IPlcConnection<GenericParameterHelper>>();
@@ -64,8 +63,7 @@ public class IPlcConnectionExtensionTests
         var mock = new Mock<IPlcConnection<GenericParameterHelper>>();
         _ = mock.SetupGet(x => x.SessionStream).Returns(Observable.Repeat(Mock.Of<IConnected<GenericParameterHelper>>()));
 
-        // Act
-        // Assert
+        // Act Assert
         _ = Assert.ThrowsExceptionAsync<TimeoutException>(() => mock.Object.GetConnectedClientAsync(TimeSpan.FromMilliseconds(10)));
     }
 }

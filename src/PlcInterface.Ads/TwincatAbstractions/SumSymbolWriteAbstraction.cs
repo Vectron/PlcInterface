@@ -5,7 +5,7 @@ using TwinCAT.Ads;
 using TwinCAT.Ads.SumCommand;
 using TwinCAT.TypeSystem;
 
-namespace PlcInterface.Ads.TwincatAbstractions;
+namespace PlcInterface.Ads.TwinCATAbstractions;
 
 /// <summary>
 /// A implementation of <see cref="ISumSymbolRead"/>.
@@ -14,7 +14,7 @@ internal sealed class SumSymbolWriteAbstraction : ISumSymbolWrite
 {
     private readonly SumSymbolWrite backend;
 
-    /// <inheritdoc cref="SumSymbolRead" />
+    /// <inheritdoc cref="SumSymbolRead"/>
     public SumSymbolWriteAbstraction(IAdsConnection connection, IList<ISymbol> symbols)
         => backend = new SumSymbolWrite(connection, symbols);
 

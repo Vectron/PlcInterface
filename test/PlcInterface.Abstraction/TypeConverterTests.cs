@@ -20,7 +20,50 @@ public class TypeConverterTests
         Value5,
     }
 
+    private static IEnumerable<object[]> CanConvertStringsToBaseTypeData
+    {
+        get
+        {
+            yield return new object[]
+            {
+                "09-04-1987 06:10:50",
+                typeof(DateTime),
+                new DateTime(1987, 04, 09, 06, 10, 50),
+            };
+        }
+    }
+
     private static TypeConverter Converter => new Mock<TypeConverter> { CallBase = true, }.Object;
+
+    [DataTestMethod]
+    [DataRow("false", typeof(bool), false)]
+    [DataRow("true", typeof(bool), true)]
+    [DataRow("0", typeof(bool), false)]
+    [DataRow("1", typeof(bool), true)]
+    [DataRow("127", typeof(sbyte), sbyte.MaxValue)]
+    [DataRow("255", typeof(byte), byte.MaxValue)]
+    [DataRow("32767", typeof(short), short.MaxValue)]
+    [DataRow("65535", typeof(ushort), ushort.MaxValue)]
+    [DataRow("2147483647", typeof(int), int.MaxValue)]
+    [DataRow("4294967295", typeof(uint), uint.MaxValue)]
+    [DataRow("9223372036854775807", typeof(long), long.MaxValue)]
+    [DataRow("18446744073709551615", typeof(ulong), ulong.MaxValue)]
+    [DataRow("1.1", typeof(float), 1.1f)]
+    [DataRow("1.1", typeof(double), 1.1)]
+    [DataRow("This is text", typeof(string), "This is text")]
+    [DataRow("2", typeof(TestEnum), TestEnum.Value2)]
+    [DynamicData(nameof(CanConvertStringsToBaseTypeData))]
+    public void CanConvertStringsToBaseType(string value, Type targetType, object expectedValue)
+    {
+        // Arrange
+        var typeConverter = Converter;
+
+        // Act
+        var type = typeConverter.Convert(value, targetType);
+
+        // Assert
+        Assert.IsInstanceOfType(type, targetType);
+    }
 
     [TestMethod]
     public void ConvertConvertsDateTimeToDateTimeOffset()

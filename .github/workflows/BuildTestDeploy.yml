@@ -1,4 +1,4 @@
-name: .NET
+﻿name: .NET
 on:
   workflow_dispatch:
   push:
@@ -84,3 +84,14 @@ jobs:
       - name: Push to NuGet Feed
         if: needs.build.outputs.publicRelease == 'true' && contains(github.ref, 'refs/tags/')
         run: dotnet nuget push ${{steps.download.outputs.download-path}}/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
+
+  release:
+    if: contains(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Create release"
+        uses: "ergebnis/.github/actions/github/release/create@1.8.0"
+        with:
+          github-token: $GITHUB_KEY
+  

@@ -32,7 +32,7 @@ internal sealed class TreeBrowser : Browser
     /// <summary>
     /// Browses the specified symbols.
     /// </summary>
-    /// <param name="nodes">A <see cref="IEnumerable{T}"/> of <see cref="SymbolInfo"/> to browse.</param>
+    /// <param name="nodes">A <see cref="IEnumerable{T}"/> of <see cref="NodeId"/> to browse.</param>
     /// <returns>A <see cref="IDictionary{TKey, TValue}"/> with the browse result for every symbol.</returns>
     public IEnumerable<ReferenceDescriptionCollection> Browse(IEnumerable<NodeId> nodes)
     {
@@ -68,7 +68,7 @@ internal sealed class TreeBrowser : Browser
     /// </summary>
     /// <param name="address">The adress to start the tree at.</param>
     /// <returns>All found symbols on the server.</returns>
-    public IDictionary<string, SymbolInfo> BrowseTree(Uri address)
+    public IDictionary<string, IOpcSymbolInfo> BrowseTree(Uri address)
     {
         var path = address.AbsolutePath.Trim('/').Replace("%20", " ", StringComparison.OrdinalIgnoreCase);
         var rootNode = CreateRootNodeSymbol(path);
@@ -90,7 +90,7 @@ internal sealed class TreeBrowser : Browser
         return uri.Replace(rootName, string.Empty, StringComparison.OrdinalIgnoreCase).Trim(splitChar);
     }
 
-    private static SymbolInfo CreateSymbol(ReferenceDescription description, NodeInfo nodeInfo, SymbolInfo? parent, string rootName)
+    private static IOpcSymbolInfo CreateSymbol(ReferenceDescription description, NodeInfo nodeInfo, IOpcSymbolInfo? parent, string rootName)
     {
         var nameBuilder = new StringBuilder();
         var parentName = parent == null ? ReadOnlySpan<char>.Empty : parent.Name.AsSpan();
@@ -174,7 +174,7 @@ internal sealed class TreeBrowser : Browser
         return results[0].References;
     }
 
-    private IEnumerable<SymbolInfo> BrowseRecursive(IEnumerable<SymbolInfo> symbols, string rootName)
+    private IEnumerable<IOpcSymbolInfo> BrowseRecursive(IEnumerable<IOpcSymbolInfo> symbols, string rootName)
     {
         var browseResult = Browse(symbols.Select(x => x.Handle)).ToList();
         var nodeInfos = browseResult
@@ -193,13 +193,13 @@ internal sealed class TreeBrowser : Browser
 
         if (allSymbols.Count <= 0)
         {
-            return Enumerable.Empty<SymbolInfo>();
+            return Enumerable.Empty<IOpcSymbolInfo>();
         }
 
         return allSymbols.Concat(allSymbols.Chunk((int)operationLimits.MaxNodesPerBrowse).SelectMany(x => BrowseRecursive(x, rootName)));
     }
 
-    private SymbolInfo CreateRootNodeSymbol(string path)
+    private IOpcSymbolInfo CreateRootNodeSymbol(string path)
     {
         var lastNode = new ReferenceDescription() { NodeId = ObjectIds.ObjectsFolder, NodeClass = NodeClass.Object, BrowseName = string.Empty };
         var rootNodeName = string.Empty;

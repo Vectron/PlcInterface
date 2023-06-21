@@ -11,7 +11,7 @@ namespace PlcInterface.OpcUa;
 /// Stores data about a PLC symbol.
 /// </summary>
 [DebuggerDisplay("{Name}")]
-internal sealed class SymbolInfo : ISymbolInfo
+internal sealed class SymbolInfo : IOpcSymbolInfo
 {
     private readonly Lazy<int[]> arrayBounds;
     private readonly NodeInfo nodeInfo;
@@ -36,15 +36,11 @@ internal sealed class SymbolInfo : ISymbolInfo
         Comment = string.Empty;
     }
 
-    /// <summary>
-    /// Gets the bounds of the array.
-    /// </summary>
+    /// <inheritdoc/>
     public int[] ArrayBounds
         => arrayBounds.Value;
 
-    /// <summary>
-    /// Gets the builtin type.
-    /// </summary>
+    /// <inheritdoc/>
     public BuiltInType BuiltInType
         => nodeInfo.BuiltInType;
 
@@ -60,31 +56,23 @@ internal sealed class SymbolInfo : ISymbolInfo
         get;
     }
 
-    /// <summary>
-    /// Gets the PLC symbol this encapsules.
-    /// </summary>
+    /// <inheritdoc/>
     public NodeId Handle
     {
         get;
     }
 
-    /// <summary>
-    /// Gets the indices of this array item.
-    /// </summary>
+    /// <inheritdoc/>
     public int[] Indices
     {
         get;
     }
 
-    /// <summary>
-    /// Gets a value indicating whether this symbol represents a array.
-    /// </summary>
+    /// <inheritdoc/>
     public bool IsArray
         => ChildSymbols.Count > 0 && ChildSymbols[0].AsSpan(Name.Length).IndexOf('[') != -1;
 
-    /// <summary>
-    /// Gets a value indicating whether this symbol represents a complex type.
-    /// </summary>
+    /// <inheritdoc/>
     public bool IsBigType
     {
         get;

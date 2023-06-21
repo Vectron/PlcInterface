@@ -251,7 +251,7 @@ public class Monitor : IOpcMonitor, IDisposable
                 h => monitoredItem.Notification -= h)
                 .Select(x =>
                 {
-                    if (x.Sender?.Handle is SymbolInfo s
+                    if (x.Sender?.Handle is IOpcSymbolInfo s
                     && x.EventArgs.NotificationValue is MonitoredItemNotification datachange)
                     {
                         return new MonitorResult(s.Name, typeConverter.Convert(datachange.Value.Value));
@@ -268,11 +268,10 @@ public class Monitor : IOpcMonitor, IDisposable
         public void Dispose()
             => Dispose(disposing: true);
 
-        public void UpdateMonitoredItem(ISymbolHandler symbolHandler)
+        public void UpdateMonitoredItem(IOpcSymbolHandler symbolHandler)
         {
-            if (symbolHandler.TryGetSymbolinfo(name, out var symbol))
+            if (symbolHandler.TryGetSymbolinfo(name, out var symbolInfo))
             {
-                var symbolInfo = symbol.ConvertAndValidate();
                 MonitoredItem.StartNodeId = symbolInfo.Handle;
                 MonitoredItem.Handle = symbolInfo;
             }

@@ -50,8 +50,8 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     {
         var nodesToRead = ioNames
           .SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler))
-          .Where(x => x.ChildSymbols.Count == 0 && x is SymbolInfo)
-          .Cast<SymbolInfo>()
+          .Where(x => x.ChildSymbols.Count == 0 && x is IOpcSymbolInfo)
+          .Cast<IOpcSymbolInfo>()
           .Select(x => x.Handle)
           .ToList();
 
@@ -78,7 +78,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     /// <inheritdoc/>
     public object Read(string ioName)
     {
-        var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
+        var symbol = symbolHandler.GetSymbolinfo(ioName);
         if (symbol.ChildSymbols.Count > 0)
         {
             return ReadDynamic(ioName);
@@ -95,8 +95,8 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     {
         var nodesToRead = ioNames
             .SelectMany(x => symbolHandler.GetSymbolinfo(x).Flatten(symbolHandler))
-            .Where(x => x.ChildSymbols.Count == 0 && x is SymbolInfo)
-            .Cast<SymbolInfo>()
+            .Where(x => x.ChildSymbols.Count == 0 && x is IOpcSymbolInfo)
+            .Cast<IOpcSymbolInfo>()
             .Select(x => x.Handle)
             .ToList();
 
@@ -116,7 +116,7 @@ public class ReadWrite : IOpcReadWrite, IDisposable
     /// <inheritdoc/>
     public async Task<object> ReadAsync(string ioName)
     {
-        var symbol = symbolHandler.GetSymbolinfo(ioName).ConvertAndValidate();
+        var symbol = symbolHandler.GetSymbolinfo(ioName);
         if (symbol.ChildSymbols.Count > 0)
         {
             return await ReadDynamicAsync(ioName).ConfigureAwait(false);

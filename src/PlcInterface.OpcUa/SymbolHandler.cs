@@ -17,7 +17,7 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
     private readonly IOpcPlcConnection connection;
     private readonly CompositeDisposable disposables = new();
     private readonly ILogger logger;
-    private IDictionary<string, SymbolInfo> allSymbols = new Dictionary<string, SymbolInfo>(StringComparer.OrdinalIgnoreCase);
+    private IDictionary<string, IOpcSymbolInfo> allSymbols = new Dictionary<string, IOpcSymbolInfo>(StringComparer.OrdinalIgnoreCase);
     private bool disposedValue;
     private ISession? session;
 

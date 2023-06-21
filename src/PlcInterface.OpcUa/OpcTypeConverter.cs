@@ -68,7 +68,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
     /// <inheritdoc/>
     public dynamic CreateDynamic(string symbolName, IEnumerator<DataValue> valueEnumerator)
     {
-        var symbolInfo = symbolHandler.GetSymbolinfo(symbolName).ConvertAndValidate();
+        var symbolInfo = symbolHandler.GetSymbolinfo(symbolName);
         return CreateDynamic(symbolInfo, valueEnumerator);
     }
 
@@ -84,7 +84,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
         return TimeSpan.FromMilliseconds(miliSeconds);
     }
 
-    private dynamic CreateDynamic(SymbolInfo symbolInfo, IEnumerator<DataValue> valueEnumerator)
+    private dynamic CreateDynamic(IOpcSymbolInfo symbolInfo, IEnumerator<DataValue> valueEnumerator)
     {
         if (symbolInfo.ChildSymbols.Count == 0)
         {
@@ -99,7 +99,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
             var array = Array.CreateInstance(typeof(object), symbolInfo.ArrayBounds);
             foreach (var childSymbolName in symbolInfo.ChildSymbols)
             {
-                var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName).ConvertAndValidate();
+                var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName);
                 var value = CreateDynamic(childSymbolInfo, valueEnumerator);
                 var indices = childSymbolInfo.Indices;
                 array.SetValue(value, indices);
@@ -111,7 +111,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
         var collection = new ExpandoObject() as IDictionary<string, object>;
         foreach (var childSymbolName in symbolInfo.ChildSymbols)
         {
-            var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName).ConvertAndValidate();
+            var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName);
             var value = CreateDynamic(childSymbolInfo, valueEnumerator);
             var shortName = childSymbolInfo.ShortName;
             collection.Add(shortName, value);

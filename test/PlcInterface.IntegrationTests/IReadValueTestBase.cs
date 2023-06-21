@@ -2,10 +2,10 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PlcInterface.Tests.DataTypes;
-using PlcInterface.Tests.Extension;
+using PlcInterface.IntegrationTests.DataTypes;
+using PlcInterface.IntegrationTests.Extension;
 
-namespace PlcInterface.Tests;
+namespace PlcInterface.IntegrationTests;
 
 public abstract class IReadValueTestBase
 {

@@ -68,7 +68,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
     /// <inheritdoc/>
     public dynamic CreateDynamic(string symbolName, IEnumerator<DataValue> valueEnumerator)
     {
-        var symbolInfo = symbolHandler.GetSymbolinfo(symbolName);
+        var symbolInfo = symbolHandler.GetSymbolInfo(symbolName);
         return CreateDynamic(symbolInfo, valueEnumerator);
     }
 
@@ -80,8 +80,8 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
             return TimeSpan.FromTicks(ticks);
         }
 
-        var miliSeconds = System.Convert.ToDouble(value, CultureInfo.InvariantCulture);
-        return TimeSpan.FromMilliseconds(miliSeconds);
+        var milliSeconds = System.Convert.ToDouble(value, CultureInfo.InvariantCulture);
+        return TimeSpan.FromMilliseconds(milliSeconds);
     }
 
     private dynamic CreateDynamic(IOpcSymbolInfo symbolInfo, IEnumerator<DataValue> valueEnumerator)
@@ -99,7 +99,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
             var array = Array.CreateInstance(typeof(object), symbolInfo.ArrayBounds);
             foreach (var childSymbolName in symbolInfo.ChildSymbols)
             {
-                var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName);
+                var childSymbolInfo = symbolHandler.GetSymbolInfo(childSymbolName);
                 var value = CreateDynamic(childSymbolInfo, valueEnumerator);
                 var indices = childSymbolInfo.Indices;
                 array.SetValue(value, indices);
@@ -111,7 +111,7 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
         var collection = new ExpandoObject() as IDictionary<string, object>;
         foreach (var childSymbolName in symbolInfo.ChildSymbols)
         {
-            var childSymbolInfo = symbolHandler.GetSymbolinfo(childSymbolName);
+            var childSymbolInfo = symbolHandler.GetSymbolInfo(childSymbolName);
             var value = CreateDynamic(childSymbolInfo, valueEnumerator);
             var shortName = childSymbolInfo.ShortName;
             collection.Add(shortName, value);

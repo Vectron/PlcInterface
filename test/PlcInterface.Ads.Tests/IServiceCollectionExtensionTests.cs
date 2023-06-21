@@ -76,7 +76,7 @@ public class IServiceCollectionExtensionTests
     }
 
     [TestMethod]
-    public void MonitorIsregisterCorrect()
+    public void MonitorIsRegisterCorrect()
     {
         Assert.IsNotNull(provider);
 
@@ -90,7 +90,7 @@ public class IServiceCollectionExtensionTests
     }
 
     [TestMethod]
-    public void PlCConnectionIsregisterCorrect()
+    public void PlCConnectionIsRegisterCorrect()
     {
         Assert.IsNotNull(provider);
 
@@ -106,7 +106,7 @@ public class IServiceCollectionExtensionTests
     }
 
     [TestMethod]
-    public void ReadWriteIsregisterCorrect()
+    public void ReadWriteIsRegisterCorrect()
     {
         Assert.IsNotNull(provider);
 
@@ -120,7 +120,7 @@ public class IServiceCollectionExtensionTests
     }
 
     [TestMethod]
-    public void SymbolHandlerIsregisterCorrect()
+    public void SymbolHandlerIsRegisterCorrect()
     {
         Assert.IsNotNull(provider);
 

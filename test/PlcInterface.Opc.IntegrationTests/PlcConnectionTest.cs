@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PlcInterface.IntegrationTests;
 using PlcInterface.OpcUa;
-using PlcInterface.Tests;
 using TestUtilities;
 
 namespace PlcInterface.Opc.IntegrationTests;
@@ -16,12 +16,12 @@ public sealed class PlcConnectionTest : IPlcConnectionTestBase, IDisposable
     [TestInitialize]
     public void ConnectAsync()
     {
-        var connectionsettings = new OpcPlcConnectionOptions();
-        new DefaultOpcPlcConnectionConfigureOptions().Configure(connectionsettings);
-        connectionsettings.Address = Settings.PLCUriNoRoot;
+        var connectionSettings = new OpcPlcConnectionOptions();
+        new DefaultOpcPlcConnectionConfigureOptions().Configure(connectionSettings);
+        connectionSettings.Address = Settings.PLCUriNoRoot;
 
         plcConnection?.Dispose();
-        plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>());
+        plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionSettings), MockHelpers.GetLoggerMock<PlcConnection>());
     }
 
     [TestCleanup]

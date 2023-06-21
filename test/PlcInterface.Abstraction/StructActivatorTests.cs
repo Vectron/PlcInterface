@@ -6,9 +6,9 @@ namespace PlcInterface.Abstraction.Tests;
 public class StructActivatorTests
 {
     [TestMethod]
-    public void FailesToCreateTypeWhenThereAreNotEnoughProperties()
+    public void FailsToCreateTypeWhenThereAreNotEnoughProperties()
     {
-        // Arange
+        // Arrange
         var activator = new StructActivator(typeof(TestValueType));
 
         // Act

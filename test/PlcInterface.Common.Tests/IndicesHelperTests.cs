@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PlcInterface.Abstraction.Tests;
+namespace PlcInterface.Common.Tests;
 
 [TestClass]
 public class IndicesHelperTests
@@ -35,12 +35,12 @@ public class IndicesHelperTests
         var expected = new[] { 5, 3 };
 
         // Act
-        var indeces1 = IndicesHelper.GetIndices(name);
-        var indeces2 = IndicesHelper.GetIndices(name.AsSpan());
+        var indices1 = IndicesHelper.GetIndices(name);
+        var indices2 = IndicesHelper.GetIndices(name.AsSpan());
 
         // Assert
-        CollectionAssert.AreEqual(expected, indeces1);
-        CollectionAssert.AreEqual(indeces1, indeces2);
+        CollectionAssert.AreEqual(expected, indices1);
+        CollectionAssert.AreEqual(indices1, indices2);
     }
 
     [TestMethod]
@@ -50,8 +50,7 @@ public class IndicesHelperTests
         var data = Data;
         Array? first = null;
 
-        // Act
-        // Assert
+        // Act Assert
         foreach (var indices in IndicesHelper.GetIndices(data))
         {
             first ??= indices;

@@ -3,8 +3,8 @@ using System.IO.Abstractions;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using PlcInterface.Ads.TwincatAbstractions;
-using PlcInterface.Tests;
+using PlcInterface.Ads.TwinCATAbstractions;
+using PlcInterface.IntegrationTests;
 using TestUtilities;
 using TwinCAT.Ads;
 
@@ -21,13 +21,13 @@ public class WriteValueTest : IWriteValueTestBase
     [ClassInitialize]
     public static async Task ConnectAsync(TestContext testContext)
     {
-        var connectionsettings = new AdsPlcConnectionOptions() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
-        var symbolhandlersettings = new AdsSymbolHandlerOptions() { StoreSymbolsToDisk = false };
+        var connectionSettings = new AdsPlcConnectionOptions() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
+        var symbolHandlerSettings = new AdsSymbolHandlerOptions() { StoreSymbolsToDisk = false };
         var typeConverter = new AdsTypeConverter();
         adsClient = new AdsClient();
 
-        connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
-        symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolhandlersettings), MockHelpers.GetLoggerMock<SymbolHandler>(), Mock.Of<IFileSystem>(), new SymbolLoaderFactoryAbstraction());
+        connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionSettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
+        symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), Mock.Of<IFileSystem>(), new SymbolLoaderFactoryAbstraction());
         var sumSymbolFactory = new SumSymbolFactory();
         readWrite = new ReadWrite(connection, symbolHandler, typeConverter, sumSymbolFactory);
         if (!await connection.ConnectAsync())

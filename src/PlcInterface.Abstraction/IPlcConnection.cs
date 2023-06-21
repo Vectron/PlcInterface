@@ -50,7 +50,7 @@ public interface IPlcConnection
     /// <summary>
     /// Connect to the PLC.
     /// </summary>
-    /// <returns><see langword="true"/> when connection is opened successfull, otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> when connection is opened successful, otherwise <see langword="false"/>.</returns>
     bool Connect();
 
     /// <summary>
@@ -58,7 +58,7 @@ public interface IPlcConnection
     /// </summary>
     /// <returns>
     /// A <see cref="Task"/> that handles the connection. <see langword="true"/> when connection is
-    /// opened successfull, otherwise <see langword="false"/>.
+    /// opened successful, otherwise <see langword="false"/>.
     /// </returns>
     Task<bool> ConnectAsync();
 

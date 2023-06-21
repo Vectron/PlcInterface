@@ -12,7 +12,7 @@ namespace PlcInterface.Ads;
 internal static class ObjectExtension
 {
     /// <summary>
-    /// Do a depth first traversel of a tree.
+    /// Do a depth first traversal of a tree.
     /// </summary>
     /// <typeparam name="T">The type of the objects in the tree.</typeparam>
     /// <param name="root">The first item to traverse.</param>
@@ -35,7 +35,7 @@ internal static class ObjectExtension
     }
 
     /// <summary>
-    /// Do a depth first traversel of a tree.
+    /// Do a depth first traversal of a tree.
     /// </summary>
     /// <typeparam name="T">The type of the objects in the tree.</typeparam>
     /// <param name="roots">The root items to traverse.</param>

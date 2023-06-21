@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PlcInterface.Tests;
+namespace PlcInterface.IntegrationTests;
 
 public abstract class ISymbolHandlerTestBase
 {
@@ -12,7 +12,7 @@ public abstract class ISymbolHandlerTestBase
         var symbolHandler = GetSymbolHandler();
 
         // Act
-        var symbol = symbolHandler.GetSymbolinfo(ioName);
+        var symbol = symbolHandler.GetSymbolInfo(ioName);
 
         // Assert
         Assert.IsNotNull(symbol);
@@ -33,14 +33,14 @@ public abstract class ISymbolHandlerTestBase
     }
 
     [TestMethod]
-    public void TryGetSymbolInfoReturnsFalseWithInvallidData()
+    public void TryGetSymbolInfoReturnsFalseWithInvalidData()
     {
         // Arrange
         var symbolHandler = GetSymbolHandler();
-        var ioName = "ANonExcistingSymbol";
+        var ioName = "ANonExistingSymbol";
 
         // Act
-        var result = symbolHandler.TryGetSymbolinfo(ioName, out var symbol);
+        var result = symbolHandler.TryGetSymbolInfo(ioName, out var symbol);
 
         // Assert
         Assert.AreEqual(false, result);
@@ -49,13 +49,13 @@ public abstract class ISymbolHandlerTestBase
 
     [TestMethod]
     [DynamicData(nameof(Settings.GetMonitorData), typeof(Settings), DynamicDataSourceType.Method)]
-    public void TryGetSymbolInfoReturnsTrueWithVallidData(string ioName)
+    public void TryGetSymbolInfoReturnsTrueWithValidData(string ioName)
     {
         // Arrange
         var symbolHandler = GetSymbolHandler();
 
         // Act
-        var result = symbolHandler.TryGetSymbolinfo(ioName, out var symbol);
+        var result = symbolHandler.TryGetSymbolInfo(ioName, out var symbol);
 
         // Assert
         Assert.AreEqual(true, result);

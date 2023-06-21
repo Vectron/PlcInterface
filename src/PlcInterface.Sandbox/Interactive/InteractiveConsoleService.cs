@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace PlcInterface.Sandbox.Interactive;
 
 /// <summary>
-/// A <see cref="IHostedService" /> for interacting with the user through the <see cref="Console" />.
+/// A <see cref="IHostedService"/> for interacting with the user through the <see cref="Console"/>.
 /// </summary>
 internal class InteractiveConsoleService : IHostedService, IDisposable
 {
@@ -21,10 +21,10 @@ internal class InteractiveConsoleService : IHostedService, IDisposable
     private CancellationTokenSource? stopTokenSource;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="InteractiveConsoleService" /> class.
+    /// Initializes a new instance of the <see cref="InteractiveConsoleService"/> class.
     /// </summary>
-    /// <param name="commands">A <see cref="IEnumerable{T}" /> of vallid <see cref="IApplicationCommand" />.</param>
-    /// <param name="autoCompletionHandler">A <see cref="IAutoCompleteHandler" /> implementation.</param>
+    /// <param name="commands">A <see cref="IEnumerable{T}"/> of valid <see cref="IApplicationCommand"/>.</param>
+    /// <param name="autoCompletionHandler">A <see cref="IAutoCompleteHandler"/> implementation.</param>
     /// <param name="logger">A <see cref="ILogger"/> instance.</param>
     public InteractiveConsoleService(IEnumerable<IApplicationCommand> commands, IAutoCompleteHandler autoCompletionHandler, ILogger<InteractiveConsoleService> logger)
     {
@@ -33,7 +33,7 @@ internal class InteractiveConsoleService : IHostedService, IDisposable
         ReadLine.AutoCompletionHandler = autoCompletionHandler;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -41,7 +41,7 @@ internal class InteractiveConsoleService : IHostedService, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Task StartAsync(CancellationToken cancellationToken)
     {
         stopTokenSource?.Dispose();
@@ -51,7 +51,7 @@ internal class InteractiveConsoleService : IHostedService, IDisposable
         return Task.CompletedTask;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public async Task StopAsync(CancellationToken cancellationToken)
     {
         if (checkForInputTask != null && stopTokenSource != null)
@@ -106,7 +106,7 @@ internal class InteractiveConsoleService : IHostedService, IDisposable
                     var commandAndParameters = input.Split(' ');
                     var command = commandAndParameters[0];
                     var parameters = commandAndParameters.Skip(1).ToArray();
-                    ProccesCommand(command, parameters);
+                    ProcessCommand(command, parameters);
                 }
                 catch (Exception ex)
                 {
@@ -116,7 +116,7 @@ internal class InteractiveConsoleService : IHostedService, IDisposable
         }
     }
 
-    private void ProccesCommand(string command, params string[] parameters)
+    private void ProcessCommand(string command, params string[] parameters)
     {
         var response = commands
             .FirstOrDefault(c => string.Equals(c.Name, command, StringComparison.OrdinalIgnoreCase))?

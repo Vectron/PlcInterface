@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace PlcInterface.Sandbox.Interactive;
 
 /// <summary>
-/// A base implementation of a <see cref="IApplicationCommand" />.
+/// A base implementation of a <see cref="IApplicationCommand"/>.
 /// </summary>
 internal abstract class CommandBase : IApplicationCommand
 {
@@ -15,30 +15,30 @@ internal abstract class CommandBase : IApplicationCommand
     protected CommandBase(string name)
     {
         Name = name;
-        HelpTekst = string.Empty;
-        VallidParameters = Array.Empty<string>();
+        HelpText = string.Empty;
+        ValidParameters = Array.Empty<string>();
     }
 
-    /// <inheritdoc />
-    public string HelpTekst
+    /// <inheritdoc/>
+    public string HelpText
     {
         get;
         protected set;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public string Name
     {
         get;
     }
 
-    /// <inheritdoc />
-    public IReadOnlyList<string> VallidParameters
+    /// <inheritdoc/>
+    public IReadOnlyList<string> ValidParameters
     {
         get;
         protected set;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public abstract Response Execute(string[] parameters);
 }

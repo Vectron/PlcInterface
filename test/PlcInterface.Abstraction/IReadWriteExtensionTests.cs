@@ -9,7 +9,7 @@ namespace PlcInterface.Abstraction.Tests;
 public class IReadWriteExtensionTests
 {
     [TestMethod]
-    public async Task WaitForValueAsyncBlocksUntillValueIsTriggered()
+    public async Task WaitForValueAsyncBlocksUntilValueIsTriggered()
     {
         // Arrange
         var ioName = "test.var";
@@ -25,7 +25,7 @@ public class IReadWriteExtensionTests
     }
 
     [TestMethod]
-    public void WaitForValueBlocksUntillValueIsTriggered()
+    public void WaitForValueBlocksUntilValueIsTriggered()
     {
         // Arrange
         var ioName = "test.var";
@@ -81,8 +81,7 @@ public class IReadWriteExtensionTests
         var ioName = "test.var";
         var readWrite = Mock.Of<IReadWrite>();
 
-        // Act
-        // Assert
+        // Act Assert
         _ = Assert.ThrowsException<TimeoutException>(() => readWrite.WaitForValue(ioName, true, TimeSpan.FromMilliseconds(2)));
     }
 
@@ -93,8 +92,7 @@ public class IReadWriteExtensionTests
         var ioName = "test.var";
         var readWrite = Mock.Of<IReadWrite>();
 
-        // Act
-        // Assert
+        // Act Assert
         _ = Assert.ThrowsExceptionAsync<TimeoutException>(() => readWrite.WaitForValueAsync(ioName, true, TimeSpan.FromMilliseconds(2)));
     }
 }

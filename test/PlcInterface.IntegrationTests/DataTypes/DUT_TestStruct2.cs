@@ -1,12 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-namespace PlcInterface.Tests.DataTypes;
+namespace PlcInterface.IntegrationTests.DataTypes;
 
 [StructLayout(LayoutKind.Sequential, Pack = 0)]
-internal sealed class DUT_TestClass2 : System.IEquatable<DUT_TestClass2?>
+internal struct DUT_TestStruct2 : System.IEquatable<DUT_TestStruct2>
 {
-    public static DUT_TestClass2 Default => new()
+    public static DUT_TestStruct2 Default => new()
     {
         ByteValue = byte.MaxValue,
         WordValue = ushort.MaxValue,
@@ -14,7 +14,7 @@ internal sealed class DUT_TestClass2 : System.IEquatable<DUT_TestClass2?>
         LWordValue = ulong.MaxValue,
     };
 
-    public static DUT_TestClass2 Write => new()
+    public static DUT_TestStruct2 Write => new()
     {
         ByteValue = byte.MinValue,
         WordValue = ushort.MinValue,
@@ -42,18 +42,18 @@ internal sealed class DUT_TestClass2 : System.IEquatable<DUT_TestClass2?>
         get; set;
     }
 
-    public override bool Equals(object? obj)
-        => Equals(obj as DUT_TestClass2);
+    [ExcludeFromCodeCoverage]
+    public override readonly bool Equals(object? obj)
+        => obj is DUT_TestStruct2 @struct && Equals(@struct);
 
-    public bool Equals(DUT_TestClass2? other)
-        => other != null
-            && ByteValue == other.ByteValue
-            && WordValue == other.WordValue
-            && DWordValue == other.DWordValue
-            && LWordValue == other.LWordValue;
+    public readonly bool Equals(DUT_TestStruct2 other)
+        => ByteValue == other.ByteValue
+        && WordValue == other.WordValue
+        && DWordValue == other.DWordValue
+        && LWordValue == other.LWordValue;
 
     [ExcludeFromCodeCoverage]
-    public override int GetHashCode()
+    public override readonly int GetHashCode()
     {
         var hashCode = -1110352730;
         hashCode = (hashCode * -1521134295) + ByteValue.GetHashCode();

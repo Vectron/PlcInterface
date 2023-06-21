@@ -7,8 +7,8 @@ using System.Reflection;
 namespace PlcInterface;
 
 /// <summary>
-/// Encapsuls the logic to create a type by constructor with parameters, or default constructor with
-/// property setters.
+/// Encapsules the logic to create a type by constructor with parameters, or default constructor
+/// with property setters.
 /// </summary>
 internal sealed class ObjectActivator : ITypeActivator
 {

@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using PlcInterface.Ads.TwincatAbstractions;
+using PlcInterface.Ads.TwinCATAbstractions;
 using TwinCAT.Ads;
 using TwinCAT.TypeSystem;
 using TwinCAT.ValueAccess;
@@ -28,7 +28,7 @@ public class ReadWriteTests
         var symbolHandler = new Mock<IAdsSymbolHandler>();
         var symbolInfo = CreateSymbolInfoMock(ioTag, dummyValue, out var valueSymbolMock);
 
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfo);
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns(symbolInfo);
         var typeConverter = CreateTypeConverterMock();
         var sumSymbolFactory = new Mock<ISumSymbolFactory>();
         var readWrite = new ReadWrite(connection.Object, symbolHandler.Object, typeConverter, sumSymbolFactory.Object);
@@ -53,7 +53,7 @@ public class ReadWriteTests
         var symbolHandler = new Mock<IAdsSymbolHandler>();
         var symbolInfo = CreateSymbolInfoMock(ioTag, dummyValue, out var valueSymbolMock);
 
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfo);
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns(symbolInfo);
         var typeConverter = CreateTypeConverterMock();
         var sumSymbolFactory = new Mock<ISumSymbolFactory>();
         var readWrite = new ReadWrite(connection.Object, symbolHandler.Object, typeConverter, sumSymbolFactory.Object);
@@ -72,7 +72,7 @@ public class ReadWriteTests
         var connection = new Mock<IAdsPlcConnection>();
 
         var symbolHandler = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(CreateSymbolInfoMock(ioTag, dummyValue, out _));
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns(CreateSymbolInfoMock(ioTag, dummyValue, out _));
         var typeConverter = CreateTypeConverterMock();
         var sumSymbolFactory = new Mock<ISumSymbolFactory>();
         var readWrite = new ReadWrite(connection.Object, symbolHandler.Object, typeConverter, sumSymbolFactory.Object);
@@ -90,7 +90,7 @@ public class ReadWriteTests
         Assert.AreEqual(dummyValue, value4);
     }
 
-    // TODO remove supression when fixed
+    // TODO remove suppression when fixed
     [TestMethod]
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
         "IDisposableAnalyzers.Correctness",
@@ -113,10 +113,10 @@ public class ReadWriteTests
         using var subject = new BehaviorSubject<IConnected<IAdsConnection>>(Connected.Yes(Mock.Of<IAdsConnection>()));
         _ = connection.SetupGet(x => x.SessionStream).Returns(subject);
         var symbolHandler = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.Is<string>(x => x.Equals(ioTags[0], StringComparison.Ordinal)))).Returns(symbolMocks[0]);
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.Is<string>(x => x.Equals(ioTags[1], StringComparison.Ordinal)))).Returns(symbolMocks[1]);
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.Is<string>(x => x.Equals(ioTags[2], StringComparison.Ordinal)))).Returns(symbolMocks[2]);
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.Is<string>(x => x.Equals(ioTags[3], StringComparison.Ordinal)))).Returns(symbolMocks[3]);
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.Is<string>(x => x.Equals(ioTags[0], StringComparison.Ordinal)))).Returns(symbolMocks[0]);
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.Is<string>(x => x.Equals(ioTags[1], StringComparison.Ordinal)))).Returns(symbolMocks[1]);
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.Is<string>(x => x.Equals(ioTags[2], StringComparison.Ordinal)))).Returns(symbolMocks[2]);
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.Is<string>(x => x.Equals(ioTags[3], StringComparison.Ordinal)))).Returns(symbolMocks[3]);
         var typeConverter = CreateTypeConverterMock();
         var sumSymbolMock = new Mock<ISumSymbolRead>();
         var returnValue = dummyValues.Cast<object>().ToArray();
@@ -150,7 +150,7 @@ public class ReadWriteTests
         var connection = new Mock<IAdsPlcConnection>();
 
         var symbolHandler = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(CreateSymbolInfoMock(ioTag, dummyValue, out _));
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns(CreateSymbolInfoMock(ioTag, dummyValue, out _));
         var typeConverter = CreateTypeConverterMock();
         var sumSymbolFactory = new Mock<ISumSymbolFactory>();
         var readWrite = new ReadWrite(connection.Object, symbolHandler.Object, typeConverter, sumSymbolFactory.Object);
@@ -172,7 +172,7 @@ public class ReadWriteTests
         var connection = new Mock<IAdsPlcConnection>();
         var symbolHandler = new Mock<IAdsSymbolHandler>();
         var symbol = CreateSymbolInfoMock(ioTag, dummyValue, out var valueSymbolMock);
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbol);
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns(symbol);
         var typeConverter = CreateTypeConverterMock();
         var sumSymbolFactory = new Mock<ISumSymbolFactory>();
         var readWrite = new ReadWrite(connection.Object, symbolHandler.Object, typeConverter, sumSymbolFactory.Object);
@@ -194,7 +194,7 @@ public class ReadWriteTests
         var connection = new Mock<IAdsPlcConnection>();
         var symbolHandler = new Mock<IAdsSymbolHandler>();
         var symbolInfo = CreateSymbolInfoMock(ioTag, dummyValue, out var valueSymbolMock);
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfo);
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns(symbolInfo);
         var typeConverter = CreateTypeConverterMock();
         var sumSymbolFactory = new Mock<ISumSymbolFactory>();
         var readWrite = new ReadWrite(connection.Object, symbolHandler.Object, typeConverter, sumSymbolFactory.Object);
@@ -208,7 +208,7 @@ public class ReadWriteTests
         valueSymbolMock.Verify(x => x.WriteValueAsync(It.Is<int>(x => dummyValue == x), It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    // TODO remove supression when fixed
+    // TODO remove suppression when fixed
     [TestMethod]
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
         "IDisposableAnalyzers.Correctness",
@@ -225,7 +225,7 @@ public class ReadWriteTests
         _ = connection.SetupGet(x => x.SessionStream).Returns(subject);
         var symbolHandler = new Mock<IAdsSymbolHandler>();
         var symbolInfo = CreateSymbolInfoMock(ioTag, dummyValue, out _);
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfo);
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns(symbolInfo);
         var typeConverter = CreateTypeConverterMock();
         var sumSymbolMock = new Mock<ISumSymbolWrite>();
         _ = sumSymbolMock.Setup(x => x.WriteAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()));
@@ -243,13 +243,13 @@ public class ReadWriteTests
         sumSymbolMock.Verify(x => x.WriteAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    // TODO remove supression when fixed
+    // TODO remove suppression when fixed
     [TestMethod]
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
         "IDisposableAnalyzers.Correctness",
         "IDISP013:Await in using",
         Justification = "Problem with expressionTrees; see https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
-    public async Task WriteMultipleWhenArgumentExceptionIsThrownFlattenTheHirachyAndWriteAgainAsync()
+    public async Task WriteMultipleWhenArgumentExceptionIsThrownFlattenTheHierarchyAndWriteAgainAsync()
     {
         // Arrange
         var ioTag = "dummyVar";
@@ -260,7 +260,7 @@ public class ReadWriteTests
         _ = connection.SetupGet(x => x.SessionStream).Returns(subject);
         var symbolHandler = new Mock<IAdsSymbolHandler>();
         var symbolInfo = CreateSymbolInfoMock(ioTag, dummyValue, out _);
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns(symbolInfo);
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns(symbolInfo);
         var typeConverter = CreateTypeConverterMock();
         var sumSymbolMock = new Mock<ISumSymbolWrite>();
         _ = sumSymbolMock.SetupSequence(x => x.WriteAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>())).Throws<ArgumentException>().Returns(Task.CompletedTask);
@@ -281,7 +281,7 @@ public class ReadWriteTests
 
     [TestMethod]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP013:Await in using", Justification = "See https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
-    public async Task WriteSingleWhenArgumentExceptionIsThrownFlattenTheHirachyAndWriteAgainAsync()
+    public async Task WriteSingleWhenArgumentExceptionIsThrownFlattenTheHierarchyAndWriteAgainAsync()
     {
         // Arrange
         var ioTag = "dummyVar1";
@@ -296,8 +296,8 @@ public class ReadWriteTests
         var symbolHandler = new Mock<IAdsSymbolHandler>();
 
         var genericSymbolHandler = symbolHandler.As<ISymbolHandler>();
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns<string>(x => symbol);
-        _ = genericSymbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns<string>(x => symbol);
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns<string>(x => symbol);
+        _ = genericSymbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns<string>(x => symbol);
         var typeConverter = CreateTypeConverterMock();
         var sumSymbolMock = new Mock<ISumSymbolWrite>();
         _ = sumSymbolMock.Setup(x => x.WriteAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);

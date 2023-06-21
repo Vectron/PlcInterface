@@ -4,20 +4,20 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace PlcInterface.Abstraction.Tests;
+namespace PlcInterface.Common.Tests;
 
 [TestClass]
 public class ISymbolInfoExtensionTests
 {
     [TestMethod]
-    public void FlattenReturnsAIenumerableOfISymbolInfoWithAllChildSymbols()
+    public void FlattenReturnsAIEnumerableOfISymbolInfoWithAllChildSymbols()
     {
         // Arrange
         var symbolInfo = new Mock<ISymbolInfo>();
         _ = symbolInfo.SetupGet(x => x.Name).Returns("FlattenObject");
         _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.BoolValue", "FlattenObject.IntValue", "FlattenObject.ChildArray" });
         var symbolHandler = new Mock<ISymbolHandler>();
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns<string>(s =>
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns<string>(s =>
         {
             var symbolInfo = new Mock<ISymbolInfo>();
             _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>());
@@ -64,14 +64,14 @@ public class ISymbolInfoExtensionTests
     }
 
     [TestMethod]
-    public void FlattenWithValueFlattensAISymbolinfoChildHirachyAndAddsValues()
+    public void FlattenWithValueFlattensAISymbolInfoChildHierarchyAndAddsValues()
     {
         // Arrange
         var symbolInfo = new Mock<ISymbolInfo>();
         _ = symbolInfo.SetupGet(x => x.Name).Returns("FlattenObject");
         _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.BoolValue", "FlattenObject.IntValue", "FlattenObject.ChildArray" });
         var symbolHandler = new Mock<ISymbolHandler>();
-        _ = symbolHandler.Setup(x => x.GetSymbolinfo(It.IsAny<string>())).Returns<string>(s =>
+        _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns<string>(s =>
         {
             var symbolInfo = new Mock<ISymbolInfo>();
             _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>());

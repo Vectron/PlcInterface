@@ -76,7 +76,7 @@ public class AdsTypeConverterTests
     }
 
     [TestMethod]
-    public void ConvertConvertsDateTimeToDateTimeOfset()
+    public void ConvertConvertsDateTimeToDateTimeOffset()
     {
         // Arrange
         var typeConverter = new AdsTypeConverter();
@@ -138,7 +138,7 @@ public class AdsTypeConverterTests
     }
 
     [TestMethod]
-    public void ConvertConvertsToPrimativeArray()
+    public void ConvertConvertsToPrimitiveArray()
     {
         // Arrange
         var typeConverter = new AdsTypeConverter();

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PlcInterface.Tests;
+using PlcInterface.IntegrationTests;
 using TestUtilities;
 using TwinCAT.Ads;
 
@@ -17,9 +17,9 @@ public sealed class PlcConnectionTest : IPlcConnectionTestBase, IDisposable
     [TestInitialize]
     public void ConnectAsync()
     {
-        var connectionsettings = new AdsPlcConnectionOptions() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
+        var connectionSettings = new AdsPlcConnectionOptions() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
         adsClient = new AdsClient();
-        plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionsettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
+        plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionSettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
     }
 
     [TestCleanup]

@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
-namespace PlcInterface.Tests.Extension;
+namespace PlcInterface.IntegrationTests.Extension;
 
 internal static class MethodInfoExtensions
 {

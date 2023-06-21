@@ -67,8 +67,8 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
     {
         var elementType = targetType.GetElementType()
             ?? throw new NotSupportedException($"Unable to retrieve element type");
-        var dimensionLengts = arrayType.Dimensions.GetDimensionLengths();
-        var destination = Array.CreateInstance(elementType, dimensionLengts);
+        var dimensionLengths = arrayType.Dimensions.GetDimensionLengths();
+        var destination = Array.CreateInstance(elementType, dimensionLengths);
 
         foreach (var indices in IndicesHelper.GetIndices(destination))
         {

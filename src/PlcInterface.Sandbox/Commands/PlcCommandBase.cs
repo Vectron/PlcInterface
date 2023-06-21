@@ -30,8 +30,8 @@ internal abstract class PlcCommandBase : CommandBase, IDisposable
     protected PlcCommandBase(string commandName, IPlcConnection plcConnection, IReadWrite readWrite, ISymbolHandler symbolHandler, IMonitor monitor)
         : base(commandName)
     {
-        HelpTekst = commandName + ": Common plc actions";
-        VallidParameters = new[] { "connect", "disconnect", "read", "write", "dump", "toggle", "monitor", "unmonitor" };
+        HelpText = commandName + ": Common plc actions";
+        ValidParameters = new[] { "connect", "disconnect", "read", "write", "dump", "toggle", "monitor", "unmonitor" };
         this.plcConnection = plcConnection;
         this.readWrite = readWrite;
         this.symbolHandler = symbolHandler;
@@ -60,7 +60,7 @@ internal abstract class PlcCommandBase : CommandBase, IDisposable
     {
         if (parameters.Length <= 0)
         {
-            return new Response(HelpTekst);
+            return new Response(HelpText);
         }
 
         var command = parameters[0].ToLowerInvariant();

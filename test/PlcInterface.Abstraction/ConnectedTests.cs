@@ -22,7 +22,7 @@ public class ConnectedTests
     }
 
     [TestMethod]
-    public void ConnectedNoReturnsAVallidIConnected()
+    public void ConnectedNoReturnsAValidIConnected()
     {
         // Arrange
 
@@ -37,7 +37,7 @@ public class ConnectedTests
     }
 
     [TestMethod]
-    public void ConnectedYesReturnsAVallidIConnected()
+    public void ConnectedYesReturnsAValidIConnected()
     {
         // Arrange
         var expectedValue = new GenericParameterHelper();

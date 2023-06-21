@@ -71,7 +71,7 @@ public abstract class TypeConverter : ITypeConverter
 
     private object Convert(Func<string, Type, object?> memberValueGetter, int memberCount, Type targetType)
     {
-        var parameterInfos = activatorCache.GetOrAdd(
+        var parameterInfo = activatorCache.GetOrAdd(
             targetType.Name,
             (key, targetType) =>
             {
@@ -92,7 +92,7 @@ public abstract class TypeConverter : ITypeConverter
             },
             targetType);
 
-        foreach (var typeMapperInfo in parameterInfos)
+        foreach (var typeMapperInfo in parameterInfo)
         {
             if (!typeMapperInfo.TryCreateInstance(memberValueGetter, memberCount, out var instance))
             {
@@ -108,13 +108,13 @@ public abstract class TypeConverter : ITypeConverter
     private object ConvertArray(Array expandArray, Type targetType)
     {
         var elementType = targetType.GetElementType() ?? throw new NotSupportedException($"Unable to retrieve element type");
-        var dimensionLengts = new int[expandArray.Rank];
+        var dimensionLengths = new int[expandArray.Rank];
         for (var i = 0; i < expandArray.Rank; i++)
         {
-            dimensionLengts[i] = expandArray.GetLength(i);
+            dimensionLengths[i] = expandArray.GetLength(i);
         }
 
-        var destination = Array.CreateInstance(elementType, dimensionLengts);
+        var destination = Array.CreateInstance(elementType, dimensionLengths);
         foreach (var indices in IndicesHelper.GetIndices(destination))
         {
             var dynamicValue = expandArray.GetValue(indices)

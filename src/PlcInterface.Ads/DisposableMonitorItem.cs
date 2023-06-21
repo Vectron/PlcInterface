@@ -52,7 +52,7 @@ internal sealed class DisposableMonitorItem : IDisposable
     /// <param name="typeConverter">A <see cref="ITypeConverter"/>.</param>
     public void Update(IAdsSymbolHandler symbolHandler, ISubject<IMonitorResult> symbolStream, IAdsTypeConverter typeConverter)
     {
-        if (symbolHandler.TryGetSymbolinfo(name, out var symbolInfo)
+        if (symbolHandler.TryGetSymbolInfo(name, out var symbolInfo)
             && symbolInfo.Symbol is IValueSymbol valueSymbol
             && valueSymbol.Connection != null
             && valueSymbol.Connection.IsConnected)

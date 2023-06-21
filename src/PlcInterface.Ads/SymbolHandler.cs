@@ -33,7 +33,9 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
     /// Initializes a new instance of the <see cref="SymbolHandler"/> class.
     /// </summary>
     /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
-    /// <param name="options">A <see cref="IOptions{TOptions}"/> of <see cref="AdsSymbolHandlerOptions"/> implementation.</param>
+    /// <param name="options">
+    /// A <see cref="IOptions{TOptions}"/> of <see cref="AdsSymbolHandlerOptions"/> implementation.
+    /// </param>
     /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
     /// <param name="fileSystem">A <see cref="IFileSystem"/> for interacting with the file system.</param>
     /// <param name="symbolLoaderFactory">A factory for creating a <see cref="SymbolLoaderFactory"/>.</param>
@@ -63,37 +65,37 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
     }
 
     /// <inheritdoc/>
-    ISymbolInfo ISymbolHandler.GetSymbolinfo(string ioName)
-        => GetSymbolinfo(ioName);
+    ISymbolInfo ISymbolHandler.GetSymbolInfo(string ioName)
+        => GetSymbolInfo(ioName);
 
     /// <inheritdoc/>
-    public IAdsSymbolInfo GetSymbolinfo(string ioName)
+    public IAdsSymbolInfo GetSymbolInfo(string ioName)
     {
-        if (TryGetSymbolinfo(ioName, out var symbolInfo) && symbolInfo != null)
+        if (TryGetSymbolInfo(ioName, out var symbolInfo) && symbolInfo != null)
         {
             return symbolInfo;
         }
 
-        throw new SymbolException($"{ioName} Does not excist in the PLC");
+        throw new SymbolException($"{ioName} Does not exist in the PLC");
     }
 
     /// <inheritdoc/>
-    bool ISymbolHandler.TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo)
+    bool ISymbolHandler.TryGetSymbolInfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo)
     {
-        var result = TryGetSymbolinfo(ioName, out var symbolInfoResult);
+        var result = TryGetSymbolInfo(ioName, out var symbolInfoResult);
         symbolInfo = symbolInfoResult;
         return result;
     }
 
     /// <inheritdoc/>
-    public bool TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out IAdsSymbolInfo symbolInfo)
+    public bool TryGetSymbolInfo(string ioName, [MaybeNullWhen(false)] out IAdsSymbolInfo symbolInfo)
     {
         if (allSymbols.TryGetValue(ioName, out symbolInfo))
         {
             return true;
         }
 
-        logger.LogError("{IoName} Does not excist in the PLC", ioName);
+        logger.LogError("{IoName} Does not exist in the PLC", ioName);
         return false;
     }
 

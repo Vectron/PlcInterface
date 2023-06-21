@@ -16,7 +16,7 @@ public class AdsPlcConnectionOptions
     }
 
     /// <summary>
-    /// Gets or sets the adress to connect to.
+    /// Gets or sets the address to connect to.
     /// </summary>
     public string AmsNetId
     {

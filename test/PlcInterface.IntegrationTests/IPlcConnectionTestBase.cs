@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PlcInterface.Tests;
+namespace PlcInterface.IntegrationTests;
 
 public abstract class IPlcConnectionTestBase
 {

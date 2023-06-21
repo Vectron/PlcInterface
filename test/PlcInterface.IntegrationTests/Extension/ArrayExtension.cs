@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using PlcInterface.Tests.Extension;
+using PlcInterface.IntegrationTests.Extension;
 
-namespace PlcInterface.Tests.Extension;
+namespace PlcInterface.IntegrationTests.Extension;
 
 internal static class ArrayExtension
 {

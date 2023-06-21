@@ -2,9 +2,9 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PlcInterface.Tests.Extension;
+using PlcInterface.IntegrationTests.Extension;
 
-namespace PlcInterface.Tests;
+namespace PlcInterface.IntegrationTests;
 
 [DoNotParallelize]
 public abstract class IWriteValueTestBase

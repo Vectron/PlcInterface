@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlcInterface.Ads", "src\Plc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlcInterface.Ads.Tests", "test\PlcInterface.Ads.Tests\PlcInterface.Ads.Tests.csproj", "{4A73D0C2-E2F9-47FB-814E-07F667CEDE22}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlcInterface.Tests", "test\PlcInterface.Tests\PlcInterface.Tests.csproj", "{71FFF78E-DD02-44DC-9153-208EC22C15C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlcInterface.IntegrationTests", "test\PlcInterface.IntegrationTests\PlcInterface.IntegrationTests.csproj", "{71FFF78E-DD02-44DC-9153-208EC22C15C2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{312F1DED-6F69-4617-9C28-A9A51C8E1E14}"
 	ProjectSection(SolutionItems) = preProject

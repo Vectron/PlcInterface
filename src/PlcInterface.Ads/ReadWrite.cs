@@ -4,7 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using PlcInterface.Ads.TwincatAbstractions;
+using PlcInterface.Ads.TwinCATAbstractions;
 
 namespace PlcInterface.Ads;
 
@@ -38,7 +38,7 @@ public class ReadWrite : IAdsReadWrite
     {
         var client = connection.GetConnectedClient();
         var tcSymbols = ioNames
-            .Select(x => symbolHandler.GetSymbolinfo(x).Symbol)
+            .Select(x => symbolHandler.GetSymbolInfo(x).Symbol)
             .ToList();
 
         var sumReader = sumSymbolFactory.CreateSumSymbolRead(client, tcSymbols);
@@ -46,7 +46,7 @@ public class ReadWrite : IAdsReadWrite
         return ioNames
             .Zip(result, (ioName, value) =>
             {
-                var adsSymbol = symbolHandler.GetSymbolinfo(ioName).Symbol.CastAndValidate();
+                var adsSymbol = symbolHandler.GetSymbolInfo(ioName).Symbol.CastAndValidate();
                 var fixedValue = typeConverter.Convert(value, adsSymbol);
                 return (ioName, fixedValue);
             })
@@ -56,12 +56,12 @@ public class ReadWrite : IAdsReadWrite
     /// <inheritdoc/>
     public object Read(string ioName)
     {
-        var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
+        var symbolInfo = symbolHandler.GetSymbolInfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
         var value = adsSymbol.ReadValue();
         if (value == null)
         {
-            ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
+            ThrowHelper.ThrowInvalidOperationException_FailedToRead(ioName);
         }
 
         return typeConverter.Convert(value, adsSymbol);
@@ -70,12 +70,12 @@ public class ReadWrite : IAdsReadWrite
     /// <inheritdoc/>
     public T Read<T>(string ioName)
     {
-        var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
+        var symbolInfo = symbolHandler.GetSymbolInfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
         var value = adsSymbol.ReadValue();
         if (value == null)
         {
-            ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
+            ThrowHelper.ThrowInvalidOperationException_FailedToRead(ioName);
         }
 
         return typeConverter.Convert<T>(value);
@@ -84,12 +84,12 @@ public class ReadWrite : IAdsReadWrite
     /// <inheritdoc/>
     public async Task<object> ReadAsync(string ioName)
     {
-        var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
+        var symbolInfo = symbolHandler.GetSymbolInfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
         var resultReadValue = await adsSymbol.ReadValueAsync(CancellationToken.None).ConfigureAwait(false);
         if (resultReadValue.Value == null)
         {
-            ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
+            ThrowHelper.ThrowInvalidOperationException_FailedToRead(ioName);
         }
 
         return typeConverter.Convert(resultReadValue.Value, adsSymbol);
@@ -98,12 +98,12 @@ public class ReadWrite : IAdsReadWrite
     /// <inheritdoc/>
     public async Task<T> ReadAsync<T>(string ioName)
     {
-        var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
+        var symbolInfo = symbolHandler.GetSymbolInfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
         var resultReadValue = await adsSymbol.ReadValueAsync(CancellationToken.None).ConfigureAwait(false);
         if (resultReadValue.Value == null)
         {
-            ThrowHelper.ThrowInvallidOperationException_FailedToRead(ioName);
+            ThrowHelper.ThrowInvalidOperationException_FailedToRead(ioName);
         }
 
         return typeConverter.Convert<T>(resultReadValue.Value);
@@ -114,7 +114,7 @@ public class ReadWrite : IAdsReadWrite
     {
         var client = await connection.GetConnectedClientAsync().ConfigureAwait(false);
         var tcSymbols = ioNames
-            .Select(symbolHandler.GetSymbolinfo)
+            .Select(symbolHandler.GetSymbolInfo)
             .Select(x => x.Symbol)
             .ToList();
 
@@ -128,7 +128,7 @@ public class ReadWrite : IAdsReadWrite
         var dictionary = ioNames
                 .Zip(resultSum, (ioName, value) =>
                 {
-                    var adsSymbol = symbolHandler.GetSymbolinfo(ioName).Symbol.CastAndValidate();
+                    var adsSymbol = symbolHandler.GetSymbolInfo(ioName).Symbol.CastAndValidate();
                     var fixedValue = typeConverter.Convert(value, adsSymbol);
                     return (ioName, fixedValue);
                 })
@@ -167,7 +167,7 @@ public class ReadWrite : IAdsReadWrite
     {
         var client = connection.GetConnectedClient();
         var tcSymbols = namesValues
-            .Select(x => symbolHandler.GetSymbolinfo(x.Key))
+            .Select(x => symbolHandler.GetSymbolInfo(x.Key))
             .Select(x => x.Symbol)
             .ToList();
 
@@ -178,9 +178,10 @@ public class ReadWrite : IAdsReadWrite
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
-            // When a object can't be marshalled then ArgumentException will be thrown, if this happens we try to write all objects individually
+            // When a object can't be marshalled then ArgumentException will be thrown, if this
+            // happens we try to write all objects individually
             var flattened = namesValues
-                .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
+                .SelectMany(x => symbolHandler.GetSymbolInfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
                 .Select(x => (x.SymbolInfo.CastAndValidate().Symbol, x.Value));
 
             var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, flattened.Select(x => x.Symbol).ToList());
@@ -192,7 +193,7 @@ public class ReadWrite : IAdsReadWrite
     public void Write<T>(string ioName, T value)
         where T : notnull
     {
-        var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
+        var symbolInfo = symbolHandler.GetSymbolInfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
         var type = value.GetType();
 
@@ -212,7 +213,8 @@ public class ReadWrite : IAdsReadWrite
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
-            // When a object can't be marshalled then ArgumentException will be thrown, if this happens we try to write all objects individually
+            // When a object can't be marshalled then ArgumentException will be thrown, if this
+            // happens we try to write all objects individually
             var flattenItems = symbolInfo.FlattenWithValue(symbolHandler, value).ToDictionary(x => x.SymbolInfo.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);
             Write(flattenItems);
         }
@@ -223,7 +225,7 @@ public class ReadWrite : IAdsReadWrite
     {
         var client = await connection.GetConnectedClientAsync().ConfigureAwait(false);
         var tcSymbols = namesValues
-            .Select(x => symbolHandler.GetSymbolinfo(x.Key))
+            .Select(x => symbolHandler.GetSymbolInfo(x.Key))
             .Select(x => x.Symbol)
             .ToList();
         try
@@ -233,9 +235,10 @@ public class ReadWrite : IAdsReadWrite
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
-            // When a object can't be marshalled then ArgumentException will be thrown, if this happens we try to write all objects individually
+            // When a object can't be marshalled then ArgumentException will be thrown, if this
+            // happens we try to write all objects individually
             var flattened = namesValues
-                .SelectMany(x => symbolHandler.GetSymbolinfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
+                .SelectMany(x => symbolHandler.GetSymbolInfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
                 .Select(x => (x.SymbolInfo.CastAndValidate().Symbol, x.Value));
 
             var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, flattened.Select(x => x.Symbol).ToList());
@@ -247,7 +250,7 @@ public class ReadWrite : IAdsReadWrite
     public async Task WriteAsync<T>(string ioName, T value)
         where T : notnull
     {
-        var symbolInfo = symbolHandler.GetSymbolinfo(ioName);
+        var symbolInfo = symbolHandler.GetSymbolInfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
         var type = value.GetType();
 
@@ -267,7 +270,8 @@ public class ReadWrite : IAdsReadWrite
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
-            // When a object can't be marshalled then ArgumentException will be thrown, if this happens we try to write all objects individually
+            // When a object can't be marshalled then ArgumentException will be thrown, if this
+            // happens we try to write all objects individually
             var flattenItems = symbolInfo.FlattenWithValue(symbolHandler, value).ToDictionary(x => x.SymbolInfo.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);
             await WriteAsync(flattenItems).ConfigureAwait(false);
         }

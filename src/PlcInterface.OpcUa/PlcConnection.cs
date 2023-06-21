@@ -73,14 +73,14 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             }
 
             var settings = options.Value;
-            var config = settings.ApplicationConfiguration ?? throw new InvalidOperationException("No vallid application configuration given.");
+            var config = settings.ApplicationConfiguration ?? throw new InvalidOperationException("No valid application configuration given.");
             Utils.SetTraceOutput(Utils.TraceOutput.DebugAndFile);
-            logger.LogInformation("Opening connection to {Adress}", settings.Address);
+            logger.LogInformation("Opening connection to {Address}", settings.Address);
             logger.LogDebug("Creating an Application Configuration.");
             await config.Validate(ApplicationType.Client).ConfigureAwait(false);
             var usesSecurity = SetupSecurity(config);
-            logger.LogDebug("Discover endpoints of {DiscoveryAdress}.", settings.DiscoveryAdress);
-            var selectedEndpoint = CoreClientUtils.SelectEndpoint(settings.DiscoveryAdress.ToString(), usesSecurity, 15000);
+            logger.LogDebug("Discover endpoints of {DiscoveryAddress}.", settings.DiscoveryAddress);
+            var selectedEndpoint = CoreClientUtils.SelectEndpoint(settings.DiscoveryAddress.ToString(), usesSecurity, 15000);
             logger.LogDebug("Selected endpoint uses: {Security}", selectedEndpoint.SecurityPolicyUri[(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1)..]);
             logger.LogDebug("Create a session with OPC UA server.");
             var endpointConfiguration = EndpointConfiguration.Create(config);
@@ -177,7 +177,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         disposedValue = true;
     }
 
-    private static void UpdateAplicationUri(ApplicationConfiguration applicationConfiguration)
+    private static void UpdateApplicationUri(ApplicationConfiguration applicationConfiguration)
     {
         var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
         if (applicationCertificate.Certificate != null)
@@ -251,7 +251,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
                 break;
 
             default:
-                logger.LogError(ex, "Unproccesed error {BrowseName}", StatusCodes.GetBrowseName(ex.Result.StatusCode.Code));
+                logger.LogError(ex, "Unprocessed error {BrowseName}", StatusCodes.GetBrowseName(ex.Result.StatusCode.Code));
                 break;
         }
     }
@@ -271,12 +271,12 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
 
             if (applicationConfiguration.SecurityConfiguration.AutoAcceptUntrustedCertificates)
             {
-                logger.LogDebug("Accepted Certificate: {CertificateSubject} (errorcode: {BrowseName})", certificate.Subject, StatusCodes.GetBrowseName(eventArgs.Error.Code));
+                logger.LogDebug("Accepted Certificate: {CertificateSubject} (error code: {BrowseName})", certificate.Subject, StatusCodes.GetBrowseName(eventArgs.Error.Code));
                 eventArgs.Accept = true;
                 return;
             }
 
-            logger.LogDebug("Rejected Certificate: {CertificateSubject} (errorcode: {BrowseName})", certificate.Subject, StatusCodes.GetBrowseName(eventArgs.Error.Code));
+            logger.LogDebug("Rejected Certificate: {CertificateSubject} (error code: {BrowseName})", certificate.Subject, StatusCodes.GetBrowseName(eventArgs.Error.Code));
         }));
     }
 
@@ -294,7 +294,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         var applicationCertificate = config.SecurityConfiguration.ApplicationCertificate;
         if (applicationCertificate.Certificate != null)
         {
-            UpdateAplicationUri(config);
+            UpdateApplicationUri(config);
             return true;
         }
 
@@ -305,7 +305,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         }
 
         CreateCertificate(config);
-        UpdateAplicationUri(config);
+        UpdateApplicationUri(config);
         return true;
     }
 }

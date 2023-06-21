@@ -57,18 +57,30 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
     }
 
     /// <inheritdoc/>
-    public ISymbolInfo GetSymbolinfo(string ioName)
+    ISymbolInfo ISymbolHandler.GetSymbolinfo(string ioName)
+        => GetSymbolinfo(ioName);
+
+    /// <inheritdoc/>
+    public IOpcSymbolInfo GetSymbolinfo(string ioName)
     {
         if (TryGetSymbolinfo(ioName, out var symbolInfo) && symbolInfo != null)
         {
             return symbolInfo;
         }
 
-        throw new SymbolException($"{ioName} Does not excist in the PLC");
+        throw new SymbolException($"{ioName} Does not exist in the PLC");
     }
 
     /// <inheritdoc/>
-    public bool TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo)
+    bool ISymbolHandler.TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo)
+    {
+        var result = TryGetSymbolinfo(ioName, out var symbolInfoResult);
+        symbolInfo = symbolInfoResult;
+        return result;
+    }
+
+    /// <inheritdoc/>
+    public bool TryGetSymbolinfo(string ioName, [MaybeNullWhen(false)] out IOpcSymbolInfo symbolInfo)
     {
         if (allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out var symbolInfoResult))
         {
@@ -76,7 +88,7 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
             return true;
         }
 
-        logger.LogError("{IoName} Does not excist in the PLC", ioName);
+        logger.LogError("{IoName} Does not exist in the PLC", ioName);
         symbolInfo = null;
         return false;
     }

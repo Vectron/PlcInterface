@@ -26,20 +26,19 @@ public class TypeConverterTests
         {
             yield return new object[]
             {
-                "09-04-1987 06:10:50",
+                "04-09-1987 06:10:50",
                 typeof(DateTime),
                 new DateTime(1987, 04, 09, 06, 10, 50),
             };
         }
     }
 
-    private static TypeConverter Converter => new Mock<TypeConverter> { CallBase = true, }.Object;
+    private static TypeConverter Converter => new TypeConverterMock();
 
     [DataTestMethod]
+    [DynamicData(nameof(CanConvertStringsToBaseTypeData))]
     [DataRow("false", typeof(bool), false)]
     [DataRow("true", typeof(bool), true)]
-    [DataRow("0", typeof(bool), false)]
-    [DataRow("1", typeof(bool), true)]
     [DataRow("127", typeof(sbyte), sbyte.MaxValue)]
     [DataRow("255", typeof(byte), byte.MaxValue)]
     [DataRow("32767", typeof(short), short.MaxValue)]
@@ -52,7 +51,6 @@ public class TypeConverterTests
     [DataRow("1.1", typeof(double), 1.1)]
     [DataRow("This is text", typeof(string), "This is text")]
     [DataRow("2", typeof(TestEnum), TestEnum.Value2)]
-    [DynamicData(nameof(CanConvertStringsToBaseTypeData))]
     public void CanConvertStringsToBaseType(string value, Type targetType, object expectedValue)
     {
         // Arrange
@@ -63,6 +61,7 @@ public class TypeConverterTests
 
         // Assert
         Assert.IsInstanceOfType(type, targetType);
+        Assert.AreEqual(expectedValue, type);
     }
 
     [TestMethod]

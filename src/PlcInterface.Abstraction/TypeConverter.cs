@@ -39,6 +39,13 @@ public abstract class TypeConverter : ITypeConverter
             return new DateTimeOffset(dateTime);
         }
 
+        if (targetType.IsEnum
+            && value.GetType() == typeof(string))
+        {
+            var enumNumber = Convert(value, typeof(long));
+            return Enum.ToObject(targetType, enumNumber);
+        }
+
         if (targetType.IsEnum)
         {
             return Enum.ToObject(targetType, value);

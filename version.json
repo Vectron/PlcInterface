@@ -1,11 +1,11 @@
 ﻿{
-    "$schema": "https://raw.githubusercontent.com/dotnet/Nerdbank.GitVersioning/master/src/NerdBank.GitVersioning/version.schema.json",
-    "version": "2.5",
-    "publicReleaseRefSpec": [
-      "^refs/tags/v\\d+\\.\\d+"
+  "$schema": "https://raw.githubusercontent.com/dotnet/Nerdbank.GitVersioning/master/src/NerdBank.GitVersioning/version.schema.json",
+  "version": "2.6",
+  "publicReleaseRefSpec": [
+    "^refs/tags/v\\d+\\.\\d+"
   ],
-    "pathFilters": [
-        "."
-    ],
-    "inherit": false
+  "pathFilters": [
+    "."
+  ],
+  "inherit": false
 }

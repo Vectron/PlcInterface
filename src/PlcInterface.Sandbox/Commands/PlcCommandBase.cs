@@ -64,57 +64,116 @@ internal abstract class PlcCommandBase : CommandBase, IDisposable
         }
 
         var command = parameters[0].ToLowerInvariant();
-        switch (command)
+        return command switch
         {
-            case "connect":
-                _ = plcConnection.ConnectAsync();
-                return new Response("Connecting to the plc");
+            "connect" => ExecuteConnect(),
+            "disconnect" => ExecuteDisconnect(),
+            "read" => ExecuteRead(parameters[1]),
+            "write" => ExecuteWrite(parameters[1], parameters[2]),
+            "dump" => ExecuteDump(),
+            "toggle" => ExecuteToggle(parameters[1]),
+            "monitor" => ExecuteMonitor(parameters[1]),
+            "unmonitor" => ExecuteUnMonitor(parameters[1]),
+            _ => new Response("Invalid parameter"),
+        };
+    }
 
-            case "disconnect":
-                _ = plcConnection.DisconnectAsync();
-                return new Response("Disconnecting from the plc");
+    /// <summary>
+    /// Execute the 'connect' command.
+    /// </summary>
+    /// <returns>A <see cref="Response"/> with the command result.</returns>
+    protected virtual Response ExecuteConnect()
+    {
+        _ = plcConnection.ConnectAsync();
+        return new Response("Connecting to the plc");
+    }
 
-            case "read":
-                var value = readWrite.Read(parameters[1]);
-                var result = string.Empty;
-                result = value is IDictionary<string, object?> multiValues
-                    ? FlattenExpando(multiValues)
-                    : value.ToString();
+    /// <summary>
+    /// Execute the 'disconnect' command.
+    /// </summary>
+    /// <returns>A <see cref="Response"/> with the command result.</returns>
+    protected virtual Response ExecuteDisconnect()
+    {
+        _ = plcConnection.DisconnectAsync();
+        return new Response("Disconnecting from the plc");
+    }
 
-                return value == null ? new Response($"Failed reading value from {parameters[1]}") : new Response(result ?? string.Empty);
-
-            case "write":
-                readWrite.Write(parameters[1], true);
-                return new Response("Value written to PLC");
-
-            case "dump":
-                foreach (var name in symbolHandler.AllSymbols.Select(x => x.Name))
-                {
-                    ConsoleHelper.ConsoleWriteLineColored(name, ConsoleColor.Cyan);
-                }
-
-                return new Response("Done");
-
-            case "toggle":
-                readWrite.ToggleBool(parameters[1]);
-                return new Response("Value toggled");
-
-            case "monitor":
-                monitor.RegisterIO(parameters[1], 10);
-                var subscription = monitor.SymbolStream.Where(x => string.Equals(x.Name, parameters[1], StringComparison.OrdinalIgnoreCase))
-                    .Finally(() => monitor.UnregisterIO(parameters[1]))
-                    .Subscribe(x => ConsoleHelper.ConsoleWriteLineColored($"{parameters[1]} updated to {x.Value}", ConsoleColor.Cyan));
-                disposables.Add(parameters[1], subscription);
-                return new Response("Started monitoring");
-
-            case "unmonitor":
-                _ = disposables.Remove(parameters[1], out var disposable);
-                disposable?.Dispose();
-                return new Response("Stopped monitoring");
-
-            default:
-                return new Response("Invallid parameter");
+    /// <summary>
+    /// Execute the 'dump' command.
+    /// </summary>
+    /// <returns>A <see cref="Response"/> with the command result.</returns>
+    protected virtual Response ExecuteDump()
+    {
+        foreach (var name in symbolHandler.AllSymbols.Select(x => x.Name))
+        {
+            ConsoleHelper.ConsoleWriteLineColored(name, ConsoleColor.Cyan);
         }
+
+        return new Response("Done");
+    }
+
+    /// <summary>
+    /// Execute the 'monitor' command.
+    /// </summary>
+    /// <param name="symbolName">The name of the symbol.</param>
+    /// <returns>A <see cref="Response"/> with the command result.</returns>
+    protected virtual Response ExecuteMonitor(string symbolName)
+    {
+        monitor.RegisterIO(symbolName, 10);
+        var subscription = monitor.SymbolStream.Where(x => string.Equals(x.Name, symbolName, StringComparison.OrdinalIgnoreCase))
+            .Finally(() => monitor.UnregisterIO(symbolName))
+            .Subscribe(x => ConsoleHelper.ConsoleWriteLineColored($"{symbolName} updated to {x.Value}", ConsoleColor.Cyan));
+        disposables.Add(symbolName, subscription);
+        return new Response("Started monitoring");
+    }
+
+    /// <summary>
+    /// Execute the 'read' command.
+    /// </summary>
+    /// <param name="symbolName">The name of the symbol.</param>
+    /// <returns>A <see cref="Response"/> with the command result.</returns>
+    protected virtual Response ExecuteRead(string symbolName)
+    {
+        var value = readWrite.Read(symbolName);
+        var result = value is IDictionary<string, object?> multiValues
+            ? FlattenExpando(multiValues)
+            : value.ToString();
+
+        return value == null ? new Response($"Failed reading value from {symbolName}") : new Response(result ?? string.Empty);
+    }
+
+    /// <summary>
+    /// Execute the 'unmonitor' command.
+    /// </summary>
+    /// <param name="symbolName">The name of the symbol.</param>
+    /// <returns>A <see cref="Response"/> with the command result.</returns>
+    protected virtual Response ExecuteUnMonitor(string symbolName)
+    {
+        _ = disposables.Remove(symbolName, out var disposable);
+        disposable?.Dispose();
+        return new Response("Stopped monitoring");
+    }
+
+    /// <summary>
+    /// Execute the 'write' command.
+    /// </summary>
+    /// <param name="symbolName">The name of the symbol.</param>
+    /// <param name="value">The value to write.</param>
+    /// <returns>A <see cref="Response"/> with the command result.</returns>
+    protected virtual Response ExecuteWrite(string symbolName, string value)
+    {
+        readWrite.Write(symbolName, value);
+        return new Response("Value written to PLC");
+    }
+
+    /// <summary>
+    /// Execute the 'toggle' command.
+    /// </summary>
+    /// <returns>A <see cref="Response"/> with the command result.</returns>
+    private Response ExecuteToggle(string symbolName)
+    {
+        readWrite.ToggleBool(symbolName);
+        return new Response("Value toggled");
     }
 
     private string FlattenExpando(IDictionary<string, object?> parameters, int indentation = 0)

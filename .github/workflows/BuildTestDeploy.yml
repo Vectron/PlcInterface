@@ -43,7 +43,7 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Nerdbank.GitVersioning
         id: nbgv
-        uses: dotnet/nbgv@v0.4.0
+        uses: dotnet/nbgv@master
       - name: Restore dependencies
         run: dotnet restore ${{ env.SOLUTION_NAME }}
       - name: Build

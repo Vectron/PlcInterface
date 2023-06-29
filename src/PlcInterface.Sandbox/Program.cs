@@ -46,6 +46,8 @@ internal static class Program
             .AddScoped<IConsoleCommand, PlcMonitorCommand>(x => new PlcMonitorCommand(OpcBaseCommand, x.GetRequiredService<IOpcMonitor>()))
             .AddScoped<IConsoleCommand, PlcStopMonitorCommand>(x => new PlcStopMonitorCommand(OpcBaseCommand, x.GetRequiredService<IOpcMonitor>()))
             .AddScoped<IConsoleCommand, PlcSymbolDumpCommand>(x => new PlcSymbolDumpCommand(OpcBaseCommand, x.GetRequiredService<IOpcSymbolHandler>()))
+            .AddScoped<IAutoCompleteHandler, PlcSymbolAutoCompleteHandler>(x => new PlcSymbolAutoCompleteHandler(AdsBaseCommand, x.GetRequiredService<IAdsSymbolHandler>()))
+            .AddScoped<IAutoCompleteHandler, PlcSymbolAutoCompleteHandler>(x => new PlcSymbolAutoCompleteHandler(OpcBaseCommand, x.GetRequiredService<IOpcSymbolHandler>()))
             .AddAdsPLC()
             .AddOpcPLC()
             .Configure<AdsPlcConnectionOptions>(context.Configuration.GetSection(AdsBaseCommand))

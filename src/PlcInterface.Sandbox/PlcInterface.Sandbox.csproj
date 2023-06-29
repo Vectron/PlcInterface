@@ -15,7 +15,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="NLog.Extensions.Logging" Version="$(NLogVersion)" />
     <PackageReference Include="NLog.Schema" Version="$(NLogVersion)" />
-    <PackageReference Include="ReadLine" Version="2.0.1" />
   </ItemGroup>
 
   <ItemGroup>

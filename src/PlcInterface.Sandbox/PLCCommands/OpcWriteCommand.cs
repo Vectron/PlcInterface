@@ -1,51 +1,45 @@
 ﻿using System;
 using PlcInterface.OpcUa;
-using PlcInterface.Sandbox.Interactive;
 
-namespace PlcInterface.Sandbox.Commands;
+namespace PlcInterface.Sandbox.PLCCommands;
 
 /// <summary>
-/// A <see cref="IApplicationCommand"/> implementation for interacting with a ads PLC.
+/// Command for writing values with OPC.
 /// </summary>
-internal sealed class OpcPlcCommand : PlcCommandBase
+internal sealed class OpcWriteCommand : PlcWriteCommand
 {
-    private const string CommandName = "opc";
-    private readonly IOpcReadWrite readWrite;
     private readonly IOpcSymbolHandler symbolHandler;
     private readonly IOpcTypeConverter typeConverter;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="OpcPlcCommand"/> class.
+    /// Initializes a new instance of the <see cref="OpcWriteCommand"/> class.
     /// </summary>
-    /// <param name="plcConnection">A <see cref="IOpcPlcConnection"/>.</param>
-    /// <param name="readWrite">A <see cref="IOpcReadWrite"/>.</param>
-    /// <param name="symbolHandler">A <see cref="IOpcSymbolHandler"/>.</param>
-    /// <param name="monitor">A <see cref="IOpcMonitor"/>.</param>
-    /// <param name="typeConverter">A <see cref="IOpcTypeConverter"/>.</param>
-    public OpcPlcCommand(IOpcPlcConnection plcConnection, IOpcReadWrite readWrite, IOpcSymbolHandler symbolHandler, IOpcMonitor monitor, IOpcTypeConverter typeConverter)
-        : base(CommandName, plcConnection, readWrite, symbolHandler, monitor)
+    /// <param name="readWrite">A <see cref="IOpcReadWrite"/> instance.</param>
+    /// <param name="symbolHandler">A <see cref="IOpcSymbolHandler"/> instance.</param>
+    /// <param name="typeConverter">A <see cref="IOpcTypeConverter"/> instance.</param>
+    public OpcWriteCommand(IOpcReadWrite readWrite, IOpcSymbolHandler symbolHandler, IOpcTypeConverter typeConverter)
+        : base("opc", readWrite)
     {
-        this.readWrite = readWrite;
         this.symbolHandler = symbolHandler;
         this.typeConverter = typeConverter;
     }
 
     /// <inheritdoc/>
-    protected override Response ExecuteWrite(string symbolName, string value)
+    protected override object ConvertToValidInputValue(string symbolName, string value)
     {
         if (!symbolHandler.TryGetSymbolInfo(symbolName, out var symbolInfo))
         {
-            return new Response("Symbol not found");
+            throw new InvalidOperationException("Symbol not found");
         }
 
         if (symbolInfo.IsArray)
         {
-            return new Response("Arrays are not supported");
+            throw new InvalidOperationException("Arrays are not supported");
         }
 
         if (symbolInfo.IsBigType)
         {
-            return new Response("object types are not supported");
+            throw new InvalidOperationException("object types are not supported");
         }
 
         var boxedValue = symbolInfo.BuiltInType switch
@@ -81,12 +75,7 @@ internal sealed class OpcPlcCommand : PlcCommandBase
             _ => null,
         };
 
-        if (boxedValue == null)
-        {
-            return new Response("Unknown data type");
-        }
-
-        readWrite.Write(symbolName, boxedValue);
-        return new Response("Value written to PLC");
+        return boxedValue
+            ?? throw new InvalidOperationException("Unknown data type");
     }
 }

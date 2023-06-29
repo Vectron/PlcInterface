@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using InteractiveConsole;
+using InteractiveConsole.AutoComplete;
+using InteractiveConsole.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -8,7 +11,7 @@ using NLog.Extensions.Logging;
 using PlcInterface.Ads;
 using PlcInterface.OpcUa;
 using PlcInterface.Sandbox.Commands;
-using PlcInterface.Sandbox.Interactive;
+using PlcInterface.Sandbox.PLCCommands;
 
 namespace PlcInterface.Sandbox;
 
@@ -17,19 +20,36 @@ namespace PlcInterface.Sandbox;
 /// </summary>
 internal static class Program
 {
+    private const string AdsBaseCommand = "ads";
+    private const string OpcBaseCommand = "opc";
+
     private static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
         => services.AddOptions()
             .AddSingleton(context.Configuration)
-            .AddHostedService<InteractiveConsoleService>()
-            .AddScoped<IAutoCompleteHandler, AutoCompletionHandler>()
-            .AddTransient<IApplicationCommand, CloseApplicationCommand>()
-            .AddTransient<IApplicationCommand, HelpCommand>()
-            .AddTransient<IApplicationCommand, AdsPlcCommand>()
-            .AddTransient<IApplicationCommand, OpcPlcCommand>()
+            .AddInteractiveConsole()
+            .AddConsoleCommand()
+            .AddScoped<IConsoleCommand, CloseApplicationCommand>()
+            .AddScoped<IConsoleCommand, HelpCommand>()
+            .AddScoped<IConsoleCommand, PlcConnectCommand>(x => new PlcConnectCommand(AdsBaseCommand, x.GetRequiredService<IAdsPlcConnection>()))
+            .AddScoped<IConsoleCommand, PlcDisconnectCommand>(x => new PlcDisconnectCommand(AdsBaseCommand, x.GetRequiredService<IAdsPlcConnection>()))
+            .AddScoped<IConsoleCommand, PlcReadCommand>(x => new PlcReadCommand(AdsBaseCommand, x.GetRequiredService<IAdsReadWrite>()))
+            .AddScoped<IConsoleCommand, PlcToggleCommand>(x => new PlcToggleCommand(AdsBaseCommand, x.GetRequiredService<IAdsReadWrite>()))
+            .AddScoped<IConsoleCommand, AdsWriteCommand>()
+            .AddScoped<IConsoleCommand, PlcMonitorCommand>(x => new PlcMonitorCommand(AdsBaseCommand, x.GetRequiredService<IAdsMonitor>()))
+            .AddScoped<IConsoleCommand, PlcStopMonitorCommand>(x => new PlcStopMonitorCommand(AdsBaseCommand, x.GetRequiredService<IAdsMonitor>()))
+            .AddScoped<IConsoleCommand, PlcSymbolDumpCommand>(x => new PlcSymbolDumpCommand(AdsBaseCommand, x.GetRequiredService<IAdsSymbolHandler>()))
+            .AddScoped<IConsoleCommand, PlcConnectCommand>(x => new PlcConnectCommand(OpcBaseCommand, x.GetRequiredService<IOpcPlcConnection>()))
+            .AddScoped<IConsoleCommand, PlcDisconnectCommand>(x => new PlcDisconnectCommand(OpcBaseCommand, x.GetRequiredService<IOpcPlcConnection>()))
+            .AddScoped<IConsoleCommand, PlcReadCommand>(x => new PlcReadCommand(OpcBaseCommand, x.GetRequiredService<IOpcReadWrite>()))
+            .AddScoped<IConsoleCommand, PlcToggleCommand>(x => new PlcToggleCommand(OpcBaseCommand, x.GetRequiredService<IOpcReadWrite>()))
+            .AddScoped<IConsoleCommand, OpcWriteCommand>()
+            .AddScoped<IConsoleCommand, PlcMonitorCommand>(x => new PlcMonitorCommand(OpcBaseCommand, x.GetRequiredService<IOpcMonitor>()))
+            .AddScoped<IConsoleCommand, PlcStopMonitorCommand>(x => new PlcStopMonitorCommand(OpcBaseCommand, x.GetRequiredService<IOpcMonitor>()))
+            .AddScoped<IConsoleCommand, PlcSymbolDumpCommand>(x => new PlcSymbolDumpCommand(OpcBaseCommand, x.GetRequiredService<IOpcSymbolHandler>()))
             .AddAdsPLC()
             .AddOpcPLC()
-            .Configure<AdsPlcConnectionOptions>(context.Configuration.GetSection("Ads"))
-            .Configure<OpcPlcConnectionOptions>(context.Configuration.GetSection("Opc"));
+            .Configure<AdsPlcConnectionOptions>(context.Configuration.GetSection(AdsBaseCommand))
+            .Configure<OpcPlcConnectionOptions>(context.Configuration.GetSection(OpcBaseCommand));
 
     /// <summary>
     /// The main entry point.

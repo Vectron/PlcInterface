@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Text;
+using InteractiveConsole.Commands;
 using Microsoft.Extensions.DependencyInjection;
-using PlcInterface.Sandbox.Interactive;
 
 namespace PlcInterface.Sandbox.Commands;
 
 /// <summary>
-/// A <see cref="IApplicationCommand"/> that prints a help text.
+/// A <see cref="IConsoleCommand"/> that prints a help text.
 /// </summary>
-internal sealed class HelpCommand : CommandBase
+internal sealed class HelpCommand : IConsoleCommand
 {
-    private const string CommandName = "help";
     private readonly IServiceProvider serviceProvider;
 
     /// <summary>
@@ -18,22 +17,33 @@ internal sealed class HelpCommand : CommandBase
     /// </summary>
     /// <param name="serviceProvider">A <see cref="IServiceProvider"/> implementation.</param>
     public HelpCommand(IServiceProvider serviceProvider)
-        : base(CommandName)
-    {
-        HelpText = CommandName + ": prints this information";
-        this.serviceProvider = serviceProvider;
-    }
+        => this.serviceProvider = serviceProvider;
 
     /// <inheritdoc/>
-    public override Response Execute(string[] parameters)
+    public string[] CommandParameters => new[] { "help" };
+
+    /// <inheritdoc/>
+    public string HelpText => "prints this information";
+
+    /// <inheritdoc/>
+    public int MaxArguments => 0;
+
+    /// <inheritdoc/>
+    public int MinArguments => 0;
+
+    /// <inheritdoc/>
+    public void Execute(string[] arguments)
     {
         var builder = new StringBuilder();
-        var consoleCommands = serviceProvider.GetServices<IApplicationCommand>();
-        foreach (var comm in consoleCommands)
+        var consoleCommands = serviceProvider.GetServices<IConsoleCommand>();
+        foreach (var command in consoleCommands)
         {
-            _ = builder.AppendLine(comm.HelpText);
+            _ = builder.AppendJoin(' ', command.CommandParameters)
+                .Append(": ")
+                .Append(command.HelpText)
+                .AppendLine();
         }
 
-        return new Response(builder.ToString());
+        Console.WriteLine(builder.ToString());
     }
 }

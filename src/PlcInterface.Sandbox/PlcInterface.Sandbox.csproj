@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <NLogVersion>5.2.0</NLogVersion>
+    <NLogVersion>5.2.2</NLogVersion>
   </PropertyGroup>
 
   <ItemGroup>

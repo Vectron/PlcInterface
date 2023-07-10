@@ -1,7 +1,7 @@
 ﻿# Plc interface
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/Vectron/PlcInterface/blob/main/LICENSE.txt)
 [![Build status](https://github.com/Vectron/PlcInterface/actions/workflows/BuildTestDeploy.yml/badge.svg)](https://github.com/Vectron/PlcInterface/actions)
-[![NuGet](https://img.shields.io/nuget/v/PlcInterface.svg)](https://www.nuget.org/packages/PlcInterface.Abstraction)
+[![NuGet](https://img.shields.io/nuget/v/PlcInterface.Abstraction.svg)](https://www.nuget.org/packages/PlcInterface.Abstraction)
 
 An abstraction for communicating with PLC over different protocols.
 The abstraction can be used with Microsoft.Extensions.DependencyInjection.Abstractions
@@ -14,11 +14,11 @@ Important interfaces:
 
 # Plc interface ADS
 Implementation for the TwinCAT Ads interface.
-[![NuGet](https://img.shields.io/nuget/v/PlcInterface.svg)](https://www.nuget.org/packages/PlcInterface.Ads)
+[![NuGet](https://img.shields.io/nuget/v/PlcInterface.Ads.svg)](https://www.nuget.org/packages/PlcInterface.Ads)
 
 # Plc interface OPC
-Implementation for the OPC interface.
-[![NuGet](https://img.shields.io/nuget/v/PlcInterface.svg)](https://www.nuget.org/packages/PlcInterface.Opc)
+Implementation for the OPC UA interface.
+[![NuGet](https://img.shields.io/nuget/v/PlcInterface.OpcUa.svg)](https://www.nuget.org/packages/PlcInterface.OpcUa)
 
 ## Authors
 - [@Vectron](https://www.github.com/Vectron)

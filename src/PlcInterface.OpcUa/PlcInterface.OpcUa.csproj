@@ -1,6 +1,5 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
     <Description>A PLC communication implementation for OPC</Description>
   </PropertyGroup>
 

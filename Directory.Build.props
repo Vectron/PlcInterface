@@ -26,6 +26,7 @@
     <Copyright>Vectron</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Vectron/PlcInterface</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <!--Settings to move the bin en output folders to the root folder-->
@@ -56,5 +57,6 @@
 
   <ItemGroup>
     <None Include="$(SolutionDir)\LICENSE.txt" Pack="true" PackagePath="" />
+    <None Include="$(SolutionDir)\README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 </Project>

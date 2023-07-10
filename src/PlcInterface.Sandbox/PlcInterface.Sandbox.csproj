@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="InteractiveConsole" Version="0.0.29" />
+    <PackageReference Include="InteractiveConsole" Version="0.0.41" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="NLog.Extensions.Logging" Version="$(NLogVersion)" />

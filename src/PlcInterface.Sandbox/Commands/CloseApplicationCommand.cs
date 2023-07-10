@@ -1,5 +1,5 @@
-﻿using InteractiveConsole.Commands;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
+using Vectron.InteractiveConsole.Commands;
 
 namespace PlcInterface.Sandbox.Commands;
 

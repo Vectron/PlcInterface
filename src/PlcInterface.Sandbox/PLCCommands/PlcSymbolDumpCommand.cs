@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using InteractiveConsole.Commands;
+using Vectron.InteractiveConsole.Commands;
 
 namespace PlcInterface.Sandbox.PLCCommands;
 

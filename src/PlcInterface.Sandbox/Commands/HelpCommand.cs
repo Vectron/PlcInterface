@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
-using InteractiveConsole.Commands;
 using Microsoft.Extensions.DependencyInjection;
+using Vectron.InteractiveConsole.Commands;
 
 namespace PlcInterface.Sandbox.Commands;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InteractiveConsole.AutoComplete;
+using Vectron.InteractiveConsole.AutoComplete;
 
 namespace PlcInterface.Sandbox.PLCCommands;
 

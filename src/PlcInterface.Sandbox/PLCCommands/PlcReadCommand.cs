@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using InteractiveConsole.Commands;
+using Vectron.InteractiveConsole.Commands;
 
 namespace PlcInterface.Sandbox.PLCCommands;
 

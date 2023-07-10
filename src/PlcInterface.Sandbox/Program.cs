@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using InteractiveConsole;
-using InteractiveConsole.AutoComplete;
-using InteractiveConsole.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -12,6 +9,9 @@ using PlcInterface.Ads;
 using PlcInterface.OpcUa;
 using PlcInterface.Sandbox.Commands;
 using PlcInterface.Sandbox.PLCCommands;
+using Vectron.InteractiveConsole;
+using Vectron.InteractiveConsole.AutoComplete;
+using Vectron.InteractiveConsole.Commands;
 
 namespace PlcInterface.Sandbox;
 

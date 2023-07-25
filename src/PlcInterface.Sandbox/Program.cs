@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using PlcInterface.Ads;
 using PlcInterface.OpcUa;
-using PlcInterface.Sandbox.Commands;
 using PlcInterface.Sandbox.PLCCommands;
 using Vectron.InteractiveConsole;
 using Vectron.InteractiveConsole.AutoComplete;
@@ -28,8 +27,6 @@ internal static class Program
             .AddSingleton(context.Configuration)
             .AddInteractiveConsole()
             .AddConsoleCommand()
-            .AddScoped<IConsoleCommand, CloseApplicationCommand>()
-            .AddScoped<IConsoleCommand, HelpCommand>()
             .AddScoped<IConsoleCommand, PlcConnectCommand>(x => new PlcConnectCommand(AdsBaseCommand, x.GetRequiredService<IAdsPlcConnection>()))
             .AddScoped<IConsoleCommand, PlcDisconnectCommand>(x => new PlcDisconnectCommand(AdsBaseCommand, x.GetRequiredService<IAdsPlcConnection>()))
             .AddScoped<IConsoleCommand, PlcReadCommand>(x => new PlcReadCommand(AdsBaseCommand, x.GetRequiredService<IAdsReadWrite>()))

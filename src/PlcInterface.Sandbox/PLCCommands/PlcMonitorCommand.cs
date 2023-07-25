@@ -31,6 +31,9 @@ internal sealed class PlcMonitorCommand : IConsoleCommand, IDisposable
     }
 
     /// <inheritdoc/>
+    public string[]? ArgumentNames => new[] { "tag" };
+
+    /// <inheritdoc/>
     public string[] CommandParameters
     {
         get;

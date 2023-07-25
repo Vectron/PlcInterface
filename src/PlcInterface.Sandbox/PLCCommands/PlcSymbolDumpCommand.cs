@@ -28,6 +28,9 @@ internal sealed class PlcSymbolDumpCommand : IConsoleCommand
     }
 
     /// <inheritdoc/>
+    public string[]? ArgumentNames => Array.Empty<string>();
+
+    /// <inheritdoc/>
     public string[] CommandParameters
     {
         get;

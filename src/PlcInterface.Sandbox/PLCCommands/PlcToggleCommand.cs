@@ -27,6 +27,9 @@ internal sealed class PlcToggleCommand : IConsoleCommand
     }
 
     /// <inheritdoc/>
+    public string[]? ArgumentNames => new[] { "tag" };
+
+    /// <inheritdoc/>
     public string[] CommandParameters
     {
         get;

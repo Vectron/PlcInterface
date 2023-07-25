@@ -27,6 +27,9 @@ internal abstract class PlcWriteCommand : IConsoleCommand
     }
 
     /// <inheritdoc/>
+    public string[]? ArgumentNames => new[] { "tag", "new value" };
+
+    /// <inheritdoc/>
     public string[] CommandParameters
     {
         get;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,7 @@ using NLog.Extensions.Logging;
 using PlcInterface.Ads;
 using PlcInterface.OpcUa;
 using PlcInterface.Sandbox.PLCCommands;
+using TwinCAT.Ads.TcpRouter;
 using Vectron.InteractiveConsole;
 using Vectron.InteractiveConsole.AutoComplete;
 using Vectron.InteractiveConsole.Commands;
@@ -27,8 +29,8 @@ internal static class Program
             .AddSingleton(context.Configuration)
             .AddInteractiveConsole()
             .AddConsoleCommand()
-            .AddScoped<IConsoleCommand, PlcConnectCommand>(x => new PlcConnectCommand(AdsBaseCommand, x.GetRequiredService<IAdsPlcConnection>()))
-            .AddScoped<IConsoleCommand, PlcDisconnectCommand>(x => new PlcDisconnectCommand(AdsBaseCommand, x.GetRequiredService<IAdsPlcConnection>()))
+            .AddScoped<IConsoleCommand, AdsPlcConnectCommand>()
+            .AddScoped<IConsoleCommand, AdsPlcDisconnectCommand>()
             .AddScoped<IConsoleCommand, PlcReadCommand>(x => new PlcReadCommand(AdsBaseCommand, x.GetRequiredService<IAdsReadWrite>()))
             .AddScoped<IConsoleCommand, PlcToggleCommand>(x => new PlcToggleCommand(AdsBaseCommand, x.GetRequiredService<IAdsReadWrite>()))
             .AddScoped<IConsoleCommand, AdsWriteCommand>()
@@ -46,6 +48,7 @@ internal static class Program
             .AddScoped<IAutoCompleteHandler, PlcSymbolAutoCompleteHandler>(x => new PlcSymbolAutoCompleteHandler(AdsBaseCommand, x.GetRequiredService<IAdsSymbolHandler>()))
             .AddScoped<IAutoCompleteHandler, PlcSymbolAutoCompleteHandler>(x => new PlcSymbolAutoCompleteHandler(OpcBaseCommand, x.GetRequiredService<IOpcSymbolHandler>()))
             .AddAdsPLC()
+            .AddSingleton<IAmsRouter>(x => new AmsTcpIpRouter(x.GetRequiredService<ILogger<AmsTcpIpRouter>>(), x.GetRequiredService<IConfiguration>()))
             .AddOpcPLC()
             .Configure<AdsPlcConnectionOptions>(context.Configuration.GetSection(AdsBaseCommand))
             .Configure<OpcPlcConnectionOptions>(context.Configuration.GetSection(OpcBaseCommand));

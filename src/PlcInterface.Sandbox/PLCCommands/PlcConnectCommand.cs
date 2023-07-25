@@ -6,7 +6,7 @@ namespace PlcInterface.Sandbox.PLCCommands;
 /// <summary>
 /// Base class for a <see cref="IConsoleCommand"/> to connect to the PLC.
 /// </summary>
-internal sealed class PlcConnectCommand : IConsoleCommand
+internal class PlcConnectCommand : IConsoleCommand
 {
     /// <summary>
     /// The parameter needed for this command.
@@ -46,7 +46,7 @@ internal sealed class PlcConnectCommand : IConsoleCommand
     public int MinArguments => 0;
 
     /// <inheritdoc/>
-    public void Execute(string[] arguments)
+    public virtual void Execute(string[] arguments)
     {
         _ = plcConnection.ConnectAsync();
         Console.WriteLine("Connecting to the PLC");

@@ -6,7 +6,7 @@ namespace PlcInterface.Sandbox.PLCCommands;
 /// <summary>
 /// Base class for a <see cref="IConsoleCommand"/> to disconnect from the PLC.
 /// </summary>
-internal sealed class PlcDisconnectCommand : IConsoleCommand
+internal class PlcDisconnectCommand : IConsoleCommand
 {
     /// <summary>
     /// The parameter needed for this command.
@@ -46,7 +46,7 @@ internal sealed class PlcDisconnectCommand : IConsoleCommand
     public int MinArguments => 0;
 
     /// <inheritdoc/>
-    public void Execute(string[] arguments)
+    public virtual void Execute(string[] arguments)
     {
         _ = plcConnection.DisconnectAsync();
         Console.WriteLine("Disconnecting from the PLC");

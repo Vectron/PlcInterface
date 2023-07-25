@@ -3,17 +3,11 @@
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <PropertyGroup>
-    <NLogVersion>5.2.0</NLogVersion>
-  </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Vectron.InteractiveConsole" Version="1.0.9" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="$(NLogVersion)" />
-    <PackageReference Include="NLog.Schema" Version="$(NLogVersion)" />
     <PackageReference Include="Beckhoff.TwinCAT.Ads.TcpRouter" Version="6.0.249" />
   </ItemGroup>
 

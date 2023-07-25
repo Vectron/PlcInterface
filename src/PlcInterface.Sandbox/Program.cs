@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NLog.Extensions.Logging;
 using PlcInterface.Ads;
 using PlcInterface.OpcUa;
 using PlcInterface.Sandbox.PLCCommands;
@@ -24,10 +23,17 @@ internal static class Program
     private const string AdsBaseCommand = "ads";
     private const string OpcBaseCommand = "opc";
 
-    private static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
-        => services.AddOptions()
-            .AddSingleton(context.Configuration)
-            .AddInteractiveConsole()
+    /// <summary>
+    /// The main entry point.
+    /// </summary>
+    private static async Task Main(string[] args)
+    {
+        var builder = Host.CreateApplicationBuilder(args);
+
+        _ = builder.Logging
+            .AddConsoleFormatter<CustomConsoleFormatter, CustomConsoleFormatterOptions>();
+
+        _ = builder.Services
             .AddConsoleCommand()
             .AddScoped<IConsoleCommand, AdsPlcConnectCommand>()
             .AddScoped<IConsoleCommand, AdsPlcDisconnectCommand>()
@@ -37,6 +43,7 @@ internal static class Program
             .AddScoped<IConsoleCommand, PlcMonitorCommand>(x => new PlcMonitorCommand(AdsBaseCommand, x.GetRequiredService<IAdsMonitor>()))
             .AddScoped<IConsoleCommand, PlcStopMonitorCommand>(x => new PlcStopMonitorCommand(AdsBaseCommand, x.GetRequiredService<IAdsMonitor>()))
             .AddScoped<IConsoleCommand, PlcSymbolDumpCommand>(x => new PlcSymbolDumpCommand(AdsBaseCommand, x.GetRequiredService<IAdsSymbolHandler>()))
+            .AddScoped<IAutoCompleteHandler, PlcSymbolAutoCompleteHandler>(x => new PlcSymbolAutoCompleteHandler(AdsBaseCommand, x.GetRequiredService<IAdsSymbolHandler>()))
             .AddScoped<IConsoleCommand, PlcConnectCommand>(x => new PlcConnectCommand(OpcBaseCommand, x.GetRequiredService<IOpcPlcConnection>()))
             .AddScoped<IConsoleCommand, PlcDisconnectCommand>(x => new PlcDisconnectCommand(OpcBaseCommand, x.GetRequiredService<IOpcPlcConnection>()))
             .AddScoped<IConsoleCommand, PlcReadCommand>(x => new PlcReadCommand(OpcBaseCommand, x.GetRequiredService<IOpcReadWrite>()))
@@ -45,43 +52,29 @@ internal static class Program
             .AddScoped<IConsoleCommand, PlcMonitorCommand>(x => new PlcMonitorCommand(OpcBaseCommand, x.GetRequiredService<IOpcMonitor>()))
             .AddScoped<IConsoleCommand, PlcStopMonitorCommand>(x => new PlcStopMonitorCommand(OpcBaseCommand, x.GetRequiredService<IOpcMonitor>()))
             .AddScoped<IConsoleCommand, PlcSymbolDumpCommand>(x => new PlcSymbolDumpCommand(OpcBaseCommand, x.GetRequiredService<IOpcSymbolHandler>()))
-            .AddScoped<IAutoCompleteHandler, PlcSymbolAutoCompleteHandler>(x => new PlcSymbolAutoCompleteHandler(AdsBaseCommand, x.GetRequiredService<IAdsSymbolHandler>()))
-            .AddScoped<IAutoCompleteHandler, PlcSymbolAutoCompleteHandler>(x => new PlcSymbolAutoCompleteHandler(OpcBaseCommand, x.GetRequiredService<IOpcSymbolHandler>()))
+            .AddScoped<IAutoCompleteHandler, PlcSymbolAutoCompleteHandler>(x => new PlcSymbolAutoCompleteHandler(OpcBaseCommand, x.GetRequiredService<IOpcSymbolHandler>()));
+
+        _ = builder.Services
             .AddAdsPLC()
             .AddSingleton<IAmsRouter>(x => new AmsTcpIpRouter(x.GetRequiredService<ILogger<AmsTcpIpRouter>>(), x.GetRequiredService<IConfiguration>()))
-            .AddOpcPLC()
-            .Configure<AdsPlcConnectionOptions>(context.Configuration.GetSection(AdsBaseCommand))
-            .Configure<OpcPlcConnectionOptions>(context.Configuration.GetSection(OpcBaseCommand));
+            .AddOptions<AdsPlcConnectionOptions>()
+                .BindConfiguration(AdsBaseCommand);
 
-    /// <summary>
-    /// The main entry point.
-    /// </summary>
-    private static async Task Main(string[] args)
-    {
-        var logger = NLog.LogManager.GetCurrentClassLogger();
+        _ = builder.Services
+            .AddOpcPLC()
+            .AddOptions<OpcPlcConnectionOptions>()
+                .BindConfiguration(OpcBaseCommand);
 
         try
         {
-            await Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(SetupLogging)
-                .ConfigureServices(ConfigureServices)
-                .RunConsoleAsync(CancellationToken.None)
+            var host = builder.Build();
+            await host.RunAsync(CancellationToken.None)
                 .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "Stopped program because of exception");
-            throw;
-        }
-        finally
-        {
-            NLog.LogManager.Shutdown();
+            Console.WriteLine(ex.Message);
+            System.Diagnostics.Debugger.Break();
         }
     }
-
-    // configure Logging with NLog
-    private static void SetupLogging(HostBuilderContext context, ILoggingBuilder loggingBuilder)
-        => loggingBuilder.ClearProviders()
-            .SetMinimumLevel(LogLevel.Trace)
-            .AddNLog(context.Configuration);
 }

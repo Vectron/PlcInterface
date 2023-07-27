@@ -9,6 +9,7 @@ using PlcInterface.Ads;
 using PlcInterface.OpcUa;
 using PlcInterface.Sandbox.PLCCommands;
 using TwinCAT.Ads.TcpRouter;
+using Vectron.Extensions.Logging.Console.Formatter;
 using Vectron.InteractiveConsole;
 using Vectron.InteractiveConsole.AutoComplete;
 using Vectron.InteractiveConsole.Commands;
@@ -31,7 +32,7 @@ internal static class Program
         var builder = Host.CreateApplicationBuilder(args);
 
         _ = builder.Logging
-            .AddConsoleFormatter<CustomConsoleFormatter, CustomConsoleFormatterOptions>();
+            .AddSingleLineConsole();
 
         _ = builder.Services
             .AddConsoleCommand()

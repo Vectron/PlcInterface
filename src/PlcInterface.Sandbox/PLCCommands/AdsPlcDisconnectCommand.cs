@@ -8,7 +8,7 @@ namespace PlcInterface.Sandbox.PLCCommands;
 /// <summary>
 /// Base class for a <see cref="IConsoleCommand"/> to disconnect from the ads PLC.
 /// </summary>
-internal class AdsPlcDisconnectCommand : PlcDisconnectCommand
+internal sealed class AdsPlcDisconnectCommand : PlcDisconnectCommand
 {
     private readonly IAmsRouter amsRouter;
 

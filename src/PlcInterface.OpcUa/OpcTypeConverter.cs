@@ -25,6 +25,11 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
     {
         if (value is DateTime dateTime)
         {
+            if (dateTime.Ticks == 0)
+            {
+                return dateTime;
+            }
+
             var specified = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
             return new DateTimeOffset(specified);
         }
@@ -43,6 +48,11 @@ public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
         if (targetType == typeof(DateTimeOffset)
             && value is DateTime dateTime)
         {
+            if (dateTime.Ticks == 0)
+            {
+                return default(DateTimeOffset);
+            }
+
             var specified = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
             return new DateTimeOffset(specified);
         }

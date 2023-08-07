@@ -3,55 +3,94 @@
   <DUT Name="WriteTestData" Id="{316d82d6-9b5b-48ba-a25a-d97d492fc17a}">
     <Declaration><![CDATA[TYPE WriteTestData :
 STRUCT
-	Reset				: BOOL 			:= FALSE;
-	BoolValue			: BOOL			:= TRUE;
+	Reset						: BOOL 			:= FALSE;
 	
-	ByteValue			: BYTE			:= 16#FF;
-	WordValue			: WORD			:= 16#FFFF;
-	DWordValue			: DWORD			:= 16#FFFF_FFFF;
-	LWordValue			: LWORD			:= 16#FFFF_FFFF_FFFF_FFFF;
+	BoolValueReset				: BOOL			:= FALSE;
+	BoolValue					: BOOL			:= TRUE;
 	
-	SIntValue			: SINT			:= -128;
-	IntValue			: INT			:= -32768;
-	DIntValue			: DINT			:= -2147483648 ;
-	LIntValue			: LINT			:= -9223372036854775808;
+	ByteValueReset				: BOOL			:= FALSE;
+	ByteValue					: BYTE			:= 16#FF;
+	WordValueReset				: BOOL			:= FALSE;
+	WordValue					: WORD			:= 16#FFFF;
+	DWordValueReset				: BOOL			:= FALSE;
+	DWordValue					: DWORD			:= 16#FFFF_FFFF;
+	LWordValueReset				: BOOL			:= FALSE;
+	LWordValue					: LWORD			:= 16#FFFF_FFFF_FFFF_FFFF;
 	
-	USIntValue			: USINT			:= 255;
-	UIntValue			: UINT			:= 65535;
-	UDIntValue			: UDINT			:= 4294967295;
-	ULIntValue			: ULINT			:= 18446744073709551615;
+	SIntValueReset				: BOOL			:= FALSE;
+	SIntValue					: SINT			:= -128;
+	IntValueReset				: BOOL			:= FALSE;
+	IntValue					: INT			:= -32768;
+	DIntValueReset				: BOOL			:= FALSE;
+	DIntValue					: DINT			:= -2147483648 ;
+	LIntValueReset				: BOOL			:= FALSE;
+	LIntValue					: LINT			:= -9223372036854775808;
 	
-	RealValue			: REAL			:= -3.402823E+38;
-	LRealValue			: LREAL			:= -1.79769313486231E+308;
+	USIntValueReset				: BOOL			:= FALSE;
+	USIntValue					: USINT			:= 255;
+	UIntValueReset				: BOOL			:= FALSE;
+	UIntValue					: UINT			:= 65535;
+	UDIntValueReset				: BOOL			:= FALSE;
+	UDIntValue					: UDINT			:= 4294967295;
+	ULIntValueReset				: BOOL			:= FALSE;
+	ULIntValue					: ULINT			:= 18446744073709551615;
 	
-	TimeValue1			: TIME			:= T#1000MS;
-	TimeValue2			: TIME			:= T#1000MS;
-	TimeOfDayValue1		: TIME_OF_DAY	:= TOD#01:00;
-	TimeOfDayValue2		: TIME_OF_DAY	:= TOD#01:00;
-	LTimeValue1			: LTIME 		:= LTIME#1000NS;
-	LTimeValue2			: LTIME 		:= LTIME#1000NS;
-	DateValue1			: DATE			:= D#2106-02-06;
-	DateValue2			: DATE			:= D#2106-02-06;
-	DateAndTimeValue1	: DATE_AND_TIME	:= DT#2106-02-06-06:28:15;
-	DateAndTimeValue2	: DATE_AND_TIME	:= DT#2106-02-06-06:28:15;
+	RealValueReset				: BOOL			:= FALSE;
+	RealValue					: REAL			:= -3.402823E+38;
+	LRealValueReset				: BOOL			:= FALSE;
+	LRealValue					: LREAL			:= -1.79769313486231E+308;
 	
-	StringValue			: STRING		:= 'Test String';
-	WStringValue		: WSTRING		:= "Test WString";
+	TimeValue1Reset				: BOOL			:= FALSE;
+	TimeValue1					: TIME			:= T#1000MS;
+	TimeValue2Reset				: BOOL			:= FALSE;
+	TimeValue2					: TIME			:= T#1000MS;
+	TimeOfDayValue1Reset		: BOOL			:= FALSE;
+	TimeOfDayValue1				: TIME_OF_DAY	:= TOD#01:00;
+	TimeOfDayValue2Reset		: BOOL			:= FALSE;
+	TimeOfDayValue2				: TIME_OF_DAY	:= TOD#01:00;
+	LTimeValue1Reset			: BOOL			:= FALSE;
+	LTimeValue1					: LTIME 		:= LTIME#1000NS;
+	LTimeValue2Reset			: BOOL			:= FALSE;
+	LTimeValue2					: LTIME 		:= LTIME#1000NS;
+	DateValue1Reset				: BOOL			:= FALSE;
+	DateValue1					: DATE			:= D#2106-02-06;
+	DateValue2Reset				: BOOL			:= FALSE;
+	DateValue2					: DATE			:= D#2106-02-06;
+	DateAndTimeValue1Reset		: BOOL			:= FALSE;
+	DateAndTimeValue1			: DATE_AND_TIME	:= DT#2106-02-06-06:28:15;
+	DateAndTimeValue2Reset		: BOOL			:= FALSE;
+	DateAndTimeValue2			: DATE_AND_TIME	:= DT#2106-02-06-06:28:15;
 	
-	EnumValue1			: TestEnum		:= TestEnum.first;
-	EnumValue2			: TestEnum		:= TestEnum.first;
-	EnumValue3			: TestEnum		:= TestEnum.first;
+	StringValueReset			: BOOL			:= FALSE;
+	StringValue					: STRING		:= 'Test String';
+	WStringValueReset			: BOOL			:= FALSE;
+	WStringValue				: WSTRING		:= "Test WString";
 	
-	IntArray			: ARRAY[0..10] OF INT := [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010];
-	MultiDimensionArray : ARRAY[0..1,0..2,0..3] OF INT := [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400];
-	ComplexArray		: ARRAY[0..2] OF DUT_TestStruct2;
-	MultiDimensionComplexArray : ARRAY[0..1,0..2,0..3] OF DUT_TestStruct2;
+	EnumValue1Reset				: BOOL			:= FALSE;
+	EnumValue1					: TestEnum		:= TestEnum.first;
+	EnumValue2Reset				: BOOL			:= FALSE;
+	EnumValue2					: TestEnum		:= TestEnum.first;
+	EnumValue3Reset				: BOOL			:= FALSE;
+	EnumValue3					: TestEnum		:= TestEnum.first;
 	
-	Nested				: DUT_TestStruct2;
-	Nested2				: DUT_TestStruct2;
+	IntArrayReset				: BOOL			:= FALSE;
+	IntArray					: ARRAY[0..10] OF INT := [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010];
+	MultiDimensionArrayReset	: BOOL			:= FALSE;
+	MultiDimensionArray 		: ARRAY[0..1,0..2,0..3] OF INT := [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400];
+	ComplexArrayReset			: BOOL			:= FALSE;
+	ComplexArray				: ARRAY[0..2] OF DUT_TestStruct2;
+	MultiDimensionComplexArrayReset	: BOOL			:= FALSE;
+	MultiDimensionComplexArray 	: ARRAY[0..1,0..2,0..3] OF DUT_TestStruct2;
 	
-	StructValue			: DUT_TestStruct;
-	StructValue2		: DUT_TestStruct;
+	Nested1Reset				: BOOL			:= FALSE;
+	Nested1						: DUT_TestStruct2;
+	Nested2Reset				: BOOL			:= FALSE;
+	Nested2						: DUT_TestStruct2;
+	
+	StructValue1Reset			: BOOL			:= FALSE;
+	StructValue1				: DUT_TestStruct;
+	StructValue2Reset			: BOOL			:= FALSE;
+	StructValue2				: DUT_TestStruct;
 END_STRUCT
 END_TYPE
 ]]></Declaration>

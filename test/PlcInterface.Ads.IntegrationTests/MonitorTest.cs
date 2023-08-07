@@ -10,7 +10,11 @@ namespace PlcInterface.Ads.IntegrationTests;
 [TestClass]
 public class MonitorTest : IMonitorTestBase
 {
-    protected override string DataRoot => "Ads";
+#if NET6_0
+    protected override string DataRoot => "AdsNet6";
+#elif NET7_0
+    protected override string DataRoot => "AdsNet7";
+#endif
 
     protected override ServiceProvider GetServiceProvider()
     {

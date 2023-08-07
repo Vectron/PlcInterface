@@ -12,7 +12,11 @@ namespace PlcInterface.Opc.IntegrationTests;
 [DoNotParallelize]
 public class WriteValueTest : IWriteValueTestBase
 {
-    protected override string DataRoot => "Opc";
+#if NET6_0
+    protected override string DataRoot => "OpcNet6";
+#elif NET7_0
+    protected override string DataRoot => "OpcNet7";
+#endif
 
     protected override ServiceProvider GetServiceProvider()
     {

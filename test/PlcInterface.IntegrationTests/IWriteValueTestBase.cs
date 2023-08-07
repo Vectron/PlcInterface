@@ -102,9 +102,9 @@ public abstract class IWriteValueTestBase
                     },
                 },
             },
-            new object[] { "StructValue", DUT_TestStruct.Write },
+            new object[] { "StructValue1", DUT_TestStruct.Write },
             new object[] { "StructValue2", DUT_TestClass.Write },
-            new object[] { "Nested", DUT_TestStruct2.Write },
+            new object[] { "Nested1", DUT_TestStruct2.Write },
             new object[] { "Nested2", DUT_TestClass2.Write },
         };
 
@@ -182,7 +182,7 @@ public abstract class IWriteValueTestBase
         // Act
         var connected = connection.Connect();
         Assert.IsTrue(connected, "Plc could not connect");
-        ResetPLCValues(readWrite);
+        ResetPLCValues(readWrite, string.Empty);
         var originalData = readWrite.Read(writeData.Keys);
         readWrite.Write(writeData);
         var newValueRead = readWrite.Read(writeData.Keys);
@@ -234,7 +234,7 @@ public abstract class IWriteValueTestBase
         // Act
         var connected = await connection.ConnectAsync();
         Assert.IsTrue(connected, "Plc could not connect");
-        ResetPLCValues(readWrite);
+        ResetPLCValues(readWrite, string.Empty);
         var originalData = await readWrite.ReadAsync(writeData.Keys);
         await readWrite.WriteAsync(writeData);
         var newValueRead = await readWrite.ReadAsync(writeData.Keys);
@@ -277,7 +277,7 @@ public abstract class IWriteValueTestBase
 
         // Act
         Assert.IsTrue(connection.Connect());
-        ResetPLCValues(readWrite);
+        ResetPLCValues(readWrite, itemName);
         var original = readWrite.Read(ioName);
         readWrite.Write(ioName, newValue);
         var newValueRead = readWrite.Read(ioName);
@@ -301,7 +301,7 @@ public abstract class IWriteValueTestBase
 
         // Act
         Assert.IsTrue(connection.Connect());
-        ResetPLCValues(readWrite);
+        ResetPLCValues(readWrite, itemName);
         var original = await readWrite.ReadAsync(ioName);
         await readWrite.WriteAsync(ioName, newValue);
         var newValueRead = await readWrite.ReadAsync(ioName);
@@ -313,11 +313,11 @@ public abstract class IWriteValueTestBase
 
     protected abstract IServiceProvider GetServiceProvider();
 
-    protected void ResetPLCValues(IReadWrite readWrite, [CallerMemberName] string memberName = "")
+    protected void ResetPLCValues(IReadWrite readWrite, string fieldName, [CallerMemberName] string memberName = "")
     {
-        var ioName = $"{DataRoot}.WriteTestData.{memberName}.Reset";
+        var ioName = $"{DataRoot}.WriteTestData.{memberName}.{fieldName}Reset";
         readWrite.Write(ioName, true);
-        var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(1));
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
         while (readWrite.Read<bool>(ioName))
         {
             cts.Token.ThrowIfCancellationRequested();
@@ -338,7 +338,7 @@ public abstract class IWriteValueTestBase
         // Act
         var connected = connection.Connect();
         Assert.IsTrue(connected, "Plc could not connect");
-        ResetPLCValues(readWrite, memberName);
+        ResetPLCValues(readWrite, itemName, memberName);
         var original = readWrite.Read<T2>(ioName);
         readWrite.Write(ioName, newValue);
 
@@ -369,7 +369,7 @@ public abstract class IWriteValueTestBase
         // Act
         var connected = connection.Connect();
         Assert.IsTrue(connected, "Plc could not connect");
-        ResetPLCValues(readWrite, memberName);
+        ResetPLCValues(readWrite, itemName, memberName);
         var original = await readWrite.ReadAsync<T2>(ioName).ConfigureAwait(false);
         await readWrite.WriteAsync(ioName, newValue).ConfigureAwait(false);
 

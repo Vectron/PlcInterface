@@ -47,11 +47,19 @@
     <Compile Include="DUTs\WriteTestData.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GVLs\Ads.TcGVL">
+    <Compile Include="GVLs\AdsNet6.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
     </Compile>
-    <Compile Include="GVLs\Opc.TcGVL">
+    <Compile Include="GVLs\AdsNet7.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="GVLs\OpcNet6.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="GVLs\OpcNet7.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
     </Compile>

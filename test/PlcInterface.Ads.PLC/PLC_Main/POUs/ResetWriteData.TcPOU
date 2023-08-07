@@ -54,12 +54,202 @@ END_VAR
 	data.ComplexArray					:= EmptyStruct.ComplexArray;
 	data.MultiDimensionComplexArray		:= EmptyStruct.MultiDimensionComplexArray;
 	
-	data.Nested							:= EmptyStruct.Nested;
+	data.Nested1						:= EmptyStruct.Nested;
 	data.Nested2						:= EmptyStruct.Nested;
-	data.StructValue					:= EmptyStruct;
+	data.StructValue1					:= EmptyStruct;
 	data.StructValue2					:= EmptyStruct;
 	
 	data.Reset 							:= FALSE;
+END_IF
+
+IF (data.BoolValueReset) THEN
+	data.BoolValue						:= TRUE;
+	data.BoolValueReset					:= FALSE;
+END_IF
+	
+IF (data.ByteValueReset) THEN
+	data.ByteValue						:= 16#FF;
+	data.ByteValueReset					:= FALSE;
+END_IF
+	
+IF (data.WordValueReset) THEN
+	data.WordValue						:= 16#FFFF;
+	data.WordValueReset					:= FALSE;
+END_IF
+	
+IF (data.DWordValueReset) THEN
+	data.DWordValue						:= 16#FFFF_FFFF;
+	data.DWordValueReset				:= FALSE;
+END_IF
+	
+IF (data.LWordValueReset) THEN
+	data.LWordValue						:= 16#FFFF_FFFF_FFFF_FFFF;
+	data.LWordValueReset				:= FALSE;
+END_IF
+	
+IF (data.SIntValueReset) THEN
+	data.SIntValue						:= -128;
+	data.SIntValueReset					:= FALSE;
+END_IF
+	
+IF (data.IntValueReset) THEN
+	data.IntValue						:= -32768;
+	data.IntValueReset					:= FALSE;
+END_IF
+	
+IF (data.DIntValueReset) THEN
+	data.DIntValue						:= -2147483648 ;
+	data.DIntValueReset					:= FALSE;
+END_IF
+	
+IF (data.LIntValueReset) THEN
+	data.LIntValue						:= -9223372036854775808;
+	data.LIntValueReset					:= FALSE;
+END_IF
+	
+IF (data.USIntValueReset) THEN
+	data.USIntValue						:= 255;
+	data.USIntValueReset				:= FALSE;
+END_IF
+	
+IF (data.UIntValueReset) THEN
+	data.UIntValue						:= 65535;
+	data.UIntValueReset					:= FALSE;
+END_IF
+	
+IF (data.UDIntValueReset) THEN
+	data.UDIntValue						:= 4294967295;
+	data.UDIntValueReset				:= FALSE;
+END_IF
+	
+IF (data.ULintValueReset) THEN
+	data.ULintValue						:= 18446744073709551615;
+	data.ULintValueReset					:= FALSE;
+END_IF
+	
+IF (data.RealValueReset) THEN
+	data.RealValue						:= -3.402823E+38;
+	data.RealValueReset					:= FALSE;
+END_IF
+	
+IF (data.LRealValueReset) THEN
+	data.LRealValue						:= -1.79769313486231E+308;
+	data.LRealValueReset				:= FALSE;
+END_IF
+	
+IF (data.TimeValue1Reset) THEN
+	data.TimeValue1						:= T#1000MS;
+	data.TimeValue1Reset				:= FALSE;
+END_IF
+	
+IF (data.TimeValue2Reset) THEN
+	data.TimeValue2						:= T#1000MS;
+	data.TimeValue2Reset				:= FALSE;
+END_IF
+	
+IF (data.TimeOfDayValue1Reset) THEN
+	data.TimeOfDayValue1				:= TOD#01:00;
+	data.TimeOfDayValue1Reset			:= FALSE;
+END_IF
+	
+IF (data.TimeOfDayValue2Reset) THEN
+	data.TimeOfDayValue2				:= TOD#01:00;
+	data.TimeOfDayValue2Reset			:= FALSE;
+END_IF
+	
+IF (data.LTimeValue1Reset) THEN
+	data.LTimeValue1					:= LTIME#1000NS;
+	data.LTimeValue1Reset				:= FALSE;
+END_IF
+	
+IF (data.LTimeValue2Reset) THEN
+	data.LTimeValue2					:= LTIME#1000NS;
+	data.LTimeValue2Reset				:= FALSE;
+END_IF
+	
+IF (data.DateValue1Reset) THEN
+	data.DateValue1						:= D#2106-02-06;
+	data.DateValue1Reset				:= FALSE;
+END_IF
+	
+IF (data.DateValue2Reset) THEN
+	data.DateValue2						:= D#2106-02-06;
+	data.DateValue2Reset				:= FALSE;
+END_IF
+	
+IF (data.DateAndTimeValue1Reset) THEN
+	data.DateAndTimeValue1				:= DT#2106-02-06-06:28:15;
+	data.DateAndTimeValue1Reset			:= FALSE;
+END_IF
+	
+IF (data.DateAndTimeValue2Reset) THEN
+	data.DateAndTimeValue2				:= DT#2106-02-06-06:28:15;
+	data.DateAndTimeValue2Reset			:= FALSE;
+END_IF
+	
+IF (data.StringValueReset) THEN
+	data.StringValue					:= 'Test String';
+	data.StringValueReset				:= FALSE;
+END_IF
+	
+IF (data.WStringValueReset) THEN
+	data.WStringValue					:= "Test WString";
+	data.WStringValueReset				:= FALSE;
+END_IF
+	
+IF (data.EnumValue1Reset) THEN
+	data.EnumValue1						:= TestEnum.first;
+	data.EnumValue1Reset				:= FALSE;
+END_IF
+	
+IF (data.EnumValue2Reset) THEN
+	data.EnumValue2						:= TestEnum.first;
+	data.EnumValue2Reset				:= FALSE;
+END_IF
+	
+IF (data.EnumValue3Reset) THEN
+	data.EnumValue3						:= TestEnum.first;
+	data.EnumValue3Reset				:= FALSE;
+END_IF
+	
+IF (data.IntArrayReset) THEN
+	data.IntArray				 		:= EmptyStruct.IntArray;
+	data.IntArrayReset					:= FALSE;
+END_IF
+	
+IF (data.MultiDimensionArrayReset) THEN
+	data.MultiDimensionArray			:= EmptyStruct.MultiDimensionArray;
+	data.MultiDimensionArrayReset		:= FALSE;
+END_IF
+	
+IF (data.ComplexArrayReset) THEN
+	data.ComplexArray					:= EmptyStruct.ComplexArray;
+	data.ComplexArrayReset				:= FALSE;
+END_IF
+	
+IF (data.MultiDimensionComplexArrayReset) THEN
+	data.MultiDimensionComplexArray		:= EmptyStruct.MultiDimensionComplexArray;
+	data.MultiDimensionComplexArrayReset:= FALSE;
+END_IF
+	
+IF (data.Nested1Reset) THEN
+	data.Nested1						:= EmptyStruct.Nested;
+	data.Nested1Reset:= FALSE;
+END_IF
+	
+IF (data.Nested2Reset) THEN
+	data.Nested2						:= EmptyStruct.Nested;
+	data.Nested2Reset:= FALSE;
+END_IF
+	
+IF (data.StructValue1Reset) THEN
+	data.StructValue1					:= EmptyStruct;
+	data.StructValue1Reset:= FALSE;
+END_IF
+	
+IF (data.StructValue2Reset) THEN
+	data.StructValue2					:= EmptyStruct;
+	data.StructValue2Reset:= FALSE;
 END_IF
 ]]></ST>
     </Implementation>

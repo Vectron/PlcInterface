@@ -3,7 +3,6 @@
     <RunConfiguration>
         <MaxCpuCount>0</MaxCpuCount>
         <ResultsDirectory>.\bin\TestResults</ResultsDirectory>
-        <TestSessionTimeout>10000</TestSessionTimeout>
         <TreatNoTestsAsError>false</TreatNoTestsAsError>
     </RunConfiguration>
 

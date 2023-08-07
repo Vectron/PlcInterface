@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="ResetWriteData" Id="{56a86ef4-6e2e-43d3-bcfa-6b6086db4f62}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION ResetWriteData : BOOL
+VAR_INPUT
+	data			: REFERENCE TO WriteTestData;
+END_VAR
+VAR CONSTANT
+	EmptyStruct		: DUT_TestStruct;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF data.Reset THEN
+	data.BoolValue						:= TRUE;
+	
+	data.ByteValue						:= 16#FF;
+	data.WordValue						:= 16#FFFF;
+	data.DWordValue						:= 16#FFFF_FFFF;
+	data.LWordValue						:= 16#FFFF_FFFF_FFFF_FFFF;
+
+	data.SIntValue						:= -128;
+	data.IntValue						:= -32768;
+	data.DIntValue						:= -2147483648 ;
+	data.LIntValue						:= -9223372036854775808;
+
+	data.USIntValue						:= 255;
+	data.UIntValue						:= 65535;
+	data.UDIntValue						:= 4294967295;
+	data.ULintValue						:= 18446744073709551615;
+	
+	data.RealValue						:= -3.402823E+38;
+	data.LRealValue						:= -1.79769313486231E+308;
+	
+	data.TimeValue1						:= T#1000MS;
+	data.TimeValue2						:= T#1000MS;
+	data.TimeOfDayValue1				:= TOD#01:00;
+	data.TimeOfDayValue2				:= TOD#01:00;
+	data.LTimeValue1					:= LTIME#1000NS;
+	data.LTimeValue2					:= LTIME#1000NS;
+	data.DateValue1						:= D#2106-02-06;
+	data.DateValue2						:= D#2106-02-06;
+	data.DateAndTimeValue1				:= DT#2106-02-06-06:28:15;
+	data.DateAndTimeValue2				:= DT#2106-02-06-06:28:15;
+	
+	data.StringValue					:= 'Test String';
+	data.WStringValue					:= "Test WString";
+	
+	data.EnumValue1						:= TestEnum.first;
+	data.EnumValue2						:= TestEnum.first;
+	data.EnumValue3						:= TestEnum.first;
+	
+	data.IntArray				 		:= EmptyStruct.IntArray;	
+	data.MultiDimensionArray			:= EmptyStruct.MultiDimensionArray;
+	data.ComplexArray					:= EmptyStruct.ComplexArray;
+	data.MultiDimensionComplexArray		:= EmptyStruct.MultiDimensionComplexArray;
+	
+	data.Nested							:= EmptyStruct.Nested;
+	data.Nested2						:= EmptyStruct.Nested;
+	data.StructValue					:= EmptyStruct;
+	data.StructValue2					:= EmptyStruct;
+	
+	data.Reset 							:= FALSE;
+END_IF
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

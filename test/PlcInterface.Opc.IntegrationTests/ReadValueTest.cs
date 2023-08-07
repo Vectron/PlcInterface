@@ -1,61 +1,27 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.IntegrationTests;
 using PlcInterface.OpcUa;
-using TestUtilities;
 
 namespace PlcInterface.Opc.IntegrationTests;
 
 [TestClass]
-public sealed class ReadValueTest : IReadValueTestBase, IDisposable
+[DoNotParallelize]
+public sealed class ReadValueTest : IReadValueTestBase
 {
-    private PlcConnection? connection;
-    private bool disposed;
-    private ReadWrite? readWrite;
-    private SymbolHandler? symbolHandler;
+    protected override string DataRoot => "Opc";
 
-    [TestInitialize]
-    public async Task ConnectAsync()
+    protected override ServiceProvider GetServiceProvider()
     {
-        var connectionSettings = new OpcPlcConnectionOptions();
-        new DefaultOpcPlcConnectionConfigureOptions().Configure(connectionSettings);
-        connectionSettings.Address = Settings.PLCUri;
+        var services = new ServiceCollection()
+            .AddOpcPLC()
+            .Configure<OpcPlcConnectionOptions>(o => o.Address = Settings.PLCUri);
 
-        connection?.Dispose();
-        symbolHandler?.Dispose();
-        readWrite?.Dispose();
+        services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(NullLogger<>)));
 
-        connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionSettings), MockHelpers.GetLoggerMock<PlcConnection>());
-        symbolHandler = new SymbolHandler(connection, MockHelpers.GetLoggerMock<SymbolHandler>());
-        var typeConverter = new OpcTypeConverter(symbolHandler);
-        readWrite = new ReadWrite(connection, symbolHandler, typeConverter, MockHelpers.GetLoggerMock<ReadWrite>());
-        if (!await connection.ConnectAsync())
-        {
-            throw new InvalidOperationException("Connection to PLC Failed");
-        }
-    }
-
-    [TestCleanup]
-    public void Disconnect()
-        => Dispose();
-
-    public void Dispose()
-    {
-        if (disposed)
-        {
-            return;
-        }
-
-        disposed = true;
-        connection!.Dispose();
-        symbolHandler!.Dispose();
-        readWrite!.Dispose();
-    }
-
-    protected override IReadWrite GetReadWrite()
-    {
-        Assert.IsNotNull(readWrite);
-        return readWrite;
+        return services.BuildServiceProvider();
     }
 }

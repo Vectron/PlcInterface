@@ -1,40 +1,27 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.IntegrationTests;
 using PlcInterface.OpcUa;
-using TestUtilities;
 
 namespace PlcInterface.Opc.IntegrationTests;
 
 [TestClass]
+[DoNotParallelize]
 public class SymbolHandlerTest : ISymbolHandlerTestBase
 {
-    private static PlcConnection? connection;
-    private static SymbolHandler? symbolHandler;
+    protected override string DataRoot => "Opc";
 
-    [ClassInitialize]
-    public static async Task ConnectAsync(TestContext testContext)
+    protected override ServiceProvider GetServiceProvider()
     {
-        var connectionSettings = new OpcPlcConnectionOptions();
-        new DefaultOpcPlcConnectionConfigureOptions().Configure(connectionSettings);
-        connectionSettings.Address = Settings.PLCUri;
+        var services = new ServiceCollection()
+            .AddOpcPLC()
+            .Configure<OpcPlcConnectionOptions>(o => o.Address = Settings.PLCUri);
 
-        connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionSettings), MockHelpers.GetLoggerMock<PlcConnection>());
-        symbolHandler = new SymbolHandler(connection, MockHelpers.GetLoggerMock<SymbolHandler>());
-        if (!await connection.ConnectAsync())
-        {
-            throw new InvalidOperationException("Connection to PLC Failed");
-        }
+        services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(NullLogger<>)));
+
+        return services.BuildServiceProvider();
     }
-
-    [ClassCleanup]
-    public static void Disconnect()
-    {
-        connection!.Dispose();
-        symbolHandler!.Dispose();
-    }
-
-    protected override ISymbolHandler GetSymbolHandler()
-        => symbolHandler!;
 }

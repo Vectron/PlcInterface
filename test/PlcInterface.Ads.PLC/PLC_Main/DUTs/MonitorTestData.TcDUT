@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="MonitorTestData" Id="{12b35f3e-79e8-4885-8bda-2bc492d885bc}">
+    <Declaration><![CDATA[{attribute 'analysis' := '-33'}
+TYPE MonitorTestData :
+STRUCT
+	BoolValue			: BOOL;
+	
+	ByteValue			: BYTE;
+	WordValue			: WORD;
+	DWordValue			: DWORD;
+	LWordValue			: LWORD;
+	
+	SIntValue			: SINT;
+	IntValue			: INT;
+	DIntValue			: DINT;
+	LIntValue			: LINT;
+	
+	USIntValue			: USINT;
+	UIntValue			: UINT;
+	UDIntValue			: UDINT;
+	ULIntValue			: ULINT;
+	
+	RealValue			: REAL;
+	LRealValue			: LREAL;
+	
+	TimeValue			: TIME;
+	TimeOfDayValue		: TOD;
+	LTimeValue			: LTIME;
+	DateValue			: DATE;
+	DateAndTimeValue	: DT;
+	StringValue			: STRING;
+	WStringValue		: WSTRING;
+	EnumValue1			: TestEnum;
+	EnumValue2			: TestEnum;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

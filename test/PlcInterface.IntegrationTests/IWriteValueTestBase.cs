@@ -1,7 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PlcInterface.IntegrationTests.DataTypes;
 using PlcInterface.IntegrationTests.Extension;
 
 namespace PlcInterface.IntegrationTests;
@@ -9,24 +15,112 @@ namespace PlcInterface.IntegrationTests;
 [DoNotParallelize]
 public abstract class IWriteValueTestBase
 {
-    [TestInitialize]
-    public void ResetPLCValues()
+    protected abstract string DataRoot
     {
-        var readWrite = GetReadWrite();
-        readWrite.Write("MAIN.Reset", true);
-        while (readWrite.Read<bool>("MAIN.Reset"))
-        {
-        }
+        get;
     }
+
+    private static IEnumerable<object[]> WriteTestData
+        => new List<object[]>()
+        {
+            new object[] { "BoolValue", false },
+            new object[] { "ByteValue", byte.MinValue },
+            new object[] { "WordValue", ushort.MinValue },
+            new object[] { "DWordValue", uint.MinValue },
+            new object[] { "LWordValue", ulong.MinValue },
+            new object[] { "SIntValue", sbyte.MaxValue },
+            new object[] { "IntValue", short.MaxValue },
+            new object[] { "DIntValue", int.MaxValue },
+            new object[] { "LIntValue", long.MaxValue },
+            new object[] { "USIntValue", byte.MinValue },
+            new object[] { "UIntValue", ushort.MinValue },
+            new object[] { "UDIntValue", uint.MinValue },
+            new object[] { "ULIntValue", ulong.MinValue },
+            new object[] { "RealValue", 3.402823E+38F },
+            new object[] { "LRealValue", 1.79769313486231E+308 },
+            new object[] { "TimeValue1", TimeSpan.FromSeconds(3) },
+            new object[] { "TimeValue2", 3000u, TimeSpan.FromSeconds(3) },
+            new object[] { "TimeOfDayValue1", TimeSpan.FromHours(10) },
+            new object[] { "TimeOfDayValue2", 36000000u, TimeSpan.FromHours(10) },
+            new object[] { "LTimeValue1", TimeSpan.FromTicks(100) },
+            new object[] { "LTimeValue2", 10000ul, TimeSpan.FromTicks(100) },
+            new object[] { "DateValue1", new DateTimeOffset(2019, 02, 21, 00, 00, 00, TimeSpan.FromHours(1)) },
+            new object[] { "DateValue2", new DateTime(2019, 02, 21), new DateTimeOffset(2019, 02, 21, 00, 00, 00, TimeSpan.FromHours(1)) },
+            new object[] { "DateAndTimeValue1", new DateTimeOffset(2019, 02, 21, 12, 15, 10, TimeSpan.FromHours(1)) },
+            new object[] { "DateAndTimeValue2", new DateTime(2019, 02, 21, 12, 15, 10), new DateTimeOffset(2019, 02, 21, 12, 15, 10, TimeSpan.FromHours(1)) },
+            new object[] { "StringValue", "new Test String" },
+            new object[] { "WStringValue", "new Test WString" },
+            new object[] { "EnumValue1", TestEnum.Third, (int)TestEnum.Third },
+            new object[] { "EnumValue2", (short)TestEnum.Third, (int)TestEnum.Third },
+            new object[] { "EnumValue3", (int)TestEnum.Third },
+        };
+
+    private static IEnumerable<object[]> WriteTestDataExtended
+        => new List<object[]>()
+        {
+            new object[]
+            {
+                "IntArray",
+                new short[] { 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010 },
+            },
+            new object[]
+            {
+                "MultiDimensionArray",
+                new short[,,]
+                {
+                    {
+                        { 01000, 02000, 03000, 04000 },
+                        { 05000, 06000, 07000, 08000 },
+                        { 09000, 10000, 11000, 12000 },
+                    },
+                    {
+                        { 13000, 14000, 15000, 16000 },
+                        { 17000, 18000, 19000, 20000 },
+                        { 21000, 22000, 23000, 24000 },
+                    },
+                },
+            },
+            new object[]
+            {
+                "ComplexArray",
+                new DUT_TestStruct2[] { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
+            },
+            new object[]
+            {
+                "MultiDimensionComplexArray",
+                new DUT_TestStruct2[,,]
+                {
+                    {
+                        { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
+                        { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
+                        { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
+                    },
+                    {
+                        { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
+                        { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
+                        { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
+                    },
+                },
+            },
+            new object[] { "StructValue", DUT_TestStruct.Write },
+            new object[] { "StructValue2", DUT_TestClass.Write },
+            new object[] { "Nested", DUT_TestStruct2.Write },
+            new object[] { "Nested2", DUT_TestClass2.Write },
+        };
 
     [TestMethod]
     public void ToggleBool()
     {
         // Arrange
-        var readWrite = GetReadWrite();
-        var ioName = "WriteTestData.BoolValue";
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.WriteTestData.ToggleBool";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         var original = readWrite.Read<bool>(ioName);
         readWrite.ToggleBool(ioName);
         var newValue = readWrite.Read<bool>(ioName);
@@ -36,160 +130,256 @@ public abstract class IWriteValueTestBase
     }
 
     [DataTestMethod]
-    [DynamicData(nameof(Settings.GetWriteData), typeof(Settings), DynamicDataSourceType.Method)]
-    public void Write(string ioName, object newValue, object readValue)
+    [DynamicData(nameof(WriteTestData))]
+    [DynamicData(nameof(WriteTestDataExtended))]
+    public void WriteGenericUpdatesTheValueInPlc(string itemName, object newValue, object? readValue = null)
+    {
+        var writeType = newValue.GetType();
+        var readType = readValue == null ? writeType : readValue.GetType();
+
+        var method = GetType()
+            .GetMethod(nameof(WriteValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
+            ?.MakeGenericMethod(writeType, readType)
+            ?? throw new InvalidOperationException($"Unable to create the generic method {newValue.GetType().Name}.");
+        _ = method.InvokeUnwrappedException(this, new[] { itemName, newValue, readValue ?? newValue, nameof(WriteGenericUpdatesTheValueInPlc) });
+    }
+
+    [DataTestMethod]
+    [DynamicData(nameof(WriteTestData))]
+    [DynamicData(nameof(WriteTestDataExtended))]
+    public async Task WriteGenericUpdatesTheValueInPlcAsync(string itemName, object newValue, object? readValue = null)
+    {
+        var writeType = newValue.GetType();
+        var readType = readValue == null ? writeType : readValue.GetType();
+
+        var method = GetType()
+            .GetMethod(nameof(WriteValueGenericHelperAsync), BindingFlags.NonPublic | BindingFlags.Instance)
+            ?.MakeGenericMethod(writeType, readType)
+            ?? throw new InvalidOperationException($"Unable to create the generic method {newValue.GetType().Name}.");
+        await method.InvokeAsyncUnwrappedException(this, new[] { itemName, newValue, readValue ?? newValue, nameof(WriteGenericUpdatesTheValueInPlcAsync) });
+    }
+
+    [TestMethod]
+    public void WriteMultipleUpdatesTheValueInPlc()
     {
         // Arrange
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var writeData = WriteTestData
+            .Concat(WriteTestDataExtended)
+            .ToDictionary(
+                kv => $"{DataRoot}.WriteTestData.{nameof(WriteMultipleUpdatesTheValueInPlc)}.{kv[0]}",
+                kv => kv[1],
+                StringComparer.Ordinal);
+
+        var expectedData = WriteTestData
+            .Concat(WriteTestDataExtended)
+            .Select(kv => kv.Length == 3 ? kv[2] : kv[1])
+            .ToList();
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
+        ResetPLCValues(readWrite);
+        var originalData = readWrite.Read(writeData.Keys);
+        readWrite.Write(writeData);
+        var newValueRead = readWrite.Read(writeData.Keys);
+
+        // Assert
+        using var writeDataEnumerator = writeData.GetEnumerator();
+        using var originalEnumerator = originalData.GetEnumerator();
+        using var newValueEnumerator = newValueRead.GetEnumerator();
+        using var expectedDataEnumerator = expectedData.GetEnumerator();
+
+        Assert.AreEqual(writeData.Count, originalData.Count);
+        Assert.AreEqual(writeData.Count, newValueRead.Count);
+        var multiAssert = new MultiAssert();
+
+        while (writeDataEnumerator.MoveNext()
+                && newValueEnumerator.MoveNext()
+                && originalEnumerator.MoveNext()
+                && expectedDataEnumerator.MoveNext())
+        {
+            multiAssert.Check(() => Assert.AreEqual(writeDataEnumerator.Current.Key, newValueEnumerator.Current.Key));
+            multiAssert.Check(() => Assert.AreEqual(writeDataEnumerator.Current.Key, originalEnumerator.Current.Key));
+            multiAssert.Check(() => Assert.That.ObjectNotEquals(writeDataEnumerator.Current.Value, originalEnumerator.Current.Value, "Reset values in PLC"));
+            multiAssert.Check(() => Assert.That.ObjectEquals(expectedDataEnumerator.Current, newValueEnumerator.Current.Value, writeDataEnumerator.Current.Key));
+        }
+
+        multiAssert.Assert();
+    }
+
+    [TestMethod]
+    public async Task WriteMultipleUpdatesTheValueInPlcAsync()
+    {
+        // Arrange
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var writeData = WriteTestData
+            .Concat(WriteTestDataExtended)
+            .ToDictionary(
+                kv => $"{DataRoot}.WriteTestData.{nameof(WriteMultipleUpdatesTheValueInPlcAsync)}.{kv[0]}",
+                kv => kv[1],
+                StringComparer.Ordinal);
+
+        var expectedData = WriteTestData
+            .Concat(WriteTestDataExtended)
+            .Select(kv => kv.Length == 3 ? kv[2] : kv[1])
+            .ToList();
+
+        // Act
+        var connected = await connection.ConnectAsync();
+        Assert.IsTrue(connected, "Plc could not connect");
+        ResetPLCValues(readWrite);
+        var originalData = await readWrite.ReadAsync(writeData.Keys);
+        await readWrite.WriteAsync(writeData);
+        var newValueRead = await readWrite.ReadAsync(writeData.Keys);
+
+        // Assert
+        using var writeDataEnumerator = writeData.GetEnumerator();
+        using var originalEnumerator = originalData.GetEnumerator();
+        using var newValueEnumerator = newValueRead.GetEnumerator();
+        using var expectedDataEnumerator = expectedData.GetEnumerator();
+
+        Assert.AreEqual(writeData.Count, originalData.Count);
+        Assert.AreEqual(writeData.Count, newValueRead.Count);
+        var multiAssert = new MultiAssert();
+
+        while (writeDataEnumerator.MoveNext()
+            && newValueEnumerator.MoveNext()
+            && originalEnumerator.MoveNext()
+            && expectedDataEnumerator.MoveNext())
+        {
+            multiAssert.Check(() => Assert.AreEqual(writeDataEnumerator.Current.Key, newValueEnumerator.Current.Key));
+            multiAssert.Check(() => Assert.AreEqual(writeDataEnumerator.Current.Key, originalEnumerator.Current.Key));
+            multiAssert.Check(() => Assert.That.ObjectNotEquals(writeDataEnumerator.Current.Value, originalEnumerator.Current.Value, "Reset values in PLC"));
+            multiAssert.Check(() => Assert.That.ObjectEquals(expectedDataEnumerator.Current, newValueEnumerator.Current.Value, writeDataEnumerator.Current.Key));
+        }
+
+        multiAssert.Assert();
+    }
+
+    [DataTestMethod]
+    [DynamicData(nameof(WriteTestData))]
+    [DynamicData(nameof(WriteTestDataExtended))]
+    public void WriteUpdatesTheValueInPlc(string itemName, object newValue, object? readValue = null)
+    {
+        // Arrange
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.WriteTestData.{nameof(WriteUpdatesTheValueInPlc)}.{itemName}";
+
+        // Act
+        Assert.IsTrue(connection.Connect());
+        ResetPLCValues(readWrite);
         var original = readWrite.Read(ioName);
         readWrite.Write(ioName, newValue);
         var newValueRead = readWrite.Read(ioName);
 
         // Assert
-        Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
-        Assert.That.ObjectEquals(readValue, newValueRead, ioName);
+        Assert.That.ObjectNotEquals(readValue ?? newValue, original, "Reset values in PLC");
+        Assert.That.ObjectEquals(readValue ?? newValue, newValueRead, ioName);
     }
 
     [DataTestMethod]
-    [DynamicData(nameof(Settings.GetWriteData), typeof(Settings), DynamicDataSourceType.Method)]
-    public async Task WriteAsync(string ioName, object newValue, object readValue)
+    [DynamicData(nameof(WriteTestData))]
+    [DynamicData(nameof(WriteTestDataExtended))]
+    public async Task WriteUpdatesTheValueInPlcAsync(string itemName, object newValue, object? readValue = null)
     {
-        var readWrite = GetReadWrite();
-
         // Arrange
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.WriteTestData.{nameof(WriteUpdatesTheValueInPlcAsync)}.{itemName}";
 
         // Act
+        Assert.IsTrue(connection.Connect());
+        ResetPLCValues(readWrite);
         var original = await readWrite.ReadAsync(ioName);
         await readWrite.WriteAsync(ioName, newValue);
         var newValueRead = await readWrite.ReadAsync(ioName);
 
         // Assert
-        Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
-        Assert.That.ObjectEquals(readValue, newValueRead, ioName);
+        Assert.That.ObjectNotEquals(readValue ?? newValue, original, "Reset values in PLC");
+        Assert.That.ObjectEquals(readValue ?? newValue, newValueRead, ioName);
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(Settings.GetWriteData), typeof(Settings), DynamicDataSourceType.Method)]
-    public void WriteGeneric(string ioName, object newValue, object readValue)
+    protected abstract IServiceProvider GetServiceProvider();
+
+    protected void ResetPLCValues(IReadWrite readWrite, [CallerMemberName] string memberName = "")
     {
-        var method = GetType()
-            .GetMethod(nameof(WriteValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
-            ?.MakeGenericMethod(newValue.GetType(), readValue.GetType())
-            ?? throw new InvalidOperationException($"Unable to create the generic method {newValue.GetType().Name}.");
-        _ = method.InvokeUnwrappedException(this, new[] { ioName, newValue, readValue });
-    }
-
-    [DataTestMethod]
-    [DynamicData(nameof(Settings.GetWriteData), typeof(Settings), DynamicDataSourceType.Method)]
-    public async Task WriteGenericAsync(string ioName, object newValue, object readValue)
-    {
-        var method = GetType()
-            .GetMethod(nameof(WriteValueGenericHelperAsync), BindingFlags.NonPublic | BindingFlags.Instance)
-            ?.MakeGenericMethod(newValue.GetType(), readValue.GetType())
-            ?? throw new InvalidOperationException($"Unable to create the generic method {newValue.GetType().Name}.");
-        await method.InvokeAsyncUnwrappedException(this, new[] { ioName, newValue, readValue });
-    }
-
-    [TestMethod]
-    public void WriteMultiple()
-    {
-        // Arrange
-        var data = Settings.WriteMultipleData;
-        var readWrite = GetReadWrite();
-
-        // Act
-        var original = readWrite.Read(data.Keys);
-        readWrite.Write(data);
-        var newValueRead = readWrite.Read(data.Keys);
-
-        // Assert
-        using var dataEnumerator = data.GetEnumerator();
-        using var originalEnumerator = original.GetEnumerator();
-        using var newValueEnumerator = newValueRead.GetEnumerator();
-
-        Assert.AreEqual(data.Count, original.Count);
-        Assert.AreEqual(data.Count, newValueRead.Count);
-        var multiAssert = new MultiAssert();
-
-        while (dataEnumerator.MoveNext()
-                && newValueEnumerator.MoveNext()
-                && originalEnumerator.MoveNext())
+        var ioName = $"{DataRoot}.WriteTestData.{memberName}.Reset";
+        readWrite.Write(ioName, true);
+        var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(1));
+        while (readWrite.Read<bool>(ioName))
         {
-            multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, newValueEnumerator.Current.Key));
-            multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, originalEnumerator.Current.Key));
-            multiAssert.Check(() => Assert.That.ObjectNotEquals(dataEnumerator.Current.Value, originalEnumerator.Current.Value, "Reset values in PLC"));
-            multiAssert.Check(() => Assert.That.ObjectEquals(dataEnumerator.Current.Value, newValueEnumerator.Current.Value, dataEnumerator.Current.Key));
+            cts.Token.ThrowIfCancellationRequested();
         }
-
-        multiAssert.Assert();
     }
 
-    [TestMethod]
-    public async Task WriteMultipleAsync()
-    {
-        // Arrange
-        var data = Settings.WriteMultipleData;
-        var readWrite = GetReadWrite();
-
-        // Act
-        var original = await readWrite.ReadAsync(data.Keys);
-        await readWrite.WriteAsync(data);
-        var newValueRead = await readWrite.ReadAsync(data.Keys);
-
-        // Assert
-        using var dataEnumerator = data.GetEnumerator();
-        using var originalEnumerator = original.GetEnumerator();
-        using var newValueEnumerator = newValueRead.GetEnumerator();
-
-        Assert.AreEqual(data.Count, original.Count);
-        Assert.AreEqual(data.Count, newValueRead.Count);
-        var multiAssert = new MultiAssert();
-
-        while (dataEnumerator.MoveNext()
-            && newValueEnumerator.MoveNext()
-            && originalEnumerator.MoveNext())
-        {
-            multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, newValueEnumerator.Current.Key));
-            multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, originalEnumerator.Current.Key));
-            multiAssert.Check(() => Assert.That.ObjectNotEquals(dataEnumerator.Current.Value, originalEnumerator.Current.Value, "Reset values in PLC"));
-            multiAssert.Check(() => Assert.That.ObjectEquals(dataEnumerator.Current.Value, newValueEnumerator.Current.Value, dataEnumerator.Current.Key));
-        }
-
-        multiAssert.Assert();
-    }
-
-    protected abstract IReadWrite GetReadWrite();
-
-    protected void WriteValueGenericHelper<T1, T2>(string ioName, T1 newValue, T2 readValue)
+    protected void WriteValueGenericHelper<T1, T2>(string itemName, T1 newValue, T2 readValue, [CallerMemberName] string memberName = "")
         where T1 : notnull
         where T2 : notnull
     {
         // Arrange
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.WriteTestData.{memberName}.{itemName}";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
+        ResetPLCValues(readWrite, memberName);
         var original = readWrite.Read<T2>(ioName);
         readWrite.Write(ioName, newValue);
+
         var newValueRead = readWrite.Read<T2>(ioName);
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        while (newValueRead.Equals(original))
+        {
+            Assert.IsFalse(cts.IsCancellationRequested, "Timeout reading");
+            newValueRead = readWrite.Read<T2>(ioName);
+        }
 
         // Assert
         Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
         Assert.That.ObjectEquals(readValue, newValueRead, ioName);
     }
 
-    protected async Task WriteValueGenericHelperAsync<T1, T2>(string ioName, T1 newValue, T2 readValue)
+    protected async Task WriteValueGenericHelperAsync<T1, T2>(string itemName, T1 newValue, T2 readValue, [CallerMemberName] string memberName = "")
         where T1 : notnull
         where T2 : notnull
     {
         // Arrange
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.WriteTestData.{memberName}.{itemName}";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
+        ResetPLCValues(readWrite, memberName);
         var original = await readWrite.ReadAsync<T2>(ioName).ConfigureAwait(false);
         await readWrite.WriteAsync(ioName, newValue).ConfigureAwait(false);
+
         var newValueRead = await readWrite.ReadAsync<T2>(ioName).ConfigureAwait(false);
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        while (newValueRead.Equals(original))
+        {
+            Assert.IsFalse(cts.IsCancellationRequested, "Timeout reading");
+            newValueRead = await readWrite.ReadAsync<T2>(ioName).ConfigureAwait(false);
+        }
 
         // Assert
         Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");

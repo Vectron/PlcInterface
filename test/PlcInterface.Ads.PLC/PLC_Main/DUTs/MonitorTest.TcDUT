@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="MonitorTest" Id="{1fc35e25-4ef3-4a65-ae98-97be52d7f9ba}">
+    <Declaration><![CDATA[{attribute 'analysis' := '-33'}
+TYPE MonitorTest :
+STRUCT
+	MonitorBeforeConnectDoesNotMatter		: BOOL;	
+	SubscriptionsWillAllTriggerOnUpdate		: BOOL;
+	RegisterUnregisterIO					: BOOL;
+	
+	RegisterUnregisterMultipleIO1			: BOOL;
+	RegisterUnregisterMultipleIO2			: BOOL;
+	RegisterUnregisterMultipleIO3			: BOOL;
+	RegisterUnregisterMultipleIO4			: BOOL;
+	RegisterUnregisterMultipleIO5			: BOOL;
+	RegisterUnregisterMultipleIO6			: BOOL;
+	RegisterUnregisterMultipleIO7			: BOOL;
+	RegisterUnregisterMultipleIO8			: BOOL;
+	
+	SubscribeIOUpdatesWhenValueChanges		: BOOL;
+	SubscriptionsPersistReconnects			: BOOL;
+	SubscribeIOShouldTriggerOnSubscribe		: BOOL;
+	
+	CanSubscribeToAllPlcTypes				: MonitorTestData;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

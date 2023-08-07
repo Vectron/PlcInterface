@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.IntegrationTests.DataTypes;
 using PlcInterface.IntegrationTests.Extension;
@@ -9,70 +13,224 @@ namespace PlcInterface.IntegrationTests;
 
 public abstract class IReadValueTestBase
 {
+    protected abstract string DataRoot
+    {
+        get;
+    }
+
+    private static IEnumerable<object[]> ReadTestData
+        => new List<object[]>()
+        {
+                new object[] { "BoolValue", true },
+                new object[] { "ByteValue", byte.MaxValue },
+                new object[] { "WordValue", ushort.MaxValue },
+                new object[] { "DWordValue", uint.MaxValue },
+                new object[] { "LWordValue", ulong.MaxValue },
+                new object[] { "SIntValue", sbyte.MinValue },
+                new object[] { "IntValue", short.MinValue },
+                new object[] { "DIntValue", int.MinValue },
+                new object[] { "LIntValue", long.MinValue },
+                new object[] { "USIntValue", byte.MaxValue },
+                new object[] { "UIntValue", ushort.MaxValue },
+                new object[] { "UDIntValue", uint.MaxValue },
+                new object[] { "ULIntValue", ulong.MaxValue },
+                new object[] { "RealValue", -3.402823E+38F },
+                new object[] { "LRealValue", -1.79769313486231E+308 },
+                new object[] { "TimeValue", TimeSpan.FromSeconds(1) },
+                new object[] { "TimeOfDayValue", TimeSpan.FromHours(1) },
+                new object[] { "LTimeValue", TimeSpan.FromTicks(10) },
+                new object[] { "DateValue", new DateTimeOffset(2106, 02, 05, 0, 0, 0, TimeSpan.FromHours(1)) },
+                new object[] { "DateAndTimeValue", new DateTimeOffset(2106, 02, 05, 06, 28, 15, TimeSpan.FromHours(1)) },
+                new object[] { "StringValue", "Test String" },
+                new object[] { "WStringValue", "Test WString" },
+                new object[] { "EnumValue1", (int)TestEnum.Second },
+        };
+
+    private static IEnumerable<object[]> ReadTestDataExtended
+            => new List<object[]>()
+            {
+                new object[]
+                {
+                    "IntArray",
+                    new short[]
+                    {
+                        1000,
+                        1001,
+                        1002,
+                        1003,
+                        1004,
+                        1005,
+                        1006,
+                        1007,
+                        1008,
+                        1009,
+                        1010,
+                    },
+                },
+                new object[]
+                {
+                    "MultiDimensionArray",
+                    new short[,,]
+                    {
+                        {
+                            { 0100, 0200, 0300, 0400 },
+                            { 0500, 0600, 0700, 0800 },
+                            { 0900, 1000, 1100, 1200 },
+                        },
+                        {
+                            { 1300, 1400, 1500, 1600 },
+                            { 1700, 1800, 1900, 2000 },
+                            { 2100, 2200, 2300, 2400 },
+                        },
+                    },
+                },
+                new object[]
+                {
+                    "ComplexArray",
+                    new DUT_TestStruct2[]
+                    {
+                        DUT_TestStruct2.Default,
+                        DUT_TestStruct2.Default,
+                        DUT_TestStruct2.Default,
+                    },
+                },
+                new object[]
+                {
+                    "MultiDimensionComplexArray",
+                    new DUT_TestStruct2[,,]
+                    {
+                        {
+                            {
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                            },
+                            {
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                            },
+                            {
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                            },
+                        },
+                        {
+                            {
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                            },
+                            {
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                            },
+                            {
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                                DUT_TestStruct2.Default,
+                            },
+                        },
+                    },
+                },
+                new object[] { "StructValue", DUT_TestStruct.Default },
+                new object[] { "StructValue2", DUT_TestClass.Default },
+            };
+
     [TestMethod]
-    public void ReadDynamic()
+    public void ReadDynamicReadsAStructure()
     {
         // Arrange
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         var expected = DUT_TestStruct.Default;
+        var ioName = $"{DataRoot}.ReadTestData.{nameof(ReadDynamicReadsAStructure)}";
 
         // Act
-        var structValue = readWrite.ReadDynamic("ReadTestData.StructValue");
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
+        var structValue = readWrite.ReadDynamic(ioName);
 
         // Assert
         AssertExtension.DUT_TestStructEquals(expected, structValue);
     }
 
     [TestMethod]
-    public async Task ReadDynamicAsync()
+    public async Task ReadDynamicReadsAStructureAsync()
     {
         // Arrange
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         var expected = DUT_TestStruct.Default;
+        var ioName = $"{DataRoot}.ReadTestData.{nameof(ReadDynamicReadsAStructureAsync)}";
 
         // Act
-        var structValue = await readWrite.ReadDynamicAsync("ReadTestData.StructValue");
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
+        var structValue = await readWrite.ReadDynamicAsync(ioName);
 
         // Assert
         AssertExtension.DUT_TestStructEquals(expected, structValue);
     }
 
     [DataTestMethod]
-    [DynamicData(nameof(Settings.GetReadData), typeof(Settings), DynamicDataSourceType.Method)]
-    [DataRow("ReadTestData.EnumValue", TestEnum.Second)]
-    public void ReadGeneric(string ioName, object value)
+    [DynamicData(nameof(ReadTestData))]
+    [DynamicData(nameof(ReadTestDataExtended))]
+    [DataRow("EnumValue2", TestEnum.Second)]
+    public void ReadGenericReturnsTheRequestedType(string ioName, object value)
     {
         var instanceType = value.GetType();
         var method = typeof(IReadValueTestBase)
-            .GetMethod(nameof(ReadValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetMethod(nameof(ReadValueGeneric), BindingFlags.NonPublic | BindingFlags.Instance)
             ?.MakeGenericMethod(instanceType)
-            ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(ReadValueGenericHelper)}.");
+            ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(ReadValueGeneric)}.");
 
-        _ = method.InvokeUnwrappedException(this, new object[] { ioName, value });
+        _ = method.InvokeUnwrappedException(this, new object[] { ioName, value, nameof(ReadGenericReturnsTheRequestedType) });
     }
 
     [DataTestMethod]
-    [DynamicData(nameof(Settings.GetReadData), typeof(Settings), DynamicDataSourceType.Method)]
-    [DataRow("ReadTestData.EnumValue", TestEnum.Second)]
-    public async Task ReadGenericAsync(string ioName, object value)
+    [DynamicData(nameof(ReadTestData))]
+    [DynamicData(nameof(ReadTestDataExtended))]
+    [DataRow("EnumValue2", TestEnum.Second)]
+    public async Task ReadGenericReturnsTheRequestedTypeAsync(string ioName, object value)
     {
         var instanceType = value.GetType();
         var method = typeof(IReadValueTestBase)
-            .GetMethod(nameof(ReadValueGenericHelperAsync), BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetMethod(nameof(ReadValueGenericAsync), BindingFlags.NonPublic | BindingFlags.Instance)
             ?.MakeGenericMethod(instanceType)
-            ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(ReadValueGenericHelperAsync)}.");
+            ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(ReadValueGenericAsync)}.");
 
-        await method.InvokeAsyncUnwrappedException(this, new object[] { ioName, value });
+        await method.InvokeAsyncUnwrappedException(this, new object[] { ioName, value, nameof(ReadGenericReturnsTheRequestedTypeAsync) });
     }
 
     [TestMethod]
-    public void ReadMultiple()
+    public void ReadMultipleItemsInOneTransaction()
     {
         // Arrange
-        var data = Settings.ReadMultipleData;
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var data = ReadTestData.Concat(ReadTestDataExtended).ToDictionary(
+            kv => $"{DataRoot}.ReadTestData.{nameof(ReadMultipleItemsInOneTransaction)}.{kv[0]}",
+            kv => kv[1],
+            StringComparer.Ordinal);
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         var value = readWrite.Read(data.Keys);
 
         // Assert
@@ -93,13 +251,21 @@ public abstract class IReadValueTestBase
     }
 
     [TestMethod]
-    public async Task ReadMultipleAsync()
+    public async Task ReadMultipleItemsInOneTransactionAsync()
     {
         // Arrange
-        var data = Settings.ReadMultipleData;
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var data = ReadTestData.Concat(ReadTestDataExtended).ToDictionary(
+            kv => $"{DataRoot}.ReadTestData.{nameof(ReadMultipleItemsInOneTransactionAsync)}.{kv[0]}",
+            kv => kv[1],
+            StringComparer.Ordinal);
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         var value = await readWrite.ReadAsync(data.Keys);
 
         // Assert
@@ -120,13 +286,19 @@ public abstract class IReadValueTestBase
     }
 
     [DataTestMethod]
-    [DynamicData(nameof(Settings.GetReadData), typeof(Settings), DynamicDataSourceType.Method)]
-    public void ReadValue(string ioName, object expectedValue)
+    [DynamicData(nameof(ReadTestData))]
+    [DynamicData(nameof(ReadTestDataExtended))]
+    public void ReadValueReturnsTheExpectedValue(string itemName, object expectedValue)
     {
         // Arrange
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.ReadTestData.{nameof(ReadValueReturnsTheExpectedValue)}.{itemName}";
 
         // Act
+        Assert.IsTrue(connection.Connect());
         var value = readWrite.Read(ioName);
 
         // Assert
@@ -134,13 +306,20 @@ public abstract class IReadValueTestBase
     }
 
     [DataTestMethod]
-    [DynamicData(nameof(Settings.GetReadData), typeof(Settings), DynamicDataSourceType.Method)]
-    public async Task ReadValueAsync(string ioName, object expectedValue)
+    [DynamicData(nameof(ReadTestData))]
+    [DynamicData(nameof(ReadTestDataExtended))]
+    public async Task ReadValueReturnsTheExpectedValueAsync(string itemName, object expectedValue)
     {
         // Arrange
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.ReadTestData.{nameof(ReadValueReturnsTheExpectedValueAsync)}.{itemName}";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         var value = await readWrite.ReadAsync(ioName);
 
         // Assert
@@ -150,55 +329,75 @@ public abstract class IReadValueTestBase
     [TestMethod]
     public void WaitForValueThrowsExceptionOnTimeout()
     {
-        var readWrite = GetReadWrite();
-        var ioName = "ReadTestData.BoolValue";
+        // Arrange
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.ReadTestData.{nameof(WaitForValueThrowsExceptionOnTimeout)}";
 
-        _ = Assert.ThrowsException<TimeoutException>(() => readWrite.WaitForValue(ioName, false, TimeSpan.FromSeconds(1)));
+        // Act assert
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
+        _ = Assert.ThrowsException<TimeoutException>(() => readWrite.WaitForValue(ioName, true, TimeSpan.FromSeconds(1)));
     }
 
     [TestMethod]
     public void WaitForValueThrowsExceptionOnTimeoutAsync()
     {
-        var readWrite = GetReadWrite();
-        var ioName = "ReadTestData.BoolValue";
+        // Arrange
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.ReadTestData.{nameof(WaitForValueThrowsExceptionOnTimeoutAsync)}";
 
+        // Act Assert
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         _ = Assert.ThrowsExceptionAsync<TimeoutException>(async () => await readWrite.WaitForValueAsync(ioName, false, TimeSpan.FromSeconds(1)).ConfigureAwait(false));
     }
 
     [DataTestMethod]
-    [DynamicData(nameof(Settings.GetWaitForValueData), typeof(Settings), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(ReadTestData))]
     public void WaitsForValueToChange(string ioName, object readValue)
     {
         var instanceType = readValue.GetType();
         var method = typeof(IReadValueTestBase)
-            .GetMethod(nameof(WaitsForValueToChange), BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetMethod(nameof(WaitsForValueToChangeGeneric), BindingFlags.NonPublic | BindingFlags.Instance)
             ?.MakeGenericMethod(instanceType)
-            ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(WaitsForValueToChange)}.");
+            ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(WaitsForValueToChangeGeneric)}.");
 
-        _ = method.InvokeUnwrappedException(this, new object[] { ioName, readValue });
+        _ = method.InvokeUnwrappedException(this, new object[] { ioName, readValue, nameof(WaitsForValueToChange) });
     }
 
     [DataTestMethod]
-    [DynamicData(nameof(Settings.GetWaitForValueData), typeof(Settings), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(ReadTestData))]
     public async Task WaitsForValueToChangeAsync(string ioName, object readValue)
     {
         var instanceType = readValue.GetType();
         var method = typeof(IReadValueTestBase)
-            .GetMethod(nameof(WaitsForValueToChangeAsync), BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetMethod(nameof(WaitsForValueToChangeGenericAsync), BindingFlags.NonPublic | BindingFlags.Instance)
             ?.MakeGenericMethod(instanceType)
-            ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(WaitsForValueToChangeAsync)}.");
+            ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(WaitsForValueToChangeGenericAsync)}.");
 
-        await method.InvokeAsyncUnwrappedException(this, new object[] { ioName, readValue });
+        await method.InvokeAsyncUnwrappedException(this, new object[] { ioName, readValue, nameof(WaitsForValueToChangeAsync) });
     }
 
-    protected abstract IReadWrite GetReadWrite();
+    protected abstract IServiceProvider GetServiceProvider();
 
-    protected void ReadValueGenericHelper<T>(string ioName, T expectedValue)
+    protected void ReadValueGeneric<T>(string itemName, T expectedValue, [CallerMemberName] string memberName = "")
     {
         // Arrange
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.ReadTestData.{memberName}.{itemName}";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         var value = readWrite.Read<T>(ioName);
 
         // Assert
@@ -207,12 +406,18 @@ public abstract class IReadValueTestBase
         Assert.That.ObjectEquals(expectedValue, value, ioName);
     }
 
-    protected async Task ReadValueGenericHelperAsync<T>(string ioName, T expectedValue)
+    protected async Task ReadValueGenericAsync<T>(string itemName, T expectedValue, [CallerMemberName] string memberName = "")
     {
         // Arrange
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.ReadTestData.{memberName}.{itemName}";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         var value = await readWrite.ReadAsync<T>(ioName).ConfigureAwait(false);
 
         // Assert
@@ -221,25 +426,37 @@ public abstract class IReadValueTestBase
         Assert.That.ObjectEquals(expectedValue, value, ioName);
     }
 
-    protected void WaitsForValueToChange<T>(string ioName, T readValue)
+    protected void WaitsForValueToChangeGeneric<T>(string itemName, T readValue, [CallerMemberName] string memberName = "")
         where T : notnull
     {
         // Arrange
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.ReadTestData.{memberName}.{itemName}";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         readWrite.WaitForValue(ioName, readValue, TimeSpan.FromMilliseconds(1000));
 
         // Assert
     }
 
-    protected async Task WaitsForValueToChangeAsync<T>(string ioName, T readValue)
+    protected async Task WaitsForValueToChangeGenericAsync<T>(string itemName, T readValue, [CallerMemberName] string memberName = "")
         where T : notnull
     {
         // Arrange
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.ReadTestData.{memberName}.{itemName}";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         await readWrite.WaitForValueAsync(ioName, readValue, TimeSpan.FromMilliseconds(1000)).ConfigureAwait(false);
 
         // Assert

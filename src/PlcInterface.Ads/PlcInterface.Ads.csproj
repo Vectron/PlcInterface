@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <TwinCATAdsVersion>6.0.249</TwinCATAdsVersion>
+    <TwinCATAdsVersion>6.0.273</TwinCATAdsVersion>
   </PropertyGroup>
 
   <ItemGroup>

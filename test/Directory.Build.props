@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <MSTestVersion>3.0.4</MSTestVersion>
+    <MSTestVersion>3.1.1</MSTestVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +20,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestVersion)" />
     <PackageReference Include="MSTest.TestFramework" Version="$(MSTestVersion)" />
     <PackageReference Include="Moq" Version="4.18.4" />

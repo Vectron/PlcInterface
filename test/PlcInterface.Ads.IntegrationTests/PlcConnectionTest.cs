@@ -1,63 +1,39 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.IntegrationTests;
-using TestUtilities;
-using TwinCAT.Ads;
 
 namespace PlcInterface.Ads.IntegrationTests;
 
 [TestClass]
-public sealed class PlcConnectionTest : IPlcConnectionTestBase, IDisposable
+public sealed class PlcConnectionTest : IPlcConnectionTestBase
 {
-    private AdsClient? adsClient;
-    private bool disposed;
-    private PlcConnection? plcConnection;
-
-    [TestInitialize]
-    public void ConnectAsync()
-    {
-        var connectionSettings = new AdsPlcConnectionOptions() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
-        adsClient = new AdsClient();
-        plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionSettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
-    }
-
-    [TestCleanup]
-    public void Disconnect()
-        => Dispose();
-
-    public void Dispose()
-    {
-        if (disposed)
-        {
-            return;
-        }
-
-        disposed = true;
-        plcConnection?.Dispose();
-        adsClient?.Dispose();
-    }
-
     [TestMethod]
     public void GetConnectedClient()
     {
         // Arrange
-        Assert.IsNotNull(plcConnection);
+        using var serviceProvider = GetServiceProvider();
+        var connection = serviceProvider.GetRequiredService<IAdsPlcConnection>();
 
         // Act
-        _ = Assert.ThrowsException<TimeoutException>(() => plcConnection.GetConnectedClient());
+        _ = Assert.ThrowsException<TimeoutException>(() => connection.GetConnectedClient());
     }
 
     [TestMethod]
     public void GetConnectedClientReturnsTheActiveConnection()
     {
         // Arrange
-        Assert.IsNotNull(plcConnection);
+        using var serviceProvider = GetServiceProvider();
+        var connection = serviceProvider.GetRequiredService<IAdsPlcConnection>();
 
         // Act
-        var connectionTask = plcConnection.ConnectAsync();
-        var client = plcConnection.GetConnectedClient(TimeSpan.FromSeconds(10));
-        _ = connectionTask.GetAwaiter().GetResult();
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
+        var client = connection.GetConnectedClient(TimeSpan.FromSeconds(2));
 
         // Assert
         Assert.IsNotNull(client);
@@ -68,21 +44,32 @@ public sealed class PlcConnectionTest : IPlcConnectionTestBase, IDisposable
     public async Task GetConnectedClientReturnsTheActiveConnectionAsync()
     {
         // Arrange
-        Assert.IsNotNull(plcConnection);
+        using var serviceProvider = GetServiceProvider();
+        var connection = serviceProvider.GetRequiredService<IAdsPlcConnection>();
 
         // Act
-        var connectionTask = plcConnection.ConnectAsync();
-        var client = await plcConnection.GetConnectedClientAsync();
-        _ = await connectionTask;
+        var connected = await connection.ConnectAsync();
+        Assert.IsTrue(connected, "Plc could not connect");
+        var client = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(2));
 
         // Assert
         Assert.IsNotNull(client);
         Assert.IsTrue(client.IsConnected);
     }
 
-    protected override IPlcConnection GetPLCConnection()
+    protected override ServiceProvider GetServiceProvider()
     {
-        Assert.IsNotNull(plcConnection);
-        return plcConnection;
+        var services = new ServiceCollection()
+            .AddAdsPLC()
+            .Configure<AdsPlcConnectionOptions>(o =>
+            {
+                o.AmsNetId = Settings.AmsNetId;
+                o.Port = Settings.Port;
+            })
+            .Configure<AdsSymbolHandlerOptions>(o => o.StoreSymbolsToDisk = false);
+
+        services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(NullLogger<>)));
+
+        return services.BuildServiceProvider();
     }
 }

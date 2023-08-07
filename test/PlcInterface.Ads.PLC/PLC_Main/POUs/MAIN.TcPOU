@@ -1,60 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <POU Name="MAIN" Id="{65800fe3-bb5f-43d1-b26a-4a3b6ac53c7a}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
-VAR
-	{attribute 'OPC.UA.DA' := '1'}
-	{attribute 'analysis' := '-27'}
-	Reset		: BOOL;
-	{attribute 'analysis' := '27'}
-	EmptyStruct	: DUT_TestStruct;
-END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF Reset THEN
-	WriteTestData.BoolValue						:= TRUE;
-	
-	WriteTestData.ByteValue						:= 16#FF;
-	WriteTestData.WordValue						:= 16#FFFF;
-	WriteTestData.DWordValue					:= 16#FFFF_FFFF;
-	WriteTestData.LWordValue					:= 16#FFFF_FFFF_FFFF_FFFF;
+      <ST><![CDATA[ResetWriteData(Ads.WriteTestData.WriteGenericUpdatesTheValueInPlc);
+ResetWriteData(Ads.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
+ResetWriteData(Ads.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
+ResetWriteData(Ads.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
+ResetWriteData(Ads.WriteTestData.WriteUpdatesTheValueInPlc);
+ResetWriteData(Ads.WriteTestData.WriteUpdatesTheValueInPlcAsync);
 
-	WriteTestData.ShortValue					:= -128;
-	WriteTestData.IntValue						:= -32768;
-	WriteTestData.DIntValue						:= -2147483648 ;
-	WriteTestData.LongValue						:= -9223372036854775808;
-
-	WriteTestData.UShortValue					:= 255;
-	WriteTestData.UIntValue						:= 65535;
-	WriteTestData.UDIntValue					:= 4294967295;
-	WriteTestData.ULongValue					:= 18446744073709551615;
-	
-	WriteTestData.FloatValue					:= -3.402823E+38;
-	WriteTestData.DoubleValue					:= -1.79769313486231E+308;
-	
-	WriteTestData.TimeValue						:= T#1000MS;
-	WriteTestData.TimeOfDay						:= TOD#01:00;
-	WriteTestData.LTimeValue		 			:= LTIME#1000NS;
-	WriteTestData.DateValue						:= D#2106-02-06;
-	WriteTestData.DateAndTimeValue				:= DT#2106-02-06-06:28:15;
-	
-	WriteTestData.StringValue					:= 'Test String';
-	WriteTestData.WStringValue					:= "Test WString";
-	
-	WriteTestData.EnumValue						:= 1;
-	
-	WriteTestData.IntArray				 		:= EmptyStruct.IntArray;	
-	WriteTestData.MultiDimensionArray			:= EmptyStruct.MultiDimensionArray;
-	WriteTestData.ComplexArray					:= EmptyStruct.ComplexArray;
-	WriteTestData.MultiDimensionComplexArray	:= EmptyStruct.MultiDimensionComplexArray;
-	
-	WriteTestData.Nested						:= EmptyStruct.Nested;
-	WriteTestData.Nested2						:= EmptyStruct.Nested;
-	WriteTestData.StructValue					:= EmptyStruct;
-	WriteTestData.StructValue2					:= EmptyStruct;
-	
-	Reset := FALSE;
-END_IF]]></ST>
+ResetWriteData(Opc.WriteTestData.WriteGenericUpdatesTheValueInPlc);
+ResetWriteData(Opc.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
+ResetWriteData(Opc.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
+ResetWriteData(Opc.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
+ResetWriteData(Opc.WriteTestData.WriteUpdatesTheValueInPlc);
+ResetWriteData(Opc.WriteTestData.WriteUpdatesTheValueInPlcAsync);
+]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>

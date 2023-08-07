@@ -1,17 +1,29 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.IntegrationTests;
 
 public abstract class ISymbolHandlerTestBase
 {
+    protected abstract string DataRoot
+    {
+        get;
+    }
+
     [TestMethod]
-    [DynamicData(nameof(Settings.GetMonitorData), typeof(Settings), DynamicDataSourceType.Method)]
-    public void GetSymbolInfo(string ioName)
+    public void GetSymbolInfoReturnsTheSymbol()
     {
         // Arrange
-        var symbolHandler = GetSymbolHandler();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var symbolHandler = serviceProvider.GetRequiredService<ISymbolHandler>();
+        var ioName = $"{DataRoot}.SymbolTestData.{nameof(GetSymbolInfoReturnsTheSymbol)}";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         var symbol = symbolHandler.GetSymbolInfo(ioName);
 
         // Assert
@@ -23,9 +35,14 @@ public abstract class ISymbolHandlerTestBase
     public void SymbolHandlerGetAll()
     {
         // Arrange
-        var symbolHandler = GetSymbolHandler();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var symbolHandler = serviceProvider.GetRequiredService<ISymbolHandler>();
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         var count = symbolHandler.AllSymbols.Count;
 
         // Assert
@@ -36,10 +53,15 @@ public abstract class ISymbolHandlerTestBase
     public void TryGetSymbolInfoReturnsFalseWithInvalidData()
     {
         // Arrange
-        var symbolHandler = GetSymbolHandler();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var symbolHandler = serviceProvider.GetRequiredService<ISymbolHandler>();
         var ioName = "ANonExistingSymbol";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         var result = symbolHandler.TryGetSymbolInfo(ioName, out var symbol);
 
         // Assert
@@ -48,13 +70,18 @@ public abstract class ISymbolHandlerTestBase
     }
 
     [TestMethod]
-    [DynamicData(nameof(Settings.GetMonitorData), typeof(Settings), DynamicDataSourceType.Method)]
-    public void TryGetSymbolInfoReturnsTrueWithValidData(string ioName)
+    public void TryGetSymbolInfoReturnsTrueWithValidData()
     {
         // Arrange
-        var symbolHandler = GetSymbolHandler();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var symbolHandler = serviceProvider.GetRequiredService<ISymbolHandler>();
+        var ioName = $"{DataRoot}.SymbolTestData.{nameof(TryGetSymbolInfoReturnsTrueWithValidData)}";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         var result = symbolHandler.TryGetSymbolInfo(ioName, out var symbol);
 
         // Assert
@@ -63,5 +90,5 @@ public abstract class ISymbolHandlerTestBase
         Assert.AreEqual(ioName, symbol.Name);
     }
 
-    protected abstract ISymbolHandler GetSymbolHandler();
+    protected abstract IServiceProvider GetServiceProvider();
 }

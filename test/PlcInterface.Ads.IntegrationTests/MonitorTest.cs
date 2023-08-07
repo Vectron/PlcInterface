@@ -1,66 +1,30 @@
-﻿using System;
-using System.IO.Abstractions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using PlcInterface.Ads.TwinCATAbstractions;
 using PlcInterface.IntegrationTests;
-using TestUtilities;
-using TwinCAT.Ads;
 
 namespace PlcInterface.Ads.IntegrationTests;
 
 [TestClass]
 public class MonitorTest : IMonitorTestBase
 {
-    private static AdsClient? adsClient;
-    private static PlcConnection? connection;
-    private static Monitor? monitor;
-    private static ReadWrite? readWrite;
-    private static SymbolHandler? symbolHandler;
+    protected override string DataRoot => "Ads";
 
-    [ClassCleanup]
-    public static void Disconnect()
+    protected override ServiceProvider GetServiceProvider()
     {
-        connection?.Dispose();
-        symbolHandler?.Dispose();
-        monitor?.Dispose();
-        adsClient?.Dispose();
+        var services = new ServiceCollection()
+            .AddAdsPLC()
+            .Configure<AdsPlcConnectionOptions>(o =>
+            {
+                o.AmsNetId = Settings.AmsNetId;
+                o.Port = Settings.Port;
+            })
+            .Configure<AdsSymbolHandlerOptions>(o => o.StoreSymbolsToDisk = false);
+
+        services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(NullLogger<>)));
+
+        return services.BuildServiceProvider();
     }
-
-    [ClassInitialize]
-    public static void Setup(TestContext testContext)
-    {
-        var connectionSettings = new AdsPlcConnectionOptions() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
-        var symbolHandlerSettings = new AdsSymbolHandlerOptions() { StoreSymbolsToDisk = false };
-        var typeConverter = new AdsTypeConverter();
-        adsClient = new AdsClient();
-
-        connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionSettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
-        symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), Mock.Of<IFileSystem>(), new SymbolLoaderFactoryAbstraction());
-        var sumSymbolFactory = new SumSymbolFactory();
-        readWrite = new ReadWrite(connection, symbolHandler, typeConverter, sumSymbolFactory);
-        monitor = new Monitor(connection, symbolHandler, typeConverter, MockHelpers.GetLoggerMock<Monitor>());
-    }
-
-    protected override IMonitor GetMonitor()
-        => monitor!;
-
-    protected override IPlcConnection GetPLCConnection(bool connected = true)
-    {
-        if (!connected)
-        {
-            return connection!;
-        }
-
-        var isConnected = connection?.Connect();
-        if (isConnected == false)
-        {
-            throw new InvalidOperationException("Connection to PLC Failed");
-        }
-
-        return connection!;
-    }
-
-    protected override IReadWrite GetReadWrite()
-        => readWrite!;
 }

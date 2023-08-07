@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.IntegrationTests;
@@ -9,12 +11,15 @@ public abstract class IPlcConnectionTestBase
     public void OpenCloseConnection()
     {
         // Arrange
-        var connection = GetPLCConnection();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
 
         // Act
-        _ = connection.Connect();
+        var connected = connection.Connect();
 
         // Assert
+        Assert.IsTrue(connected, "Plc could not connect");
         Assert.IsTrue(connection.IsConnected);
 
         // Act
@@ -29,12 +34,15 @@ public abstract class IPlcConnectionTestBase
     public async Task OpenCloseConnectionAsync()
     {
         // Arrange
-        var connection = GetPLCConnection();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
 
         // Act
-        _ = await connection.ConnectAsync();
+        var connected = await connection.ConnectAsync();
 
         // Assert
+        Assert.IsTrue(connected, "Plc could not connect");
         Assert.IsTrue(connection.IsConnected);
 
         // Act
@@ -45,5 +53,5 @@ public abstract class IPlcConnectionTestBase
         await connection.DisconnectAsync();
     }
 
-    protected abstract IPlcConnection GetPLCConnection();
+    protected abstract IServiceProvider GetServiceProvider();
 }

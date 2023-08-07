@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="SymbolTest" Id="{530a0992-3bdd-484c-b28c-44eeb7571769}">
+    <Declaration><![CDATA[{attribute 'analysis' := '-33'}
+TYPE SymbolTest :
+STRUCT
+	GetSymbolInfoReturnsTheSymbol				: BOOL;
+	TryGetSymbolInfoReturnsTrueWithValidData	: BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

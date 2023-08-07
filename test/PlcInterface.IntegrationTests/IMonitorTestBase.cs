@@ -4,9 +4,12 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PlcInterface.IntegrationTests.DataTypes;
 using PlcInterface.IntegrationTests.Extension;
 
 namespace PlcInterface.IntegrationTests;
@@ -14,15 +17,57 @@ namespace PlcInterface.IntegrationTests;
 [DoNotParallelize]
 public abstract class IMonitorTestBase
 {
+    protected abstract string DataRoot
+    {
+        get;
+    }
+
+    [DataTestMethod]
+    [DataRow("BoolValue", typeof(bool))]
+    [DataRow("ByteValue", typeof(byte))]
+    [DataRow("WordValue", typeof(ushort))]
+    [DataRow("DWordValue", typeof(uint))]
+    [DataRow("LWordValue", typeof(ulong))]
+    [DataRow("SIntValue", typeof(sbyte))]
+    [DataRow("IntValue", typeof(short))]
+    [DataRow("DIntValue", typeof(int))]
+    [DataRow("LIntValue", typeof(long))]
+    [DataRow("USIntValue", typeof(byte))]
+    [DataRow("UIntValue", typeof(ushort))]
+    [DataRow("UDIntValue", typeof(uint))]
+    [DataRow("ULIntValue", typeof(ulong))]
+    [DataRow("RealValue", typeof(float))]
+    [DataRow("LRealValue", typeof(double))]
+    [DataRow("TimeValue", typeof(TimeSpan))]
+    [DataRow("TimeOfDayValue", typeof(TimeSpan))]
+    [DataRow("LTimeValue", typeof(TimeSpan))]
+    [DataRow("DateValue", typeof(DateTimeOffset))]
+    [DataRow("DateAndTimeValue", typeof(DateTimeOffset))]
+    [DataRow("StringValue", typeof(string))]
+    [DataRow("WStringValue", typeof(string))]
+    [DataRow("EnumValue1", typeof(int))]
+    [DataRow("EnumValue2", typeof(TestEnum))]
+    public void CanSubscribeToAllPlcTypes(string ioName, Type instanceType)
+    {
+        var method = typeof(IMonitorTestBase)
+            .GetMethod(nameof(MonitorValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
+            ?.MakeGenericMethod(instanceType)
+            ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(MonitorValueGenericHelper)}.");
+
+        _ = method.InvokeUnwrappedException(this, new object[] { ioName, nameof(CanSubscribeToAllPlcTypes) });
+    }
+
     [TestMethod]
     public void MonitorBeforeConnectDoesNotMatter()
     {
         // Arrange
-        var connection = GetPLCConnection(false);
-        var monitor = GetMonitor();
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var monitor = serviceProvider.GetRequiredService<IMonitor>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         using var done = new ManualResetEvent(false);
-        var ioName = "MonitorTestData.BoolValue8";
+        var ioName = $"{DataRoot}.MonitorTestData.{nameof(MonitorBeforeConnectDoesNotMatter)}";
         var original = false;
 
         // Act
@@ -34,7 +79,8 @@ public abstract class IMonitorTestBase
             }
         });
 
-        _ = connection.Connect();
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         original = readWrite.Read<bool>(ioName);
         readWrite.ToggleBool(ioName);
         var result = done.WaitOne(TimeSpan.FromSeconds(5));
@@ -44,60 +90,22 @@ public abstract class IMonitorTestBase
     }
 
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "IDisposableAnalyzers.Correctness",
-        "IDISP017:Prefer using",
-        Justification = "We want to specifically dispose the subscription")]
-    public async Task MultipleSubscriptions()
-    {
-        // Arrange
-        var connection = GetPLCConnection();
-        var monitor = GetMonitor();
-        var readWrite = GetReadWrite();
-        var ioName = "MonitorTestData.BoolValue8";
-        var results = new List<bool>();
-
-        // Act
-        using var subscription1 = monitor.SubscribeIO<bool>(ioName, results.Add, 100);
-        using var subscription2 = monitor.SubscribeIO<bool>(ioName, results.Add, 100);
-        using var subscription3 = monitor.SubscribeIO<bool>(ioName, results.Add, 100);
-        using var subscription4 = monitor.SubscribeIO<bool>(ioName, results.Add, 100);
-        await SubscribeCheckAsync(results, 4);
-
-        // Assert
-        readWrite.ToggleBool(ioName);
-        await SubscribeCheckAsync(results, 4);
-        subscription1.Dispose();
-
-        readWrite.ToggleBool(ioName);
-        await SubscribeCheckAsync(results, 3);
-        subscription2.Dispose();
-
-        readWrite.ToggleBool(ioName);
-        await SubscribeCheckAsync(results, 2);
-        subscription3.Dispose();
-
-        readWrite.ToggleBool(ioName);
-        await SubscribeCheckAsync(results, 1);
-        subscription4.Dispose();
-
-        readWrite.ToggleBool(ioName);
-        await SubscribeCheckAsync(results, 0);
-    }
-
-    [TestMethod]
     public void RegisterUnregisterIO()
     {
         // Arrange
-        var connection = GetPLCConnection();
-        var monitor = GetMonitor();
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var monitor = serviceProvider.GetRequiredService<IMonitor>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         using var done = new ManualResetEvent(false);
-        var ioName = "MonitorTestData.BoolValue1";
+        var ioName = $"{DataRoot}.MonitorTestData.{nameof(RegisterUnregisterIO)}";
         var results = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-        monitor.RegisterIO(ioName, 1000);
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
+        monitor.RegisterIO(ioName, 1000);
         var originals = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { ioName, readWrite.Read<bool>(ioName) } };
         using var subscription = monitor.SymbolStream.Subscribe(x =>
           {
@@ -131,23 +139,35 @@ public abstract class IMonitorTestBase
     public void RegisterUnregisterMultipleIO()
     {
         // Arrange
-        var connection = GetPLCConnection();
-        var monitor = GetMonitor();
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var monitor = serviceProvider.GetRequiredService<IMonitor>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         using var done = new ManualResetEvent(false);
-        var hits = 0;
-        var variables = Settings.GetMonitorMultiple();
+        var variables = new List<string>()
+        {
+            $"{DataRoot}.MonitorTestData.{nameof(RegisterUnregisterMultipleIO)}1",
+            $"{DataRoot}.MonitorTestData.{nameof(RegisterUnregisterMultipleIO)}2",
+            $"{DataRoot}.MonitorTestData.{nameof(RegisterUnregisterMultipleIO)}3",
+            $"{DataRoot}.MonitorTestData.{nameof(RegisterUnregisterMultipleIO)}4",
+            $"{DataRoot}.MonitorTestData.{nameof(RegisterUnregisterMultipleIO)}5",
+            $"{DataRoot}.MonitorTestData.{nameof(RegisterUnregisterMultipleIO)}6",
+            $"{DataRoot}.MonitorTestData.{nameof(RegisterUnregisterMultipleIO)}7",
+            $"{DataRoot}.MonitorTestData.{nameof(RegisterUnregisterMultipleIO)}8",
+        };
         var results = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-        monitor.RegisterIO(variables);
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
+        monitor.RegisterIO(variables);
         var originals = readWrite.Read(variables);
         using var subscription = monitor.SymbolStream.Subscribe(x =>
         {
             results.Add(x.Name, x.Value);
-            hits++;
 
-            if (originals.Count == hits)
+            if (originals.Count == results.Count)
             {
                 _ = done.Set();
             }
@@ -155,11 +175,11 @@ public abstract class IMonitorTestBase
 
         var valuesToWrite = originals.ToDictionary(x => x.Key, x => (object)!(bool)x.Value, StringComparer.OrdinalIgnoreCase);
         readWrite.Write(valuesToWrite);
-        var timeoutResult = done.WaitOne(TimeSpan.FromSeconds(5));
+        var timeoutResult = done.WaitOne(TimeSpan.FromSeconds(10));
         monitor.UnregisterIO(variables);
 
         // Assert
-        Assert.IsTrue(timeoutResult, string.Create(CultureInfo.InvariantCulture, $"Timeout, items processed {hits}/{originals.Count}"));
+        Assert.IsTrue(timeoutResult, string.Create(CultureInfo.InvariantCulture, $"Timeout, items processed {results.Count}/{originals.Count}"));
         Assert.AreEqual(originals.Count, results.Count);
         using var originalsEnumerator = originals.OrderBy(x => x.Key, StringComparer.Ordinal).GetEnumerator();
         using var resultsEnumerator = results.OrderBy(x => x.Key, StringComparer.Ordinal).GetEnumerator();
@@ -174,16 +194,44 @@ public abstract class IMonitorTestBase
     }
 
     [TestMethod]
-    public void SubscribeIO()
+    public void SubscribeIOShouldTriggerOnSubscribe()
     {
         // Arrange
-        var connection = GetPLCConnection();
-        var monitor = GetMonitor();
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var monitor = serviceProvider.GetRequiredService<IMonitor>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         using var done = new ManualResetEvent(false);
-        var ioName = "MonitorTestData.BoolValue8";
+        var ioName = $"{DataRoot}.MonitorTestData.{nameof(SubscribeIOShouldTriggerOnSubscribe)}";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
+        var original = readWrite.Read<bool>(ioName);
+        using var subscription = monitor.SubscribeIO(ioName, !original, () => done.Set());
+        readWrite.Write(ioName, !original);
+        var result = done.WaitOne(TimeSpan.FromSeconds(1));
+
+        // Assert
+        Assert.IsTrue(result, "Timeout");
+    }
+
+    [TestMethod]
+    public void SubscribeIOUpdatesWhenValueChanges()
+    {
+        // Arrange
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var monitor = serviceProvider.GetRequiredService<IMonitor>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        using var done = new ManualResetEvent(false);
+        var ioName = $"{DataRoot}.MonitorTestData.{nameof(SubscribeIOUpdatesWhenValueChanges)}";
+
+        // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         var original = readWrite.Read<bool>(ioName);
         using var subscription = monitor.SubscribeIO(ioName, !original, () => done.Set());
         readWrite.ToggleBool(ioName);
@@ -193,29 +241,21 @@ public abstract class IMonitorTestBase
         Assert.IsTrue(result, "Timeout");
     }
 
-    [DataTestMethod]
-    [DynamicData(nameof(Settings.GetMonitorData2), typeof(Settings), DynamicDataSourceType.Method)]
-    public void SubscribeIOShouldTriggerOnSubscribe(string ioName, Type instanceType)
-    {
-        var method = typeof(IMonitorTestBase)
-            .GetMethod(nameof(MonitorValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
-            ?.MakeGenericMethod(instanceType)
-            ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(MonitorValueGenericHelper)}.");
-
-        _ = method.InvokeUnwrappedException(this, new object[] { ioName });
-    }
-
     [TestMethod]
     public void SubscriptionsPersistReconnects()
     {
         // Arrange
-        var connection = GetPLCConnection();
-        var monitor = GetMonitor();
-        var readWrite = GetReadWrite();
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var monitor = serviceProvider.GetRequiredService<IMonitor>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         using var done = new ManualResetEvent(false);
-        var ioName = "MonitorTestData.BoolValue8";
+        var ioName = $"{DataRoot}.MonitorTestData.{nameof(SubscriptionsPersistReconnects)}";
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         var original = readWrite.Read<bool>(ioName);
         using var subscription = monitor.SubscribeIO(ioName, !original, () => done.Set());
         connection.Disconnect();
@@ -227,22 +267,69 @@ public abstract class IMonitorTestBase
         Assert.IsTrue(result, "Timeout");
     }
 
-    protected abstract IMonitor GetMonitor();
-
-    protected abstract IPlcConnection GetPLCConnection(bool connected = true);
-
-    protected abstract IReadWrite GetReadWrite();
-
-    protected void MonitorValueGenericHelper<T>(string ioName)
+    [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "IDisposableAnalyzers.Correctness",
+        "IDISP017:Prefer using",
+        Justification = "We want to specifically dispose the subscription")]
+    public async Task SubscriptionsWillAllTriggerOnUpdate()
     {
         // Arrange
-        var connection = GetPLCConnection();
-        var monitor = GetMonitor();
-        using var done = new ManualResetEvent(false);
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var monitor = serviceProvider.GetRequiredService<IMonitor>();
+        var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
+        var ioName = $"{DataRoot}.MonitorTestData.{nameof(SubscriptionsWillAllTriggerOnUpdate)}";
+        var results = new List<bool>();
 
         // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
+        using var subscription1 = monitor.SubscribeIO<bool>(ioName, results.Add, 100);
+        using var subscription2 = monitor.SubscribeIO<bool>(ioName, results.Add, 100);
+        using var subscription3 = monitor.SubscribeIO<bool>(ioName, results.Add, 100);
+        using var subscription4 = monitor.SubscribeIO<bool>(ioName, results.Add, 100);
+        await SubscribeCheckAsync(results, 4);
+
+        // Assert
+        readWrite.ToggleBool(ioName);
+        await SubscribeCheckAsync(results, 4);
+        subscription1.Dispose();
+
+        readWrite.ToggleBool(ioName);
+        await SubscribeCheckAsync(results, 3);
+        subscription2.Dispose();
+
+        readWrite.ToggleBool(ioName);
+        await SubscribeCheckAsync(results, 2);
+        subscription3.Dispose();
+
+        readWrite.ToggleBool(ioName);
+        await SubscribeCheckAsync(results, 1);
+        subscription4.Dispose();
+
+        readWrite.ToggleBool(ioName);
+        await SubscribeCheckAsync(results, 0);
+    }
+
+    protected abstract IServiceProvider GetServiceProvider();
+
+    protected void MonitorValueGenericHelper<T>(string itemName, [CallerMemberName] string memberName = "")
+    {
+        // Arrange
+        var serviceProvider = GetServiceProvider();
+        using var disposable = serviceProvider as IDisposable;
+        var connection = serviceProvider.GetRequiredService<IPlcConnection>();
+        var monitor = serviceProvider.GetRequiredService<IMonitor>();
+        using var done = new ManualResetEvent(false);
+        var ioName = $"{DataRoot}.MonitorTestData.{memberName}.{itemName}";
+
+        // Act
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
         using var subscription = monitor.SubscribeIO<T>(ioName, _ => done.Set(), 100);
-        var result = done.WaitOne(TimeSpan.FromMilliseconds(2000));
+        var result = done.WaitOne(TimeSpan.FromSeconds(10));
 
         // Assert
         Assert.IsTrue(result, "Timeout");

@@ -14,6 +14,7 @@
     <LibraryReferences>{d0ae1b03-3ec8-4891-96e6-569af6562dd5}</LibraryReferences>
     <CompilerDefines>VISU_USEWSTRING</CompilerDefines>
     <Released>false</Released>
+    <CombineIds>true</CombineIds>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DUTs\DUT_TestStruct.TcDUT">
@@ -22,18 +23,35 @@
     <Compile Include="DUTs\DUT_TestStruct2.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DUTs\MonitorTest.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\MonitorTestData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\ReadTest.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\ReadTestData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\SymbolTest.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DUTs\TestEnum.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GVLs\MonitorTestData.TcGVL">
+    <Compile Include="DUTs\WriteTest.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\WriteTestData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GVLs\Ads.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
     </Compile>
-    <Compile Include="GVLs\ReadTestData.TcGVL">
-      <SubType>Code</SubType>
-      <LinkAlways>true</LinkAlways>
-    </Compile>
-    <Compile Include="GVLs\WriteTestData.TcGVL">
+    <Compile Include="GVLs\Opc.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
     </Compile>
@@ -41,6 +59,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\ResetWriteData.TcPOU">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

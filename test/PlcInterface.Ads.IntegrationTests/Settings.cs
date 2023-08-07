@@ -3,7 +3,7 @@
 internal static class Settings
 {
     public static string AmsNetId
-        => "local";
+        => "172.100.3.1.1.1";
 
     public static int Port
         => 851;

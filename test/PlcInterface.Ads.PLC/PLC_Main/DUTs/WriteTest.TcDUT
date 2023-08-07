@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="WriteTest" Id="{0017aaae-6a45-4b15-b489-0498ed3ea633}">
+    <Declaration><![CDATA[TYPE WriteTest :
+STRUCT
+	ToggleBool								: BOOL;
+	
+	WriteGenericUpdatesTheValueInPlc		: WriteTestData;
+	WriteGenericUpdatesTheValueInPlcAsync	: WriteTestData;
+	
+	WriteMultipleUpdatesTheValueInPlc		: WriteTestData;
+	WriteMultipleUpdatesTheValueInPlcAsync	: WriteTestData;
+	
+	WriteUpdatesTheValueInPlc				: WriteTestData;
+	WriteUpdatesTheValueInPlcAsync			: WriteTestData;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

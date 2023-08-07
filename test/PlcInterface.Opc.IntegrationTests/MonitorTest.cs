@@ -1,61 +1,27 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.IntegrationTests;
 using PlcInterface.OpcUa;
-using TestUtilities;
 
 namespace PlcInterface.Opc.IntegrationTests;
 
 [TestClass]
+[DoNotParallelize]
 public class MonitorTest : IMonitorTestBase
 {
-    private static PlcConnection? connection;
-    private static Monitor? monitor;
-    private static ReadWrite? readWrite;
-    private static SymbolHandler? symbolHandler;
+    protected override string DataRoot => "Opc";
 
-    [ClassCleanup]
-    public static void Disconnect()
+    protected override ServiceProvider GetServiceProvider()
     {
-        connection!.Dispose();
-        symbolHandler!.Dispose();
-        readWrite!.Dispose();
-        monitor!.Dispose();
+        var services = new ServiceCollection()
+            .AddOpcPLC()
+            .Configure<OpcPlcConnectionOptions>(o => o.Address = Settings.PLCUri);
+
+        services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(NullLogger<>)));
+
+        return services.BuildServiceProvider();
     }
-
-    [ClassInitialize]
-    public static void Setup(TestContext testContext)
-    {
-        var connectionSettings = new OpcPlcConnectionOptions();
-        new DefaultOpcPlcConnectionConfigureOptions().Configure(connectionSettings);
-        connectionSettings.Address = Settings.PLCUri;
-
-        connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionSettings), MockHelpers.GetLoggerMock<PlcConnection>());
-        symbolHandler = new SymbolHandler(connection, MockHelpers.GetLoggerMock<SymbolHandler>());
-        var typeConverter = new OpcTypeConverter(symbolHandler);
-        readWrite = new ReadWrite(connection, symbolHandler, typeConverter, MockHelpers.GetLoggerMock<ReadWrite>());
-        monitor = new Monitor(connection, symbolHandler, typeConverter, MockHelpers.GetLoggerMock<Monitor>());
-    }
-
-    protected override IMonitor GetMonitor()
-        => monitor!;
-
-    protected override IPlcConnection GetPLCConnection(bool connected = true)
-    {
-        if (!connected)
-        {
-            return connection!;
-        }
-
-        var isConnected = connection?.Connect();
-        if (isConnected == false)
-        {
-            throw new InvalidOperationException("Connection to PLC Failed");
-        }
-
-        return connection!;
-    }
-
-    protected override IReadWrite GetReadWrite()
-        => readWrite!;
 }

@@ -1,64 +1,41 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.IntegrationTests;
 using PlcInterface.OpcUa;
-using TestUtilities;
 
 namespace PlcInterface.Opc.IntegrationTests;
 
 [TestClass]
-public sealed class PlcConnectionTest : IPlcConnectionTestBase, IDisposable
+[DoNotParallelize]
+public sealed class PlcConnectionTest : IPlcConnectionTestBase
 {
-    private bool disposed;
-    private PlcConnection? plcConnection;
-
-    [TestInitialize]
-    public void ConnectAsync()
-    {
-        var connectionSettings = new OpcPlcConnectionOptions();
-        new DefaultOpcPlcConnectionConfigureOptions().Configure(connectionSettings);
-        connectionSettings.Address = Settings.PLCUriNoRoot;
-
-        plcConnection?.Dispose();
-        plcConnection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionSettings), MockHelpers.GetLoggerMock<PlcConnection>());
-    }
-
-    [TestCleanup]
-    public void Disconnect()
-        => Dispose();
-
-    public void Dispose()
-    {
-        if (disposed)
-        {
-            return;
-        }
-
-        plcConnection?.Dispose();
-        disposed = true;
-    }
-
     [TestMethod]
     public void GetConnectedClient()
     {
         // Arrange
-        Assert.IsNotNull(plcConnection);
+        using var serviceProvider = GetServiceProvider();
+        var connection = serviceProvider.GetRequiredService<IOpcPlcConnection>();
 
-        // Act
-        _ = Assert.ThrowsException<TimeoutException>(() => plcConnection.GetConnectedClient());
+        // Act Assert
+        _ = Assert.ThrowsException<TimeoutException>(() => connection.GetConnectedClient());
     }
 
     [TestMethod]
     public void GetConnectedClientReturnsTheActiveConnection()
     {
         // Arrange
-        Assert.IsNotNull(plcConnection);
+        using var serviceProvider = GetServiceProvider();
+        var connection = serviceProvider.GetRequiredService<IOpcPlcConnection>();
 
         // Act
-        var connectionTask = plcConnection.ConnectAsync();
-        var client = plcConnection.GetConnectedClient(TimeSpan.FromSeconds(10));
-        _ = connectionTask.GetAwaiter().GetResult();
+        var connected = connection.Connect();
+        Assert.IsTrue(connected, "Plc could not connect");
+        var client = connection.GetConnectedClient(TimeSpan.FromSeconds(2));
 
         // Assert
         Assert.IsNotNull(client);
@@ -69,21 +46,27 @@ public sealed class PlcConnectionTest : IPlcConnectionTestBase, IDisposable
     public async Task GetConnectedClientReturnsTheActiveConnectionAsync()
     {
         // Arrange
-        Assert.IsNotNull(plcConnection);
+        using var serviceProvider = GetServiceProvider();
+        var connection = serviceProvider.GetRequiredService<IOpcPlcConnection>();
 
         // Act
-        var connectionTask = plcConnection.ConnectAsync();
-        var client = await plcConnection.GetConnectedClientAsync();
-        _ = await connectionTask;
+        var connected = await connection.ConnectAsync();
+        Assert.IsTrue(connected, "Plc could not connect");
+        var client = await connection.GetConnectedClientAsync(TimeSpan.FromSeconds(2));
 
         // Assert
         Assert.IsNotNull(client);
         Assert.IsTrue(client.Connected);
     }
 
-    protected override IPlcConnection GetPLCConnection()
+    protected override ServiceProvider GetServiceProvider()
     {
-        Assert.IsNotNull(plcConnection);
-        return plcConnection;
+        var services = new ServiceCollection()
+            .AddOpcPLC()
+            .Configure<OpcPlcConnectionOptions>(o => o.Address = Settings.PLCUri);
+
+        services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(NullLogger<>)));
+
+        return services.BuildServiceProvider();
     }
 }

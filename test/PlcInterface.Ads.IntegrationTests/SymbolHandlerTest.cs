@@ -1,45 +1,30 @@
-﻿using System;
-using System.IO.Abstractions;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using PlcInterface.Ads.TwinCATAbstractions;
 using PlcInterface.IntegrationTests;
-using TestUtilities;
-using TwinCAT.Ads;
 
 namespace PlcInterface.Ads.IntegrationTests;
 
 [TestClass]
 public class SymbolHandlerTest : ISymbolHandlerTestBase
 {
-    private static AdsClient? adsClient;
-    private static PlcConnection? connection;
-    private static SymbolHandler? symbolHandler;
+    protected override string DataRoot => "Ads";
 
-    [ClassInitialize]
-    public static async Task ConnectAsync(TestContext testContext)
+    protected override ServiceProvider GetServiceProvider()
     {
-        var connectionSettings = new AdsPlcConnectionOptions() { AmsNetId = Settings.AmsNetId, Port = Settings.Port };
-        var symbolHandlerSettings = new AdsSymbolHandlerOptions() { StoreSymbolsToDisk = false };
-        adsClient = new AdsClient();
+        var services = new ServiceCollection()
+            .AddAdsPLC()
+            .Configure<AdsPlcConnectionOptions>(o =>
+            {
+                o.AmsNetId = Settings.AmsNetId;
+                o.Port = Settings.Port;
+            })
+            .Configure<AdsSymbolHandlerOptions>(o => o.StoreSymbolsToDisk = false);
 
-        connection = new PlcConnection(MockHelpers.GetOptionsMoq(connectionSettings), MockHelpers.GetLoggerMock<PlcConnection>(), adsClient);
-        symbolHandler = new SymbolHandler(connection, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), Mock.Of<IFileSystem>(), new SymbolLoaderFactoryAbstraction());
-        if (!await connection.ConnectAsync())
-        {
-            throw new InvalidOperationException("Connection to PLC Failed");
-        }
+        services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(NullLogger<>)));
+
+        return services.BuildServiceProvider();
     }
-
-    [ClassCleanup]
-    public static void Disconnect()
-    {
-        connection!.Dispose();
-        adsClient!.Dispose();
-        symbolHandler!.Dispose();
-    }
-
-    protected override ISymbolHandler GetSymbolHandler()
-        => symbolHandler!;
 }

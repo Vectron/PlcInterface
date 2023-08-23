@@ -150,7 +150,7 @@ public class IMonitorExtensionTests
         // Act
         using var subscription = monitorMock.Object.SubscribeIO(ioName, "Test").Subscribe(observerMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(null);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns(null!);
         subject.OnNext(monitorResultMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
         _ = monitorResultMock.SetupGet(x => x.Value).Returns("Test");

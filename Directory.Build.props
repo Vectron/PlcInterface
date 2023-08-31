@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <SystemIOAbstractionsVersion>19.2.51</SystemIOAbstractionsVersion>
+    <SystemIOAbstractionsVersion>19.2.67</SystemIOAbstractionsVersion>
   </PropertyGroup>
 
   <!--Package settings-->

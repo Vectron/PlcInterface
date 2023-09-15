@@ -9,7 +9,7 @@
     <PackageReference Include="Vectron.InteractiveConsole" Version="1.0.9" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Beckhoff.TwinCAT.Ads.TcpRouter" Version="6.0.286" />
+    <PackageReference Include="Beckhoff.TwinCAT.Ads.TcpRouter" Version="6.1.74" />
   </ItemGroup>
 
   <ItemGroup>

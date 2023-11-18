@@ -8,19 +8,13 @@ namespace PlcInterface.Sandbox.PLCCommands;
 /// <summary>
 /// Base class for a <see cref="IConsoleCommand"/> to disconnect from the ads PLC.
 /// </summary>
-internal sealed class AdsPlcDisconnectCommand : PlcDisconnectCommand
+/// <remarks>
+/// Initializes a new instance of the <see cref="AdsPlcDisconnectCommand"/> class.
+/// </remarks>
+/// <param name="plcConnection">A <see cref="IPlcConnection"/> instance.</param>
+/// <param name="amsRouter">A <see cref="IAmsRouter"/> for running without TwinCAT installation.</param>
+internal sealed class AdsPlcDisconnectCommand(IAdsPlcConnection plcConnection, IAmsRouter amsRouter) : PlcDisconnectCommand("ads", plcConnection)
 {
-    private readonly IAmsRouter amsRouter;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AdsPlcDisconnectCommand"/> class.
-    /// </summary>
-    /// <param name="plcConnection">A <see cref="IPlcConnection"/> instance.</param>
-    /// <param name="amsRouter">A <see cref="IAmsRouter"/> for running without TwinCAT installation.</param>
-    public AdsPlcDisconnectCommand(IAdsPlcConnection plcConnection, IAmsRouter amsRouter)
-        : base("ads", plcConnection)
-        => this.amsRouter = amsRouter;
-
     /// <inheritdoc/>
     public override void Execute(string[] arguments)
     {

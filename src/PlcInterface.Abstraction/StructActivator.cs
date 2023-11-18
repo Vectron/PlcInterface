@@ -10,23 +10,18 @@ namespace PlcInterface;
 /// Encapsules the logic to create a type by constructor with parameters, or default constructor
 /// with property setters.
 /// </summary>
-internal sealed class StructActivator : ITypeActivator
+/// <remarks>
+/// Initializes a new instance of the <see cref="StructActivator"/> class.
+/// </remarks>
+/// <param name="type">The type of the value type.</param>
+internal sealed class StructActivator(Type type) : ITypeActivator
 {
-    private readonly Activator activator;
-    private readonly PropertyInfo[] properties;
+    private readonly Activator activator = GetActivator(type);
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="StructActivator"/> class.
-    /// </summary>
-    /// <param name="type">The type of the value type.</param>
-    public StructActivator(Type type)
-    {
-        activator = GetActivator(type);
-        properties = type
+    private readonly PropertyInfo[] properties = type
             .GetProperties()
             .Where(x => x.CanWrite)
             .ToArray();
-    }
 
     private delegate object Activator();
 

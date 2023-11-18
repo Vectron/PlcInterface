@@ -19,10 +19,7 @@ internal static class TcAdsClientExtension
     /// <exception cref="InvalidOperationException">When the plc is not in a valid state.</exception>
     public static IAdsConnection ValidateConnection(this IAdsConnection client)
     {
-        if (client == null)
-        {
-            throw new ArgumentNullException(nameof(client));
-        }
+        ArgumentNullException.ThrowIfNull(client);
 
         if (!client.IsConnected)
         {

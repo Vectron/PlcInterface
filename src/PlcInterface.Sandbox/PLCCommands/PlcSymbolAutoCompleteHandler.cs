@@ -8,25 +8,17 @@ namespace PlcInterface.Sandbox.PLCCommands;
 /// <summary>
 /// Ads auto complete handler.
 /// </summary>
-internal sealed class PlcSymbolAutoCompleteHandler : IAutoCompleteHandler
+/// <remarks>
+/// Initializes a new instance of the <see cref="PlcSymbolAutoCompleteHandler"/> class.
+/// </remarks>
+/// <param name="name">The name of the plc type.</param>
+/// <param name="symbolHandler">A <see cref="ISymbolHandler"/> instance.</param>
+internal sealed class PlcSymbolAutoCompleteHandler(string name, ISymbolHandler symbolHandler) : IAutoCompleteHandler
 {
     private const char ArgumentSeparator = ' ';
-    private readonly string name;
-    private readonly ISymbolHandler symbolHandler;
     private LinkedList<string> autoCompletions = new();
     private LinkedListNode<string>? current;
     private string rootCommand = string.Empty;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PlcSymbolAutoCompleteHandler"/> class.
-    /// </summary>
-    /// <param name="name">The name of the plc type.</param>
-    /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> instance.</param>
-    public PlcSymbolAutoCompleteHandler(string name, ISymbolHandler symbolHandler)
-    {
-        this.name = name;
-        this.symbolHandler = symbolHandler;
-    }
 
     /// <inheritdoc/>
     public string? NextSuggestions(string text)

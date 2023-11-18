@@ -64,6 +64,7 @@ public class ISymbolInfoExtensionTests
     }
 
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void FlattenWithValueFlattensAISymbolInfoChildHierarchyAndAddsValues()
     {
         // Arrange
@@ -87,7 +88,7 @@ public class ISymbolInfoExtensionTests
             return symbolInfo.Object;
         });
 
-        var data = new FlattenObject() { BoolValue = true, IntValue = 5, ChildArray = new int[] { 9, 8, 7, 6 } };
+        var data = new FlattenObject() { BoolValue = true, IntValue = 5, ChildArray = [9, 8, 7, 6] };
 
         // Act
         var linked = symbolInfo.Object.FlattenWithValue(symbolHandler.Object, data).ToList();
@@ -131,8 +132,9 @@ public class ISymbolInfoExtensionTests
 
     private sealed class FlattenObject
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
         public FlattenObject()
-            => ChildArray = Array.Empty<int>();
+            => ChildArray = [];
 
         public bool BoolValue
         {

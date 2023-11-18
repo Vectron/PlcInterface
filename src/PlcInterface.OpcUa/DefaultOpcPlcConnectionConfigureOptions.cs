@@ -23,6 +23,7 @@ public class DefaultOpcPlcConnectionConfigureOptions : IConfigureOptions<OpcPlcC
         options.ApplicationConfiguration = CreateApplicationConfiguration();
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     private static ApplicationConfiguration CreateApplicationConfiguration()
     {
         var entryAssembly = Assembly.GetEntryAssembly()
@@ -61,7 +62,7 @@ public class DefaultOpcPlcConnectionConfigureOptions : IConfigureOptions<OpcPlcC
                 NonceLength = 32,
                 AutoAcceptUntrustedCertificates = true,
             },
-            TransportConfigurations = new TransportConfigurationCollection(),
+            TransportConfigurations = [],
             TransportQuotas = new TransportQuotas { OperationTimeout = 15000 },
             ClientConfiguration = new ClientConfiguration { DefaultSessionTimeout = 60000, },
         };

@@ -132,6 +132,7 @@ public abstract class IWriteValueTestBase
     [DataTestMethod]
     [DynamicData(nameof(WriteTestData))]
     [DynamicData(nameof(WriteTestDataExtended))]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void WriteGenericUpdatesTheValueInPlc(string itemName, object newValue, object? readValue = null)
     {
         var writeType = newValue.GetType();
@@ -141,12 +142,13 @@ public abstract class IWriteValueTestBase
             .GetMethod(nameof(WriteValueGenericHelper), BindingFlags.NonPublic | BindingFlags.Instance)
             ?.MakeGenericMethod(writeType, readType)
             ?? throw new InvalidOperationException($"Unable to create the generic method {newValue.GetType().Name}.");
-        _ = method.InvokeUnwrappedException(this, new[] { itemName, newValue, readValue ?? newValue, nameof(WriteGenericUpdatesTheValueInPlc) });
+        _ = method.InvokeUnwrappedException(this, [itemName, newValue, readValue ?? newValue, nameof(WriteGenericUpdatesTheValueInPlc)]);
     }
 
     [DataTestMethod]
     [DynamicData(nameof(WriteTestData))]
     [DynamicData(nameof(WriteTestDataExtended))]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public async Task WriteGenericUpdatesTheValueInPlcAsync(string itemName, object newValue, object? readValue = null)
     {
         var writeType = newValue.GetType();
@@ -156,7 +158,7 @@ public abstract class IWriteValueTestBase
             .GetMethod(nameof(WriteValueGenericHelperAsync), BindingFlags.NonPublic | BindingFlags.Instance)
             ?.MakeGenericMethod(writeType, readType)
             ?? throw new InvalidOperationException($"Unable to create the generic method {newValue.GetType().Name}.");
-        await method.InvokeAsyncUnwrappedException(this, new[] { itemName, newValue, readValue ?? newValue, nameof(WriteGenericUpdatesTheValueInPlcAsync) });
+        await method.InvokeAsyncUnwrappedException(this, [itemName, newValue, readValue ?? newValue, nameof(WriteGenericUpdatesTheValueInPlcAsync)]);
     }
 
     [TestMethod]

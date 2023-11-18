@@ -9,18 +9,14 @@ namespace PlcInterface.Sandbox.PLCCommands;
 /// <summary>
 /// Base class for a <see cref="IConsoleCommand"/> to connect to the PLC through ads.
 /// </summary>
-internal sealed class AdsPlcConnectCommand : PlcConnectCommand
+/// <remarks>
+/// Initializes a new instance of the <see cref="AdsPlcConnectCommand"/> class.
+/// </remarks>
+/// <param name="plcConnection">A <see cref="IPlcConnection"/> instance.</param>
+/// <param name="amsRouter">A <see cref="IAmsRouter"/> for running without TwinCAT installation.</param>
+internal sealed class AdsPlcConnectCommand(IAdsPlcConnection plcConnection, IAmsRouter amsRouter) : PlcConnectCommand("ads", plcConnection)
 {
-    private readonly IAmsRouter amsRouter;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AdsPlcConnectCommand"/> class.
-    /// </summary>
-    /// <param name="plcConnection">A <see cref="IPlcConnection"/> instance.</param>
-    /// <param name="amsRouter">A <see cref="IAmsRouter"/> for running without TwinCAT installation.</param>
-    public AdsPlcConnectCommand(IAdsPlcConnection plcConnection, IAmsRouter amsRouter)
-        : base("ads", plcConnection)
-        => this.amsRouter = amsRouter;
+    private readonly IAmsRouter amsRouter = amsRouter;
 
     /// <inheritdoc/>
     public override void Execute(string[] arguments)

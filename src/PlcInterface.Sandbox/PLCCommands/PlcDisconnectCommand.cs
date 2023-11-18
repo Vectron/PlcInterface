@@ -6,35 +6,24 @@ namespace PlcInterface.Sandbox.PLCCommands;
 /// <summary>
 /// Base class for a <see cref="IConsoleCommand"/> to disconnect from the PLC.
 /// </summary>
-internal class PlcDisconnectCommand : IConsoleCommand
+/// <remarks>
+/// Initializes a new instance of the <see cref="PlcDisconnectCommand"/> class.
+/// </remarks>
+/// <param name="name">The name of the interface.</param>
+/// <param name="plcConnection">A <see cref="IPlcConnection"/> instance.</param>
+internal class PlcDisconnectCommand(string name, IPlcConnection plcConnection) : IConsoleCommand
 {
     /// <summary>
     /// The parameter needed for this command.
     /// </summary>
     public const string Parameter = "disconnect";
 
-    private readonly IPlcConnection plcConnection;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PlcDisconnectCommand"/> class.
-    /// </summary>
-    /// <param name="name">The name of the interface.</param>
-    /// <param name="plcConnection">A <see cref="IPlcConnection"/> instance.</param>
-    public PlcDisconnectCommand(string name, IPlcConnection plcConnection)
-    {
-        CommandParameters = new[] { name, Parameter };
-        this.plcConnection = plcConnection;
-    }
-
     /// <inheritdoc/>
     public string[]? ArgumentNames => Array.Empty<string>();
 
     /// <inheritdoc/>
-    public string[] CommandParameters
-    {
-        get;
-        init;
-    }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
+    public string[] CommandParameters { get; } = [name, Parameter];
 
     /// <inheritdoc/>
     public string HelpText => "Disconnect from the PLC through " + CommandParameters[0];

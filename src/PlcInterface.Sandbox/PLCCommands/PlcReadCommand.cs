@@ -9,35 +9,24 @@ namespace PlcInterface.Sandbox.PLCCommands;
 /// <summary>
 /// Base class for a <see cref="IConsoleCommand"/> to read a variable from the PLC.
 /// </summary>
-internal sealed class PlcReadCommand : IConsoleCommand
+/// <remarks>
+/// Initializes a new instance of the <see cref="PlcReadCommand"/> class.
+/// </remarks>
+/// <param name="name">The name of the interface.</param>
+/// <param name="readWrite">A <see cref="IReadWrite"/> instance.</param>
+internal sealed class PlcReadCommand(string name, IReadWrite readWrite) : IConsoleCommand
 {
     /// <summary>
     /// The parameter needed for this command.
     /// </summary>
     public const string Parameter = "read";
 
-    private readonly IReadWrite readWrite;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PlcReadCommand"/> class.
-    /// </summary>
-    /// <param name="name">The name of the interface.</param>
-    /// <param name="readWrite">A <see cref="IReadWrite"/> instance.</param>
-    public PlcReadCommand(string name, IReadWrite readWrite)
-    {
-        CommandParameters = new[] { name, Parameter };
-        this.readWrite = readWrite;
-    }
-
     /// <inheritdoc/>
     public string[]? ArgumentNames => new[] { "tag" };
 
     /// <inheritdoc/>
-    public string[] CommandParameters
-    {
-        get;
-        init;
-    }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
+    public string[] CommandParameters { get; } = [name, Parameter];
 
     /// <inheritdoc/>
     public string HelpText => "Read a variable from the PLC with " + CommandParameters[0];
@@ -76,7 +65,7 @@ internal sealed class PlcReadCommand : IConsoleCommand
         }
     }
 
-    private string ObjectToString(IDictionary<string, object?> parameters, int indentation = 0)
+    private static string ObjectToString(IDictionary<string, object?> parameters, int indentation = 0)
     {
         var builder = new StringBuilder();
         var prefix = string.Join(string.Empty, Enumerable.Repeat("  ", indentation));

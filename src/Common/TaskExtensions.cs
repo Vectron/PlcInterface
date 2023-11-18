@@ -17,15 +17,8 @@ internal static class TaskExtensions
     /// <returns>The original <see cref="Task"/>.</returns>
     public static Task LogExceptionsAsync(this Task task, ILogger logger)
     {
-        if (task is null)
-        {
-            throw new ArgumentNullException(nameof(task));
-        }
-
-        if (logger is null)
-        {
-            throw new ArgumentNullException(nameof(logger));
-        }
+        ArgumentNullException.ThrowIfNull(task);
+        ArgumentNullException.ThrowIfNull(logger);
 
         return task.ContinueWith(
             t =>

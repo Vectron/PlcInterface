@@ -22,7 +22,7 @@ public class AdsTypeConverterTests
         var dummy = expected.Cast<object>();
         var sourceMock = new Mock<DynamicObject>();
         var dynamicValue = sourceMock.As<IDynamicValue>();
-        _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType(new int[] { 9 }));
+        _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType([9]));
         _ = dynamicValue.Setup(x => x.TryGetArrayElementValues(out dummy)).Returns(true);
 
         // Act
@@ -121,7 +121,7 @@ public class AdsTypeConverterTests
         var expected = new[] { new NestedType() { IntValue = 2 }, new NestedType() { IntValue = 3 } };
         var sourceMock = new Mock<DynamicObject>();
         var dynamicValue = sourceMock.As<IDynamicValue>();
-        _ = dynamicValue.SetupGet(x => x.DataType).Returns(ComplexArrayType(new[] { 2 }));
+        _ = dynamicValue.SetupGet(x => x.DataType).Returns(ComplexArrayType([2]));
         var dummy = new object();
         _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(new MockDelegates.OutFunction<int[], object?, bool>((int[] indices, out object? value) =>
         {
@@ -145,7 +145,7 @@ public class AdsTypeConverterTests
         var expected = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         var sourceMock = new Mock<DynamicObject>();
         var dynamicValue = sourceMock.As<IDynamicValue>();
-        _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType(new[] { 9 }));
+        _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType([9]));
         var dummy = new object();
         _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy))
             .Returns(new MockDelegates.OutFunction<int[], object?, bool>((int[] indices, out object? value) =>
@@ -183,7 +183,7 @@ public class AdsTypeConverterTests
         var expected = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         var sourceMock = new Mock<DynamicObject>();
         var dynamicValue = sourceMock.As<IDynamicValue>();
-        _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType(new[] { expected.Length }));
+        _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType([expected.Length]));
         var dummy = new object();
         _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(true);
 
@@ -199,7 +199,7 @@ public class AdsTypeConverterTests
         var expected = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         var sourceMock = new Mock<DynamicObject>();
         var dynamicValue = sourceMock.As<IDynamicValue>();
-        _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType(new[] { expected.Length }));
+        _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType([expected.Length]));
         var dummy = new object();
         _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(false);
 

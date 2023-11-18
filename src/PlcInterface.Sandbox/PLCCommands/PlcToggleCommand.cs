@@ -6,35 +6,24 @@ namespace PlcInterface.Sandbox.PLCCommands;
 /// <summary>
 /// Base class for a <see cref="IConsoleCommand"/> to toggle a boolean variable in the PLC.
 /// </summary>
-internal sealed class PlcToggleCommand : IConsoleCommand
+/// <remarks>
+/// Initializes a new instance of the <see cref="PlcToggleCommand"/> class.
+/// </remarks>
+/// <param name="name">The name of the interface.</param>
+/// <param name="readWrite">A <see cref="IReadWrite"/> instance.</param>
+internal sealed class PlcToggleCommand(string name, IReadWrite readWrite) : IConsoleCommand
 {
     /// <summary>
     /// The parameter needed for this command.
     /// </summary>
     public const string Parameter = "toggle";
 
-    private readonly IReadWrite readWrite;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PlcToggleCommand"/> class.
-    /// </summary>
-    /// <param name="name">The name of the interface.</param>
-    /// <param name="readWrite">A <see cref="IReadWrite"/> instance.</param>
-    public PlcToggleCommand(string name, IReadWrite readWrite)
-    {
-        CommandParameters = new[] { name, Parameter };
-        this.readWrite = readWrite;
-    }
-
     /// <inheritdoc/>
     public string[]? ArgumentNames => new[] { "tag" };
 
     /// <inheritdoc/>
-    public string[] CommandParameters
-    {
-        get;
-        init;
-    }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
+    public string[] CommandParameters { get; } = [name, Parameter];
 
     /// <inheritdoc/>
     public string HelpText => "Toggle a boolean variable in the PLC with " + CommandParameters[0];

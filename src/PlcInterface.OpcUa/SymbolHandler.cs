@@ -15,7 +15,10 @@ namespace PlcInterface.OpcUa;
 public class SymbolHandler : IOpcSymbolHandler, IDisposable
 {
     private readonly IOpcPlcConnection connection;
-    private readonly CompositeDisposable disposables = new();
+
+    [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
+    private readonly CompositeDisposable disposables = [];
+
     private readonly ILogger logger;
     private IDictionary<string, IOpcSymbolInfo> allSymbols = new Dictionary<string, IOpcSymbolInfo>(StringComparer.OrdinalIgnoreCase);
     private bool disposedValue;

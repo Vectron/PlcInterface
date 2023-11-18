@@ -57,13 +57,14 @@ public class SymbolHandlerTests
     }
 
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void GetSymbolInfoReturnsSymbolWhenAvailable()
     {
         // Arrange
         var ioName = "DummyVar1";
         var symbols = new SymbolCollection()
             {
-                CreateSymbolMock(ioName, Array.Empty<string>()),
+                CreateSymbolMock(ioName, []),
             };
         using var subject = new Subject<IConnected<IAdsConnection>>();
         var adsPlcConnection = new Mock<IAdsPlcConnection>();
@@ -91,14 +92,15 @@ public class SymbolHandlerTests
     }
 
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void OnConnectSymbolListIsUpdated()
     {
         // Arrange
         var symbols = new SymbolCollection()
             {
-                CreateSymbolMock("DummyVar1", Array.Empty<string>()),
-                CreateSymbolMock("DummyVar2", Array.Empty<string>()),
-                CreateSymbolMock("DummyVar3", new[] { "DummyVar3.Sub1", "DummyVar3.Sub2", "DummyVar3.Sub3" }),
+                CreateSymbolMock("DummyVar1", []),
+                CreateSymbolMock("DummyVar2", []),
+                CreateSymbolMock("DummyVar3", ["DummyVar3.Sub1", "DummyVar3.Sub2", "DummyVar3.Sub3"]),
             };
         using var subject = new Subject<IConnected<IAdsConnection>>();
         var adsPlcConnection = new Mock<IAdsPlcConnection>();
@@ -123,13 +125,14 @@ public class SymbolHandlerTests
     }
 
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void SymbolsAreStoredOnDisk()
     {
         // Arrange
         var ioTag = "DummyVar1";
         var symbols = new SymbolCollection()
             {
-                CreateSymbolMock(ioTag, Array.Empty<string>()),
+                CreateSymbolMock(ioTag, []),
             };
         using var subject = new Subject<IConnected<IAdsConnection>>();
         var adsPlcConnection = new Mock<IAdsPlcConnection>();
@@ -161,13 +164,14 @@ public class SymbolHandlerTests
     }
 
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void SymbolsAreStoredOnDiskToDefaultFolder()
     {
         // Arrange
         var ioTag = "DummyVar1";
         var symbols = new SymbolCollection()
             {
-                CreateSymbolMock(ioTag, Array.Empty<string>()),
+                CreateSymbolMock(ioTag, []),
             };
         using var subject = new Subject<IConnected<IAdsConnection>>();
         var adsPlcConnection = new Mock<IAdsPlcConnection>();
@@ -199,13 +203,14 @@ public class SymbolHandlerTests
         StringAssert.Contains(fileDate.TextContents, ioTag, StringComparison.Ordinal);
     }
 
-    private ISymbol CreateSymbolMock(string name, string[] subSymbols)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
+    private static ISymbol CreateSymbolMock(string name, string[] subSymbols)
     {
         var symbol = new Mock<ISymbol>();
         _ = symbol.SetupGet(x => x.InstancePath).Returns(name);
         _ = subSymbols.Length == 0
             ? symbol.SetupGet(x => x.SubSymbols).Returns(SymbolCollection.Empty)
-            : symbol.SetupGet(x => x.SubSymbols).Returns(new SymbolCollection(subSymbols.Select(x => CreateSymbolMock(x, Array.Empty<string>()))));
+            : symbol.SetupGet(x => x.SubSymbols).Returns(new SymbolCollection(subSymbols.Select(x => CreateSymbolMock(x, []))));
 
         return symbol.Object;
     }

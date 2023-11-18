@@ -96,11 +96,12 @@ internal sealed class SymbolInfo : IOpcSymbolInfo
         get;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     private int[] CalculateBounds()
     {
         if (ChildSymbols.Count == 0)
         {
-            return Array.Empty<int>();
+            return [];
         }
 
         var indices = ChildSymbols.Select(x => IndicesHelper.GetIndices(x.AsSpan(Name.Length)));

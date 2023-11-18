@@ -10,13 +10,10 @@ namespace PlcInterface.Ads.TwinCATAbstractions;
 /// <summary>
 /// A implementation of <see cref="ISumSymbolRead"/>.
 /// </summary>
-internal sealed class SumSymbolWriteAbstraction : ISumSymbolWrite
+/// <inheritdoc cref="SumSymbolRead"/>
+internal sealed class SumSymbolWriteAbstraction(IAdsConnection connection, IList<ISymbol> symbols) : ISumSymbolWrite
 {
-    private readonly SumSymbolWrite backend;
-
-    /// <inheritdoc cref="SumSymbolRead"/>
-    public SumSymbolWriteAbstraction(IAdsConnection connection, IList<ISymbol> symbols)
-        => backend = new SumSymbolWrite(connection, symbols);
+    private readonly SumSymbolWrite backend = new(connection, symbols);
 
     /// <inheritdoc/>
     public void Write(object[] values)

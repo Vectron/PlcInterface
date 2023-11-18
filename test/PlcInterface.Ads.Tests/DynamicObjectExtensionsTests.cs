@@ -21,14 +21,14 @@ public class DynamicObjectExtensionsTests
         var nestedDummy = nestedValue.Cast<object>();
         var nestedArrayMock = new Mock<DynamicObject>();
         var iDynamicValueNestedArrayMock = nestedArrayMock.As<IDynamicValue>();
-        _ = iDynamicValueNestedArrayMock.SetupGet(x => x.DataType).Returns(ComplexArrayType(new int[] { 5 }));
+        _ = iDynamicValueNestedArrayMock.SetupGet(x => x.DataType).Returns(ComplexArrayType([5]));
         _ = iDynamicValueNestedArrayMock.Setup(x => x.TryGetArrayElementValues(out nestedDummy)).Returns(true);
 
         var values = new object[] { 44, 55, 66, 77, nestedArrayMock.Object };
         var dummy = values.Cast<object>();
         var dynamicObjectMock = new Mock<DynamicObject>();
         var iDynamicValueDynamicObjectMock = dynamicObjectMock.As<IDynamicValue>();
-        _ = iDynamicValueDynamicObjectMock.SetupGet(x => x.DataType).Returns(ComplexArrayType(new int[] { 5 }));
+        _ = iDynamicValueDynamicObjectMock.SetupGet(x => x.DataType).Returns(ComplexArrayType([5]));
         _ = iDynamicValueDynamicObjectMock.Setup(x => x.TryGetArrayElementValues(out dummy)).Returns(true);
 
         // Act
@@ -51,14 +51,14 @@ public class DynamicObjectExtensionsTests
         var nestedDummy = nestedValue.Cast<object>();
         var nestedArrayMock = new Mock<DynamicObject>();
         var iDynamicValueNestedArrayMock = nestedArrayMock.As<IDynamicValue>();
-        _ = iDynamicValueNestedArrayMock.SetupGet(x => x.DataType).Returns(ComplexArrayType(new int[] { 5 }));
+        _ = iDynamicValueNestedArrayMock.SetupGet(x => x.DataType).Returns(ComplexArrayType([5]));
         _ = iDynamicValueNestedArrayMock.Setup(x => x.TryGetArrayElementValues(out nestedDummy)).Returns(true);
 
         var values = new object[] { 44, 55, 66, 77, nestedArrayMock.Object };
         var dummy = values.Cast<object>();
         var dynamicObjectMock = new Mock<DynamicObject>();
         var iDynamicValueDynamicObjectMock = dynamicObjectMock.As<IDynamicValue>();
-        _ = iDynamicValueDynamicObjectMock.SetupGet(x => x.DataType).Returns(ComplexArrayType(new int[] { 15 }));
+        _ = iDynamicValueDynamicObjectMock.SetupGet(x => x.DataType).Returns(ComplexArrayType([15]));
         _ = iDynamicValueDynamicObjectMock.Setup(x => x.TryGetArrayElementValues(out dummy)).Returns(true);
 
         // Act
@@ -86,7 +86,7 @@ public class DynamicObjectExtensionsTests
         var dummy = values.Cast<object>();
         var dynamicObjectMock = new Mock<DynamicObject>();
         var iDynamicValueDynamicObjectMock = dynamicObjectMock.As<IDynamicValue>();
-        _ = iDynamicValueDynamicObjectMock.SetupGet(x => x.DataType).Returns(IntArrayType(new int[] { 9 }));
+        _ = iDynamicValueDynamicObjectMock.SetupGet(x => x.DataType).Returns(IntArrayType([9]));
         _ = iDynamicValueDynamicObjectMock.Setup(x => x.TryGetArrayElementValues(out dummy)).Returns(true);
 
         // Act
@@ -105,7 +105,7 @@ public class DynamicObjectExtensionsTests
         var dummy = values.Cast<object>();
         var dynamicObjectMock = new Mock<DynamicObject>();
         var iDynamicValueDynamicObjectMock = dynamicObjectMock.As<IDynamicValue>();
-        _ = iDynamicValueDynamicObjectMock.SetupGet(x => x.DataType).Returns(IntArrayType(new int[] { 15 }));
+        _ = iDynamicValueDynamicObjectMock.SetupGet(x => x.DataType).Returns(IntArrayType([15]));
         _ = iDynamicValueDynamicObjectMock.Setup(x => x.TryGetArrayElementValues(out dummy)).Returns(true);
 
         // Act
@@ -133,7 +133,8 @@ public class DynamicObjectExtensionsTests
         // Arrange
         object? dummy = null;
         var dynamicObjectMock = new Mock<DynamicObject>();
-        _ = dynamicObjectMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { "Property1", "Property2", "Property3", "Property4", "Property5" });
+        var result = new[] { "Property1", "Property2", "Property3", "Property4", "Property5" };
+        _ = dynamicObjectMock.Setup(x => x.GetDynamicMemberNames()).Returns(result);
         var iDynamicValueDynamicObjectMock = dynamicObjectMock.As<IDynamicValue>();
         _ = iDynamicValueDynamicObjectMock.SetupGet(x => x.DataType).Returns(Mock.Of<IStructType>());
         _ = iDynamicValueDynamicObjectMock.Setup(x => x.TryGetMemberValue(It.IsAny<string>(), out dummy))
@@ -165,7 +166,8 @@ public class DynamicObjectExtensionsTests
         // Arrange
         object? dummy = null;
         var nestedDynamicMock = new Mock<DynamicObject>();
-        _ = nestedDynamicMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { "Nested1", "Nested2", "Nested3" });
+        var result = new[] { "Nested1", "Nested2", "Nested3" };
+        _ = nestedDynamicMock.Setup(x => x.GetDynamicMemberNames()).Returns(result);
         var nestedDynamicIDynamicValue = nestedDynamicMock.As<IDynamicValue>();
         _ = nestedDynamicIDynamicValue.SetupGet(x => x.DataType).Returns(Mock.Of<IStructType>());
         _ = nestedDynamicIDynamicValue.Setup(x => x.TryGetMemberValue(It.IsAny<string>(), out dummy))
@@ -179,7 +181,8 @@ public class DynamicObjectExtensionsTests
             .Returns(true);
         object? nested = nestedDynamicMock.Object;
         var firstDynamic = new Mock<DynamicObject>();
-        _ = firstDynamic.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { "Property1" });
+        var firstResult = new[] { "Property1" };
+        _ = firstDynamic.Setup(x => x.GetDynamicMemberNames()).Returns(firstResult);
         var firstIDynamicValue = firstDynamic.As<IDynamicValue>();
         _ = firstIDynamicValue.SetupGet(x => x.DataType).Returns(Mock.Of<IStructType>());
         _ = firstIDynamicValue.Setup(x => x.TryGetMemberValue(It.IsAny<string>(), out nested)).Returns(true);
@@ -203,7 +206,8 @@ public class DynamicObjectExtensionsTests
 
         object? dummy = null;
         var firstDynamic = new Mock<DynamicObject>();
-        _ = firstDynamic.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { "Property1", "Property2", "Property3", "Property4" });
+        var firstResult = new[] { "Property1", "Property2", "Property3", "Property4" };
+        _ = firstDynamic.Setup(x => x.GetDynamicMemberNames()).Returns(firstResult);
         var firstIDynamicValue = firstDynamic.As<IDynamicValue>();
         _ = firstIDynamicValue.SetupGet(x => x.DataType).Returns(Mock.Of<IStructType>());
         _ = firstIDynamicValue.Setup(x => x.TryGetMemberValue(It.IsAny<string>(), out dummy))
@@ -236,7 +240,8 @@ public class DynamicObjectExtensionsTests
         // Arrange
         object? dummy = null;
         var firstDynamic = new Mock<DynamicObject>();
-        _ = firstDynamic.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { "Property1", "Property2", "Property3", "Property4" });
+        var firstDynamicResult = new[] { "Property1", "Property2", "Property3", "Property4" };
+        _ = firstDynamic.Setup(x => x.GetDynamicMemberNames()).Returns(firstDynamicResult);
         var firstIDynamicValue = firstDynamic.As<IDynamicValue>();
         _ = firstIDynamicValue.SetupGet(x => x.DataType).Returns(Mock.Of<IStructType>());
         _ = firstIDynamicValue.Setup(x => x.TryGetMemberValue(It.IsAny<string>(), out dummy))
@@ -274,7 +279,7 @@ public class DynamicObjectExtensionsTests
                 new Member("field2", new PrimitiveType("int", typeof(int))),
                 new Member("field3", new PrimitiveType("int", typeof(int))),
                 new Member("field4", new PrimitiveType("int", typeof(int))),
-                new Member("field5", IntArrayType(new[] { 3 })),
+                new Member("field5", IntArrayType([3])),
             };
 
         var complexType = new StructType("Data", null, memberCollection);

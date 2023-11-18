@@ -76,6 +76,7 @@ public abstract class TypeConverter : ITypeConverter
         }
     }
 
+    [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up")]
     private object Convert(Func<string, Type, object?> memberValueGetter, int memberCount, Type targetType)
     {
         var parameterInfo = activatorCache.GetOrAdd(
@@ -95,7 +96,7 @@ public abstract class TypeConverter : ITypeConverter
                     activators.Add(new ObjectActivator(constructor));
                 }
 
-                return activators.ToArray();
+                return [.. activators];
             },
             targetType);
 
@@ -112,7 +113,7 @@ public abstract class TypeConverter : ITypeConverter
         throw new NotSupportedException($"Failed to create an instance of {targetType.Name}");
     }
 
-    private object ConvertArray(Array expandArray, Type targetType)
+    private Array ConvertArray(Array expandArray, Type targetType)
     {
         var elementType = targetType.GetElementType() ?? throw new NotSupportedException($"Unable to retrieve element type");
         var dimensionLengths = new int[expandArray.Rank];
@@ -173,18 +174,13 @@ public abstract class TypeConverter : ITypeConverter
     /// <summary>
     /// A simple implementation of <see cref="GetMemberBinder"/>.
     /// </summary>
-    protected sealed class MemberBinder : GetMemberBinder
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="MemberBinder"/> class.
+    /// </remarks>
+    /// <param name="name">The name of the member to get.</param>
+    /// <param name="ignoreCase">true if the name should be matched ignoring case; false otherwise.</param>
+    protected sealed class MemberBinder(string name, bool ignoreCase) : GetMemberBinder(name, ignoreCase)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MemberBinder"/> class.
-        /// </summary>
-        /// <param name="name">The name of the member to get.</param>
-        /// <param name="ignoreCase">true if the name should be matched ignoring case; false otherwise.</param>
-        public MemberBinder(string name, bool ignoreCase)
-            : base(name, ignoreCase)
-        {
-        }
-
         /// <inheritdoc/>
         [ExcludeFromCodeCoverage]
         public override DynamicMetaObject FallbackGetMember(DynamicMetaObject target, DynamicMetaObject? errorSuggestion)

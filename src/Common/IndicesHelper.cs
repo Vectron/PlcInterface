@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace PlcInterface;
@@ -39,6 +40,7 @@ internal static class IndicesHelper
     /// </summary>
     /// <param name="span">The <see cref="ReadOnlySpan{T}"/> to filter the indices from.</param>
     /// <returns>An <see cref="Array"/> containing the indices of every array dimension.</returns>
+    [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up")]
     public static int[] GetIndices(ReadOnlySpan<char> span)
     {
         var sliced = span[(span.IndexOf('[') + 1)..];
@@ -59,7 +61,7 @@ internal static class IndicesHelper
             end = sliced.IndexOfAny(']', ',');
         }
 
-        return dimensions.ToArray();
+        return [.. dimensions];
     }
 
     /// <summary>

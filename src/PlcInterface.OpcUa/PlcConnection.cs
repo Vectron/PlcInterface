@@ -19,7 +19,10 @@ namespace PlcInterface.OpcUa;
 public class PlcConnection : IOpcPlcConnection, IDisposable
 {
     private readonly BehaviorSubject<IConnected<ISession>> connectionState = new(Connected.No<ISession>());
-    private readonly CompositeDisposable disposables = new();
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
+    private readonly CompositeDisposable disposables = [];
+
     private readonly ILogger logger;
     private readonly IOptions<OpcPlcConnectionOptions> options;
     private readonly TimeSpan reconnectDelay = TimeSpan.FromSeconds(1);
@@ -219,7 +222,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         connectionState.OnNext(Connected.No<ISession>());
         logger.LogError("{Status}, Reconnecting to {Endpoint}", x.EventArgs.Status, x.Sender?.ConfiguredEndpoint);
         var sessionReconnectHandler = new SessionReconnectHandler();
-        sessionReconnectHandler.BeginReconnect(x.Sender, (int)reconnectDelay.TotalMilliseconds, (s, e) =>
+        _ = sessionReconnectHandler.BeginReconnect(x.Sender, (int)reconnectDelay.TotalMilliseconds, (s, e) =>
         {
             // ignore callbacks from discarded objects.
             if (!ReferenceEquals(s, sessionReconnectHandler))

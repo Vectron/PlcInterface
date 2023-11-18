@@ -24,7 +24,7 @@ public class ObjectActivatorTests
     {
         // Arrange
         var type = Assembly.GetExecutingAssembly().GetType("System.Runtime.CompilerServices.NullableContextAttribute")!;
-        var constructor = type.GetConstructor(new Type[] { typeof(byte) })!;
+        var constructor = type.GetConstructor([typeof(byte)])!;
         var parameterInfo = constructor.GetParameters()[0];
         Assert.IsNull(parameterInfo.Name);
         var activator = new ObjectActivator(constructor!);

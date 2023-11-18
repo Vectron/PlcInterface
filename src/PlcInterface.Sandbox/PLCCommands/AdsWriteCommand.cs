@@ -6,24 +6,14 @@ namespace PlcInterface.Sandbox.PLCCommands;
 /// <summary>
 /// Command for writing values with ADS.
 /// </summary>
-internal sealed class AdsWriteCommand : PlcWriteCommand
+/// <remarks>
+/// Initializes a new instance of the <see cref="AdsWriteCommand"/> class.
+/// </remarks>
+/// <param name="readWrite">A <see cref="IAdsReadWrite"/> instance.</param>
+/// <param name="symbolHandler">A <see cref="IAdsSymbolHandler"/> instance.</param>
+/// <param name="typeConverter">A <see cref="IAdsTypeConverter"/> instance.</param>
+internal sealed class AdsWriteCommand(IAdsReadWrite readWrite, IAdsSymbolHandler symbolHandler, IAdsTypeConverter typeConverter) : PlcWriteCommand("ads", readWrite)
 {
-    private readonly IAdsSymbolHandler symbolHandler;
-    private readonly IAdsTypeConverter typeConverter;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AdsWriteCommand"/> class.
-    /// </summary>
-    /// <param name="readWrite">A <see cref="IAdsReadWrite"/> instance.</param>
-    /// <param name="symbolHandler">A <see cref="IAdsSymbolHandler"/> instance.</param>
-    /// <param name="typeConverter">A <see cref="IAdsTypeConverter"/> instance.</param>
-    public AdsWriteCommand(IAdsReadWrite readWrite, IAdsSymbolHandler symbolHandler, IAdsTypeConverter typeConverter)
-        : base("ads", readWrite)
-    {
-        this.symbolHandler = symbolHandler;
-        this.typeConverter = typeConverter;
-    }
-
     /// <inheritdoc/>
     protected override object ConvertToValidInputValue(string symbolName, string value)
     {

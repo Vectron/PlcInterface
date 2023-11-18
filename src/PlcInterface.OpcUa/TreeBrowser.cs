@@ -90,17 +90,18 @@ internal sealed class TreeBrowser : Browser
         return uri.Replace(rootName, string.Empty, StringComparison.OrdinalIgnoreCase).Trim(splitChar);
     }
 
-    private static IOpcSymbolInfo CreateSymbol(ReferenceDescription description, NodeInfo nodeInfo, IOpcSymbolInfo? parent, string rootName)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
+    private static SymbolInfo CreateSymbol(ReferenceDescription description, NodeInfo nodeInfo, IOpcSymbolInfo? parent, string rootName)
     {
         var nameBuilder = new StringBuilder();
-        var parentName = parent == null ? ReadOnlySpan<char>.Empty : parent.Name.AsSpan();
+        var parentName = parent == null ? [] : parent.Name.AsSpan();
         var arrayIndex = description.BrowseName.Name.IndexOf('[', StringComparison.OrdinalIgnoreCase);
         ReadOnlySpan<char> itemName;
         ReadOnlySpan<char> arrayIndexString;
         if (arrayIndex == -1)
         {
             itemName = description.BrowseName.Name.AsSpan();
-            arrayIndexString = ReadOnlySpan<char>.Empty;
+            arrayIndexString = [];
         }
         else
         {
@@ -199,7 +200,7 @@ internal sealed class TreeBrowser : Browser
         return allSymbols.Concat(allSymbols.Chunk((int)operationLimits.MaxNodesPerBrowse).SelectMany(x => BrowseRecursive(x, rootName)));
     }
 
-    private IOpcSymbolInfo CreateRootNodeSymbol(string path)
+    private SymbolInfo CreateRootNodeSymbol(string path)
     {
         var lastNode = new ReferenceDescription() { NodeId = ObjectIds.ObjectsFolder, NodeClass = NodeClass.Object, BrowseName = string.Empty };
         var rootNodeName = string.Empty;
@@ -268,6 +269,6 @@ internal sealed class TreeBrowser : Browser
         }
 
         // return the results.
-        return browseResults;
+        return browseResults.AsEnumerable();
     }
 }

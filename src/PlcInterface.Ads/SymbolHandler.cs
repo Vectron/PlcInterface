@@ -6,6 +6,8 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TwinCAT;
@@ -21,7 +23,9 @@ namespace PlcInterface.Ads;
 /// </summary>
 public class SymbolHandler : IAdsSymbolHandler, IDisposable
 {
-    private readonly CompositeDisposable disposables = new();
+    [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up")]
+    private readonly CompositeDisposable disposables = [];
+
     private readonly IFileSystem fileSystem;
     private readonly ILogger<SymbolHandler> logger;
     private readonly AdsSymbolHandlerOptions options;
@@ -117,7 +121,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
         }
     }
 
-    private void StoreSymbolListOnDisk()
+    private async Task StoreSymbolListOnDiskAsync()
     {
         var outputPath = options.OutputPath;
 
@@ -128,7 +132,8 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
 
         _ = fileSystem.Directory.CreateDirectory(outputPath);
         var filePath = fileSystem.Path.Combine(outputPath, "vars.txt");
-        fileSystem.File.WriteAllLines(filePath, allSymbols.Values.Select(x => x.Name), System.Text.Encoding.UTF8);
+        await fileSystem.File.WriteAllLinesAsync(filePath, allSymbols.Values.Select(x => x.Name), System.Text.Encoding.UTF8, CancellationToken.None)
+            .ConfigureAwait(false);
     }
 
     private void UpdateSymbols(IAdsConnection client)
@@ -157,7 +162,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
 
             if (options.StoreSymbolsToDisk)
             {
-                StoreSymbolListOnDisk();
+                _ = StoreSymbolListOnDiskAsync();
             }
         }
         catch (Exception ex)

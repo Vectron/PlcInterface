@@ -63,7 +63,7 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
         return base.Convert(value, targetType);
     }
 
-    private object ConvertDynamicValueArray(IDynamicValue valueObject, IArrayType arrayType, Type targetType)
+    private Array ConvertDynamicValueArray(IDynamicValue valueObject, IArrayType arrayType, Type targetType)
     {
         var elementType = targetType.GetElementType()
             ?? throw new NotSupportedException($"Unable to retrieve element type");

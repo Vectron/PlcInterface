@@ -350,8 +350,8 @@ public class TypeConverterTests
         // Arrange
         var typeConverter = Converter;
         var sourceMock = new Mock<DynamicObject>();
-        var result = new object();
-        _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { "IntValue2" });
+        var result = new[] { "IntValue2" };
+        _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(result);
 
         // Act
         _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
@@ -448,9 +448,10 @@ public class TypeConverterTests
         _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<int>(source));
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     private record struct TestRecordStructType(int IntValue, int[] IntArray, NestedRecordStructType SubType)
     {
-        public static readonly TestRecordStructType Instance = new(5, new[] { 6, 7, 8, 9 }, new NestedRecordStructType(12));
+        public static readonly TestRecordStructType Instance = new(5, [6, 7, 8, 9], new NestedRecordStructType(12));
     }
 
     private record struct NestedRecordStructType(int IntValue)
@@ -508,10 +509,11 @@ public class TypeConverterTests
 
     private struct TestValueType
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
         public static readonly TestValueType Instance = new()
         {
             IntValue = 5,
-            IntArray = new[] { 6, 7, 8, 9 },
+            IntArray = [6, 7, 8, 9],
             SubType = new NestedValueType()
             {
                 IntValue = 12,
@@ -575,19 +577,21 @@ public class TypeConverterTests
 
     private sealed class TestType
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
         public static readonly TestType Instance = new()
         {
             IntValue = 5,
-            IntArray = new[] { 6, 7, 8, 9 },
+            IntArray = [6, 7, 8, 9],
             SubType = new NestedType()
             {
                 IntValue = 12,
             },
         };
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
         public TestType()
         {
-            IntArray = Array.Empty<int>();
+            IntArray = [];
             SubType = new NestedType();
         }
 
@@ -612,7 +616,8 @@ public class TypeConverterTests
 
     private sealed record TestRecordType(int IntValue, int[] IntArray, NestedRecordType SubType)
     {
-        public static readonly TestRecordType Instance = new(5, new[] { 6, 7, 8, 9 }, new NestedRecordType(12));
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
+        public static readonly TestRecordType Instance = new(5, [6, 7, 8, 9], new NestedRecordType(12));
     }
 
     private sealed record NestedRecordType(int IntValue)

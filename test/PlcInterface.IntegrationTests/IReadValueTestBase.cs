@@ -21,29 +21,29 @@ public abstract class IReadValueTestBase
     private static IEnumerable<object[]> ReadTestData
         => new List<object[]>()
         {
-                new object[] { "BoolValue", true },
-                new object[] { "ByteValue", byte.MaxValue },
-                new object[] { "WordValue", ushort.MaxValue },
-                new object[] { "DWordValue", uint.MaxValue },
-                new object[] { "LWordValue", ulong.MaxValue },
-                new object[] { "SIntValue", sbyte.MinValue },
-                new object[] { "IntValue", short.MinValue },
-                new object[] { "DIntValue", int.MinValue },
-                new object[] { "LIntValue", long.MinValue },
-                new object[] { "USIntValue", byte.MaxValue },
-                new object[] { "UIntValue", ushort.MaxValue },
-                new object[] { "UDIntValue", uint.MaxValue },
-                new object[] { "ULIntValue", ulong.MaxValue },
-                new object[] { "RealValue", -3.402823E+38F },
-                new object[] { "LRealValue", -1.79769313486231E+308 },
-                new object[] { "TimeValue", TimeSpan.FromSeconds(1) },
-                new object[] { "TimeOfDayValue", TimeSpan.FromHours(1) },
-                new object[] { "LTimeValue", TimeSpan.FromTicks(10) },
-                new object[] { "DateValue", new DateTimeOffset(2106, 02, 05, 0, 0, 0, TimeSpan.FromHours(1)) },
-                new object[] { "DateAndTimeValue", new DateTimeOffset(2106, 02, 05, 06, 28, 15, TimeSpan.FromHours(1)) },
-                new object[] { "StringValue", "Test String" },
-                new object[] { "WStringValue", "Test WString" },
-                new object[] { "EnumValue1", (int)TestEnum.Second },
+            new object[] { "BoolValue", true },
+            new object[] { "ByteValue", byte.MaxValue },
+            new object[] { "WordValue", ushort.MaxValue },
+            new object[] { "DWordValue", uint.MaxValue },
+            new object[] { "LWordValue", ulong.MaxValue },
+            new object[] { "SIntValue", sbyte.MinValue },
+            new object[] { "IntValue", short.MinValue },
+            new object[] { "DIntValue", int.MinValue },
+            new object[] { "LIntValue", long.MinValue },
+            new object[] { "USIntValue", byte.MaxValue },
+            new object[] { "UIntValue", ushort.MaxValue },
+            new object[] { "UDIntValue", uint.MaxValue },
+            new object[] { "ULIntValue", ulong.MaxValue },
+            new object[] { "RealValue", -3.402823E+38F },
+            new object[] { "LRealValue", -1.79769313486231E+308 },
+            new object[] { "TimeValue", TimeSpan.FromSeconds(1) },
+            new object[] { "TimeOfDayValue", TimeSpan.FromHours(1) },
+            new object[] { "LTimeValue", TimeSpan.FromTicks(10) },
+            new object[] { "DateValue", new DateTimeOffset(2106, 02, 05, 0, 0, 0, TimeSpan.FromHours(1)) },
+            new object[] { "DateAndTimeValue", new DateTimeOffset(2106, 02, 05, 06, 28, 15, TimeSpan.FromHours(1)) },
+            new object[] { "StringValue", "Test String" },
+            new object[] { "WStringValue", "Test WString" },
+            new object[] { "EnumValue1", (int)TestEnum.Second },
         };
 
     private static IEnumerable<object[]> ReadTestDataExtended
@@ -189,6 +189,7 @@ public abstract class IReadValueTestBase
     [DynamicData(nameof(ReadTestData))]
     [DynamicData(nameof(ReadTestDataExtended))]
     [DataRow("EnumValue2", TestEnum.Second)]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void ReadGenericReturnsTheRequestedType(string ioName, object value)
     {
         var instanceType = value.GetType();
@@ -197,13 +198,14 @@ public abstract class IReadValueTestBase
             ?.MakeGenericMethod(instanceType)
             ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(ReadValueGeneric)}.");
 
-        _ = method.InvokeUnwrappedException(this, new object[] { ioName, value, nameof(ReadGenericReturnsTheRequestedType) });
+        _ = method.InvokeUnwrappedException(this, [ioName, value, nameof(ReadGenericReturnsTheRequestedType)]);
     }
 
     [DataTestMethod]
     [DynamicData(nameof(ReadTestData))]
     [DynamicData(nameof(ReadTestDataExtended))]
     [DataRow("EnumValue2", TestEnum.Second)]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public async Task ReadGenericReturnsTheRequestedTypeAsync(string ioName, object value)
     {
         var instanceType = value.GetType();
@@ -212,7 +214,7 @@ public abstract class IReadValueTestBase
             ?.MakeGenericMethod(instanceType)
             ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(ReadValueGenericAsync)}.");
 
-        await method.InvokeAsyncUnwrappedException(this, new object[] { ioName, value, nameof(ReadGenericReturnsTheRequestedTypeAsync) });
+        await method.InvokeAsyncUnwrappedException(this, [ioName, value, nameof(ReadGenericReturnsTheRequestedTypeAsync)]);
     }
 
     [TestMethod]
@@ -360,6 +362,7 @@ public abstract class IReadValueTestBase
 
     [DataTestMethod]
     [DynamicData(nameof(ReadTestData))]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void WaitsForValueToChange(string ioName, object readValue)
     {
         var instanceType = readValue.GetType();
@@ -368,11 +371,12 @@ public abstract class IReadValueTestBase
             ?.MakeGenericMethod(instanceType)
             ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(WaitsForValueToChangeGeneric)}.");
 
-        _ = method.InvokeUnwrappedException(this, new object[] { ioName, readValue, nameof(WaitsForValueToChange) });
+        _ = method.InvokeUnwrappedException(this, [ioName, readValue, nameof(WaitsForValueToChange)]);
     }
 
     [DataTestMethod]
     [DynamicData(nameof(ReadTestData))]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public async Task WaitsForValueToChangeAsync(string ioName, object readValue)
     {
         var instanceType = readValue.GetType();
@@ -381,7 +385,7 @@ public abstract class IReadValueTestBase
             ?.MakeGenericMethod(instanceType)
             ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(WaitsForValueToChangeGenericAsync)}.");
 
-        await method.InvokeAsyncUnwrappedException(this, new object[] { ioName, readValue, nameof(WaitsForValueToChangeAsync) });
+        await method.InvokeAsyncUnwrappedException(this, [ioName, readValue, nameof(WaitsForValueToChangeAsync)]);
     }
 
     protected abstract IServiceProvider GetServiceProvider();

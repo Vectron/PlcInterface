@@ -9,17 +9,12 @@ namespace PlcInterface.OpcUa;
 /// <summary>
 /// A <see cref="ITypeConverter"/> implementation for OPC types.
 /// </summary>
-public sealed class OpcTypeConverter : TypeConverter, IOpcTypeConverter
+/// <remarks>
+/// Initializes a new instance of the <see cref="OpcTypeConverter"/> class.
+/// </remarks>
+/// <param name="symbolHandler">A <see cref="ISymbolHandler"/> instance.</param>
+public sealed class OpcTypeConverter(IOpcSymbolHandler symbolHandler) : TypeConverter, IOpcTypeConverter
 {
-    private readonly IOpcSymbolHandler symbolHandler;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="OpcTypeConverter"/> class.
-    /// </summary>
-    /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> instance.</param>
-    public OpcTypeConverter(IOpcSymbolHandler symbolHandler)
-        => this.symbolHandler = symbolHandler;
-
     /// <inheritdoc/>
     public object Convert(object value)
     {

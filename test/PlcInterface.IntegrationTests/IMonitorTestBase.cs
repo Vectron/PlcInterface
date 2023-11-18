@@ -47,6 +47,7 @@ public abstract class IMonitorTestBase
     [DataRow("WStringValue", typeof(string))]
     [DataRow("EnumValue1", typeof(int))]
     [DataRow("EnumValue2", typeof(TestEnum))]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void CanSubscribeToAllPlcTypes(string ioName, Type instanceType)
     {
         var method = typeof(IMonitorTestBase)
@@ -54,7 +55,7 @@ public abstract class IMonitorTestBase
             ?.MakeGenericMethod(instanceType)
             ?? throw new InvalidOperationException($"Unable to create the generic method {nameof(MonitorValueGenericHelper)}.");
 
-        _ = method.InvokeUnwrappedException(this, new object[] { ioName, nameof(CanSubscribeToAllPlcTypes) });
+        _ = method.InvokeUnwrappedException(this, [ioName, nameof(CanSubscribeToAllPlcTypes)]);
     }
 
     [TestMethod]
@@ -335,7 +336,7 @@ public abstract class IMonitorTestBase
         Assert.IsTrue(result, "Timeout");
     }
 
-    private static async Task SubscribeCheckAsync(IList<bool> results, int expectedCount)
+    private static async Task SubscribeCheckAsync(List<bool> results, int expectedCount)
     {
         await Task.Delay(1000, CancellationToken.None).ConfigureAwait(false);
         Assert.AreEqual(expectedCount, results.Count);

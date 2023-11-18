@@ -14,29 +14,20 @@ namespace PlcInterface.OpcUa;
 /// <summary>
 /// Implementation of <see cref="IReadWrite"/>.
 /// </summary>
-public class ReadWrite : IOpcReadWrite, IDisposable
+/// <remarks>
+/// Initializes a new instance of the <see cref="ReadWrite"/> class.
+/// </remarks>
+/// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
+/// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
+/// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
+/// <param name="logger">A <see cref="ILogger"/> implementation.</param>
+public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHandler, IOpcTypeConverter typeConverter, ILogger<ReadWrite> logger) : IOpcReadWrite, IDisposable
 {
-    private readonly IOpcPlcConnection connection;
-    private readonly CompositeDisposable disposables = new();
-    private readonly ILogger logger;
-    private readonly IOpcSymbolHandler symbolHandler;
-    private readonly IOpcTypeConverter typeConverter;
-    private bool disposedValue;
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
+    private readonly CompositeDisposable disposables = [];
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ReadWrite"/> class.
-    /// </summary>
-    /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
-    /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
-    /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
-    /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-    public ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHandler, IOpcTypeConverter typeConverter, ILogger<ReadWrite> logger)
-    {
-        this.connection = connection;
-        this.symbolHandler = symbolHandler;
-        this.typeConverter = typeConverter;
-        this.logger = logger;
-    }
+    private readonly ILogger logger = logger;
+    private bool disposedValue;
 
     /// <inheritdoc/>
     public void Dispose()

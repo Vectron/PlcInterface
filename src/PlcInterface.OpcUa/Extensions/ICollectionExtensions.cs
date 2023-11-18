@@ -20,20 +20,12 @@ internal static class ICollectionExtensions
     /// <returns>A <see cref="IReadOnlyCollection{T}"/>.</returns>
     public static IReadOnlyCollection<T> AsReadOnly<T>(this ICollection<T> source)
     {
-        if (source == null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
-
+        ArgumentNullException.ThrowIfNull(source);
         return source as IReadOnlyCollection<T> ?? new ReadOnlyCollectionAdapter<T>(source);
     }
 
-    private sealed class ReadOnlyCollectionAdapter<T> : IReadOnlyCollection<T>
+    private sealed class ReadOnlyCollectionAdapter<T>(ICollection<T> source) : IReadOnlyCollection<T>
     {
-        private readonly ICollection<T> source;
-
-        public ReadOnlyCollectionAdapter(ICollection<T> source) => this.source = source;
-
         public int Count => source.Count;
 
         public IEnumerator<T> GetEnumerator() => source.GetEnumerator();

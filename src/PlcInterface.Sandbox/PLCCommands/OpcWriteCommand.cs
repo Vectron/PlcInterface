@@ -6,24 +6,14 @@ namespace PlcInterface.Sandbox.PLCCommands;
 /// <summary>
 /// Command for writing values with OPC.
 /// </summary>
-internal sealed class OpcWriteCommand : PlcWriteCommand
+/// <remarks>
+/// Initializes a new instance of the <see cref="OpcWriteCommand"/> class.
+/// </remarks>
+/// <param name="readWrite">A <see cref="IOpcReadWrite"/> instance.</param>
+/// <param name="symbolHandler">A <see cref="IOpcSymbolHandler"/> instance.</param>
+/// <param name="typeConverter">A <see cref="IOpcTypeConverter"/> instance.</param>
+internal sealed class OpcWriteCommand(IOpcReadWrite readWrite, IOpcSymbolHandler symbolHandler, IOpcTypeConverter typeConverter) : PlcWriteCommand("opc", readWrite)
 {
-    private readonly IOpcSymbolHandler symbolHandler;
-    private readonly IOpcTypeConverter typeConverter;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="OpcWriteCommand"/> class.
-    /// </summary>
-    /// <param name="readWrite">A <see cref="IOpcReadWrite"/> instance.</param>
-    /// <param name="symbolHandler">A <see cref="IOpcSymbolHandler"/> instance.</param>
-    /// <param name="typeConverter">A <see cref="IOpcTypeConverter"/> instance.</param>
-    public OpcWriteCommand(IOpcReadWrite readWrite, IOpcSymbolHandler symbolHandler, IOpcTypeConverter typeConverter)
-        : base("opc", readWrite)
-    {
-        this.symbolHandler = symbolHandler;
-        this.typeConverter = typeConverter;
-    }
-
     /// <inheritdoc/>
     protected override object ConvertToValidInputValue(string symbolName, string value)
     {

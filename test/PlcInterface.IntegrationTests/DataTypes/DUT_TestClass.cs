@@ -10,6 +10,7 @@ namespace PlcInterface.IntegrationTests.DataTypes;
 [StructLayout(LayoutKind.Sequential, Pack = 0)]
 internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
 {
+    [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public static DUT_TestClass Default => new()
     {
         BoolValue = true,
@@ -35,36 +36,37 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
         StringValue = "Test String",
         WStringValue = "Test WString",
         Nested = DUT_TestClass2.Default,
-        IntArray = new short[] { 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010 },
+        IntArray = [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010],
         MultiDimensionArray = new short[,,]
         {
-                {
-                    { 0100, 0200, 0300, 0400 },
-                    { 0500, 0600, 0700, 0800 },
-                    { 0900, 1000, 1100, 1200 },
-                },
-                {
-                    { 1300, 1400, 1500, 1600 },
-                    { 1700, 1800, 1900, 2000 },
-                    { 2100, 2200, 2300, 2400 },
-                },
+            {
+                { 0100, 0200, 0300, 0400 },
+                { 0500, 0600, 0700, 0800 },
+                { 0900, 1000, 1100, 1200 },
+            },
+            {
+                { 1300, 1400, 1500, 1600 },
+                { 1700, 1800, 1900, 2000 },
+                { 2100, 2200, 2300, 2400 },
+            },
         },
-        ComplexArray = new DUT_TestClass2[] { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
+        ComplexArray = [DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default],
         MultiDimensionComplexArray = new DUT_TestClass2[,,]
         {
-                {
-                    { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
-                    { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
-                    { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
-                },
-                {
-                    { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
-                    { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
-                    { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
-                },
+            {
+                { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
+                { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
+                { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
+            },
+            {
+                { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
+                { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
+                { DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default, DUT_TestClass2.Default },
+            },
         },
     };
 
+    [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public static DUT_TestClass Write => new()
     {
         BoolValue = false,
@@ -97,33 +99,33 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
         WStringValue = "new Test WString",
 
         Nested = DUT_TestClass2.Write,
-        IntArray = new short[] { 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010 },
+        IntArray = [10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010],
         MultiDimensionArray = new short[,,]
         {
-                {
-                    { 0101, 0201, 0301, 0401 },
-                    { 0501, 0600, 0701, 0801 },
-                    { 0901, 1000, 1101, 1201 },
-                },
-                {
-                    { 1301, 1401, 1501, 1601 },
-                    { 1701, 1801, 1901, 2001 },
-                    { 2101, 2201, 2301, 2401 },
-                },
+            {
+                { 0101, 0201, 0301, 0401 },
+                { 0501, 0600, 0701, 0801 },
+                { 0901, 1000, 1101, 1201 },
+            },
+            {
+                { 1301, 1401, 1501, 1601 },
+                { 1701, 1801, 1901, 2001 },
+                { 2101, 2201, 2301, 2401 },
+            },
         },
-        ComplexArray = new DUT_TestClass2[] { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
+        ComplexArray = [DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write],
         MultiDimensionComplexArray = new DUT_TestClass2[,,]
         {
-                {
-                    { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
-                    { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
-                    { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
-                },
-                {
-                    { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
-                    { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
-                    { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
-                },
+            {
+                { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
+                { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
+                { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
+            },
+            {
+                { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
+                { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
+                { DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write, DUT_TestClass2.Write },
+            },
         },
     };
 

@@ -8,16 +8,13 @@ namespace PlcInterface.Ads;
 /// <summary>
 /// Stores data about a PLC symbol.
 /// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="SymbolInfo"/> class.
+/// </remarks>
+/// <param name="symbol">The plc symbol.</param>
 [DebuggerDisplay("{Name}")]
-internal sealed class SymbolInfo : IAdsSymbolInfo
+internal sealed class SymbolInfo(ISymbol symbol) : IAdsSymbolInfo
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SymbolInfo"/> class.
-    /// </summary>
-    /// <param name="symbol">The plc symbol.</param>
-    public SymbolInfo(ISymbol symbol)
-        => Symbol = symbol;
-
     /// <inheritdoc/>
     public IList<string> ChildSymbols
         => Symbol.SubSymbols.Select(x => x.InstancePath).ToList();
@@ -47,8 +44,5 @@ internal sealed class SymbolInfo : IAdsSymbolInfo
         => Symbol.InstanceName;
 
     /// <inheritdoc/>
-    public ISymbol Symbol
-    {
-        get;
-    }
+    public ISymbol Symbol => symbol;
 }

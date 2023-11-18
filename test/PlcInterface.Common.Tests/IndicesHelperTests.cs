@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PlcInterface.Common.Tests;
@@ -10,21 +10,21 @@ public class IndicesHelperTests
     private static int[,,] Data
         => new int[,,]
         {
-                {
-                    { 00, 01, 02 },
-                    { 03, 04, 05 },
-                    { 06, 07, 08 },
-                },
-                {
-                    { 10, 11, 12 },
-                    { 13, 14, 15 },
-                    { 16, 17, 18 },
-                },
-                {
-                    { 20, 21, 22 },
-                    { 23, 24, 25 },
-                    { 26, 27, 28 },
-                },
+            {
+                { 00, 01, 02 },
+                { 03, 04, 05 },
+                { 06, 07, 08 },
+            },
+            {
+                { 10, 11, 12 },
+                { 13, 14, 15 },
+                { 16, 17, 18 },
+            },
+            {
+                { 20, 21, 22 },
+                { 23, 24, 25 },
+                { 26, 27, 28 },
+            },
         };
 
     [TestMethod]
@@ -63,37 +63,37 @@ public class IndicesHelperTests
     {
         // Arrange
         var data = Data;
-        IEnumerable<int[]> expected = new int[][]
+        var expected = new int[][]
         {
-                new int[] { 0, 0, 0 },
-                new int[] { 0, 0, 1 },
-                new int[] { 0, 0, 2 },
-                new int[] { 0, 1, 0 },
-                new int[] { 0, 1, 1 },
-                new int[] { 0, 1, 2 },
-                new int[] { 0, 2, 0 },
-                new int[] { 0, 2, 1 },
-                new int[] { 0, 2, 2 },
-                new int[] { 1, 0, 0 },
-                new int[] { 1, 0, 1 },
-                new int[] { 1, 0, 2 },
-                new int[] { 1, 1, 0 },
-                new int[] { 1, 1, 1 },
-                new int[] { 1, 1, 2 },
-                new int[] { 1, 2, 0 },
-                new int[] { 1, 2, 1 },
-                new int[] { 1, 2, 2 },
-                new int[] { 2, 0, 0 },
-                new int[] { 2, 0, 1 },
-                new int[] { 2, 0, 2 },
-                new int[] { 2, 1, 0 },
-                new int[] { 2, 1, 1 },
-                new int[] { 2, 1, 2 },
-                new int[] { 2, 2, 0 },
-                new int[] { 2, 2, 1 },
-                new int[] { 2, 2, 2 },
+            [0, 0, 0],
+            [0, 0, 1],
+            [0, 0, 2],
+            [0, 1, 0],
+            [0, 1, 1],
+            [0, 1, 2],
+            [0, 2, 0],
+            [0, 2, 1],
+            [0, 2, 2],
+            [1, 0, 0],
+            [1, 0, 1],
+            [1, 0, 2],
+            [1, 1, 0],
+            [1, 1, 1],
+            [1, 1, 2],
+            [1, 2, 0],
+            [1, 2, 1],
+            [1, 2, 2],
+            [2, 0, 0],
+            [2, 0, 1],
+            [2, 0, 2],
+            [2, 1, 0],
+            [2, 1, 1],
+            [2, 1, 2],
+            [2, 2, 0],
+            [2, 2, 1],
+            [2, 2, 2],
         };
-        using var expectedEnumerator = expected.GetEnumerator();
+        using var expectedEnumerator = expected.AsEnumerable().GetEnumerator();
 
         // Act
         var actual = IndicesHelper.GetIndices(data);

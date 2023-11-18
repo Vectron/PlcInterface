@@ -11,28 +11,15 @@ namespace PlcInterface.Ads;
 /// <summary>
 /// Implementation of <see cref="IReadWrite"/>.
 /// </summary>
-public class ReadWrite : IAdsReadWrite
+/// <remarks>
+/// Initializes a new instance of the <see cref="ReadWrite"/> class.
+/// </remarks>
+/// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
+/// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
+/// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
+/// <param name="sumSymbolFactory">A <see cref="ISumSymbolFactory"/> implementation.</param>
+public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHandler, IAdsTypeConverter typeConverter, ISumSymbolFactory sumSymbolFactory) : IAdsReadWrite
 {
-    private readonly IAdsPlcConnection connection;
-    private readonly ISumSymbolFactory sumSymbolFactory;
-    private readonly IAdsSymbolHandler symbolHandler;
-    private readonly IAdsTypeConverter typeConverter;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ReadWrite"/> class.
-    /// </summary>
-    /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
-    /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
-    /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
-    /// <param name="sumSymbolFactory">A <see cref="ISumSymbolFactory"/> implementation.</param>
-    public ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHandler, IAdsTypeConverter typeConverter, ISumSymbolFactory sumSymbolFactory)
-    {
-        this.connection = connection;
-        this.symbolHandler = symbolHandler;
-        this.typeConverter = typeConverter;
-        this.sumSymbolFactory = sumSymbolFactory;
-    }
-
     /// <inheritdoc/>
     public IDictionary<string, object> Read(IEnumerable<string> ioNames)
     {
@@ -174,7 +161,7 @@ public class ReadWrite : IAdsReadWrite
         try
         {
             var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, tcSymbols);
-            sumWriter.Write(namesValues.Values.ToArray());
+            sumWriter.Write([.. namesValues.Values]);
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
@@ -231,7 +218,7 @@ public class ReadWrite : IAdsReadWrite
         try
         {
             var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, tcSymbols);
-            await sumWriter.WriteAsync(namesValues.Values.ToArray(), CancellationToken.None).ConfigureAwait(false);
+            await sumWriter.WriteAsync([.. namesValues.Values], CancellationToken.None).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {

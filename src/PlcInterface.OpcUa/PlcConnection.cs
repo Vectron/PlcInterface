@@ -81,7 +81,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             logger.LogInformation("Opening connection to {Address}", settings.Address);
             logger.LogDebug("Creating an Application Configuration.");
             await config.Validate(ApplicationType.Client).ConfigureAwait(false);
-            var usesSecurity = SetupSecurity(config);
+            var usesSecurity = await SetupSecurityAsync(config).ConfigureAwait(false);
             logger.LogDebug("Discover endpoints of {DiscoveryAddress}.", settings.DiscoveryAddress);
             var selectedEndpoint = CoreClientUtils.SelectEndpoint(settings.DiscoveryAddress.ToString(), usesSecurity, 15000);
             logger.LogDebug("Selected endpoint uses: {Security}", selectedEndpoint.SecurityPolicyUri[(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1)..]);
@@ -189,7 +189,8 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         }
     }
 
-    private void CreateCertificate(ApplicationConfiguration applicationConfiguration)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP004:Don't ignore created IDisposable", Justification = "already marked for disposing.")]
+    private async Task CreateCertificate(ApplicationConfiguration applicationConfiguration)
     {
         var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
 
@@ -200,8 +201,9 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
              .SetNotAfter((DateTime.UtcNow - TimeSpan.FromDays(1)).AddMonths(CertificateFactory.DefaultLifeTime))
              .SetHashAlgorithm(X509Utils.GetRSAHashAlgorithmName(CertificateFactory.DefaultHashSize))
              .SetRSAKeySize(CertificateFactory.DefaultKeySize)
-             .CreateForRSA()
-             .AddToStore(applicationCertificate.StoreType, applicationCertificate.StorePath);
+             .CreateForRSA();
+        _ = await certificate.AddToStoreAsync(applicationCertificate.StoreType, applicationCertificate.StorePath, ct: CancellationToken.None)
+            .ConfigureAwait(false);
     }
 
     private UserIdentity GetUserIdentity(OpcPlcConnectionOptions settings, EndpointDescription endpoint)
@@ -283,7 +285,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         }));
     }
 
-    private bool SetupSecurity(ApplicationConfiguration config)
+    private async Task<bool> SetupSecurityAsync(ApplicationConfiguration config)
     {
         var settings = options.Value;
         if (!settings.UseSecurity)
@@ -307,7 +309,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             return false;
         }
 
-        CreateCertificate(config);
+        await CreateCertificate(config).ConfigureAwait(false);
         UpdateApplicationUri(config);
         return true;
     }

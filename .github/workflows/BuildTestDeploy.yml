@@ -37,7 +37,7 @@ jobs:
     uses: Vectron/GithubWorkflows/.github/workflows/BuildAndTest.yml@main
     with:
       os: ${{ matrix.os }}
-      dotnet_version: 7.0.x
+      dotnet_version: 8.0.x
       solution_file: PlcInterface.sln
 
   call-deploy:
@@ -47,7 +47,7 @@ jobs:
     uses: Vectron/GithubWorkflows/.github/workflows/DeployNugetGithub.yml@main
     with:
       os: ubuntu-latest
-      dotnet_version: 7.0.x
+      dotnet_version: 8.0.x
       solution_file: PlcInterface.sln
     secrets:
       NUGET_KEY: ${{ secrets.NUGET_KEY }}

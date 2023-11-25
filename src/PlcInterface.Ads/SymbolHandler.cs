@@ -13,7 +13,6 @@ using Microsoft.Extensions.Options;
 using TwinCAT;
 using TwinCAT.Ads;
 using TwinCAT.Ads.TypeSystem;
-using TwinCAT.Ads.ValueAccess;
 using TwinCAT.ValueAccess;
 
 namespace PlcInterface.Ads;

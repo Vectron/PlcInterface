@@ -1,5 +1,6 @@
 ﻿using System;
 using PlcInterface.Ads;
+using TwinCAT.TypeSystem;
 
 namespace PlcInterface.Sandbox.PLCCommands;
 
@@ -37,7 +38,7 @@ internal sealed class AdsWriteCommand(IAdsReadWrite readWrite, IAdsSymbolHandler
             throw new InvalidOperationException("Unable to read data type.");
         }
 
-        if (!symbolInfo.Symbol.DataType.IsPrimitive)
+        if (!symbolInfo.Symbol.DataType.IsPrimitive())
         {
             throw new InvalidOperationException("only primitive types are supported");
         }

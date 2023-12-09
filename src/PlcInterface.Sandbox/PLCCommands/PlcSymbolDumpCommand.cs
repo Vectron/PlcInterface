@@ -38,9 +38,9 @@ internal sealed class PlcSymbolDumpCommand(string name, ISymbolHandler symbolHan
     /// <inheritdoc/>
     public void Execute(string[] arguments)
     {
-        foreach (var name in symbolHandler.AllSymbols.Select(x => x.Name))
+        foreach (var symbolName in symbolHandler.AllSymbols.Select(x => x.Name))
         {
-            Console.WriteLine(name);
+            Console.WriteLine(symbolName);
         }
     }
 }

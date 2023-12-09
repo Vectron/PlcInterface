@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <GlobalServerConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ActiveServerUrl />
-  <ActiveServerName />
-  <ActiveEndpoint>opc.tcp://Vectrons-PC:4840 [None:None:Binary]</ActiveEndpoint>
+  <ActiveServerUrl>opc.tcp://192.168.17.56:4840</ActiveServerUrl>
+  <ActiveServerName>opc.tcp://192.168.17.56:4840 [None, None]</ActiveServerName>
+  <ActiveEndpoint />
   <UaPort>4840</UaPort>
   <EK9160MessageFeedBack>false</EK9160MessageFeedBack>
   <IsAnonymous>true</IsAnonymous>

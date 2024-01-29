@@ -49,32 +49,12 @@ public class Monitor : IOpcMonitor, IDisposable
             TimestampsToReturn = TimestampsToReturn.Both,
         };
 
-        sessionStream = connection.SessionStream.Where(x => x.IsConnected).Select(x => x.Value).WhereNotNull().Subscribe(async x =>
-         {
-             foreach (var keyValue in registeredSymbols)
-             {
-                 var value = keyValue.Value;
-                 value.UpdateMonitoredItem(symbolHandler);
-             }
-
-             if (x.Subscriptions.Contains(subscription))
-             {
-                 await subscription.ApplyChangesAsync(CancellationToken.None).ConfigureAwait(false);
-             }
-             else
-             {
-                 if (subscription.Created)
-                 {
-                     var previous = subscription;
-                     subscription = new Subscription(subscription, true);
-                     previous.Dispose();
-                 }
-
-                 _ = x.AddSubscription(subscription);
-                 await subscription.CreateAsync(CancellationToken.None).ConfigureAwait(false);
-                 await subscription.ApplyChangesAsync(CancellationToken.None).ConfigureAwait(false);
-             }
-         });
+        sessionStream = connection.SessionStream
+            .Where(x => x.IsConnected)
+            .Select(x => x.Value)
+            .Select(x => Observable.FromAsync(() => OnSessionConnected(x)))
+            .Concat()
+            .Subscribe();
     }
 
     /// <inheritdoc/>
@@ -161,6 +141,33 @@ public class Monitor : IOpcMonitor, IDisposable
     {
         if (subscription.Created && subscription.Session.Connected)
         {
+            await subscription.ApplyChangesAsync(CancellationToken.None).ConfigureAwait(false);
+        }
+    }
+
+    private async Task OnSessionConnected(ISession session)
+    {
+        foreach (var keyValue in registeredSymbols)
+        {
+            var value = keyValue.Value;
+            value.UpdateMonitoredItem(symbolHandler);
+        }
+
+        if (session.Subscriptions.Contains(subscription))
+        {
+            await subscription.ApplyChangesAsync(CancellationToken.None).ConfigureAwait(false);
+        }
+        else
+        {
+            if (subscription.Created)
+            {
+                var previous = subscription;
+                subscription = new Subscription(subscription, true);
+                previous.Dispose();
+            }
+
+            _ = session.AddSubscription(subscription);
+            await subscription.CreateAsync(CancellationToken.None).ConfigureAwait(false);
             await subscription.ApplyChangesAsync(CancellationToken.None).ConfigureAwait(false);
         }
     }

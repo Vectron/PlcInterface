@@ -1,4 +1,4 @@
-﻿# Version: 5.0.0 (Using https://semver.org/)
+# Version: 5.0.0 (Using https://semver.org/)
 # Updated: 2023-10-04
 # See https://github.com/RehanSaeed/EditorConfig/releases for release notes.
 # See https://github.com/RehanSaeed/EditorConfig for updates to this file.
@@ -508,4 +508,5 @@ dotnet_diagnostic.SA1200.severity = none
 dotnet_diagnostic.SA1633.severity = none
 
 dotnet_diagnostic.MA0026.severity = warning       # MA0026: Fix TODO comment
+dotnet_diagnostic.MA0038.severity = none          # Replaced by CA1822
 dotnet_diagnostic.MA0041.severity = none          # Replaced by CA1822

@@ -18,7 +18,7 @@ public class IReadWriteExtensionTests
         _ = readWriteMock.Setup(x => x.ReadAsync<bool>(It.Is<string>(x => x.Equals(ioName, StringComparison.Ordinal)))).Returns(() => Task.FromResult(counter++ == 2));
 
         // Act
-        await readWriteMock.Object.WaitForValueAsync(ioName, true, TimeSpan.FromMilliseconds(1000));
+        await readWriteMock.Object.WaitForValueAsync(ioName, filterValue: true, TimeSpan.FromMilliseconds(1000));
 
         // Assert
         readWriteMock.Verify(x => x.ReadAsync<bool>(It.Is<string>(x => x.Equals(ioName, StringComparison.Ordinal))), Times.Exactly(3));
@@ -34,7 +34,7 @@ public class IReadWriteExtensionTests
         _ = readWriteMock.Setup(x => x.Read<bool>(It.Is<string>(x => x.Equals(ioName, StringComparison.Ordinal)))).Returns(() => counter++ == 2);
 
         // Act
-        readWriteMock.Object.WaitForValue(ioName, true, TimeSpan.FromMilliseconds(1000));
+        readWriteMock.Object.WaitForValue(ioName, filterValue: true, TimeSpan.FromMilliseconds(1000));
 
         // Assert
         readWriteMock.Verify(x => x.Read<bool>(It.Is<string>(x => x.Equals(ioName, StringComparison.Ordinal))), Times.Exactly(3));
@@ -82,7 +82,7 @@ public class IReadWriteExtensionTests
         var readWrite = Mock.Of<IReadWrite>();
 
         // Act Assert
-        _ = Assert.ThrowsException<TimeoutException>(() => readWrite.WaitForValue(ioName, true, TimeSpan.FromMilliseconds(2)));
+        _ = Assert.ThrowsException<TimeoutException>(() => readWrite.WaitForValue(ioName, filterValue: true, TimeSpan.FromMilliseconds(2)));
     }
 
     [TestMethod]
@@ -93,6 +93,6 @@ public class IReadWriteExtensionTests
         var readWrite = Mock.Of<IReadWrite>();
 
         // Act Assert
-        _ = Assert.ThrowsExceptionAsync<TimeoutException>(() => readWrite.WaitForValueAsync(ioName, true, TimeSpan.FromMilliseconds(2)));
+        _ = Assert.ThrowsExceptionAsync<TimeoutException>(() => readWrite.WaitForValueAsync(ioName, filterValue: true, TimeSpan.FromMilliseconds(2)));
     }
 }

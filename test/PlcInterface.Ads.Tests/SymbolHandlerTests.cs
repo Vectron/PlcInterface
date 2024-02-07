@@ -30,7 +30,7 @@ public class SymbolHandlerTests
         using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock.Object, symbolLoaderFactory.Object);
         var adsClient = new Mock<IAdsDisposableConnection>();
         var connected = new Mock<IConnected<IAdsConnection>>();
-        _ = connected.SetupGet(x => x.IsConnected).Returns(true);
+        _ = connected.SetupGet(x => x.IsConnected).Returns(value: true);
         _ = connected.SetupGet(x => x.Value).Returns(adsClient.Object);
 
         // Act
@@ -78,7 +78,7 @@ public class SymbolHandlerTests
         using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock.Object, symbolLoaderFactory.Object);
         var adsClient = new Mock<IAdsDisposableConnection>();
         var connected = new Mock<IConnected<IAdsConnection>>();
-        _ = connected.SetupGet(x => x.IsConnected).Returns(true);
+        _ = connected.SetupGet(x => x.IsConnected).Returns(value: true);
         _ = connected.SetupGet(x => x.Value).Returns(adsClient.Object);
 
         // Act
@@ -114,7 +114,7 @@ public class SymbolHandlerTests
         using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock.Object, symbolLoaderFactory.Object);
         var adsClient = new Mock<IAdsDisposableConnection>();
         var connected = new Mock<IConnected<IAdsConnection>>();
-        _ = connected.SetupGet(x => x.IsConnected).Returns(true);
+        _ = connected.SetupGet(x => x.IsConnected).Returns(value: true);
         _ = connected.SetupGet(x => x.Value).Returns(adsClient.Object);
 
         // Act
@@ -151,7 +151,7 @@ public class SymbolHandlerTests
         using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock, symbolLoaderFactory.Object);
         var adsClient = new Mock<IAdsDisposableConnection>();
         var connected = new Mock<IConnected<IAdsConnection>>();
-        _ = connected.SetupGet(x => x.IsConnected).Returns(true);
+        _ = connected.SetupGet(x => x.IsConnected).Returns(value: true);
         _ = connected.SetupGet(x => x.Value).Returns(adsClient.Object);
 
         // Act
@@ -190,7 +190,7 @@ public class SymbolHandlerTests
         using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock, symbolLoaderFactory.Object);
         var adsClient = new Mock<IAdsDisposableConnection>();
         var connected = new Mock<IConnected<IAdsConnection>>();
-        _ = connected.SetupGet(x => x.IsConnected).Returns(true);
+        _ = connected.SetupGet(x => x.IsConnected).Returns(value: true);
         _ = connected.SetupGet(x => x.Value).Returns(adsClient.Object);
 
         // Act

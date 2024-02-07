@@ -83,7 +83,7 @@ public class PlcConnection : IAdsPlcConnection, IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        Dispose(true);
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 

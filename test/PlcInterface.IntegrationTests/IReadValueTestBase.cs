@@ -341,7 +341,7 @@ public abstract class IReadValueTestBase
         // Act assert
         var connected = connection.Connect();
         Assert.IsTrue(connected, "Plc could not connect");
-        _ = Assert.ThrowsException<TimeoutException>(() => readWrite.WaitForValue(ioName, true, TimeSpan.FromSeconds(1)));
+        _ = Assert.ThrowsException<TimeoutException>(() => readWrite.WaitForValue(ioName, filterValue: true, TimeSpan.FromSeconds(1)));
     }
 
     [TestMethod]
@@ -357,7 +357,7 @@ public abstract class IReadValueTestBase
         // Act Assert
         var connected = connection.Connect();
         Assert.IsTrue(connected, "Plc could not connect");
-        _ = Assert.ThrowsExceptionAsync<TimeoutException>(async () => await readWrite.WaitForValueAsync(ioName, false, TimeSpan.FromSeconds(1)).ConfigureAwait(false));
+        _ = Assert.ThrowsExceptionAsync<TimeoutException>(async () => await readWrite.WaitForValueAsync(ioName, filterValue: false, TimeSpan.FromSeconds(1)).ConfigureAwait(false));
     }
 
     [DataTestMethod]

@@ -27,16 +27,16 @@ public class MonitorTests
         _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
         var symbolInfo = symbolInfoMock.Object;
         var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolInfo(It.IsAny<string>(), out symbolInfo)).Returns(true);
+        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolInfo(It.IsAny<string>(), out symbolInfo)).Returns(value: true);
         var typeConverterMock = new Mock<IAdsTypeConverter>();
         using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
         var connectedMock = new Mock<IConnected<IAdsConnection>>();
-        _ = connectedMock.Setup(x => x.IsConnected).Returns(true);
+        _ = connectedMock.Setup(x => x.IsConnected).Returns(value: true);
 
         // Act
         monitor.RegisterIO(ioTags);
         valueSymbolMock.VerifyAdd(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), Times.Never);
-        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(value: true);
         session.OnNext(connectedMock.Object);
 
         // Assert
@@ -51,14 +51,14 @@ public class MonitorTests
         var connectionMock = new Mock<IAdsPlcConnection>();
         _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
         var twinCATConnectionMock = new Mock<IConnection>();
-        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(value: true);
         var valueSymbolMock = new Mock<IValueSymbol>();
         _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twinCATConnectionMock.Object);
         var symbolInfoMock = new Mock<IAdsSymbolInfo>();
         _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
         var symbolInfo = symbolInfoMock.Object;
         var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolInfo(It.IsAny<string>(), out symbolInfo)).Returns(true);
+        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolInfo(It.IsAny<string>(), out symbolInfo)).Returns(value: true);
         var typeConverterMock = new Mock<IAdsTypeConverter>();
         using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
 
@@ -77,7 +77,7 @@ public class MonitorTests
         var connectionMock = new Mock<IAdsPlcConnection>();
         _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
         var twinCATConnectionMock = new Mock<IConnection>();
-        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(value: true);
         var valueSymbolMock = new Mock<IValueSymbol>();
         _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twinCATConnectionMock.Object);
         var symbolInfoMock = new Mock<IAdsSymbolInfo>();
@@ -102,14 +102,14 @@ public class MonitorTests
         var connectionMock = new Mock<IAdsPlcConnection>();
         _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
         var twinCATConnectionMock = new Mock<IConnection>();
-        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(value: true);
         var valueSymbolMock = new Mock<IValueSymbol>();
         _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twinCATConnectionMock.Object);
         var symbolInfoMock = new Mock<IAdsSymbolInfo>();
         _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
         var symbolInfo = symbolInfoMock.Object;
         var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolInfo(It.IsAny<string>(), out symbolInfo)).Returns(true);
+        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolInfo(It.IsAny<string>(), out symbolInfo)).Returns(value: true);
         var typeConverterMock = new Mock<IAdsTypeConverter>();
         using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
 
@@ -143,7 +143,7 @@ public class MonitorTests
         var connectionMock = new Mock<IAdsPlcConnection>();
         _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
         var twinCATConnectionMock = new Mock<IConnection>();
-        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(value: true);
         var valueSymbolMock = new Mock<IValueSymbol>();
         _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twinCATConnectionMock.Object);
         var symbolInfoMock = new Mock<IAdsSymbolInfo>();
@@ -169,14 +169,14 @@ public class MonitorTests
         var connectionMock = new Mock<IAdsPlcConnection>();
         _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
         var twinCATConnectionMock = new Mock<IConnection>();
-        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(value: true);
         var valueSymbolMock = new Mock<IValueSymbol>();
         _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twinCATConnectionMock.Object);
         var symbolInfoMock = new Mock<IAdsSymbolInfo>();
         _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
         var symbolInfo = symbolInfoMock.Object;
         var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolInfo(It.IsAny<string>(), out symbolInfo)).Returns(true);
+        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolInfo(It.IsAny<string>(), out symbolInfo)).Returns(value: true);
         var typeConverterMock = new Mock<IAdsTypeConverter>();
         using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
 
@@ -199,25 +199,25 @@ public class MonitorTests
         var connectionMock = new Mock<IAdsPlcConnection>();
         _ = connectionMock.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
         var twinCATConnectionMock = new Mock<IConnection>();
-        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = twinCATConnectionMock.SetupGet(x => x.IsConnected).Returns(value: true);
         var valueSymbolMock = new Mock<IValueSymbol>();
         _ = valueSymbolMock.SetupGet(x => x.Connection).Returns(twinCATConnectionMock.Object);
         var symbolInfoMock = new Mock<IAdsSymbolInfo>();
         _ = symbolInfoMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
         var symbolInfo = symbolInfoMock.Object;
         var symbolHandlerMock = new Mock<IAdsSymbolHandler>();
-        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolInfo(It.IsAny<string>(), out symbolInfo)).Returns(true);
+        _ = symbolHandlerMock.Setup(x => x.TryGetSymbolInfo(It.IsAny<string>(), out symbolInfo)).Returns(value: true);
         var typeConverterMock = new Mock<IAdsTypeConverter>();
         _ = typeConverterMock.Setup(x => x.Convert(It.IsAny<object>(), It.IsAny<IValueSymbol>())).Returns<object, IValueSymbol>((o, v) => o);
         using var monitor = new Monitor(connectionMock.Object, symbolHandlerMock.Object, typeConverterMock.Object, MockHelpers.GetLoggerMock<Monitor>());
         var connectedMock = new Mock<IConnected<IAdsConnection>>();
-        _ = connectedMock.Setup(x => x.IsConnected).Returns(true);
+        _ = connectedMock.Setup(x => x.IsConnected).Returns(value: true);
         var observerMock = new Mock<IObserver<IMonitorResult>>();
 
         // Act
         using var subscription = monitor.SymbolStream.Subscribe(observerMock.Object);
         monitor.RegisterIO(ioTag);
-        valueSymbolMock.Raise(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), new ValueChangedEventArgs(valueSymbolMock.Object, true, DateTimeOffset.UtcNow));
+        valueSymbolMock.Raise(x => x.ValueChanged += It.IsAny<EventHandler<ValueChangedEventArgs>>(), new ValueChangedEventArgs(valueSymbolMock.Object, value: true, DateTimeOffset.UtcNow));
 
         // Assert
         observerMock.Verify(x => x.OnNext(It.Is<IMonitorResult>(x => x.Name.Equals(ioTag, StringComparison.Ordinal) && ((bool)x.Value))), Times.Once);

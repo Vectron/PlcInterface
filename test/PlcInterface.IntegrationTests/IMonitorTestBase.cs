@@ -67,7 +67,7 @@ public abstract class IMonitorTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var monitor = serviceProvider.GetRequiredService<IMonitor>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        using var done = new ManualResetEvent(false);
+        using var done = new ManualResetEvent(initialState: false);
         var ioName = $"{DataRoot}.MonitorTestData.{nameof(MonitorBeforeConnectDoesNotMatter)}";
         var original = false;
 
@@ -99,7 +99,7 @@ public abstract class IMonitorTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var monitor = serviceProvider.GetRequiredService<IMonitor>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        using var done = new ManualResetEvent(false);
+        using var done = new ManualResetEvent(initialState: false);
         var ioName = $"{DataRoot}.MonitorTestData.{nameof(RegisterUnregisterIO)}";
         var results = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
@@ -145,7 +145,7 @@ public abstract class IMonitorTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var monitor = serviceProvider.GetRequiredService<IMonitor>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        using var done = new ManualResetEvent(false);
+        using var done = new ManualResetEvent(initialState: false);
         var variables = new List<string>()
         {
             $"{DataRoot}.MonitorTestData.{nameof(RegisterUnregisterMultipleIO)}1",
@@ -203,7 +203,7 @@ public abstract class IMonitorTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var monitor = serviceProvider.GetRequiredService<IMonitor>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        using var done = new ManualResetEvent(false);
+        using var done = new ManualResetEvent(initialState: false);
         var ioName = $"{DataRoot}.MonitorTestData.{nameof(SubscribeIOShouldTriggerOnSubscribe)}";
 
         // Act
@@ -227,7 +227,7 @@ public abstract class IMonitorTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var monitor = serviceProvider.GetRequiredService<IMonitor>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        using var done = new ManualResetEvent(false);
+        using var done = new ManualResetEvent(initialState: false);
         var ioName = $"{DataRoot}.MonitorTestData.{nameof(SubscribeIOUpdatesWhenValueChanges)}";
 
         // Act
@@ -251,7 +251,7 @@ public abstract class IMonitorTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var monitor = serviceProvider.GetRequiredService<IMonitor>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        using var done = new ManualResetEvent(false);
+        using var done = new ManualResetEvent(initialState: false);
         var ioName = $"{DataRoot}.MonitorTestData.{nameof(SubscriptionsPersistReconnects)}";
 
         // Act
@@ -323,7 +323,7 @@ public abstract class IMonitorTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var monitor = serviceProvider.GetRequiredService<IMonitor>();
-        using var done = new ManualResetEvent(false);
+        using var done = new ManualResetEvent(initialState: false);
         var ioName = $"{DataRoot}.MonitorTestData.{memberName}.{itemName}";
 
         // Act

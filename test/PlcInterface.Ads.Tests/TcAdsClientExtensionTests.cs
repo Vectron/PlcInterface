@@ -14,7 +14,7 @@ public class TcAdsClientExtensionTests
         // Arrange
         var stateInfo = new StateInfo(AdsState.Run, 0);
         var clientMock = new Mock<IAdsConnection>();
-        _ = clientMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = clientMock.SetupGet(x => x.IsConnected).Returns(value: true);
         _ = clientMock.Setup(x => x.TryReadState(out stateInfo)).Returns(AdsErrorCode.NoError);
 
         // Act
@@ -34,7 +34,7 @@ public class TcAdsClientExtensionTests
         // Arrange
         var stateInfo = default(StateInfo);
         var clientMock = new Mock<IAdsConnection>();
-        _ = clientMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = clientMock.SetupGet(x => x.IsConnected).Returns(value: true);
         _ = clientMock.Setup(x => x.TryReadState(out stateInfo)).Returns(AdsErrorCode.InternalError);
 
         // Act
@@ -49,7 +49,7 @@ public class TcAdsClientExtensionTests
         // Arrange
         var stateInfo = default(StateInfo);
         var clientMock = new Mock<IAdsConnection>();
-        _ = clientMock.SetupGet(x => x.IsConnected).Returns(false);
+        _ = clientMock.SetupGet(x => x.IsConnected).Returns(value: false);
         _ = clientMock.Setup(x => x.TryReadState(out stateInfo)).Returns(AdsErrorCode.InternalError);
 
         // Act
@@ -64,7 +64,7 @@ public class TcAdsClientExtensionTests
         // Arrange
         var stateInfo = new StateInfo(AdsState.Stop, 0);
         var clientMock = new Mock<IAdsConnection>();
-        _ = clientMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = clientMock.SetupGet(x => x.IsConnected).Returns(value: true);
         _ = clientMock.Setup(x => x.TryReadState(out stateInfo)).Returns(AdsErrorCode.NoError);
 
         // Act

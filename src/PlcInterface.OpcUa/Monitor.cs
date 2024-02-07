@@ -68,7 +68,7 @@ public class Monitor : IOpcMonitor, IDisposable
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        Dispose(true);
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 
@@ -162,7 +162,7 @@ public class Monitor : IOpcMonitor, IDisposable
             if (subscription.Created)
             {
                 var previous = subscription;
-                subscription = new Subscription(subscription, true);
+                subscription = new Subscription(subscription, copyEventHandlers: true);
                 previous.Dispose();
             }
 

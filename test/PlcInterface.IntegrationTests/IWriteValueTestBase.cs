@@ -318,7 +318,7 @@ public abstract class IWriteValueTestBase
     protected void ResetPLCValues(IReadWrite readWrite, string fieldName, [CallerMemberName] string memberName = "")
     {
         var ioName = $"{DataRoot}.WriteTestData.{memberName}.{fieldName}Reset";
-        readWrite.Write(ioName, true);
+        readWrite.Write(ioName, value: true);
         var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
         while (readWrite.Read<bool>(ioName))
         {

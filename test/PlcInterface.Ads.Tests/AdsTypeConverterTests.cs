@@ -23,7 +23,7 @@ public class AdsTypeConverterTests
         var sourceMock = new Mock<DynamicObject>();
         var dynamicValue = sourceMock.As<IDynamicValue>();
         _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType([9]));
-        _ = dynamicValue.Setup(x => x.TryGetArrayElementValues(out dummy)).Returns(true);
+        _ = dynamicValue.Setup(x => x.TryGetArrayElementValues(out dummy)).Returns(value: true);
 
         // Act
         var actual = typeConverter.Convert(sourceMock.Object, Mock.Of<IValueSymbol>());
@@ -185,7 +185,7 @@ public class AdsTypeConverterTests
         var dynamicValue = sourceMock.As<IDynamicValue>();
         _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType([expected.Length]));
         var dummy = new object();
-        _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(true);
+        _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(value: true);
 
         // Act Assert
         _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
@@ -201,7 +201,7 @@ public class AdsTypeConverterTests
         var dynamicValue = sourceMock.As<IDynamicValue>();
         _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType([expected.Length]));
         var dummy = new object();
-        _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(false);
+        _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(value: false);
 
         // Act Assert
         _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
@@ -213,7 +213,7 @@ public class AdsTypeConverterTests
         {
             new Member(nameof(NestedType.IntValue), new PrimitiveType("int", typeof(int))),
         };
-        var complexType = new StructType("NestedType", null, memberCollection);
+        var complexType = new StructType("NestedType", baseType: null, memberCollection);
         var dimensionCollection = new DimensionCollection(rank);
         var arrayType = new ArrayType(complexType, dimensionCollection);
         return arrayType;

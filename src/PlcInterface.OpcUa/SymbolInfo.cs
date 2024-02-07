@@ -32,7 +32,7 @@ internal sealed class SymbolInfo : IOpcSymbolInfo
         ChildSymbols = new List<string>();
         IsBigType = symbol.NodeClass is NodeClass.Object or NodeClass.ObjectType;
         Indices = IndicesHelper.GetIndices(Name);
-        arrayBounds = new Lazy<int[]>(CalculateBounds, false);
+        arrayBounds = new Lazy<int[]>(CalculateBounds, isThreadSafe: false);
         Comment = string.Empty;
     }
 

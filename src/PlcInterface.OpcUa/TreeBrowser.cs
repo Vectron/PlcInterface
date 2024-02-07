@@ -50,7 +50,7 @@ internal sealed class TreeBrowser : Browser
 
         // make the call to the server.
         var responseHeader = Session.Browse(
-            null,
+            requestHeader: null,
             View,
             MaxReferencesReturned,
             nodesToBrowse,
@@ -152,7 +152,7 @@ internal sealed class TreeBrowser : Browser
 
         // make the call to the server.
         var responseHeader = Session.BrowseNext(
-            null,
+            requestHeader: null,
             cancel,
             continuationPoints,
             out var results,
@@ -224,7 +224,7 @@ internal sealed class TreeBrowser : Browser
         }
 
         var nodeInfo = Session.ReadNodeInfo((NodeId)lastNode.NodeId);
-        return CreateSymbol(lastNode, nodeInfo, null, string.Empty);
+        return CreateSymbol(lastNode, nodeInfo, parent: null, string.Empty);
     }
 
     private IEnumerable<ReferenceDescriptionCollection> DecodeResult(ResponseHeader responseHeader, BrowseResultCollection results, DiagnosticInfoCollection diagnosticInfos)
@@ -250,11 +250,11 @@ internal sealed class TreeBrowser : Browser
 
                 if (!ContinueUntilDone)
                 {
-                    _ = BrowseNext(ref continuationPoint, true);
+                    _ = BrowseNext(ref continuationPoint, cancel: true);
                     return browseResults;
                 }
 
-                additionalReferences = BrowseNext(ref continuationPoint, false);
+                additionalReferences = BrowseNext(ref continuationPoint, cancel: false);
                 if (additionalReferences != null && additionalReferences.Count > 0)
                 {
                     references.AddRange(additionalReferences);

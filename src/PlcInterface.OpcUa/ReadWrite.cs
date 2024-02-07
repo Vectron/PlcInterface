@@ -32,7 +32,7 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
     /// <inheritdoc/>
     public void Dispose()
     {
-        Dispose(true);
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 
@@ -168,7 +168,7 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
 
         var nodesToWrite = new WriteValueCollection(query);
         var responseHeader = session.Write(
-            null,
+            requestHeader: null,
             nodesToWrite,
             out var statusCodes,
             out var diagnosticInfos);
@@ -200,7 +200,7 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
         var nodesToWrite = new WriteValueCollection(query);
 
         var writeResult = await session.WriteAsync(
-            null,
+            requestHeader: null,
             nodesToWrite,
             CancellationToken.None)
             .ConfigureAwait(false);

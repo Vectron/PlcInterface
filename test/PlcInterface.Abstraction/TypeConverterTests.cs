@@ -396,7 +396,7 @@ public class TypeConverterTests
         var result = new object();
         _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(TestType.IntValue) });
         var value = new object();
-        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out value)).Returns(false);
+        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out value)).Returns(value: false);
 
         // Act
         _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<TestType>(sourceMock.Object));

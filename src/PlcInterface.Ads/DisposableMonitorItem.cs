@@ -42,7 +42,7 @@ internal sealed class DisposableMonitorItem : IDisposable
 
     /// <inheritdoc/>
     public void Dispose()
-        => Dispose(true);
+        => Dispose(disposing: true);
 
     /// <summary>
     /// Update the subscriptions.

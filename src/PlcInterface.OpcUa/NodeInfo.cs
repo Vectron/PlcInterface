@@ -27,13 +27,13 @@ internal sealed class NodeInfo
 
         if (NodeId.IsNull(dataType))
         {
-            builtInType = new Lazy<BuiltInType>(() => BuiltInType.Null, false);
-            dataTypeDisplayText = new Lazy<string>(() => string.Empty, false);
+            builtInType = new Lazy<BuiltInType>(() => BuiltInType.Null, isThreadSafe: false);
+            dataTypeDisplayText = new Lazy<string>(() => string.Empty, isThreadSafe: false);
         }
         else
         {
-            builtInType = new Lazy<BuiltInType>(() => DataTypes.GetBuiltInType(dataType, session.TypeTree), false);
-            dataTypeDisplayText = new Lazy<string>(() => session.NodeCache.GetDisplayText(dataType), false);
+            builtInType = new Lazy<BuiltInType>(() => DataTypes.GetBuiltInType(dataType, session.TypeTree), isThreadSafe: false);
+            dataTypeDisplayText = new Lazy<string>(() => session.NodeCache.GetDisplayText(dataType), isThreadSafe: false);
         }
     }
 

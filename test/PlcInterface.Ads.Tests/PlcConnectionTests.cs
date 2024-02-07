@@ -40,7 +40,7 @@ public class PlcConnectionTests
     {
         // Arrange
         var adsClientMock = new Mock<IAdsDisposableConnection>();
-        _ = adsClientMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = adsClientMock.SetupGet(x => x.IsConnected).Returns(value: true);
         using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(Mock.Of<AdsPlcConnectionOptions>()), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
 
         // Act
@@ -115,7 +115,7 @@ public class PlcConnectionTests
     {
         // Arrange
         var adsClientMock = new Mock<IAdsDisposableConnection>();
-        _ = adsClientMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = adsClientMock.SetupGet(x => x.IsConnected).Returns(value: true);
         using var connection = new PlcConnection(MockHelpers.GetOptionsMoq(Mock.Of<AdsPlcConnectionOptions>()), MockHelpers.GetLoggerMock<PlcConnection>(), adsClientMock.Object);
 
         // Act

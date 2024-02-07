@@ -55,7 +55,7 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        Dispose(true);
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 

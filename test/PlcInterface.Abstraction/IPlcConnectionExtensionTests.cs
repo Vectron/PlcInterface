@@ -16,7 +16,7 @@ public class IPlcConnectionExtensionTests
         var plcConnectionMock = new Mock<IPlcConnection<GenericParameterHelper>>();
         var iConnectedMock = new Mock<IConnected<GenericParameterHelper>>();
         var expected = new GenericParameterHelper();
-        _ = iConnectedMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = iConnectedMock.SetupGet(x => x.IsConnected).Returns(value: true);
         _ = iConnectedMock.SetupGet(x => x.Value).Returns(expected);
         _ = plcConnectionMock.SetupGet(x => x.SessionStream).Returns(Observable.Repeat(iConnectedMock.Object));
 
@@ -45,7 +45,7 @@ public class IPlcConnectionExtensionTests
         var plcConnectionMock = new Mock<IPlcConnection<GenericParameterHelper>>();
         var iConnectedMock = new Mock<IConnected<GenericParameterHelper>>();
         var expected = new GenericParameterHelper();
-        _ = iConnectedMock.SetupGet(x => x.IsConnected).Returns(true);
+        _ = iConnectedMock.SetupGet(x => x.IsConnected).Returns(value: true);
         _ = iConnectedMock.SetupGet(x => x.Value).Returns(expected);
         _ = plcConnectionMock.SetupGet(x => x.SessionStream).Returns(Observable.Repeat(iConnectedMock.Object));
 

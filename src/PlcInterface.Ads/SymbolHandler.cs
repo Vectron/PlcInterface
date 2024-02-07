@@ -63,7 +63,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        Dispose(true);
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 

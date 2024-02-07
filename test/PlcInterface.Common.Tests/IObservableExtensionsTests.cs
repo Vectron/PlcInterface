@@ -17,13 +17,13 @@ public class IObservableExtensionsTests
 
         // Act
         using var subscription = subject.WhereNotNull().Subscribe(observerMock.Object);
-        subject.OnNext(null);
-        subject.OnNext(null);
-        subject.OnNext(true);
-        subject.OnNext(null);
-        subject.OnNext(null);
-        subject.OnNext(null);
-        subject.OnNext(null);
+        subject.OnNext(value: null);
+        subject.OnNext(value: null);
+        subject.OnNext(value: true);
+        subject.OnNext(value: null);
+        subject.OnNext(value: null);
+        subject.OnNext(value: null);
+        subject.OnNext(value: null);
 
         // Assert
         observerMock.Verify(x => x.OnNext(It.IsNotNull<object>()), Times.Once);
@@ -39,9 +39,9 @@ public class IObservableExtensionsTests
 
         // Act
         using var subscription = subject.WhereNotNull().Subscribe(observerMock.Object);
-        subject.OnNext(null);
-        subject.OnNext(true);
-        subject.OnNext(null);
+        subject.OnNext(value: null);
+        subject.OnNext(value: true);
+        subject.OnNext(value: null);
         subject.OnError(expectedException);
 
         // Assert
@@ -57,9 +57,9 @@ public class IObservableExtensionsTests
 
         // Act
         using var subscription = subject.WhereNotNull().Subscribe(observerMock.Object);
-        subject.OnNext(null);
-        subject.OnNext(true);
-        subject.OnNext(null);
+        subject.OnNext(value: null);
+        subject.OnNext(value: true);
+        subject.OnNext(value: null);
         subject.OnCompleted();
 
         // Assert

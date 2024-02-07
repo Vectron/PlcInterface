@@ -87,10 +87,10 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             logger.LogDebug("Selected endpoint uses: {Security}", selectedEndpoint.SecurityPolicyUri[(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1)..]);
             logger.LogDebug("Create a session with OPC UA server.");
             var endpointConfiguration = EndpointConfiguration.Create(config);
-            var endpoint = new ConfiguredEndpoint(null, selectedEndpoint, endpointConfiguration);
+            var endpoint = new ConfiguredEndpoint(collection: null, selectedEndpoint, endpointConfiguration);
             var identity = GetUserIdentity(settings, selectedEndpoint);
             session?.Dispose();
-            session = await Session.Create(config, endpoint, false, config.ApplicationName, 60000, identity, null).ConfigureAwait(false);
+            session = await Session.Create(config, endpoint, updateBeforeConnect: false, config.ApplicationName, 60000, identity, preferredLocales: null).ConfigureAwait(false);
 
             if (!IsConnected)
             {
@@ -137,7 +137,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         connectionState.OnNext(Connected.No<ISession>());
         if (session.Connected)
         {
-            var closeSessionResponse = await session.CloseSessionAsync(null, false, CancellationToken.None).ConfigureAwait(false);
+            var closeSessionResponse = await session.CloseSessionAsync(requestHeader: null, deleteSubscriptions: false, CancellationToken.None).ConfigureAwait(false);
             if (ServiceResult.IsBad(closeSessionResponse.ResponseHeader.ServiceResult))
             {
                 logger.LogError("Failed to close session {StatusCode}", closeSessionResponse.ResponseHeader.ServiceResult);
@@ -152,7 +152,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        Dispose(true);
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 
@@ -196,7 +196,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
 
         logger.LogDebug("Creating new application certificate for: {ApplicationName}", applicationConfiguration.ApplicationName);
 
-        using var certificate = CertificateFactory.CreateCertificate(applicationConfiguration.ApplicationUri, applicationConfiguration.ApplicationName, applicationCertificate.SubjectName, null)
+        using var certificate = CertificateFactory.CreateCertificate(applicationConfiguration.ApplicationUri, applicationConfiguration.ApplicationName, applicationCertificate.SubjectName, domainNames: null)
              .SetNotBefore(DateTime.UtcNow - TimeSpan.FromDays(1))
              .SetNotAfter((DateTime.UtcNow - TimeSpan.FromDays(1)).AddMonths(CertificateFactory.DefaultLifeTime))
              .SetHashAlgorithm(X509Utils.GetRSAHashAlgorithmName(CertificateFactory.DefaultHashSize))

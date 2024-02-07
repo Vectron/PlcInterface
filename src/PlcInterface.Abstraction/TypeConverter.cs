@@ -142,7 +142,7 @@ public abstract class TypeConverter : ITypeConverter
 
         object? GetValue(string name, Type targetType)
         {
-            if (dynamicObject.TryGetMember(new MemberBinder(name, true), out var value)
+            if (dynamicObject.TryGetMember(new MemberBinder(name, ignoreCase: true), out var value)
                 && value != null)
             {
                 return Convert(value, targetType);

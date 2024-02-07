@@ -32,10 +32,10 @@ public class IMonitorExtensionTests
         _ = monitorResultMock.SetupGet(x => x.Value).Returns(1u);
         subject.OnNext(monitorResultMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(true);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns(value: true);
         subject.OnNext(monitorResultMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns($"{ioName}3");
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(false);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns(value: false);
         subject.OnNext(monitorResultMock.Object);
 
         // Assert
@@ -58,12 +58,12 @@ public class IMonitorExtensionTests
         var observerMock = new Mock<Action>();
 
         // Act
-        using var subscription = monitorMock.Object.SubscribeIO(ioName, true, observerMock.Object);
+        using var subscription = monitorMock.Object.SubscribeIO(ioName, filterValue: true, observerMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(true);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns(value: true);
         subject.OnNext(monitorResultMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(false);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns(value: false);
         subject.OnNext(monitorResultMock.Object);
 
         // Assert
@@ -88,16 +88,16 @@ public class IMonitorExtensionTests
         // Act
         using var subscription = monitorMock.Object.SubscribeIO<bool>(ioName).Subscribe(observerMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns($"{ioName}1");
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(true);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns(value: true);
         subject.OnNext(monitorResultMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns($"{ioName}2");
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(true);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns(value: true);
         subject.OnNext(monitorResultMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(true);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns(value: true);
         subject.OnNext(monitorResultMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns($"{ioName}3");
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(true);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns(value: true);
         subject.OnNext(monitorResultMock.Object);
 
         // Assert
@@ -120,12 +120,12 @@ public class IMonitorExtensionTests
         var observerMock = new Mock<IObserver<bool>>();
 
         // Act
-        using var subscription = monitorMock.Object.SubscribeIO(ioName, true).Subscribe(observerMock.Object);
+        using var subscription = monitorMock.Object.SubscribeIO(ioName, filterValue: true).Subscribe(observerMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(true);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns(value: true);
         subject.OnNext(monitorResultMock.Object);
         _ = monitorResultMock.SetupGet(x => x.Name).Returns(ioName);
-        _ = monitorResultMock.SetupGet(x => x.Value).Returns(false);
+        _ = monitorResultMock.SetupGet(x => x.Value).Returns(value: false);
         subject.OnNext(monitorResultMock.Object);
 
         // Assert

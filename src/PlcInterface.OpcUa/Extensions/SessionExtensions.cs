@@ -29,7 +29,7 @@ internal static class SessionExtensions
 
         var nodesToRead = new ReadValueIdCollection(GetReadValueIds(nodeId));
         _ = session.Read(
-            null,
+            requestHeader: null,
             0,
             TimestampsToReturn.Neither,
             nodesToRead,
@@ -65,7 +65,7 @@ internal static class SessionExtensions
         try
         {
             _ = session.Read(
-                null,
+                requestHeader: null,
                 0,
                 TimestampsToReturn.Neither,
                 nodesToRead,

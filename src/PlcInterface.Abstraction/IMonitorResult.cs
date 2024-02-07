@@ -1,4 +1,4 @@
-﻿namespace PlcInterface;
+namespace PlcInterface;
 
 /// <summary>
 /// Represents a type containing results from a monitoring event.

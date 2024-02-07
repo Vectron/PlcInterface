@@ -1,4 +1,4 @@
-﻿namespace PlcInterface;
+namespace PlcInterface;
 
 /// <summary>
 /// A generic implementation of <see cref="IConnected"/>.

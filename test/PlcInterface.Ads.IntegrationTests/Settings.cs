@@ -1,4 +1,4 @@
-﻿namespace PlcInterface.Ads.IntegrationTests;
+namespace PlcInterface.Ads.IntegrationTests;
 
 internal static class Settings
 {

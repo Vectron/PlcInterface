@@ -1,4 +1,4 @@
-﻿namespace PlcInterface;
+namespace PlcInterface;
 
 /// <summary>
 /// Helpers for creating <see cref="IConnected{T}"/>.

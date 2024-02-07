@@ -1,4 +1,4 @@
-﻿namespace PlcInterface.OpcUa;
+namespace PlcInterface.OpcUa;
 
 /// <summary>
 /// The Ads implementation of a <see cref="IReadWrite"/>.

@@ -1,4 +1,4 @@
-﻿namespace PlcInterface.Ads;
+namespace PlcInterface.Ads;
 
 /// <summary>
 /// The Ads implementation of a <see cref="IReadWrite"/>.

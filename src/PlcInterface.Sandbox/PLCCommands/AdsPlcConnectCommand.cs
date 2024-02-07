@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using PlcInterface.Ads;
 using TwinCAT.Ads.TcpRouter;

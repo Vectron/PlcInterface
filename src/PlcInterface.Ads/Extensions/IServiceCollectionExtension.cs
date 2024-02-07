@@ -1,4 +1,4 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PlcInterface.Ads.TwinCATAbstractions;

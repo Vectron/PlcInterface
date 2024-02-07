@@ -1,4 +1,4 @@
-﻿using Opc.Ua.Client;
+using Opc.Ua.Client;
 
 namespace PlcInterface.OpcUa;
 

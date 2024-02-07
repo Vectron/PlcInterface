@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using PlcInterface.OpcUa;
 
 namespace PlcInterface.Sandbox.PLCCommands;

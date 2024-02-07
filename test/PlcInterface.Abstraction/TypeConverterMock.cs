@@ -1,4 +1,4 @@
-﻿namespace PlcInterface.Abstraction.Tests;
+namespace PlcInterface.Abstraction.Tests;
 
 internal sealed class TypeConverterMock : TypeConverter
 {

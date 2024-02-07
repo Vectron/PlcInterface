@@ -1,4 +1,4 @@
-﻿using TwinCAT;
+using TwinCAT;
 using TwinCAT.Ads.TypeSystem;
 using TwinCAT.TypeSystem;
 

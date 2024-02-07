@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reactive.Subjects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;

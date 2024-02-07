@@ -1,4 +1,4 @@
-﻿using TwinCAT.Ads;
+using TwinCAT.Ads;
 
 namespace PlcInterface.Ads;
 

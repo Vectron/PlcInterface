@@ -1,4 +1,4 @@
-﻿namespace PlcInterface.OpcUa;
+namespace PlcInterface.OpcUa;
 
 /// <summary>
 /// Implementation for <see cref="IMonitorResult"/>.

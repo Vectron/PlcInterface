@@ -1,4 +1,4 @@
-﻿namespace PlcInterface.Ads;
+namespace PlcInterface.Ads;
 
 /// <summary>
 /// Settings for the <see cref="PlcConnection"/>.

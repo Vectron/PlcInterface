@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.IntegrationTests.DataTypes;
 
 namespace PlcInterface.IntegrationTests.Extension;

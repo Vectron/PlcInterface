@@ -1,4 +1,4 @@
-﻿namespace PlcInterface.IntegrationTests.DataTypes;
+namespace PlcInterface.IntegrationTests.DataTypes;
 
 internal enum TestEnum
 {

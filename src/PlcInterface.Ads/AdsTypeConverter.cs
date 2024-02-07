@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Dynamic;
 using System.Globalization;
 using TwinCAT.TypeSystem;

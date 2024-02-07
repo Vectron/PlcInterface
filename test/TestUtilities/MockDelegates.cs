@@ -1,4 +1,4 @@
-﻿namespace TestUtilities;
+namespace TestUtilities;
 
 public static class MockDelegates
 {

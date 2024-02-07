@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Vectron.InteractiveConsole.Commands;
 
 namespace PlcInterface.Sandbox.PLCCommands;

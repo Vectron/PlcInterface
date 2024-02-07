@@ -22,9 +22,7 @@ namespace PlcInterface.Ads;
 /// </summary>
 public class SymbolHandler : IAdsSymbolHandler, IDisposable
 {
-    [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up")]
     private readonly CompositeDisposable disposables = [];
-
     private readonly IFileSystem fileSystem;
     private readonly ILogger<SymbolHandler> logger;
     private readonly AdsSymbolHandlerOptions options;

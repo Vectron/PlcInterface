@@ -132,7 +132,6 @@ public abstract class IWriteValueTestBase
     [DataTestMethod]
     [DynamicData(nameof(WriteTestData))]
     [DynamicData(nameof(WriteTestDataExtended))]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void WriteGenericUpdatesTheValueInPlc(string itemName, object newValue, object? readValue = null)
     {
         var writeType = newValue.GetType();
@@ -148,7 +147,6 @@ public abstract class IWriteValueTestBase
     [DataTestMethod]
     [DynamicData(nameof(WriteTestData))]
     [DynamicData(nameof(WriteTestDataExtended))]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public async Task WriteGenericUpdatesTheValueInPlcAsync(string itemName, object newValue, object? readValue = null)
     {
         var writeType = newValue.GetType();

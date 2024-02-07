@@ -23,7 +23,6 @@ public class DefaultOpcPlcConnectionConfigureOptions : IConfigureOptions<OpcPlcC
         options.ApplicationConfiguration = CreateApplicationConfiguration();
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     private static ApplicationConfiguration CreateApplicationConfiguration()
     {
         var entryAssembly = Assembly.GetEntryAssembly()

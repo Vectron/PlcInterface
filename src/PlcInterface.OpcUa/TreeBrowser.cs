@@ -90,7 +90,6 @@ internal sealed class TreeBrowser : Browser
         return uri.Replace(rootName, string.Empty, StringComparison.OrdinalIgnoreCase).Trim(splitChar);
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     private static SymbolInfo CreateSymbol(ReferenceDescription description, NodeInfo nodeInfo, IOpcSymbolInfo? parent, string rootName)
     {
         var nameBuilder = new StringBuilder();

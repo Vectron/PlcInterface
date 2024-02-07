@@ -20,7 +20,6 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
 {
     private readonly BehaviorSubject<IConnected<ISession>> connectionState = new(Connected.No<ISession>());
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     private readonly CompositeDisposable disposables = [];
 
     private readonly ILogger logger;

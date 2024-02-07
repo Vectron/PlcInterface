@@ -9,7 +9,6 @@ namespace PlcInterface.IntegrationTests;
 [ExcludeFromCodeCoverage]
 public class MultiAssert
 {
-    [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     private readonly List<AssertFailedException> exceptions = [];
 
     public static void Aggregate(params Action[] actions)

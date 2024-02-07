@@ -10,7 +10,6 @@ namespace PlcInterface.IntegrationTests.DataTypes;
 [StructLayout(LayoutKind.Sequential, Pack = 0)]
 internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
 {
-    [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public static DUT_TestClass Default => new()
     {
         BoolValue = true,
@@ -66,7 +65,6 @@ internal sealed class DUT_TestClass : IEquatable<DUT_TestClass>
         },
     };
 
-    [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public static DUT_TestClass Write => new()
     {
         BoolValue = false,

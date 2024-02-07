@@ -448,7 +448,6 @@ public class TypeConverterTests
         _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<int>(source));
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     private record struct TestRecordStructType(int IntValue, int[] IntArray, NestedRecordStructType SubType)
     {
         public static readonly TestRecordStructType Instance = new(5, [6, 7, 8, 9], new NestedRecordStructType(12));
@@ -509,7 +508,6 @@ public class TypeConverterTests
 
     private struct TestValueType
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
         public static readonly TestValueType Instance = new()
         {
             IntValue = 5,
@@ -577,7 +575,6 @@ public class TypeConverterTests
 
     private sealed class TestType
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
         public static readonly TestType Instance = new()
         {
             IntValue = 5,
@@ -588,7 +585,6 @@ public class TypeConverterTests
             },
         };
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
         public TestType()
         {
             IntArray = [];
@@ -616,7 +612,6 @@ public class TypeConverterTests
 
     private sealed record TestRecordType(int IntValue, int[] IntArray, NestedRecordType SubType)
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
         public static readonly TestRecordType Instance = new(5, [6, 7, 8, 9], new NestedRecordType(12));
     }
 

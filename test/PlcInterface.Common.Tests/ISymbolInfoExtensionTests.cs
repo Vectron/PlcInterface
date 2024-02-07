@@ -64,7 +64,6 @@ public class ISymbolInfoExtensionTests
     }
 
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void FlattenWithValueFlattensAISymbolInfoChildHierarchyAndAddsValues()
     {
         // Arrange
@@ -132,7 +131,6 @@ public class ISymbolInfoExtensionTests
 
     private sealed class FlattenObject
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
         public FlattenObject()
             => ChildArray = [];
 

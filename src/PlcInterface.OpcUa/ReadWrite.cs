@@ -23,7 +23,6 @@ namespace PlcInterface.OpcUa;
 /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
 public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHandler, IOpcTypeConverter typeConverter, ILogger<ReadWrite> logger) : IOpcReadWrite, IDisposable
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     private readonly CompositeDisposable disposables = [];
 
     private readonly ILogger logger = logger;

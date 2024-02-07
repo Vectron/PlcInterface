@@ -20,7 +20,6 @@ internal abstract class PlcWriteCommand : IConsoleCommand
     /// </summary>
     /// <param name="name">The name of the interface.</param>
     /// <param name="readWrite">A <see cref="IReadWrite"/> instance.</param>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     protected PlcWriteCommand(string name, IReadWrite readWrite)
     {
         CommandParameters = [name, Parameter];

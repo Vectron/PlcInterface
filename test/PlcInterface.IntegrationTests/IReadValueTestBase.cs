@@ -189,7 +189,6 @@ public abstract class IReadValueTestBase
     [DynamicData(nameof(ReadTestData))]
     [DynamicData(nameof(ReadTestDataExtended))]
     [DataRow("EnumValue2", TestEnum.Second)]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void ReadGenericReturnsTheRequestedType(string ioName, object value)
     {
         var instanceType = value.GetType();
@@ -205,7 +204,6 @@ public abstract class IReadValueTestBase
     [DynamicData(nameof(ReadTestData))]
     [DynamicData(nameof(ReadTestDataExtended))]
     [DataRow("EnumValue2", TestEnum.Second)]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public async Task ReadGenericReturnsTheRequestedTypeAsync(string ioName, object value)
     {
         var instanceType = value.GetType();
@@ -362,7 +360,6 @@ public abstract class IReadValueTestBase
 
     [DataTestMethod]
     [DynamicData(nameof(ReadTestData))]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void WaitsForValueToChange(string ioName, object readValue)
     {
         var instanceType = readValue.GetType();
@@ -376,7 +373,6 @@ public abstract class IReadValueTestBase
 
     [DataTestMethod]
     [DynamicData(nameof(ReadTestData))]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public async Task WaitsForValueToChangeAsync(string ioName, object readValue)
     {
         var instanceType = readValue.GetType();

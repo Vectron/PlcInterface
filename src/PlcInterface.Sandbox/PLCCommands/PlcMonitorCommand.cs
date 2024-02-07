@@ -26,7 +26,6 @@ internal sealed class PlcMonitorCommand(string name, IMonitor monitor) : IConsol
     public string[]? ArgumentNames => new[] { "tag" };
 
     /// <inheritdoc/>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public string[] CommandParameters { get; } = [name, Parameter];
 
     /// <inheritdoc/>

@@ -57,7 +57,6 @@ public class SymbolHandlerTests
     }
 
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void GetSymbolInfoReturnsSymbolWhenAvailable()
     {
         // Arrange
@@ -92,7 +91,6 @@ public class SymbolHandlerTests
     }
 
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void OnConnectSymbolListIsUpdated()
     {
         // Arrange
@@ -125,7 +123,6 @@ public class SymbolHandlerTests
     }
 
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void SymbolsAreStoredOnDisk()
     {
         // Arrange
@@ -164,7 +161,6 @@ public class SymbolHandlerTests
     }
 
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     public void SymbolsAreStoredOnDiskToDefaultFolder()
     {
         // Arrange
@@ -203,7 +199,6 @@ public class SymbolHandlerTests
         StringAssert.Contains(fileDate.TextContents, ioTag, StringComparison.Ordinal);
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up yet.")]
     private static ISymbol CreateSymbolMock(string name, string[] subSymbols)
     {
         var symbol = new Mock<ISymbol>();

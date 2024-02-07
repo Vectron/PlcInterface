@@ -76,7 +76,6 @@ public abstract class TypeConverter : ITypeConverter
         }
     }
 
-    [SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1010:Opening square brackets should be spaced correctly", Justification = "Style cop hasn't caught up")]
     private object Convert(Func<string, Type, object?> memberValueGetter, int memberCount, Type targetType)
     {
         var parameterInfo = activatorCache.GetOrAdd(

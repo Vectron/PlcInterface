@@ -22,7 +22,11 @@ namespace PlcInterface.Sandbox;
 internal static class Program
 {
     private const string AdsBaseCommand = "ads";
+    private const string AdsConnectionSettingsSection = "Ads:Connection";
+    private const string AdsSymbolHandlerSettingsSection = "Ads:SymbolHandler";
     private const string OpcBaseCommand = "opc";
+    private const string OpcConnectionSettingsSection = "Opc:Connection";
+    private const string OpcSymbolHandlerSettingsSection = "Opc:SymbolHandler";
 
     /// <summary>
     /// The main entry point.
@@ -59,12 +63,18 @@ internal static class Program
             .AddAdsPLC()
             .AddSingleton<IAmsRouter>(x => new AmsTcpIpRouter(x.GetRequiredService<ILogger<AmsTcpIpRouter>>(), x.GetRequiredService<IConfiguration>()))
             .AddOptions<AdsPlcConnectionOptions>()
-                .BindConfiguration(AdsBaseCommand);
+                .BindConfiguration(AdsConnectionSettingsSection)
+                .Services
+            .AddOptions<AdsSymbolHandlerOptions>()
+                .BindConfiguration(AdsSymbolHandlerSettingsSection);
 
         _ = builder.Services
             .AddOpcPLC()
             .AddOptions<OpcPlcConnectionOptions>()
-                .BindConfiguration(OpcBaseCommand);
+                .BindConfiguration(OpcConnectionSettingsSection)
+                .Services
+            .AddOptions<OpcSymbolHandlerOptions>()
+                .BindConfiguration(OpcSymbolHandlerSettingsSection);
 
         try
         {

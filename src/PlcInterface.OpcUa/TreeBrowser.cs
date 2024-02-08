@@ -109,7 +109,7 @@ internal sealed class TreeBrowser : Browser
         }
 
         _ = nameBuilder.Append(parentName);
-        if (!parentName.EndsWith(itemName, StringComparison.Ordinal))
+        if (arrayIndex == -1)
         {
             if (!parentName.IsEmpty)
             {

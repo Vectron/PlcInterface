@@ -66,11 +66,11 @@ internal sealed class TreeBrowser : Browser
     /// <summary>
     /// Browse the symbol tree starting from the root node.
     /// </summary>
-    /// <param name="address">The address to start the tree at.</param>
+    /// <param name="rootNodePath">The path to start the tree at.</param>
     /// <returns>All found symbols on the server.</returns>
-    public IDictionary<string, IOpcSymbolInfo> BrowseTree(Uri address)
+    public IDictionary<string, IOpcSymbolInfo> BrowseTree(string rootNodePath)
     {
-        var path = address.AbsolutePath.Trim('/').Replace("%20", " ", StringComparison.OrdinalIgnoreCase);
+        var path = rootNodePath.Trim('/').Replace("%20", " ", StringComparison.OrdinalIgnoreCase);
         var rootNode = CreateRootNodeSymbol(path);
         var treeStart = new[] { rootNode };
         return treeStart

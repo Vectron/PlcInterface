@@ -23,5 +23,6 @@ public static class IServiceCollectionExtension
             .AddSingletonFactory<PlcConnection, IPlcConnection<Opc.Ua.Client.ISession>, IOpcPlcConnection>()
             .AddSingleton<IPlcConnection>(x => x.GetRequiredService<IOpcPlcConnection>())
             .AddTransient<IOpcTypeConverter, OpcTypeConverter>()
-            .ConfigureOptions<DefaultOpcPlcConnectionConfigureOptions>();
+            .ConfigureOptions<DefaultOpcPlcConnectionConfigureOptions>()
+            .ConfigureOptions<DefaultOpcSymbolHandlerSettingsConfigureOptions>();
 }

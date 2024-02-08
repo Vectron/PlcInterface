@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reactive.Disposables;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Opc.Ua.Client;
 
 namespace PlcInterface.OpcUa;
@@ -15,10 +16,9 @@ namespace PlcInterface.OpcUa;
 public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
 {
     private readonly IOpcPlcConnection connection;
-
     private readonly CompositeDisposable disposables = [];
-
     private readonly ILogger logger;
+    private readonly OpcSymbolHandlerOptions options;
     private IDictionary<string, IOpcSymbolInfo> allSymbols = new Dictionary<string, IOpcSymbolInfo>(StringComparer.OrdinalIgnoreCase);
     private bool disposedValue;
     private ISession? session;
@@ -27,10 +27,12 @@ public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
     /// Initializes a new instance of the <see cref="SymbolHandler"/> class.
     /// </summary>
     /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
+    /// <param name="options">A <see cref="IOptions{TOptions}"/> of <see cref="OpcSymbolHandlerOptions"/> implementation.</param>
     /// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-    public SymbolHandler(IOpcPlcConnection connection, ILogger<SymbolHandler> logger)
+    public SymbolHandler(IOpcPlcConnection connection, IOptions<OpcSymbolHandlerOptions> options, ILogger<SymbolHandler> logger)
     {
         this.connection = connection;
+        this.options = options.Value;
         this.logger = logger;
         disposables.Add(connection.SessionStream.Subscribe(x =>
         {
@@ -116,21 +118,13 @@ public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
 
     private void UpdateSymbols(ISession session)
     {
-        // create a browser to browse the node tree
-        if (connection.Settings is not OpcPlcConnectionOptions settings)
-        {
-            // TODO: this should not be done, it's to error prone when the settings are overridden.
-            // logger.LogCritical("No valid OPCSettings found");
-            return;
-        }
-
         LogUpdatingSymbols();
         var elapsedWatch = Stopwatch.StartNew();
         var browser = new TreeBrowser(session);
         allSymbols.Clear();
         try
         {
-            allSymbols = browser.BrowseTree(settings.Address ?? new Uri(string.Empty));
+            allSymbols = browser.BrowseTree(options.RootNodePath);
         }
         catch (Exception ex)
         {

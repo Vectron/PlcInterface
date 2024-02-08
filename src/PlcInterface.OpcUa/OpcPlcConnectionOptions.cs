@@ -11,11 +11,7 @@ public class OpcPlcConnectionOptions
     /// <summary>
     /// Gets or sets the address to connect to.
     /// </summary>
-    public Uri? Address
-    {
-        get;
-        set;
-    }
+    public string Address { get; set; } = "127.0.0.1";
 
     /// <summary>
     /// Gets or sets the application configuration.
@@ -47,11 +43,12 @@ public class OpcPlcConnectionOptions
     /// <summary>
     /// Gets the discovery address.
     /// </summary>
-    public Uri DiscoveryAddress
-        => new UriBuilder(Address ?? new Uri("127.0.0.1"))
-        {
-            Path = "/discovery",
-        }.Uri;
+    public Uri DiscoveryAddress => new UriBuilder(FullAddress) { Path = "/discovery", }.Uri;
+
+    /// <summary>
+    /// Gets the address to connect to.
+    /// </summary>
+    public Uri FullAddress => new UriBuilder(UriSchema, Address, Port, string.Empty).Uri;
 
     /// <summary>
     /// Gets or sets the password.
@@ -61,6 +58,19 @@ public class OpcPlcConnectionOptions
         get;
         set;
     }
+
+    /// <summary>
+    /// Gets or sets the port to connect to.
+    /// </summary>
+    public int Port { get; set; } = 4840;
+
+    /// <summary>
+    /// Gets or sets the connection schema to use.
+    /// </summary>
+    /// <remarks>
+    /// Default value is 'opc.tcp'.
+    /// </remarks>
+    public string UriSchema { get; set; } = "opc.tcp";
 
     /// <summary>
     /// Gets or sets the user name.

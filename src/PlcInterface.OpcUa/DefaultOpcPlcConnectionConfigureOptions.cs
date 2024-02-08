@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using Microsoft.Extensions.Options;
 using Opc.Ua;
@@ -13,8 +12,9 @@ public class DefaultOpcPlcConnectionConfigureOptions : IConfigureOptions<OpcPlcC
     /// <inheritdoc/>
     public void Configure(OpcPlcConnectionOptions options)
     {
-        var builder = new UriBuilder("opc.tcp", "127.0.0.1", 48010, string.Empty);
-        options.Address = builder.Uri;
+        options.Address = "127.0.0.1";
+        options.Port = 4840;
+        options.UriSchema = "opc.tcp";
         options.UserName = string.Empty;
         options.Password = string.Empty;
         options.AutoConnect = false;

@@ -77,7 +77,7 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
             var settings = options.Value;
             var config = settings.ApplicationConfiguration ?? throw new InvalidOperationException("No valid application configuration given.");
             Utils.SetTraceOutput(Utils.TraceOutput.DebugAndFile);
-            LogConnectingTo(settings.Address);
+            LogConnectingTo(settings.FullAddress);
             LogCreatingAppConfiguration();
             await config.Validate(ApplicationType.Client).ConfigureAwait(false);
             var usesSecurity = await SetupSecurityAsync(config).ConfigureAwait(false);

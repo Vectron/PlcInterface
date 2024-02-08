@@ -19,14 +19,13 @@ namespace PlcInterface.OpcUa;
 public partial class PlcConnection : IOpcPlcConnection, IDisposable
 {
     private readonly BehaviorSubject<IConnected<ISession>> connectionState = new(Connected.No<ISession>());
-
     private readonly CompositeDisposable disposables = [];
-
     private readonly ILogger logger;
     private readonly IOptions<OpcPlcConnectionOptions> options;
     private readonly TimeSpan reconnectDelay = TimeSpan.FromSeconds(1);
     private bool disposedValue;
     private ISession? session;
+    private SessionReconnectHandler? sessionReconnectHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlcConnection"/> class.
@@ -73,6 +72,9 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
             {
                 return true;
             }
+
+            sessionReconnectHandler?.Dispose();
+            sessionReconnectHandler = null;
 
             var settings = options.Value;
             var config = settings.ApplicationConfiguration ?? throw new InvalidOperationException("No valid application configuration given.");
@@ -172,7 +174,7 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
             connectionState.OnCompleted();
             disposables.Dispose();
             connectionState.Dispose();
-
+            sessionReconnectHandler?.Dispose();
             session?.Dispose();
         }
 
@@ -219,21 +221,15 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
     private void KeepAliveSubscription(EventPattern<ISession, KeepAliveEventArgs> x)
     {
         connectionState.OnNext(Connected.No<ISession>());
-        LogKeepAliveFailed(x.EventArgs.Status, x.Sender?.ConfiguredEndpoint);
-        var sessionReconnectHandler = new SessionReconnectHandler();
-        _ = sessionReconnectHandler.BeginReconnect(x.Sender, (int)reconnectDelay.TotalMilliseconds, (s, e) =>
+        if (x.Sender == null)
         {
-            // ignore callbacks from discarded objects.
-            if (!ReferenceEquals(s, sessionReconnectHandler))
-            {
-                return;
-            }
+            return;
+        }
 
-            var sender = s as SessionReconnectHandler;
-            LogConnected(sender?.Session.ConfiguredEndpoint);
-            connectionState.OnNext(Connected.Yes(sessionReconnectHandler.Session));
-            sessionReconnectHandler.Dispose();
-        });
+        LogKeepAliveFailed(x.EventArgs.Status, x.Sender.ConfiguredEndpoint);
+        sessionReconnectHandler?.Dispose();
+        sessionReconnectHandler = new SessionReconnectHandler();
+        _ = sessionReconnectHandler.BeginReconnect(x.Sender, (int)reconnectDelay.TotalMilliseconds, OnReconnected);
     }
 
     private void LogConnectionException(ServiceResultException ex)
@@ -257,6 +253,31 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
                 LogUnknownServiceResult(ex, ex.Result.StatusCode, browserName);
                 break;
         }
+    }
+
+    private void OnReconnected(object? sender, EventArgs eventArgs)
+    {
+        if (sender is not SessionReconnectHandler handler)
+        {
+            return;
+        }
+
+        // ignore callbacks from discarded objects.
+        if (!ReferenceEquals(sender, sessionReconnectHandler))
+        {
+            return;
+        }
+
+        if (!ReferenceEquals(session, handler.Session))
+        {
+            session?.Dispose();
+            session = handler.Session;
+        }
+
+        sessionReconnectHandler?.Dispose();
+        sessionReconnectHandler = null;
+        LogConnected(handler.Session.ConfiguredEndpoint);
+        connectionState.OnNext(Connected.Yes(session));
     }
 
     private void SetupCertificateSigning(ApplicationConfiguration applicationConfiguration)

@@ -23,7 +23,7 @@ public class ObjectActivatorTests
     public void FailsCreateInstanceIfParameterNameIsNull()
     {
         // Arrange
-        var type = Assembly.GetExecutingAssembly().GetType("System.Runtime.CompilerServices.NullableContextAttribute")!;
+        var type = MyTypeBuilder.CompileResultType();
         var constructor = type.GetConstructor([typeof(byte)])!;
         var parameterInfo = constructor.GetParameters()[0];
         Assert.IsNull(parameterInfo.Name);

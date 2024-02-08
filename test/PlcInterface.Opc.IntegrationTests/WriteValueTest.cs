@@ -22,7 +22,12 @@ public class WriteValueTest : IWriteValueTestBase
     {
         var services = new ServiceCollection()
             .AddOpcPLC()
-            .Configure<OpcPlcConnectionOptions>(o => o.Address = Settings.PLCUri);
+            .Configure<OpcPlcConnectionOptions>(o =>
+            {
+                o.Address = Settings.OpcIp;
+                o.Port = Settings.OpcPort;
+            })
+            .Configure<OpcSymbolHandlerOptions>(o => o.RootNodePath = Settings.RootNode);
 
         services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(NullLogger<>)));
 

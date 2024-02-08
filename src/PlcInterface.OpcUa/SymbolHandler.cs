@@ -12,7 +12,7 @@ namespace PlcInterface.OpcUa;
 /// <summary>
 /// Implementation of <see cref="ISymbolHandler"/>.
 /// </summary>
-public class SymbolHandler : IOpcSymbolHandler, IDisposable
+public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
 {
     private readonly IOpcPlcConnection connection;
 
@@ -90,7 +90,7 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
             return true;
         }
 
-        logger.LogError("{IoName} Does not exist in the PLC", ioName);
+        LogVariableDoesNotExist(ioName);
         symbolInfo = null;
         return false;
     }
@@ -119,11 +119,12 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
         // create a browser to browse the node tree
         if (connection.Settings is not OpcPlcConnectionOptions settings)
         {
-            logger.LogCritical("No valid OPCSettings found");
+            // TODO: this should not be done, it's to error prone when the settings are overridden.
+            // logger.LogCritical("No valid OPCSettings found");
             return;
         }
 
-        logger.LogInformation("Updating Symbols");
+        LogUpdatingSymbols();
         var elapsedWatch = Stopwatch.StartNew();
         var browser = new TreeBrowser(session);
         allSymbols.Clear();
@@ -133,10 +134,10 @@ public class SymbolHandler : IOpcSymbolHandler, IDisposable
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Exception thrown while building symbol tree");
+            LogUpdatingSymbolsFailed(ex);
         }
 
         elapsedWatch.Stop();
-        logger.LogInformation("Symbols updated in {Time} ms, found {Amount} symbols", elapsedWatch.ElapsedMilliseconds, allSymbols.Count);
+        LogSymbolsUpdated(elapsedWatch.ElapsedMilliseconds, allSymbols.Count);
     }
 }

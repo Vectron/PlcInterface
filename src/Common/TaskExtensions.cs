@@ -7,7 +7,7 @@ namespace PlcInterface;
 /// <summary>
 /// Extension methods for <see cref="Task"/>.
 /// </summary>
-internal static class TaskExtensions
+internal static partial class TaskExtensions
 {
     /// <summary>
     /// Log exceptions async.
@@ -29,10 +29,13 @@ internal static class TaskExtensions
                     for (var i = aggregateException.InnerExceptions.Count - 1; i >= 0; i--)
                     {
                         var exception = aggregateException.InnerExceptions[i];
-                        logger.LogError(exception, "Task Error");
+                        logger.LogException(exception);
                     }
                 }
             },
             TaskContinuationOptions.OnlyOnFaulted);
     }
+
+    [LoggerMessage(EventId = 0, Level = LogLevel.Error, Message = "Task Error")]
+    private static partial void LogException(this ILogger logger, Exception exception);
 }

@@ -16,7 +16,7 @@ namespace PlcInterface.OpcUa;
 /// <summary>
 /// Implementation of <see cref="IPlcConnection{T}"/> for the <see cref="ISession"/>.
 /// </summary>
-public class PlcConnection : IOpcPlcConnection, IDisposable
+public partial class PlcConnection : IOpcPlcConnection, IDisposable
 {
     private readonly BehaviorSubject<IConnected<ISession>> connectionState = new(Connected.No<ISession>());
 
@@ -77,14 +77,14 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             var settings = options.Value;
             var config = settings.ApplicationConfiguration ?? throw new InvalidOperationException("No valid application configuration given.");
             Utils.SetTraceOutput(Utils.TraceOutput.DebugAndFile);
-            logger.LogInformation("Opening connection to {Address}", settings.Address);
-            logger.LogDebug("Creating an Application Configuration.");
+            LogConnectingTo(settings.Address);
+            LogCreatingAppConfiguration();
             await config.Validate(ApplicationType.Client).ConfigureAwait(false);
             var usesSecurity = await SetupSecurityAsync(config).ConfigureAwait(false);
-            logger.LogDebug("Discover endpoints of {DiscoveryAddress}.", settings.DiscoveryAddress);
+            LogFindingEndpoint(settings.DiscoveryAddress);
             var selectedEndpoint = CoreClientUtils.SelectEndpoint(settings.DiscoveryAddress.ToString(), usesSecurity, 15000);
-            logger.LogDebug("Selected endpoint uses: {Security}", selectedEndpoint.SecurityPolicyUri[(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1)..]);
-            logger.LogDebug("Create a session with OPC UA server.");
+            LogSelectedSecurity(selectedEndpoint.SecurityPolicyUri[(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1)..]);
+            LogCreateSession();
             var endpointConfiguration = EndpointConfiguration.Create(config);
             var endpoint = new ConfiguredEndpoint(collection: null, selectedEndpoint, endpointConfiguration);
             var identity = GetUserIdentity(settings, selectedEndpoint);
@@ -93,13 +93,13 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
 
             if (!IsConnected)
             {
-                logger.LogError("Failed to connect to {Endpoint}", endpoint);
+                LogConnectingFailed(endpoint);
                 session.Dispose();
                 session = null;
                 return false;
             }
 
-            logger.LogInformation("Connected to {Endpoint}", endpoint);
+            LogConnected(endpoint);
             disposables.Add(Observable.FromEventPattern<KeepAliveEventHandler, ISession, KeepAliveEventArgs>(
                 h => session.KeepAlive += h,
                 h => session.KeepAlive -= h)
@@ -139,7 +139,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             var closeSessionResponse = await session.CloseSessionAsync(requestHeader: null, deleteSubscriptions: false, CancellationToken.None).ConfigureAwait(false);
             if (ServiceResult.IsBad(closeSessionResponse.ResponseHeader.ServiceResult))
             {
-                logger.LogError("Failed to close session {StatusCode}", closeSessionResponse.ResponseHeader.ServiceResult);
+                LogCloseConnectionFailed(closeSessionResponse.ResponseHeader.ServiceResult);
             }
         }
 
@@ -192,9 +192,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
     private async Task CreateCertificate(ApplicationConfiguration applicationConfiguration)
     {
         var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
-
-        logger.LogDebug("Creating new application certificate for: {ApplicationName}", applicationConfiguration.ApplicationName);
-
+        LogCreateCertificate(applicationConfiguration.ApplicationName);
         using var certificate = CertificateFactory.CreateCertificate(applicationConfiguration.ApplicationUri, applicationConfiguration.ApplicationName, applicationCertificate.SubjectName, domainNames: null)
              .SetNotBefore(DateTime.UtcNow - TimeSpan.FromDays(1))
              .SetNotAfter((DateTime.UtcNow - TimeSpan.FromDays(1)).AddMonths(CertificateFactory.DefaultLifeTime))
@@ -211,7 +209,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         if (!string.IsNullOrEmpty(settings.UserName)
             && tokenType != null)
         {
-            logger.LogDebug("Logging in with user: {UserName}", settings.UserName);
+            LogLoggingIn(settings.UserName);
             return new UserIdentity(settings.UserName, settings.Password);
         }
 
@@ -221,7 +219,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
     private void KeepAliveSubscription(EventPattern<ISession, KeepAliveEventArgs> x)
     {
         connectionState.OnNext(Connected.No<ISession>());
-        logger.LogError("{Status}, Reconnecting to {Endpoint}", x.EventArgs.Status, x.Sender?.ConfiguredEndpoint);
+        LogKeepAliveFailed(x.EventArgs.Status, x.Sender?.ConfiguredEndpoint);
         var sessionReconnectHandler = new SessionReconnectHandler();
         _ = sessionReconnectHandler.BeginReconnect(x.Sender, (int)reconnectDelay.TotalMilliseconds, (s, e) =>
         {
@@ -232,7 +230,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
             }
 
             var sender = s as SessionReconnectHandler;
-            logger.LogInformation("Connected to {Endpoint}", sender?.Session.ConfiguredEndpoint);
+            LogConnected(sender?.Session.ConfiguredEndpoint);
             connectionState.OnNext(Connected.Yes(sessionReconnectHandler.Session));
             sessionReconnectHandler.Dispose();
         });
@@ -243,19 +241,20 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         switch (ex.Result.StatusCode.Code)
         {
             case StatusCodes.BadNotConnected:
-                logger.LogError(ex, "Failed to connect to Opc, check network connection and Opc settings");
+                LogBadNoConnection(ex);
                 break;
 
             case StatusCodes.BadSecurityChecksFailed:
-                logger.LogError(ex, "Security Checks Failed, Check if certificate is trusted");
+                LogSecurityCheckFailed(ex);
                 break;
 
             case StatusCodes.BadRequestTimeout:
-                logger.LogError(ex, "Request Timed Out");
+                LogRequestTimeout(ex);
                 break;
 
             default:
-                logger.LogError(ex, "Unprocessed error {BrowseName}", StatusCodes.GetBrowseName(ex.Result.StatusCode.Code));
+                var browserName = StatusCodes.GetBrowseName(ex.Result.StatusCode.Code);
+                LogUnknownServiceResult(ex, ex.Result.StatusCode, browserName);
                 break;
         }
     }
@@ -275,12 +274,12 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
 
             if (applicationConfiguration.SecurityConfiguration.AutoAcceptUntrustedCertificates)
             {
-                logger.LogDebug("Accepted Certificate: {CertificateSubject} (error code: {BrowseName})", certificate.Subject, StatusCodes.GetBrowseName(eventArgs.Error.Code));
+                LogCertificateAccepted(certificate.Subject, eventArgs.Error.StatusCode, StatusCodes.GetBrowseName(eventArgs.Error.Code));
                 eventArgs.Accept = true;
                 return;
             }
 
-            logger.LogDebug("Rejected Certificate: {CertificateSubject} (error code: {BrowseName})", certificate.Subject, StatusCodes.GetBrowseName(eventArgs.Error.Code));
+            LogCertificateRejected(certificate.Subject, eventArgs.Error.StatusCode, StatusCodes.GetBrowseName(eventArgs.Error.Code));
         }));
     }
 
@@ -289,7 +288,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
         var settings = options.Value;
         if (!settings.UseSecurity)
         {
-            logger.LogWarning("Security turned off, using unsecure connection.");
+            LogUnsecureConnection();
             return false;
         }
 
@@ -304,7 +303,7 @@ public class PlcConnection : IOpcPlcConnection, IDisposable
 
         if (!settings.AutoGenCertificate)
         {
-            logger.LogWarning("Missing application certificate, using unsecure connection.");
+            LogMissingCertificate();
             return false;
         }
 

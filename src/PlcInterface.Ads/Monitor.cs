@@ -9,7 +9,7 @@ namespace PlcInterface.Ads;
 /// <summary>
 /// A implementation of <see cref="IMonitor"/>.
 /// </summary>
-public class Monitor : IAdsMonitor, IDisposable
+public partial class Monitor : IAdsMonitor, IDisposable
 {
     private readonly ILogger logger;
     private readonly IDisposable sessionStream;
@@ -34,7 +34,7 @@ public class Monitor : IAdsMonitor, IDisposable
 
         sessionStream = connection.SessionStream.Where(x => x.IsConnected).Subscribe(x =>
         {
-            logger.LogDebug("Updating all subscriptions.");
+            LogUpdatingSubscriptions();
             foreach (var keyValue in streams)
             {
                 keyValue.Value.Update(symbolHandler, symbolStream, typeConverter);
@@ -79,7 +79,7 @@ public class Monitor : IAdsMonitor, IDisposable
         disposableMonitorItem = DisposableMonitorItem.Create(ioName);
         disposableMonitorItem.Update(symbolHandler, symbolStream, typeConverter);
         streams.Add(ioName, disposableMonitorItem);
-        logger.LogDebug("Registered IO {IOName} with {UpdateInterval}", ioName, updateInterval);
+        LogVariableRegistered(ioName, updateInterval);
     }
 
     /// <inheritdoc/>
@@ -96,20 +96,20 @@ public class Monitor : IAdsMonitor, IDisposable
     {
         if (!streams.TryGetValue(ioName, out var disposableMonitorItem))
         {
-            logger.LogDebug("{IOName} was not registered.", ioName);
+            LogVariableNotRegistered(ioName);
             return;
         }
 
         disposableMonitorItem.Subscriptions -= 1;
         if (disposableMonitorItem.Subscriptions != 0)
         {
-            logger.LogDebug("{IOName} has {Subscriptions} subscriptions left.", ioName, disposableMonitorItem.Subscriptions);
+            LogVariableStillHasSubscriptions(ioName, disposableMonitorItem.Subscriptions);
             return;
         }
 
         _ = streams.Remove(ioName);
         disposableMonitorItem.Dispose();
-        logger.LogDebug("{IOName} subscription remove.", ioName);
+        LogVariableUnregistered(ioName);
     }
 
     /// <summary>

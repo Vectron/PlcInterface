@@ -14,7 +14,7 @@ namespace PlcInterface.OpcUa;
 /// <summary>
 /// A implementation of <see cref="IMonitor"/>.
 /// </summary>
-public class Monitor : IOpcMonitor, IDisposable
+public partial class Monitor : IOpcMonitor, IDisposable
 {
     private readonly ILogger<Monitor> logger;
     private readonly Dictionary<string, RegisteredSymbol> registeredSymbols = new(StringComparer.OrdinalIgnoreCase);
@@ -147,6 +147,7 @@ public class Monitor : IOpcMonitor, IDisposable
 
     private async Task OnSessionConnected(ISession session)
     {
+        LogUpdatingSubscriptions();
         foreach (var keyValue in registeredSymbols)
         {
             var value = keyValue.Value;
@@ -185,7 +186,7 @@ public class Monitor : IOpcMonitor, IDisposable
             return false;
         }
 
-        logger.LogDebug("Registered {Name} for monitoring", name);
+        LogVariableRegistered(name);
         registeredSymbol = RegisteredSymbol.Create(name, updateInterval, symbolStream, typeConverter);
         registeredSymbols.Add(name, registeredSymbol);
         subscription.AddItem(registeredSymbol.MonitoredItem);
@@ -202,19 +203,21 @@ public class Monitor : IOpcMonitor, IDisposable
 
         if (!registeredSymbols.TryGetValue(name, out var registeredSymbol))
         {
+            LogVariableNotRegistered(name);
             return;
         }
 
-        logger.LogDebug("Unregistered {Name} from monitoring", name);
         registeredSymbol.Subscriptions--;
-
-        if (registeredSymbol.Subscriptions == 0)
+        if (registeredSymbol.Subscriptions > 0)
         {
-            subscription.RemoveItem(registeredSymbol.MonitoredItem);
-            _ = registeredSymbols.Remove(name);
-            registeredSymbol.Dispose();
-            logger.LogDebug("Removed {Name} from monitoring", name);
+            LogVariableStillHasSubscriptions(name, registeredSymbol.Subscriptions);
+            return;
         }
+
+        subscription.RemoveItem(registeredSymbol.MonitoredItem);
+        _ = registeredSymbols.Remove(name);
+        registeredSymbol.Dispose();
+        LogVariableUnregistered(name);
     }
 
     private sealed class RegisteredSymbol : IDisposable

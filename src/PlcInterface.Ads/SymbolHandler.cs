@@ -20,7 +20,7 @@ namespace PlcInterface.Ads;
 /// <summary>
 /// Implementation of <see cref="ISymbolHandler"/>.
 /// </summary>
-public class SymbolHandler : IAdsSymbolHandler, IDisposable
+public partial class SymbolHandler : IAdsSymbolHandler, IDisposable
 {
     private readonly CompositeDisposable disposables = [];
     private readonly IFileSystem fileSystem;
@@ -96,7 +96,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
             return true;
         }
 
-        logger.LogError("{IoName} Does not exist in the PLC", ioName);
+        LogVariableDoesNotExist(ioName);
         return false;
     }
 
@@ -135,7 +135,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
 
     private void UpdateSymbols(IAdsConnection client)
     {
-        logger.LogInformation("Updating Symbols");
+        LogUpdatingSymbols();
         var watch = Stopwatch.StartNew();
         try
         {
@@ -155,7 +155,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
                 .Select(x => new SymbolInfo(x))
                 .Cast<IAdsSymbolInfo>()
                 .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
-            logger.LogInformation("Symbols updated in {Time} ms, found {Amount} symbols", watch.ElapsedMilliseconds, allSymbols.Count);
+            LogSymbolsUpdated(watch.ElapsedMilliseconds, allSymbols.Count);
 
             if (options.StoreSymbolsToDisk)
             {
@@ -164,7 +164,7 @@ public class SymbolHandler : IAdsSymbolHandler, IDisposable
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Exception updating symbols");
+            LogUpdatingSymbolsFailed(ex);
         }
     }
 }

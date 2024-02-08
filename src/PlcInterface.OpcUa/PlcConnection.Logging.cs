@@ -21,16 +21,14 @@ public partial class PlcConnection
     [LoggerMessage(EventId = 5, Level = LogLevel.Error, Message = "Failed to close connection with error {StatusCode}")]
     private partial void LogCloseConnectionFailed(StatusCode statusCode);
 
-    // TODO: don't take a nullable
     [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "Connected to {Endpoint}")]
-    private partial void LogConnected(ConfiguredEndpoint? endpoint);
+    private partial void LogConnected(ConfiguredEndpoint endpoint);
 
     [LoggerMessage(EventId = 3, Level = LogLevel.Error, Message = "Failed to connect to {Endpoint}")]
     private partial void LogConnectingFailed(ConfiguredEndpoint endpoint);
 
-    // TODO: don't take a nullable
     [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Opening connection to {Address}")]
-    private partial void LogConnectingTo(Uri? address);
+    private partial void LogConnectingTo(Uri address);
 
     [LoggerMessage(EventId = 20, Level = LogLevel.Trace, Message = "Creating new application certificate for: {ApplicationName}")]
     private partial void LogCreateCertificate(string applicationName);
@@ -44,9 +42,8 @@ public partial class PlcConnection
     [LoggerMessage(EventId = 11, Level = LogLevel.Trace, Message = "Discover endpoints of {DiscoveryAddress}")]
     private partial void LogFindingEndpoint(Uri discoveryAddress);
 
-    // TODO: don't take a nullable
     [LoggerMessage(EventId = 30, Level = LogLevel.Error, Message = "Server not responding, status: {ServiceResult}, Reconnecting to {Endpoint}")]
-    private partial void LogKeepAliveFailed(ServiceResult serviceResult, ConfiguredEndpoint? endpoint);
+    private partial void LogKeepAliveFailed(ServiceResult serviceResult, ConfiguredEndpoint endpoint);
 
     [LoggerMessage(EventId = 14, Level = LogLevel.Debug, Message = "Logging in with user: {UserName}")]
     private partial void LogLoggingIn(string userName);

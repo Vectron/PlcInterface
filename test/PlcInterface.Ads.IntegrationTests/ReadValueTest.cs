@@ -10,11 +10,7 @@ namespace PlcInterface.Ads.IntegrationTests;
 [TestClass]
 public sealed class ReadValueTest : IReadValueTestBase
 {
-#if NET6_0
-    protected override string DataRoot => "AdsNet6";
-#elif NET7_0
-    protected override string DataRoot => "AdsNet7";
-#endif
+    protected override string DataRoot => Settings.DataRoot;
 
     protected override ServiceProvider GetServiceProvider()
     {

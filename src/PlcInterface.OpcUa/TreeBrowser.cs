@@ -79,20 +79,20 @@ internal sealed partial class TreeBrowser : Browser
 
         IEnumerable<ReferenceDescriptionCollection> CallServer(BrowseDescriptionCollection nodesToBrowse)
         {
-        // make the call to the server.
-        var responseHeader = Session.Browse(
-            requestHeader: null,
-            View,
-            MaxReferencesReturned,
-            nodesToBrowse,
-            out var results,
-            out var diagnosticInfos);
+            // make the call to the server.
+            var responseHeader = Session.Browse(
+                requestHeader: null,
+                View,
+                MaxReferencesReturned,
+                nodesToBrowse,
+                out var results,
+                out var diagnosticInfos);
 
-        // ensure that the server returned valid results.
-        ClientBase.ValidateResponse(results, nodesToBrowse);
-        ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToBrowse);
-        return DecodeResult(responseHeader, results, diagnosticInfos);
-    }
+            // ensure that the server returned valid results.
+            ClientBase.ValidateResponse(results, nodesToBrowse);
+            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToBrowse);
+            return DecodeResult(responseHeader, results, diagnosticInfos);
+        }
     }
 
     /// <summary>
@@ -208,7 +208,12 @@ internal sealed partial class TreeBrowser : Browser
 
     private IEnumerable<IOpcSymbolInfo> BrowseRecursive(IEnumerable<IOpcSymbolInfo> symbols, string rootName)
     {
-        var browseResult = Browse(symbols.Select(x => x.Handle)).ToList();
+        var browseResult = symbols
+            .Select(x => x.Handle)
+            .Chunk((int)operationLimits.MaxNodesPerBrowse)
+            .SelectMany(Browse)
+            .ToArray();
+
         var nodeInfos = browseResult
             .SelectMany(x => x)
             .Select(x => (NodeId)x.NodeId)
@@ -228,7 +233,7 @@ internal sealed partial class TreeBrowser : Browser
             return Enumerable.Empty<IOpcSymbolInfo>();
         }
 
-        return allSymbols.Concat(allSymbols.Chunk((int)operationLimits.MaxNodesPerBrowse).SelectMany(x => BrowseRecursive(x, rootName)));
+        return allSymbols.Concat(BrowseRecursive(allSymbols, rootName));
     }
 
     private SymbolInfo CreateRootNodeSymbol(string path)

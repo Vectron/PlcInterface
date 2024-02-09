@@ -1,34 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="10.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{c6b6e391-a9da-4bad-a62e-89651a65103d}</ProjectGuid>
+    <ProjectGuid>{c7f34262-5eb4-45ac-a11c-c5339bc82ff9}</ProjectGuid>
     <AssemblyName>PlcInterface.OpcUa.OpcServer</AssemblyName>
     <Name>PlcInterface.OpcUa.OpcServer</Name>
     <RootNamespace>PlcInterface.OpcUa.OpcServer</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="Server.tcopcuasrv">
+    <Content Include="OPCServer.tcopcuasrv">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <tcopcuasrvdaCompile Include="Server\Data Access\Data Access.opcuada">
-      <DependentUpon>Server.tcopcuasrv</DependentUpon>
+    <tcopcuasrvdaCompile Include="OPCServer\Data Access\Data Access.opcuada">
+      <DependentUpon>OPCServer.tcopcuasrv</DependentUpon>
     </tcopcuasrvdaCompile>
   </ItemGroup>
   <ItemGroup>
-    <tcopcuasrvalarmcCompile Include="Server\Alarms and Conditions\Alarms and Conditions.ac">
-      <DependentUpon>Server.tcopcuasrv</DependentUpon>
+    <tcopcuasrvalarmcCompile Include="OPCServer\Alarms and Conditions\Alarms and Conditions.ac">
+      <DependentUpon>OPCServer.tcopcuasrv</DependentUpon>
     </tcopcuasrvalarmcCompile>
   </ItemGroup>
   <ItemGroup>
-    <tcopcuasrvhaCompile Include="Server\Historical Access\Historical Access.opcuaha">
-      <DependentUpon>Server.tcopcuasrv</DependentUpon>
+    <tcopcuasrvresCompile Include="OPCServer\Resources\Resources.res">
+      <DependentUpon>OPCServer.tcopcuasrv</DependentUpon>
+    </tcopcuasrvresCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <tcopcuasrvhaCompile Include="OPCServer\Historical Access\Historical Access.opcuaha">
+      <DependentUpon>OPCServer.tcopcuasrv</DependentUpon>
     </tcopcuasrvhaCompile>
   </ItemGroup>
   <ItemGroup>
-    <tcopcuasrvsecCompile Include="Server\Security Access\Security Access.sec">
-      <DependentUpon>Server.tcopcuasrv</DependentUpon>
+    <tcopcuasrvsecCompile Include="OPCServer\Security Access\Security Access.sec">
+      <DependentUpon>OPCServer.tcopcuasrv</DependentUpon>
     </tcopcuasrvsecCompile>
   </ItemGroup>
   <!-- This next bit is required unless the macro used to Import your targets is defined in an MSBuild toolset. -->

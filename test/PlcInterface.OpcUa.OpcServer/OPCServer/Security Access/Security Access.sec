@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TcUaSecurityConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <!--enum PermissionType
+{
+	UA_ATTRREADABLE     = 0x0001,       // read all non value attributes
+	UA_READABLE          = 0x0002,        // read value attribute
+	UA_WRITABLE         = 0x0004,       // write value attribute
+	UA_BROWSEABLE       = 0x0008,       // browse node
+	UA_HISTORYREADABLE  = 0x0010,       // read history
+	UA_HISTORYINSERT    = 0x0020,       // insert into history:
+	UA_HISTORYMODIFY    = 0x0040,       // modify existing history
+	UA_HISTORYDELETE    = 0x0080,       // delete from history
+	UA_EVENTREADABLE    = 0x0100,       // receive events
+	UA_EXECUTABLE       = UA_WRITABLE,  // execute method call
+	UA_ATTRWRITABLE     = 0x0200,       // write non value attributes dependent on write mask
+	UA_PERMISSION_ALL   = 0x03FF
+}-->
+  <Users>
+    <User Name="Anonymous" Auth="None" IsRoot="true" />
+    <User Name="Admin" Auth="OS" Password="" IsRoot="true" MemberOf="Administrators" />
+  </Users>
+  <Groups>
+    <Group Name="Administrators">
+      <DefaultAccess Namespace="*" Access="0x000003FF" />
+    </Group>
+    <Group Name="Guests">
+      <DefaultAccess Namespace="http://opcfoundation.org/UA/" Access="0x0000000B" />
+    </Group>
+    <Group Name="Users">
+      <DefaultAccess Namespace="urn:BeckhoffAutomation:TcOpcUaServer" Access="0x0000011B" />
+      <DefaultAccess Namespace="urn:TwinCAT-PC:BeckhoffAutomation:TcOpcUaServer:1" Access="0x0000011B" />
+      <DefaultAccess Namespace="http://opcfoundation.org/UA/DI/" Access="0x0000011B" />
+      <DefaultAccess Namespace="http://PLCopen.org/OpcUa/IEC61131-3/" Access="0x0000001B" />
+      <DefaultAccess Namespace="urn:BeckhoffAutomation:Ua:PLC1" Access="0x000003FF" />
+      <DefaultAccess Namespace="urn:BeckhoffAutomation:Ua:Types:GlobalTypes" Access="0x0000001B" />
+      <DefaultAccess Namespace="urn:BeckhoffAutomation:Ua:HA" Access="0x0000000B" />
+      <DefaultAccess Namespace="http://Beckhoff.com/TwinCAT/TF6100/Server/Configuration" Access="0x0000000B" />
+      <DefaultAccess Namespace="http://opcfoundation.org/UA/" Access="0x0000000B" />
+      <DefaultAccess Namespace="urn:BeckhoffAutomation:Ua:AC" Access="0x0000011B" />
+    </Group>
+  </Groups>
+  <AccessInfos />
+</TcUaSecurityConfig>

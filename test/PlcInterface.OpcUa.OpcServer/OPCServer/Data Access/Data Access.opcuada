@@ -13,7 +13,7 @@
     <AutoCfgSymFile>[BootDir]\Plc\Port_851.tmc</AutoCfgSymFile>
     <Disabled>0</Disabled>
     <ArraySubItemLegacySupport>0</ArraySubItemLegacySupport>
-    <ReleaseAdsVarHandles>0</ReleaseAdsVarHandles>
+    <ReleaseAdsVarHandles>1</ReleaseAdsVarHandles>
     <ForceCase>0</ForceCase>
     <NamespaceNameVersion>2</NamespaceNameVersion>
     <ImportPlcProperties>false</ImportPlcProperties>

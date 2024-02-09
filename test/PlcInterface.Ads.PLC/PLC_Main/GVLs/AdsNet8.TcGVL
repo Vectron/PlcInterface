@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="AdsNet8" Id="{5529c7f8-9faf-0c30-3bcc-6036a5c21a80}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'analysis' := '-33'}
+VAR_GLOBAL
+	MonitorTestData		: MonitorTest;
+	ReadTestData		: ReadTest;
+	SymbolTestData		: SymbolTest;
+	WriteTestData		: WriteTest;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

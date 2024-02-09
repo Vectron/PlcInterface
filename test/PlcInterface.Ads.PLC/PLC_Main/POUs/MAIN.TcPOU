@@ -18,6 +18,13 @@ ResetWriteData(AdsNet7.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
 ResetWriteData(AdsNet7.WriteTestData.WriteUpdatesTheValueInPlc);
 ResetWriteData(AdsNet7.WriteTestData.WriteUpdatesTheValueInPlcAsync);
 
+ResetWriteData(AdsNet8.WriteTestData.WriteGenericUpdatesTheValueInPlc);
+ResetWriteData(AdsNet8.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
+ResetWriteData(AdsNet8.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
+ResetWriteData(AdsNet8.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
+ResetWriteData(AdsNet8.WriteTestData.WriteUpdatesTheValueInPlc);
+ResetWriteData(AdsNet8.WriteTestData.WriteUpdatesTheValueInPlcAsync);
+
 ResetWriteData(OpcNet6.WriteTestData.WriteGenericUpdatesTheValueInPlc);
 ResetWriteData(OpcNet6.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
 ResetWriteData(OpcNet6.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
@@ -31,6 +38,13 @@ ResetWriteData(OpcNet7.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
 ResetWriteData(OpcNet7.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
 ResetWriteData(OpcNet7.WriteTestData.WriteUpdatesTheValueInPlc);
 ResetWriteData(OpcNet7.WriteTestData.WriteUpdatesTheValueInPlcAsync);
+
+ResetWriteData(OpcNet8.WriteTestData.WriteGenericUpdatesTheValueInPlc);
+ResetWriteData(OpcNet8.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
+ResetWriteData(OpcNet8.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
+ResetWriteData(OpcNet8.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
+ResetWriteData(OpcNet8.WriteTestData.WriteUpdatesTheValueInPlc);
+ResetWriteData(OpcNet8.WriteTestData.WriteUpdatesTheValueInPlcAsync);
 ]]></ST>
     </Implementation>
   </POU>

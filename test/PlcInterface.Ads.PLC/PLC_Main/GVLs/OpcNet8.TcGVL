@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="OpcNet8" Id="{d4c482c0-327d-05be-1127-660ed056f9c9}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'analysis' := '-33'}
+VAR_GLOBAL
+	{attribute 'OPC.UA.DA' := '1'}
+	MonitorTestData		: MonitorTest;
+	{attribute 'OPC.UA.DA' := '1'}
+	ReadTestData		: ReadTest;
+	{attribute 'OPC.UA.DA' := '1'}
+	SymbolTestData		: SymbolTest;
+	{attribute 'OPC.UA.DA' := '1'}
+	WriteTestData		: WriteTest;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

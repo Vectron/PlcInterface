@@ -213,7 +213,7 @@ internal sealed partial class TreeBrowser : Browser
             .SelectMany(x => x)
             .Select(x => (NodeId)x.NodeId)
             .Chunk((int)operationLimits.MaxNodesPerRead)
-            .SelectMany(Session.ReadNodeInfo);
+            .SelectMany(x => Session.ReadNodeInfo(x, logger));
 
         var allSymbols = browseResult
            .Zip(symbols, (referenceDescriptions, parent) => (referenceDescriptions, parent))

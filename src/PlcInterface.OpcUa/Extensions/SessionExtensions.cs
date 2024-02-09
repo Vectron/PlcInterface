@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Opc.Ua;
 using Opc.Ua.Client;
 
@@ -12,7 +15,7 @@ namespace PlcInterface.OpcUa;
 /// <summary>
 /// Extension methods for <see cref="ISession"/>.
 /// </summary>
-internal static class SessionExtensions
+internal static partial class SessionExtensions
 {
     /// <summary>
     /// Gets the datatype of an OPC tag.
@@ -47,22 +50,46 @@ internal static class SessionExtensions
     /// </summary>
     /// <param name="session">The <see cref="ISession"/> to read from.</param>
     /// <param name="nodeIds">The <see cref="NodeId"/> to get datatype of.</param>
+    /// <param name="logger">A <see cref="ILogger"/> instance.</param>
     /// <returns>System Type.</returns>
-    public static IEnumerable<NodeInfo> ReadNodeInfo(this ISession session, IEnumerable<NodeId> nodeIds)
+    public static IEnumerable<NodeInfo> ReadNodeInfo(this ISession session, IEnumerable<NodeId> nodeIds, ILogger logger)
     {
         if (session == null)
         {
             throw new InvalidOperationException("Session is null");
         }
 
+        logger ??= NullLogger.Instance;
         var nodesToRead = new ReadValueIdCollection(nodeIds.SelectMany(GetReadValueIds));
-
         if (nodesToRead.Count <= 0)
         {
             return Enumerable.Empty<NodeInfo>();
         }
 
-        try
+        var chunkSize = nodesToRead.Count / 3;
+        while (true)
+        {
+            try
+            {
+                return nodesToRead
+                    .Chunk(chunkSize * 3)
+                    .SelectMany(x => CallServer(session, x))
+                    .ToImmutableArray();
+            }
+            catch (ServiceResultException ex)
+            {
+                if (ex.StatusCode != StatusCodes.BadEncodingLimitsExceeded)
+                {
+                    return Enumerable.Empty<NodeInfo>();
+                }
+
+                var previous = chunkSize;
+                chunkSize /= 2;
+                LogReadInfoFailed(logger, ex.StatusCode, previous, chunkSize);
+            }
+        }
+
+        static IEnumerable<NodeInfo> CallServer(ISession session, ReadValueIdCollection nodesToRead)
         {
             _ = session.Read(
                 requestHeader: null,
@@ -75,16 +102,6 @@ internal static class SessionExtensions
             ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToRead);
             var nodeInfos = results.Chunk(3).Select(x => NodeInfoFromDataValue(x, session));
             return nodeInfos;
-        }
-        catch (ServiceResultException ex)
-        {
-            if (ex.Result.StatusCode == StatusCodes.BadEncodingLimitsExceeded)
-            {
-                var chunkSize = ((nodesToRead.Count / 3) >> 1) + 1;
-                return nodeIds.Chunk(chunkSize).SelectMany(session.ReadNodeInfo);
-            }
-
-            throw;
         }
     }
 
@@ -156,6 +173,9 @@ internal static class SessionExtensions
             AttributeId = Attributes.ValueRank,
         };
     }
+
+    [LoggerMessage(EventId = 100, Level = LogLevel.Warning, Message = "Failed to read symbols (Error: {StatusCode}), changing chunk size {OldSize} -> {NewSize}")]
+    private static partial void LogReadInfoFailed(ILogger logger, uint statusCode, int oldSize, int newSize);
 
     private static NodeInfo NodeInfoFromDataValue(IList<DataValue> dataValues, ISession session)
     {

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Opc.Ua;
 using Opc.Ua.Client;
 
@@ -10,15 +12,17 @@ namespace PlcInterface.OpcUa;
 /// <summary>
 /// Extension of <see cref="Browser"/> to recursive browse symbols.
 /// </summary>
-internal sealed class TreeBrowser : Browser
+internal sealed partial class TreeBrowser : Browser
 {
+    private readonly ILogger logger;
     private readonly OperationLimits operationLimits;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TreeBrowser"/> class.
     /// </summary>
     /// <param name="session">The session to browse.</param>
-    public TreeBrowser(ISession session)
+    /// <param name="logger">The <see cref="ILogger"/>.</param>
+    public TreeBrowser(ISession session, ILogger logger)
         : base(session)
     {
         BrowseDirection = BrowseDirection.Forward;
@@ -27,6 +31,7 @@ internal sealed class TreeBrowser : Browser
         NodeClassMask = 0;
         ContinueUntilDone = true;
         operationLimits = Session.ReadOperationLimits();
+        this.logger = logger;
     }
 
     /// <summary>
@@ -48,6 +53,32 @@ internal sealed class TreeBrowser : Browser
             return Enumerable.Empty<ReferenceDescriptionCollection>();
         }
 
+        var chunkSize = nodesToBrowse.Count + 1;
+        while (true)
+        {
+            try
+            {
+                return nodesToBrowse
+                    .Chunk(chunkSize)
+                    .SelectMany(x => CallServer(x))
+                    .ToImmutableArray();
+            }
+            catch (ServiceResultException ex)
+            {
+                if (ex.StatusCode is not StatusCodes.BadResponseTooLarge
+                    and not StatusCodes.BadEncodingLimitsExceeded)
+                {
+                    return Enumerable.Empty<ReferenceDescriptionCollection>();
+                }
+
+                var previous = chunkSize;
+                chunkSize /= 2;
+                LogBrowseFailed(ex.StatusCode, previous, chunkSize);
+            }
+        }
+
+        IEnumerable<ReferenceDescriptionCollection> CallServer(BrowseDescriptionCollection nodesToBrowse)
+        {
         // make the call to the server.
         var responseHeader = Session.Browse(
             requestHeader: null,
@@ -61,6 +92,7 @@ internal sealed class TreeBrowser : Browser
         ClientBase.ValidateResponse(results, nodesToBrowse);
         ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToBrowse);
         return DecodeResult(responseHeader, results, diagnosticInfos);
+    }
     }
 
     /// <summary>

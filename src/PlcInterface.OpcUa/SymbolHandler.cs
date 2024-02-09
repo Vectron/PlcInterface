@@ -120,7 +120,7 @@ public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
     {
         LogUpdatingSymbols();
         var elapsedWatch = Stopwatch.StartNew();
-        var browser = new TreeBrowser(session);
+        var browser = new TreeBrowser(session, logger);
         allSymbols.Clear();
         try
         {

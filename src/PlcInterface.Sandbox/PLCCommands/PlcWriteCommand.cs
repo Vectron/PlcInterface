@@ -6,35 +6,23 @@ namespace PlcInterface.Sandbox.PLCCommands;
 /// <summary>
 /// Base class for a <see cref="IConsoleCommand"/> to read a variable from the PLC.
 /// </summary>
-internal abstract class PlcWriteCommand : IConsoleCommand
+/// <remarks>
+/// Initializes a new instance of the <see cref="PlcWriteCommand"/> class.
+/// </remarks>
+/// <param name="name">The name of the interface.</param>
+/// <param name="readWrite">A <see cref="IReadWrite"/> instance.</param>
+internal abstract class PlcWriteCommand(string name, IReadWrite readWrite) : IConsoleCommand
 {
     /// <summary>
     /// The parameter needed for this command.
     /// </summary>
     public const string Parameter = "write";
 
-    private readonly IReadWrite readWrite;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PlcWriteCommand"/> class.
-    /// </summary>
-    /// <param name="name">The name of the interface.</param>
-    /// <param name="readWrite">A <see cref="IReadWrite"/> instance.</param>
-    protected PlcWriteCommand(string name, IReadWrite readWrite)
-    {
-        CommandParameters = [name, Parameter];
-        this.readWrite = readWrite;
-    }
-
     /// <inheritdoc/>
     public string[]? ArgumentNames => ["tag", "new value"];
 
     /// <inheritdoc/>
-    public string[] CommandParameters
-    {
-        get;
-        init;
-    }
+    public string[] CommandParameters { get; init; } = [name, Parameter];
 
     /// <inheritdoc/>
     public string HelpText => "Write a variable to the PLC with " + CommandParameters[0];

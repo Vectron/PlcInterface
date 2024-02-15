@@ -68,7 +68,7 @@ public sealed class PlcConnectionTest : IPlcConnectionTestBase
                 o.Address = Settings.OpcIp;
                 o.Port = Settings.OpcPort;
             })
-            .Configure<OpcSymbolHandlerOptions>(o => o.RootNodePath = Settings.RootNode);
+            .Configure<OpcSymbolHandlerOptions>(o => o.RootVariable = Settings.RootVariable);
 
         services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(NullLogger<>)));
 

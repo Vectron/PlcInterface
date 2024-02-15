@@ -9,5 +9,5 @@ public class DefaultOpcSymbolHandlerSettingsConfigureOptions : IConfigureOptions
 {
     /// <inheritdoc/>
     public void Configure(OpcSymbolHandlerOptions options)
-        => options.RootNodePath = string.Empty;
+        => options.RootVariable = string.Empty;
 }

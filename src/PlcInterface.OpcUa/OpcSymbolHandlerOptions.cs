@@ -8,5 +8,8 @@ public class OpcSymbolHandlerOptions
     /// <summary>
     /// Gets or sets the path to the root node.
     /// </summary>
-    public string RootNodePath { get; set; } = string.Empty;
+    /// <remarks>
+    /// Sub items are separated by a '.'.
+    /// </remarks>
+    public string RootVariable { get; set; } = string.Empty;
 }

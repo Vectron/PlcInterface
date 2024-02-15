@@ -124,7 +124,7 @@ public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
         allSymbols.Clear();
         try
         {
-            allSymbols = browser.BrowseTree(options.RootNodePath);
+            allSymbols = browser.BrowseTree(options.RootVariable);
         }
         catch (Exception ex)
         {

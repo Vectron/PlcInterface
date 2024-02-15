@@ -158,15 +158,15 @@ internal sealed partial class TreeBrowser : Browser
     }
 
     private BrowseDescription BrowseDescriptionFromNodeId(NodeId nodeId)
-        => new()
-        {
-            NodeId = nodeId,
-            BrowseDirection = BrowseDirection,
-            ReferenceTypeId = ReferenceTypeId,
-            IncludeSubtypes = IncludeSubtypes,
-            NodeClassMask = (uint)NodeClassMask,
-            ResultMask = ResultMask,
-        };
+            => new()
+            {
+                NodeId = nodeId,
+                BrowseDirection = BrowseDirection,
+                ReferenceTypeId = ReferenceTypeId,
+                IncludeSubtypes = IncludeSubtypes,
+                NodeClassMask = (uint)NodeClassMask,
+                ResultMask = ResultMask,
+            };
 
     /// <summary>
     /// Fetches the next batch of references.
@@ -243,7 +243,7 @@ internal sealed partial class TreeBrowser : Browser
 
         if (!string.IsNullOrWhiteSpace(path))
         {
-            var pathParts = path!.Split('/');
+            var pathParts = path!.Split('.');
 
             foreach (var item in pathParts)
             {

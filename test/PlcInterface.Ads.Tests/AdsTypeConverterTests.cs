@@ -42,13 +42,13 @@ public class AdsTypeConverterTests
         var sourceMock = new Mock<DynamicObject>();
         var result = new object();
         _ = sourceMock.Setup(x => x.GetDynamicMemberNames())
-            .Returns(new[]
-            {
+            .Returns(
+            [
                 nameof(TimesTestType.Date),
                 nameof(TimesTestType.Time),
                 nameof(TimesTestType.LTime),
                 nameof(TimesTestType.DateTimeOffset),
-            });
+            ]);
         _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
             .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
             {
@@ -239,7 +239,7 @@ public class AdsTypeConverterTests
         {
             var sourceMock = new Mock<DynamicObject>();
             var result = new object();
-            _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(new[] { nameof(IntValue) });
+            _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns([nameof(IntValue)]);
             _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
                 .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
                 {

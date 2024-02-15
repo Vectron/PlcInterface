@@ -19,7 +19,7 @@ internal class PlcDisconnectCommand(string name, IPlcConnection plcConnection) :
     public const string Parameter = "disconnect";
 
     /// <inheritdoc/>
-    public string[]? ArgumentNames => Array.Empty<string>();
+    public string[]? ArgumentNames => [];
 
     /// <inheritdoc/>
     public string[] CommandParameters { get; } = [name, Parameter];

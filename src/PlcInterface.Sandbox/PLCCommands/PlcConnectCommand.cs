@@ -19,7 +19,7 @@ internal class PlcConnectCommand(string name, IPlcConnection plcConnection) : IC
     public const string Parameter = "connect";
 
     /// <inheritdoc/>
-    public string[]? ArgumentNames => Array.Empty<string>();
+    public string[]? ArgumentNames => [];
 
     /// <inheritdoc/>
     public string[] CommandParameters { get; } = [name, Parameter];

@@ -20,7 +20,7 @@ internal sealed class PlcSymbolDumpCommand(string name, ISymbolHandler symbolHan
     public const string Parameter = "dump";
 
     /// <inheritdoc/>
-    public string[]? ArgumentNames => Array.Empty<string>();
+    public string[]? ArgumentNames => [];
 
     /// <inheritdoc/>
     public string[] CommandParameters { get; } = [name, Parameter];

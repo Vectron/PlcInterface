@@ -14,38 +14,37 @@ namespace PlcInterface.IntegrationTests;
 public abstract class IReadValueTestBase
 {
     private static IEnumerable<object[]> ReadTestData
-        => new List<object[]>()
-        {
-            new object[] { "BoolValue", true },
-            new object[] { "ByteValue", byte.MaxValue },
-            new object[] { "WordValue", ushort.MaxValue },
-            new object[] { "DWordValue", uint.MaxValue },
-            new object[] { "LWordValue", ulong.MaxValue },
-            new object[] { "SIntValue", sbyte.MinValue },
-            new object[] { "IntValue", short.MinValue },
-            new object[] { "DIntValue", int.MinValue },
-            new object[] { "LIntValue", long.MinValue },
-            new object[] { "USIntValue", byte.MaxValue },
-            new object[] { "UIntValue", ushort.MaxValue },
-            new object[] { "UDIntValue", uint.MaxValue },
-            new object[] { "ULIntValue", ulong.MaxValue },
-            new object[] { "RealValue", -3.402823E+38F },
-            new object[] { "LRealValue", -1.79769313486231E+308 },
-            new object[] { "TimeValue", TimeSpan.FromSeconds(1) },
-            new object[] { "TimeOfDayValue", TimeSpan.FromHours(1) },
-            new object[] { "LTimeValue", TimeSpan.FromTicks(10) },
-            new object[] { "DateValue", new DateTimeOffset(2106, 02, 05, 0, 0, 0, TimeSpan.FromHours(1)) },
-            new object[] { "DateAndTimeValue", new DateTimeOffset(2106, 02, 05, 06, 28, 15, TimeSpan.FromHours(1)) },
-            new object[] { "StringValue", "Test String" },
-            new object[] { "WStringValue", "Test WString" },
-            new object[] { "EnumValue1", (int)TestEnum.Second },
-        };
+        =>
+        [
+            ["BoolValue", true],
+            ["ByteValue", byte.MaxValue],
+            ["WordValue", ushort.MaxValue],
+            ["DWordValue", uint.MaxValue],
+            ["LWordValue", ulong.MaxValue],
+            ["SIntValue", sbyte.MinValue],
+            ["IntValue", short.MinValue],
+            ["DIntValue", int.MinValue],
+            ["LIntValue", long.MinValue],
+            ["USIntValue", byte.MaxValue],
+            ["UIntValue", ushort.MaxValue],
+            ["UDIntValue", uint.MaxValue],
+            ["ULIntValue", ulong.MaxValue],
+            ["RealValue", -3.402823E+38F],
+            ["LRealValue", -1.79769313486231E+308],
+            ["TimeValue", TimeSpan.FromSeconds(1)],
+            ["TimeOfDayValue", TimeSpan.FromHours(1)],
+            ["LTimeValue", TimeSpan.FromTicks(10)],
+            ["DateValue", new DateTimeOffset(2106, 02, 05, 0, 0, 0, TimeSpan.FromHours(1))],
+            ["DateAndTimeValue", new DateTimeOffset(2106, 02, 05, 06, 28, 15, TimeSpan.FromHours(1))],
+            ["StringValue", "Test String"],
+            ["WStringValue", "Test WString"],
+            ["EnumValue1", (int)TestEnum.Second],
+        ];
 
     private static IEnumerable<object[]> ReadTestDataExtended
-            => new List<object[]>()
-            {
-                new object[]
-                {
+            =>
+            [
+                [
                     "IntArray",
                     new short[]
                     {
@@ -61,9 +60,8 @@ public abstract class IReadValueTestBase
                         1009,
                         1010,
                     },
-                },
-                new object[]
-                {
+                ],
+                [
                     "MultiDimensionArray",
                     new short[,,]
                     {
@@ -78,9 +76,8 @@ public abstract class IReadValueTestBase
                             { 2100, 2200, 2300, 2400 },
                         },
                     },
-                },
-                new object[]
-                {
+                ],
+                [
                     "ComplexArray",
                     new DUT_TestStruct2[]
                     {
@@ -88,9 +85,8 @@ public abstract class IReadValueTestBase
                         DUT_TestStruct2.Default,
                         DUT_TestStruct2.Default,
                     },
-                },
-                new object[]
-                {
+                ],
+                [
                     "MultiDimensionComplexArray",
                     new DUT_TestStruct2[,,]
                     {
@@ -135,10 +131,10 @@ public abstract class IReadValueTestBase
                             },
                         },
                     },
-                },
-                new object[] { "StructValue", DUT_TestStruct.Default },
-                new object[] { "StructValue2", DUT_TestClass.Default },
-            };
+                ],
+                ["StructValue", DUT_TestStruct.Default],
+                ["StructValue2", DUT_TestClass.Default],
+            ];
 
     [TestMethod]
     public void ReadDynamicReadsAStructure()

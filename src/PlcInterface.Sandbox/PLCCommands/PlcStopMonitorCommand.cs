@@ -19,7 +19,7 @@ internal sealed class PlcStopMonitorCommand(string name, IMonitor monitor) : ICo
     public const string Parameter = "unmonitor";
 
     /// <inheritdoc/>
-    public string[]? ArgumentNames => new[] { "tag" };
+    public string[]? ArgumentNames => ["tag"];
 
     /// <inheritdoc/>
     public string[] CommandParameters { get; } = [name, Parameter];

@@ -16,7 +16,7 @@ internal static class ISymbolInfoExtension
     /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
     /// <returns>A <see cref="IEnumerable{T}"/> of all child symbols.</returns>
     public static IEnumerable<ISymbolInfo> Flatten(this ISymbolInfo symbolInfo, ISymbolHandler symbolHandler)
-        => symbolInfo.ChildSymbols.Count == 0 ? new[] { symbolInfo } : symbolInfo.ChildSymbols.SelectMany(x => symbolHandler.GetSymbolInfo(x).Flatten(symbolHandler));
+        => symbolInfo.ChildSymbols.Count == 0 ? [symbolInfo] : symbolInfo.ChildSymbols.SelectMany(x => symbolHandler.GetSymbolInfo(x).Flatten(symbolHandler));
 
     /// <summary>
     /// Flatten the type hierarchy.
@@ -51,7 +51,7 @@ internal static class ISymbolInfoExtension
 
                 if (childValue == null)
                 {
-                    return Enumerable.Empty<(ISymbolInfo SymbolInfo, object Value)>();
+                    return [];
                 }
 
                 return x.FlattenWithValue(symbolHandler, childValue);

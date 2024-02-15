@@ -22,7 +22,7 @@ internal sealed class PlcReadCommand(string name, IReadWrite readWrite) : IConso
     public const string Parameter = "read";
 
     /// <inheritdoc/>
-    public string[]? ArgumentNames => new[] { "tag" };
+    public string[]? ArgumentNames => ["tag"];
 
     /// <inheritdoc/>
     public string[] CommandParameters { get; } = [name, Parameter];

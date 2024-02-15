@@ -23,7 +23,7 @@ internal sealed class PlcMonitorCommand(string name, IMonitor monitor) : IConsol
     private bool disposed;
 
     /// <inheritdoc/>
-    public string[]? ArgumentNames => new[] { "tag" };
+    public string[]? ArgumentNames => ["tag"];
 
     /// <inheritdoc/>
     public string[] CommandParameters { get; } = [name, Parameter];

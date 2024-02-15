@@ -324,7 +324,7 @@ public class ReadWriteTests
         var symbolMock = new Mock<IAdsSymbolInfo>();
         _ = symbolMock.SetupGet(x => x.Symbol).Returns(valueSymbolMock.Object);
         _ = symbolMock.SetupGet(x => x.Name).Returns(name);
-        _ = symbolMock.SetupGet(x => x.ChildSymbols).Returns(new List<string>());
+        _ = symbolMock.SetupGet(x => x.ChildSymbols).Returns([]);
         var splitNames = name.Split('.');
         var shortName = splitNames[splitNames.Length - 1];
         _ = symbolMock.SetupGet(x => x.ShortName).Returns(shortName);

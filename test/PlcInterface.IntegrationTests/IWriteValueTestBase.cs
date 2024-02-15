@@ -16,50 +16,48 @@ namespace PlcInterface.IntegrationTests;
 public abstract class IWriteValueTestBase
 {
     private static IEnumerable<object[]> WriteTestData
-        => new List<object[]>()
-        {
-            new object[] { "BoolValue", false },
-            new object[] { "ByteValue", byte.MinValue },
-            new object[] { "WordValue", ushort.MinValue },
-            new object[] { "DWordValue", uint.MinValue },
-            new object[] { "LWordValue", ulong.MinValue },
-            new object[] { "SIntValue", sbyte.MaxValue },
-            new object[] { "IntValue", short.MaxValue },
-            new object[] { "DIntValue", int.MaxValue },
-            new object[] { "LIntValue", long.MaxValue },
-            new object[] { "USIntValue", byte.MinValue },
-            new object[] { "UIntValue", ushort.MinValue },
-            new object[] { "UDIntValue", uint.MinValue },
-            new object[] { "ULIntValue", ulong.MinValue },
-            new object[] { "RealValue", 3.402823E+38F },
-            new object[] { "LRealValue", 1.79769313486231E+308 },
-            new object[] { "TimeValue1", TimeSpan.FromSeconds(3) },
-            new object[] { "TimeValue2", 3000u, TimeSpan.FromSeconds(3) },
-            new object[] { "TimeOfDayValue1", TimeSpan.FromHours(10) },
-            new object[] { "TimeOfDayValue2", 36000000u, TimeSpan.FromHours(10) },
-            new object[] { "LTimeValue1", TimeSpan.FromTicks(100) },
-            new object[] { "LTimeValue2", 10000ul, TimeSpan.FromTicks(100) },
-            new object[] { "DateValue1", new DateTimeOffset(2019, 02, 21, 00, 00, 00, TimeSpan.FromHours(1)) },
-            new object[] { "DateValue2", new DateTime(2019, 02, 21), new DateTimeOffset(2019, 02, 21, 00, 00, 00, TimeSpan.FromHours(1)) },
-            new object[] { "DateAndTimeValue1", new DateTimeOffset(2019, 02, 21, 12, 15, 10, TimeSpan.FromHours(1)) },
-            new object[] { "DateAndTimeValue2", new DateTime(2019, 02, 21, 12, 15, 10), new DateTimeOffset(2019, 02, 21, 12, 15, 10, TimeSpan.FromHours(1)) },
-            new object[] { "StringValue", "new Test String" },
-            new object[] { "WStringValue", "new Test WString" },
-            new object[] { "EnumValue1", TestEnum.Third, (int)TestEnum.Third },
-            new object[] { "EnumValue2", (short)TestEnum.Third, (int)TestEnum.Third },
-            new object[] { "EnumValue3", (int)TestEnum.Third },
-        };
+        =>
+        [
+            ["BoolValue", false],
+            ["ByteValue", byte.MinValue],
+            ["WordValue", ushort.MinValue],
+            ["DWordValue", uint.MinValue],
+            ["LWordValue", ulong.MinValue],
+            ["SIntValue", sbyte.MaxValue],
+            ["IntValue", short.MaxValue],
+            ["DIntValue", int.MaxValue],
+            ["LIntValue", long.MaxValue],
+            ["USIntValue", byte.MinValue],
+            ["UIntValue", ushort.MinValue],
+            ["UDIntValue", uint.MinValue],
+            ["ULIntValue", ulong.MinValue],
+            ["RealValue", 3.402823E+38F],
+            ["LRealValue", 1.79769313486231E+308],
+            ["TimeValue1", TimeSpan.FromSeconds(3)],
+            ["TimeValue2", 3000u, TimeSpan.FromSeconds(3)],
+            ["TimeOfDayValue1", TimeSpan.FromHours(10)],
+            ["TimeOfDayValue2", 36000000u, TimeSpan.FromHours(10)],
+            ["LTimeValue1", TimeSpan.FromTicks(100)],
+            ["LTimeValue2", 10000ul, TimeSpan.FromTicks(100)],
+            ["DateValue1", new DateTimeOffset(2019, 02, 21, 00, 00, 00, TimeSpan.FromHours(1))],
+            ["DateValue2", new DateTime(2019, 02, 21), new DateTimeOffset(2019, 02, 21, 00, 00, 00, TimeSpan.FromHours(1))],
+            ["DateAndTimeValue1", new DateTimeOffset(2019, 02, 21, 12, 15, 10, TimeSpan.FromHours(1))],
+            ["DateAndTimeValue2", new DateTime(2019, 02, 21, 12, 15, 10), new DateTimeOffset(2019, 02, 21, 12, 15, 10, TimeSpan.FromHours(1))],
+            ["StringValue", "new Test String"],
+            ["WStringValue", "new Test WString"],
+            ["EnumValue1", TestEnum.Third, (int)TestEnum.Third],
+            ["EnumValue2", (short)TestEnum.Third, (int)TestEnum.Third],
+            ["EnumValue3", (int)TestEnum.Third],
+        ];
 
     private static IEnumerable<object[]> WriteTestDataExtended
-        => new List<object[]>()
-        {
-            new object[]
-            {
+        =>
+        [
+            [
                 "IntArray",
                 new short[] { 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010 },
-            },
-            new object[]
-            {
+            ],
+            [
                 "MultiDimensionArray",
                 new short[,,]
                 {
@@ -74,14 +72,12 @@ public abstract class IWriteValueTestBase
                         { 21000, 22000, 23000, 24000 },
                     },
                 },
-            },
-            new object[]
-            {
+            ],
+            [
                 "ComplexArray",
                 new DUT_TestStruct2[] { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
-            },
-            new object[]
-            {
+            ],
+            [
                 "MultiDimensionComplexArray",
                 new DUT_TestStruct2[,,]
                 {
@@ -96,12 +92,12 @@ public abstract class IWriteValueTestBase
                         { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
                     },
                 },
-            },
-            new object[] { "StructValue1", DUT_TestStruct.Write },
-            new object[] { "StructValue2", DUT_TestClass.Write },
-            new object[] { "Nested1", DUT_TestStruct2.Write },
-            new object[] { "Nested2", DUT_TestClass2.Write },
-        };
+            ],
+            ["StructValue1", DUT_TestStruct.Write],
+            ["StructValue2", DUT_TestClass.Write],
+            ["Nested1", DUT_TestStruct2.Write],
+            ["Nested2", DUT_TestClass2.Write],
+        ];
 
     [TestMethod]
     public void ToggleBool()

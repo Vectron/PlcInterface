@@ -19,7 +19,7 @@ internal sealed class PlcToggleCommand(string name, IReadWrite readWrite) : ICon
     public const string Parameter = "toggle";
 
     /// <inheritdoc/>
-    public string[]? ArgumentNames => new[] { "tag" };
+    public string[]? ArgumentNames => ["tag"];
 
     /// <inheritdoc/>
     public string[] CommandParameters { get; } = [name, Parameter];

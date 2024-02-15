@@ -50,7 +50,7 @@ internal sealed partial class TreeBrowser : Browser
 
         if (nodesToBrowse.Count <= 0)
         {
-            return Enumerable.Empty<ReferenceDescriptionCollection>();
+            return [];
         }
 
         var chunkSize = nodesToBrowse.Count + 1;
@@ -68,7 +68,7 @@ internal sealed partial class TreeBrowser : Browser
                 if (ex.StatusCode is not StatusCodes.BadResponseTooLarge
                     and not StatusCodes.BadEncodingLimitsExceeded)
                 {
-                    return Enumerable.Empty<ReferenceDescriptionCollection>();
+                    return [];
                 }
 
                 var previous = chunkSize;
@@ -230,7 +230,7 @@ internal sealed partial class TreeBrowser : Browser
 
         if (allSymbols.Count <= 0)
         {
-            return Enumerable.Empty<IOpcSymbolInfo>();
+            return [];
         }
 
         return allSymbols.Concat(BrowseRecursive(allSymbols, rootName));

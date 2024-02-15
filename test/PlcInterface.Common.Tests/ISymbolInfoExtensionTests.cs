@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -15,19 +14,19 @@ public class ISymbolInfoExtensionTests
         // Arrange
         var symbolInfo = new Mock<ISymbolInfo>();
         _ = symbolInfo.SetupGet(x => x.Name).Returns("FlattenObject");
-        _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.BoolValue", "FlattenObject.IntValue", "FlattenObject.ChildArray" });
+        _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(["FlattenObject.BoolValue", "FlattenObject.IntValue", "FlattenObject.ChildArray"]);
         var symbolHandler = new Mock<ISymbolHandler>();
         _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns<string>(s =>
         {
             var symbolInfo = new Mock<ISymbolInfo>();
-            _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>());
+            _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns([]);
             _ = symbolInfo.SetupGet(x => x.Name).Returns(s);
             var splitName = s.Split('.');
             _ = symbolInfo.SetupGet(x => x.ShortName).Returns(splitName[splitName.Length - 1]);
 
             if (s.Equals("FlattenObject.ChildArray", StringComparison.Ordinal))
             {
-                _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.ChildArray[0]", "FlattenObject.ChildArray[1]", "FlattenObject.ChildArray[2]", "FlattenObject.ChildArray[3]" });
+                _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(["FlattenObject.ChildArray[0]", "FlattenObject.ChildArray[1]", "FlattenObject.ChildArray[2]", "FlattenObject.ChildArray[3]"]);
             }
 
             return symbolInfo.Object;
@@ -52,7 +51,7 @@ public class ISymbolInfoExtensionTests
         // Arrange
         var symbolInfo = new Mock<ISymbolInfo>();
         _ = symbolInfo.SetupGet(x => x.Name).Returns("FlattenObject");
-        _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>());
+        _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns([]);
         var symbolHandler = new Mock<ISymbolHandler>();
 
         // Act
@@ -69,19 +68,19 @@ public class ISymbolInfoExtensionTests
         // Arrange
         var symbolInfo = new Mock<ISymbolInfo>();
         _ = symbolInfo.SetupGet(x => x.Name).Returns("FlattenObject");
-        _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.BoolValue", "FlattenObject.IntValue", "FlattenObject.ChildArray" });
+        _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(["FlattenObject.BoolValue", "FlattenObject.IntValue", "FlattenObject.ChildArray"]);
         var symbolHandler = new Mock<ISymbolHandler>();
         _ = symbolHandler.Setup(x => x.GetSymbolInfo(It.IsAny<string>())).Returns<string>(s =>
         {
             var symbolInfo = new Mock<ISymbolInfo>();
-            _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>());
+            _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns([]);
             _ = symbolInfo.SetupGet(x => x.Name).Returns(s);
             var splitName = s.Split('.');
             _ = symbolInfo.SetupGet(x => x.ShortName).Returns(splitName[splitName.Length - 1]);
 
             if (s.Equals("FlattenObject.ChildArray", StringComparison.Ordinal))
             {
-                _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>() { "FlattenObject.ChildArray[0]", "FlattenObject.ChildArray[1]", "FlattenObject.ChildArray[2]", "FlattenObject.ChildArray[3]" });
+                _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(["FlattenObject.ChildArray[0]", "FlattenObject.ChildArray[1]", "FlattenObject.ChildArray[2]", "FlattenObject.ChildArray[3]"]);
             }
 
             return symbolInfo.Object;
@@ -115,7 +114,7 @@ public class ISymbolInfoExtensionTests
         var ioName = "FlattenObject";
         var symbolInfo = new Mock<ISymbolInfo>();
         _ = symbolInfo.SetupGet(x => x.Name).Returns(ioName);
-        _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns(new List<string>());
+        _ = symbolInfo.SetupGet(x => x.ChildSymbols).Returns([]);
         var symbolHandler = new Mock<ISymbolHandler>();
         var data = new FlattenObject() { BoolValue = true, IntValue = 5 };
 

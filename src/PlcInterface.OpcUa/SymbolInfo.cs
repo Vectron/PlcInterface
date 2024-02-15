@@ -29,7 +29,7 @@ internal sealed class SymbolInfo : IOpcSymbolInfo
         this.nodeInfo = nodeInfo;
         NameLower = Name.ToLower(CultureInfo.InvariantCulture);
         ShortName = Name[(Name.LastIndexOf(".", StringComparison.OrdinalIgnoreCase) + 1)..];
-        ChildSymbols = new List<string>();
+        ChildSymbols = [];
         IsBigType = symbol.NodeClass is NodeClass.Object or NodeClass.ObjectType;
         Indices = IndicesHelper.GetIndices(Name);
         arrayBounds = new Lazy<int[]>(CalculateBounds, isThreadSafe: false);

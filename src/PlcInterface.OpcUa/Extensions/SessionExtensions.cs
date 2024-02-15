@@ -63,7 +63,7 @@ internal static partial class SessionExtensions
         var nodesToRead = new ReadValueIdCollection(nodeIds.SelectMany(GetReadValueIds));
         if (nodesToRead.Count <= 0)
         {
-            return Enumerable.Empty<NodeInfo>();
+            return [];
         }
 
         var chunkSize = nodesToRead.Count / 3;
@@ -80,7 +80,7 @@ internal static partial class SessionExtensions
             {
                 if (ex.StatusCode != StatusCodes.BadEncodingLimitsExceeded)
                 {
-                    return Enumerable.Empty<NodeInfo>();
+                    return [];
                 }
 
                 var previous = chunkSize;

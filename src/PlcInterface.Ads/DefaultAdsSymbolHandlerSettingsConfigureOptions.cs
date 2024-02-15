@@ -12,5 +12,6 @@ public class DefaultAdsSymbolHandlerSettingsConfigureOptions : IConfigureOptions
     {
         options.OutputPath = string.Empty;
         options.StoreSymbolsToDisk = false;
+        options.RootVariable = string.Empty;
     }
 }

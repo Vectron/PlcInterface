@@ -6,22 +6,17 @@ namespace PlcInterface.Ads;
 public class AdsSymbolHandlerOptions
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="AdsSymbolHandlerOptions"/> class.
-    /// </summary>
-    public AdsSymbolHandlerOptions()
-    {
-        OutputPath = string.Empty;
-        StoreSymbolsToDisk = false;
-    }
-
-    /// <summary>
     /// Gets or sets path where to store the found symbols.
     /// </summary>
-    public string OutputPath
-    {
-        get;
-        set;
-    }
+    public string OutputPath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the path to the root node.
+    /// </summary>
+    /// <remarks>
+    /// Sub items are separated by a '.'.
+    /// </remarks>
+    public string RootVariable { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets a value indicating whether the symbol list should be written to disk.

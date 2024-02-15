@@ -12,12 +12,13 @@ namespace PlcInterface.Ads;
 /// Initializes a new instance of the <see cref="SymbolInfo"/> class.
 /// </remarks>
 /// <param name="symbol">The plc symbol.</param>
+/// <param name="rootPath">The root path of the symbol tree.</param>
 [DebuggerDisplay("{Name}")]
-internal sealed class SymbolInfo(ISymbol symbol) : IAdsSymbolInfo
+internal sealed class SymbolInfo(ISymbol symbol, string rootPath) : IAdsSymbolInfo
 {
     /// <inheritdoc/>
     public IList<string> ChildSymbols
-        => Symbol.SubSymbols.Select(x => x.InstancePath).ToList();
+        => Symbol.SubSymbols.Select(x => CleanInstancePath(x, rootPath)).ToList();
 
     /// <inheritdoc/>
     public string Comment
@@ -32,8 +33,7 @@ internal sealed class SymbolInfo(ISymbol symbol) : IAdsSymbolInfo
         => Symbol.DataType?.Category == DataTypeCategory.Struct;
 
     /// <inheritdoc/>
-    public string Name
-        => Symbol.InstancePath;
+    public string Name { get; } = CleanInstancePath(symbol, rootPath);
 
     /// <inheritdoc/>
     public string NameLower
@@ -45,4 +45,16 @@ internal sealed class SymbolInfo(ISymbol symbol) : IAdsSymbolInfo
 
     /// <inheritdoc/>
     public ISymbol Symbol => symbol;
+
+    private static string CleanInstancePath(ISymbol symbol, string rootPath)
+    {
+        if (string.IsNullOrEmpty(rootPath))
+        {
+            return symbol.InstancePath;
+        }
+
+        return symbol.InstancePath
+            .Replace(rootPath, string.Empty, System.StringComparison.OrdinalIgnoreCase)
+            .Trim('.');
+    }
 }

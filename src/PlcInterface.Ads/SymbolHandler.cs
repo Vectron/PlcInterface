@@ -150,9 +150,13 @@ public partial class SymbolHandler : IAdsSymbolHandler, IDisposable
             };
 
             var symbolLoader = symbolLoaderFactory.Create(client, symbolLoaderSettings);
+            var rootSymbolPart = options.RootVariable.Split('.').FirstOrDefault() ?? string.Empty;
+
             allSymbols = symbolLoader.Symbols
+                .Where(x => x.InstancePath.StartsWith(rootSymbolPart, StringComparison.OrdinalIgnoreCase))
                 .DepthFirstTreeTraversal(x => x.SubSymbols)
-                .Select(x => new SymbolInfo(x))
+                .Where(x => x.InstancePath.StartsWith(options.RootVariable, StringComparison.OrdinalIgnoreCase))
+                .Select(x => new SymbolInfo(x, options.RootVariable))
                 .Cast<IAdsSymbolInfo>()
                 .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
             LogSymbolsUpdated(watch.ElapsedMilliseconds, allSymbols.Count);

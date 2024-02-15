@@ -15,11 +15,6 @@ namespace PlcInterface.IntegrationTests;
 [DoNotParallelize]
 public abstract class IWriteValueTestBase
 {
-    protected abstract string DataRoot
-    {
-        get;
-    }
-
     private static IEnumerable<object[]> WriteTestData
         => new List<object[]>()
         {
@@ -116,7 +111,7 @@ public abstract class IWriteValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.WriteTestData.ToggleBool";
+        var ioName = "WriteTestData.ToggleBool";
 
         // Act
         var connected = connection.Connect();
@@ -170,7 +165,7 @@ public abstract class IWriteValueTestBase
         var writeData = WriteTestData
             .Concat(WriteTestDataExtended)
             .ToDictionary(
-                kv => $"{DataRoot}.WriteTestData.{nameof(WriteMultipleUpdatesTheValueInPlc)}.{kv[0]}",
+                kv => $"WriteTestData.{nameof(WriteMultipleUpdatesTheValueInPlc)}.{kv[0]}",
                 kv => kv[1],
                 StringComparer.Ordinal);
 
@@ -222,7 +217,7 @@ public abstract class IWriteValueTestBase
         var writeData = WriteTestData
             .Concat(WriteTestDataExtended)
             .ToDictionary(
-                kv => $"{DataRoot}.WriteTestData.{nameof(WriteMultipleUpdatesTheValueInPlcAsync)}.{kv[0]}",
+                kv => $"WriteTestData.{nameof(WriteMultipleUpdatesTheValueInPlcAsync)}.{kv[0]}",
                 kv => kv[1],
                 StringComparer.Ordinal);
 
@@ -273,7 +268,7 @@ public abstract class IWriteValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.WriteTestData.{nameof(WriteUpdatesTheValueInPlc)}.{itemName}";
+        var ioName = $"WriteTestData.{nameof(WriteUpdatesTheValueInPlc)}.{itemName}";
 
         // Act
         Assert.IsTrue(connection.Connect());
@@ -297,7 +292,7 @@ public abstract class IWriteValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.WriteTestData.{nameof(WriteUpdatesTheValueInPlcAsync)}.{itemName}";
+        var ioName = $"WriteTestData.{nameof(WriteUpdatesTheValueInPlcAsync)}.{itemName}";
 
         // Act
         Assert.IsTrue(connection.Connect());
@@ -311,11 +306,9 @@ public abstract class IWriteValueTestBase
         Assert.That.ObjectEquals(readValue ?? newValue, newValueRead, ioName);
     }
 
-    protected abstract IServiceProvider GetServiceProvider();
-
-    protected void ResetPLCValues(IReadWrite readWrite, string fieldName, [CallerMemberName] string memberName = "")
+    protected static void ResetPLCValues(IReadWrite readWrite, string fieldName, [CallerMemberName] string memberName = "")
     {
-        var ioName = $"{DataRoot}.WriteTestData.{memberName}.{fieldName}Reset";
+        var ioName = $"WriteTestData.{memberName}.{fieldName}Reset";
         readWrite.Write(ioName, value: true);
         var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
         while (readWrite.Read<bool>(ioName))
@@ -323,6 +316,8 @@ public abstract class IWriteValueTestBase
             cts.Token.ThrowIfCancellationRequested();
         }
     }
+
+    protected abstract IServiceProvider GetServiceProvider();
 
     protected void WriteValueGenericHelper<T1, T2>(string itemName, T1 newValue, T2 readValue, [CallerMemberName] string memberName = "")
         where T1 : notnull
@@ -333,7 +328,7 @@ public abstract class IWriteValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.WriteTestData.{memberName}.{itemName}";
+        var ioName = $"WriteTestData.{memberName}.{itemName}";
 
         // Act
         var connected = connection.Connect();
@@ -364,7 +359,7 @@ public abstract class IWriteValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.WriteTestData.{memberName}.{itemName}";
+        var ioName = $"WriteTestData.{memberName}.{itemName}";
 
         // Act
         var connected = connection.Connect();

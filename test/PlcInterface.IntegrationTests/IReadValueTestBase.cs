@@ -13,11 +13,6 @@ namespace PlcInterface.IntegrationTests;
 
 public abstract class IReadValueTestBase
 {
-    protected abstract string DataRoot
-    {
-        get;
-    }
-
     private static IEnumerable<object[]> ReadTestData
         => new List<object[]>()
         {
@@ -154,7 +149,7 @@ public abstract class IReadValueTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         var expected = DUT_TestStruct.Default;
-        var ioName = $"{DataRoot}.ReadTestData.{nameof(ReadDynamicReadsAStructure)}";
+        var ioName = $"ReadTestData.{nameof(ReadDynamicReadsAStructure)}";
 
         // Act
         var connected = connection.Connect();
@@ -174,7 +169,7 @@ public abstract class IReadValueTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         var expected = DUT_TestStruct.Default;
-        var ioName = $"{DataRoot}.ReadTestData.{nameof(ReadDynamicReadsAStructureAsync)}";
+        var ioName = $"ReadTestData.{nameof(ReadDynamicReadsAStructureAsync)}";
 
         // Act
         var connected = connection.Connect();
@@ -224,7 +219,7 @@ public abstract class IReadValueTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         var data = ReadTestData.Concat(ReadTestDataExtended).ToDictionary(
-            kv => $"{DataRoot}.ReadTestData.{nameof(ReadMultipleItemsInOneTransaction)}.{kv[0]}",
+            kv => $"ReadTestData.{nameof(ReadMultipleItemsInOneTransaction)}.{kv[0]}",
             kv => kv[1],
             StringComparer.Ordinal);
 
@@ -259,7 +254,7 @@ public abstract class IReadValueTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         var data = ReadTestData.Concat(ReadTestDataExtended).ToDictionary(
-            kv => $"{DataRoot}.ReadTestData.{nameof(ReadMultipleItemsInOneTransactionAsync)}.{kv[0]}",
+            kv => $"ReadTestData.{nameof(ReadMultipleItemsInOneTransactionAsync)}.{kv[0]}",
             kv => kv[1],
             StringComparer.Ordinal);
 
@@ -295,7 +290,7 @@ public abstract class IReadValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.ReadTestData.{nameof(ReadValueReturnsTheExpectedValue)}.{itemName}";
+        var ioName = $"ReadTestData.{nameof(ReadValueReturnsTheExpectedValue)}.{itemName}";
 
         // Act
         Assert.IsTrue(connection.Connect());
@@ -315,7 +310,7 @@ public abstract class IReadValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.ReadTestData.{nameof(ReadValueReturnsTheExpectedValueAsync)}.{itemName}";
+        var ioName = $"ReadTestData.{nameof(ReadValueReturnsTheExpectedValueAsync)}.{itemName}";
 
         // Act
         var connected = connection.Connect();
@@ -334,7 +329,7 @@ public abstract class IReadValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.ReadTestData.{nameof(WaitForValueThrowsExceptionOnTimeout)}";
+        var ioName = $"ReadTestData.{nameof(WaitForValueThrowsExceptionOnTimeout)}";
 
         // Act assert
         var connected = connection.Connect();
@@ -350,7 +345,7 @@ public abstract class IReadValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.ReadTestData.{nameof(WaitForValueThrowsExceptionOnTimeoutAsync)}";
+        var ioName = $"ReadTestData.{nameof(WaitForValueThrowsExceptionOnTimeoutAsync)}";
 
         // Act Assert
         var connected = connection.Connect();
@@ -393,7 +388,7 @@ public abstract class IReadValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.ReadTestData.{memberName}.{itemName}";
+        var ioName = $"ReadTestData.{memberName}.{itemName}";
 
         // Act
         var connected = connection.Connect();
@@ -413,7 +408,7 @@ public abstract class IReadValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.ReadTestData.{memberName}.{itemName}";
+        var ioName = $"ReadTestData.{memberName}.{itemName}";
 
         // Act
         var connected = connection.Connect();
@@ -434,7 +429,7 @@ public abstract class IReadValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.ReadTestData.{memberName}.{itemName}";
+        var ioName = $"ReadTestData.{memberName}.{itemName}";
 
         // Act
         var connected = connection.Connect();
@@ -452,7 +447,7 @@ public abstract class IReadValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"{DataRoot}.ReadTestData.{memberName}.{itemName}";
+        var ioName = $"ReadTestData.{memberName}.{itemName}";
 
         // Act
         var connected = connection.Connect();

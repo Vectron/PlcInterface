@@ -8,9 +8,9 @@ internal static class Settings
     public static string AmsNetId
         => "172.105.0.1.1.1";
 
-    public static string DataRoot
-        => $"AdsNet{Environment.Version.Major.ToString(CultureInfo.InvariantCulture)}";
-
     public static int Port
         => 851;
+
+    public static string RootVariable
+        => $"AdsNet{Environment.Version.Major.ToString(CultureInfo.InvariantCulture)}";
 }

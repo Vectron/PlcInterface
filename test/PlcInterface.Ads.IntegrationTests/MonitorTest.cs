@@ -10,8 +10,6 @@ namespace PlcInterface.Ads.IntegrationTests;
 [TestClass]
 public class MonitorTest : IMonitorTestBase
 {
-    protected override string DataRoot => Settings.DataRoot;
-
     protected override ServiceProvider GetServiceProvider()
     {
         var services = new ServiceCollection()
@@ -21,7 +19,11 @@ public class MonitorTest : IMonitorTestBase
                 o.AmsNetId = Settings.AmsNetId;
                 o.Port = Settings.Port;
             })
-            .Configure<AdsSymbolHandlerOptions>(o => o.StoreSymbolsToDisk = false);
+            .Configure<AdsSymbolHandlerOptions>(o =>
+            {
+                o.StoreSymbolsToDisk = false;
+                o.RootVariable = Settings.RootVariable;
+            });
 
         services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(NullLogger<>)));
 

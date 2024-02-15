@@ -6,11 +6,6 @@ namespace PlcInterface.IntegrationTests;
 
 public abstract class ISymbolHandlerTestBase
 {
-    protected abstract string DataRoot
-    {
-        get;
-    }
-
     [TestMethod]
     public void GetSymbolInfoReturnsTheSymbol()
     {
@@ -19,7 +14,7 @@ public abstract class ISymbolHandlerTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var symbolHandler = serviceProvider.GetRequiredService<ISymbolHandler>();
-        var ioName = $"{DataRoot}.SymbolTestData.{nameof(GetSymbolInfoReturnsTheSymbol)}";
+        var ioName = $"SymbolTestData.{nameof(GetSymbolInfoReturnsTheSymbol)}";
 
         // Act
         var connected = connection.Connect();
@@ -77,7 +72,7 @@ public abstract class ISymbolHandlerTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var symbolHandler = serviceProvider.GetRequiredService<ISymbolHandler>();
-        var ioName = $"{DataRoot}.SymbolTestData.{nameof(TryGetSymbolInfoReturnsTrueWithValidData)}";
+        var ioName = $"SymbolTestData.{nameof(TryGetSymbolInfoReturnsTrueWithValidData)}";
 
         // Act
         var connected = connection.Connect();

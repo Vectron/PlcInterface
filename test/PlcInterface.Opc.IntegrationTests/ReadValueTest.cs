@@ -12,8 +12,6 @@ namespace PlcInterface.Opc.IntegrationTests;
 [DoNotParallelize]
 public sealed class ReadValueTest : IReadValueTestBase
 {
-    protected override string DataRoot => Settings.DataRoot;
-
     protected override ServiceProvider GetServiceProvider()
     {
         var services = new ServiceCollection()

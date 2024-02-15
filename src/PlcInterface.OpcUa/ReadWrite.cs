@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Opc.Ua;
 
 namespace PlcInterface.OpcUa;
@@ -19,12 +18,9 @@ namespace PlcInterface.OpcUa;
 /// <param name="connection">A <see cref="IPlcConnection{T}"/> implementation.</param>
 /// <param name="symbolHandler">A <see cref="ISymbolHandler"/> implementation.</param>
 /// <param name="typeConverter">A <see cref="ITypeConverter"/> implementation.</param>
-/// <param name="logger">A <see cref="ILogger"/> implementation.</param>
-public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHandler, IOpcTypeConverter typeConverter, ILogger<ReadWrite> logger) : IOpcReadWrite, IDisposable
+public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHandler, IOpcTypeConverter typeConverter) : IOpcReadWrite, IDisposable
 {
     private readonly CompositeDisposable disposables = [];
-
-    private readonly ILogger logger = logger;
     private bool disposedValue;
 
     /// <inheritdoc/>

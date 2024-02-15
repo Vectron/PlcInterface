@@ -264,7 +264,7 @@ public partial class Monitor : IOpcMonitor, IDisposable
                     if (x.Sender?.Handle is IOpcSymbolInfo s
                     && x.EventArgs.NotificationValue is MonitoredItemNotification monitoredItemNotification)
                     {
-                        return new MonitorResult(s.Name, typeConverter.Convert(monitoredItemNotification.Value.Value));
+                        return new MonitorResult(s.Name, typeConverter.Convert(s.Name, monitoredItemNotification.Value.Value));
                     }
 
                     return null;

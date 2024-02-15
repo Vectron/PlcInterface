@@ -54,4 +54,12 @@ public interface IOpcSymbolInfo : ISymbolInfo
     {
         get;
     }
+
+    /// <summary>
+    /// Gets the display name of the type.
+    /// </summary>
+    string TypeName
+    {
+        get;
+    }
 }

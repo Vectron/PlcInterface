@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading;
@@ -77,7 +76,7 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
         var session = connection.GetConnectedClient();
         var readResponse = session.ReadValue(symbol.Handle);
         ValidateDataValue(ioName, readResponse);
-        return typeConverter.Convert(readResponse.Value);
+        return typeConverter.Convert(ioName, readResponse.Value);
     }
 
     /// <inheritdoc/>
@@ -119,7 +118,7 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
             .ConfigureAwait(false);
         ValidateDataValue(ioName, readResponse);
 
-        return typeConverter.Convert(readResponse.Value);
+        return typeConverter.Convert(ioName, readResponse.Value);
     }
 
     /// <inheritdoc/>
@@ -162,7 +161,7 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
             {
                 NodeId = x.Item1.Handle,
                 AttributeId = Attributes.Value,
-                Value = new DataValue(ConvertToOpcType(x.Value, x.Item1.BuiltInType)),
+                Value = new DataValue(typeConverter.CreateOpcVariant(x.Item1.Name, x.Value)),
             });
 
         var nodesToWrite = new WriteValueCollection(query);
@@ -193,7 +192,7 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
              {
                  NodeId = x.Item1.Handle,
                  AttributeId = Attributes.Value,
-                 Value = new DataValue(ConvertToOpcType(x.Value, x.Item1.BuiltInType)),
+                 Value = new DataValue(typeConverter.CreateOpcVariant(x.Item1, x.Value)),
              });
 
         var nodesToWrite = new WriteValueCollection(query);
@@ -227,67 +226,6 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
 
             disposedValue = true;
         }
-    }
-
-    private static Variant ConvertToOpcType(object value, BuiltInType builtInType)
-    {
-        if (value is DateTimeOffset dateTimeOffset)
-        {
-            // Mark it as UTC time so OPC lib won't try and convert it.
-            return new Variant(DateTime.SpecifyKind(dateTimeOffset.LocalDateTime, DateTimeKind.Utc));
-        }
-
-        if (value is DateTime dateTime)
-        {
-            // Mark it as UTC time so OPC lib won't try and convert it.
-            return new Variant(DateTime.SpecifyKind(dateTime, DateTimeKind.Utc));
-        }
-
-        if (builtInType == BuiltInType.Enumeration)
-        {
-            return new Variant(Convert.ToInt32(value, CultureInfo.InvariantCulture));
-        }
-
-        if (value is TimeSpan timeSpan)
-        {
-            var ticks = timeSpan.Ticks * 100;
-            return builtInType switch
-            {
-                BuiltInType.Int32 => new Variant(timeSpan.TotalMilliseconds),
-                BuiltInType.UInt32 => new Variant((uint)timeSpan.TotalMilliseconds),
-                BuiltInType.Int64 => new Variant(ticks),
-                BuiltInType.UInt64 => new Variant((ulong)ticks),
-                BuiltInType.Float => new Variant((float)timeSpan.TotalSeconds),
-                BuiltInType.Double => new Variant(timeSpan.TotalSeconds),
-                BuiltInType.Null => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.Boolean => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.SByte => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.Byte => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.Int16 => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.UInt16 => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.String => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.DateTime => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.Guid => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.ByteString => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.XmlElement => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.NodeId => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.ExpandedNodeId => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.StatusCode => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.QualifiedName => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.LocalizedText => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.ExtensionObject => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.DataValue => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.Variant => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.DiagnosticInfo => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.Number => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.Integer => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.UInteger => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                BuiltInType.Enumeration => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-                _ => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {builtInType}"),
-            };
-        }
-
-        return new Variant(value);
     }
 
     private static void ValidateDataValue(string ioName, DataValue readResponse)

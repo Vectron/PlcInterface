@@ -96,6 +96,10 @@ internal sealed class SymbolInfo : IOpcSymbolInfo
         get;
     }
 
+    /// <inheritdoc/>
+    public string TypeName
+        => nodeInfo.DataTypeDisplayText;
+
     private int[] CalculateBounds()
     {
         if (ChildSymbols.Count == 0)

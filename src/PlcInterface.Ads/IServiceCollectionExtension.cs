@@ -3,10 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PlcInterface.Ads.TwinCATAbstractions;
 
-#pragma warning disable IDE0130 // Namespace does not match folder structure
-
 namespace PlcInterface.Ads;
-#pragma warning restore IDE0130 // Namespace does not match folder structure
 
 /// <summary>
 /// Extension methods for <see cref="IServiceCollection"/>.

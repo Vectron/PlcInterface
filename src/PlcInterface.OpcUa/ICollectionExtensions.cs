@@ -2,10 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-#pragma warning disable IDE0130 // Namespace does not match folder structure
-
 namespace PlcInterface.OpcUa;
-#pragma warning restore IDE0130 // Namespace does not match folder structure
 
 /// <summary>
 /// Extension methods for <see cref="ICollection{T}"/>.

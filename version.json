@@ -4,8 +4,8 @@
   "publicReleaseRefSpec": [
     "^refs/tags/v\\d+\\.\\d+"
   ],
-  "pathFilters": [
-    "."
-  ],
+  "release": {
+    "tagName": "v{version}"
+  },
   "inherit": false
 }

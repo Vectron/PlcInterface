@@ -18,10 +18,10 @@ internal static class ICollectionExtensions
     public static IReadOnlyCollection<T> AsReadOnly<T>(this ICollection<T> source)
     {
         ArgumentNullException.ThrowIfNull(source);
-        return source as IReadOnlyCollection<T> ?? new ReadOnlyCollectionAdapter<T>(source);
+        return source as IReadOnlyCollection<T> ?? new ReadOnlyCollection<T>(source);
     }
 
-    private sealed class ReadOnlyCollectionAdapter<T>(ICollection<T> source) : IReadOnlyCollection<T>
+    private sealed class ReadOnlyCollection<T>(ICollection<T> source) : IReadOnlyCollection<T>
     {
         public int Count => source.Count;
 

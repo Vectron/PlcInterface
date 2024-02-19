@@ -60,7 +60,8 @@ internal sealed class PlcReadCommand(string name, IReadWrite readWrite) : IConso
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to read {symbolName} ({ex.Message})");
+            var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+            Console.WriteLine($"Failed to read {symbolName} ({message})");
         }
     }
 

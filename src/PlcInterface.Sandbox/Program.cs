@@ -84,7 +84,8 @@ internal static class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+            Console.WriteLine(message);
             System.Diagnostics.Debugger.Break();
         }
     }

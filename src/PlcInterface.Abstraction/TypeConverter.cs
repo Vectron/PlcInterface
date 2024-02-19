@@ -125,7 +125,7 @@ public abstract class TypeConverter : ITypeConverter
         foreach (var indices in IndicesHelper.GetIndices(destination))
         {
             var dynamicValue = expandArray.GetValue(indices)
-                ?? throw new SymbolException($"No value found at index: {indices}");
+                ?? throw new SymbolException($"No value found at index: {string.Join(';', indices)}");
             destination.SetValue(Convert(dynamicValue, elementType), indices);
         }
 

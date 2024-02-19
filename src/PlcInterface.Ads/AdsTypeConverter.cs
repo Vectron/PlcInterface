@@ -74,7 +74,7 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
         {
             if (!valueObject.TryGetIndexValue(indices, out var memberValue))
             {
-                throw new SymbolException($"No value found at index {indices}");
+                throw new SymbolException($"No value found at index {string.Join(';', indices)}");
             }
 
             destination.SetValue(Convert(memberValue, elementType), indices);

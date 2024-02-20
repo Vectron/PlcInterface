@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using TwinCAT.TypeSystem;
 
 namespace PlcInterface.Ads;
@@ -54,7 +52,7 @@ internal sealed class SymbolInfo(ISymbol symbol, string rootPath) : IAdsSymbolIn
         }
 
         return symbol.InstancePath
-            .Replace(rootPath, string.Empty, System.StringComparison.OrdinalIgnoreCase)
+            .Replace(rootPath, string.Empty, StringComparison.OrdinalIgnoreCase)
             .Trim('.');
     }
 }

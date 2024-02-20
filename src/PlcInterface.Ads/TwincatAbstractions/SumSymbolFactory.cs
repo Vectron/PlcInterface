@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using TwinCAT.Ads;
 using TwinCAT.TypeSystem;
 

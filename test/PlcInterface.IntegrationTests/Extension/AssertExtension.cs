@@ -264,7 +264,7 @@ internal static class AssertExtension
             Assert.Fail("Unknown type");
         }
 
-        if (expectedValue is System.TimeSpan timeSpan)
+        if (expectedValue is TimeSpan timeSpan)
         {
             Assert.AreEqual(timeSpan, value, message);
             return;
@@ -342,7 +342,7 @@ internal static class AssertExtension
             return;
         }
 
-        if (expectedValue is System.TimeSpan timeSpan)
+        if (expectedValue is TimeSpan timeSpan)
         {
             Assert.AreNotEqual(timeSpan, value, message);
             return;

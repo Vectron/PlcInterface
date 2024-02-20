@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 
 namespace PlcInterface.Ads.IntegrationTests;

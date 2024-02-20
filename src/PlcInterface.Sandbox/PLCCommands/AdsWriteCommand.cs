@@ -1,4 +1,3 @@
-using System;
 using PlcInterface.Ads;
 using TwinCAT.TypeSystem;
 

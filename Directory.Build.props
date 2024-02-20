@@ -4,6 +4,7 @@
     <LangVersion>default</LangVersion>
     <Deterministic>true</Deterministic>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors></WarningsAsErrors>
     <WarningsNotAsErrors>MA0026</WarningsNotAsErrors>

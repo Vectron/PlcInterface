@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Opc.Ua;
 
 namespace PlcInterface.OpcUa;

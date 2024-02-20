@@ -1,7 +1,4 @@
-using System;
 using System.Globalization;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PlcInterface;
 

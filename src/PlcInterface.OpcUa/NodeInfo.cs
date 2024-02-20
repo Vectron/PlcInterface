@@ -1,4 +1,3 @@
-using System;
 using Opc.Ua;
 using Opc.Ua.Client;
 

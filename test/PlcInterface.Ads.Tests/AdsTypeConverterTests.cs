@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using System.Dynamic;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TestUtilities;

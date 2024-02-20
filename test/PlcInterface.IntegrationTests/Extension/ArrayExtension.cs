@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using PlcInterface.IntegrationTests.Extension;
 
 namespace PlcInterface.IntegrationTests.Extension;

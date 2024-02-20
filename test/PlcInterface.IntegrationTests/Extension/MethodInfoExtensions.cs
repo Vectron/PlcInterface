@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
-using System.Threading.Tasks;
 
 namespace PlcInterface.IntegrationTests.Extension;
 

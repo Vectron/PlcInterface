@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Vectron.InteractiveConsole.Commands;
 
 namespace PlcInterface.Sandbox.PLCCommands;

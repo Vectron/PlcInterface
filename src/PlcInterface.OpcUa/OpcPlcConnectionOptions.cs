@@ -1,4 +1,3 @@
-using System;
 using Opc.Ua;
 
 namespace PlcInterface.OpcUa;

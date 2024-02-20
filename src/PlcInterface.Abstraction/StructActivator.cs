@@ -1,6 +1,4 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -19,9 +17,9 @@ internal sealed class StructActivator(Type type) : ITypeActivator
     private readonly Activator activator = GetActivator(type);
 
     private readonly PropertyInfo[] properties = type
-            .GetProperties()
-            .Where(x => x.CanWrite)
-            .ToArray();
+        .GetProperties()
+        .Where(x => x.CanWrite)
+        .ToArray();
 
     private delegate object Activator();
 

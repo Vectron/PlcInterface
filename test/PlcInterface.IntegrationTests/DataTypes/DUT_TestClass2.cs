@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace PlcInterface.IntegrationTests.DataTypes;
 
 [StructLayout(LayoutKind.Sequential, Pack = 0)]
-internal sealed class DUT_TestClass2 : System.IEquatable<DUT_TestClass2?>
+internal sealed class DUT_TestClass2 : IEquatable<DUT_TestClass2?>
 {
     public static DUT_TestClass2 Default => new()
     {

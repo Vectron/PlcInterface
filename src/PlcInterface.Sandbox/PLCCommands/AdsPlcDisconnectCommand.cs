@@ -1,4 +1,3 @@
-using System;
 using PlcInterface.Ads;
 using TwinCAT.Ads.TcpRouter;
 using Vectron.InteractiveConsole.Commands;

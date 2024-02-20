@@ -14,7 +14,7 @@ namespace PlcInterface.OpcUa;
 /// </summary>
 public partial class PlcConnection : IOpcPlcConnection, IDisposable
 {
-    private readonly BehaviorSubject<IConnected<ISession>> connectionState = new(Connected.No<ISession>());
+    private readonly BehaviorSubject<ISession?> connectionState = new(value: null);
     private readonly CompositeDisposable disposables = [];
     private readonly ILogger logger;
     private readonly IOptions<OpcPlcConnectionOptions> options;
@@ -44,8 +44,23 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
         => session?.Connected ?? false;
 
     /// <inheritdoc/>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created", Justification = "The receiver is responsible for disposing.")]
     public IObservable<IConnected<ISession>> SessionStream
-        => connectionState.AsObservable();
+        => connectionState.Select(x =>
+        {
+            if (x == null)
+            {
+                return Connected.No<ISession>();
+            }
+
+            if (!x.Connected)
+            {
+                return Connected.No<ISession>();
+            }
+
+            var wrapped = new WrappedSession(x);
+            return Connected.Yes(wrapped);
+        }).AsObservable();
 
     /// <inheritdoc/>
     IObservable<IConnected> IPlcConnection.SessionStream
@@ -107,9 +122,9 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
             disposables.Add(Observable.FromEventPattern(
                  h => session.SessionClosing += h,
                  h => session.SessionClosing -= h)
-                 .Subscribe(_ => connectionState.OnNext(Connected.No<ISession>())));
+                 .Subscribe(_ => connectionState.OnNext(value: null)));
 
-            connectionState.OnNext(Connected.Yes(session));
+            connectionState.OnNext(session);
             return true;
         }
         catch (ServiceResultException ex)
@@ -131,7 +146,7 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
             return;
         }
 
-        connectionState.OnNext(Connected.No<ISession>());
+        connectionState.OnNext(value: null);
         if (session.Connected)
         {
             var closeSessionResponse = await session.CloseSessionAsync(requestHeader: null, deleteSubscriptions: false, CancellationToken.None).ConfigureAwait(false);
@@ -216,7 +231,7 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
 
     private void KeepAliveSubscription(EventPattern<ISession, KeepAliveEventArgs> x)
     {
-        connectionState.OnNext(Connected.No<ISession>());
+        connectionState.OnNext(value: null);
         if (x.Sender == null)
         {
             return;
@@ -273,7 +288,7 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
         sessionReconnectHandler?.Dispose();
         sessionReconnectHandler = null;
         LogConnected(handler.Session.ConfiguredEndpoint);
-        connectionState.OnNext(Connected.Yes(session));
+        connectionState.OnNext(session);
     }
 
     private void SetupCertificateSigning(ApplicationConfiguration applicationConfiguration)

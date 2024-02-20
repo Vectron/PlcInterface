@@ -35,9 +35,7 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
           .Select(x => x.Handle)
           .ToList();
 
-#pragma warning disable IDISP001 // Dispose created
-        var session = connection.GetConnectedClient();
-#pragma warning restore IDISP001 // Dispose created
+        using var session = connection.GetConnectedClient();
         session.ReadValues(nodesToRead, out var values, out var serviceResults);
 
         using var valueEnumerator = values.GetEnumerator() as IEnumerator<DataValue>;
@@ -80,9 +78,7 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
             .Select(x => x.Handle)
             .ToList();
 
-#pragma warning disable IDISP001 // Dispose created
-        var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
-#pragma warning restore IDISP001 // Dispose created
+        using var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
         var (dataValues, serviceResult) = await session.ReadValuesAsync(nodesToRead, CancellationToken.None)
             .ConfigureAwait(false);
 
@@ -102,9 +98,7 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
             return await ReadDynamicAsync(ioName).ConfigureAwait(false);
         }
 
-#pragma warning disable IDISP001 // Dispose created
-        var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
-#pragma warning restore IDISP001 // Dispose created
+        using var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
         var readResponse = await session.ReadValueAsync(symbol.Handle, CancellationToken.None)
             .ConfigureAwait(false);
         ValidateDataValue(ioName, readResponse);
@@ -173,9 +167,7 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
     /// <inheritdoc/>
     public async Task WriteAsync(IDictionary<string, object> namesValues)
     {
-#pragma warning disable IDISP001 // Dispose created
-        var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
-#pragma warning restore IDISP001 // Dispose created
+        using var session = await connection.GetConnectedClientAsync().ConfigureAwait(false);
         var query = namesValues
              .SelectMany(x => symbolHandler.GetSymbolInfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
              .Select(x => (x.SymbolInfo.ConvertAndValidate(), x.Value))

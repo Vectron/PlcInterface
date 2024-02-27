@@ -1,4 +1,4 @@
-﻿name: BuildTestDeploy
+name: BuildTestDeploy
 on:
   workflow_dispatch:
   push:
@@ -34,10 +34,14 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
+      fail-fast: true
     uses: Vectron/GithubWorkflows/.github/workflows/BuildAndTest.yml@main
     with:
       os: ${{ matrix.os }}
-      dotnet_version: 8.0.x
+      dotnet_version: |
+        6.0.x
+        7.0.x
+        8.0.x
       solution_file: PlcInterface.sln
 
   call-deploy:
@@ -47,11 +51,13 @@ jobs:
     uses: Vectron/GithubWorkflows/.github/workflows/DeployNugetGithub.yml@main
     with:
       os: ubuntu-latest
-      dotnet_version: 8.0.x
+      dotnet_version: |
+        6.0.x
+        7.0.x
+        8.0.x
       solution_file: PlcInterface.sln
     secrets:
       NUGET_KEY: ${{ secrets.NUGET_KEY }}
-      
 
   call-release:
     needs: call-build-test

@@ -3,14 +3,13 @@
     <RunConfiguration>
         <MaxCpuCount>0</MaxCpuCount>
         <ResultsDirectory>.\bin\TestResults</ResultsDirectory>
-        <TreatNoTestsAsError>false</TreatNoTestsAsError>
+        <TestSessionTimeout>10000</TestSessionTimeout>
+        <TreatNoTestsAsError>true</TreatNoTestsAsError>
     </RunConfiguration>
 
     <DataCollectionRunSettings>
         <DataCollectors>
-            <DataCollector friendlyName="Code Coverage"
-                           uri="datacollector://Microsoft/CodeCoverage/2.0"
-                           assemblyQualifiedName="Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+            <DataCollector friendlyName="Code Coverage" uri="datacollector://Microsoft/CodeCoverage/2.0" assemblyQualifiedName="Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
                 <Configuration>
                     <CodeCoverage>
                         <ModulePaths>
@@ -45,10 +44,6 @@
             </DataCollector>
 
             <DataCollector friendlyName="blame" enabled="True">
-                <Configuration>
-                    <CollectDump DumpType="Full" />
-                    <CollectDumpOnTestSessionHang TestTimeout="10min" HangDumpType="Full" />
-                </Configuration>
             </DataCollector>
         </DataCollectors>
     </DataCollectionRunSettings>

@@ -53,7 +53,7 @@
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.6.133" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-Beta.*" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="IDisposableAnalyzers" Version="4.0.7" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.146" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.150" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="Meziantou.MSBuild.InternalsVisibleTo" Version="*" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="ErrorProne.NET.CoreAnalyzers" Version="0.6.1-beta.1 " PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <!--<PackageReference Include="ErrorProne.NET.Structs" Version="0.6.1-beta.1 " PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />-->

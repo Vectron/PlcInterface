@@ -25,7 +25,7 @@ internal static class ISymbolInfoExtension
     {
         if (symbolInfo.ChildSymbols.Count == 0)
         {
-            return new[] { (symbolInfo, value) };
+            return [(symbolInfo, value)];
         }
 
         return symbolInfo.ChildSymbols

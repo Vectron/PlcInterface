@@ -116,14 +116,14 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
     /// <inheritdoc/>
     public dynamic ReadDynamic(string ioName)
     {
-        var value = Read(new[] { ioName });
+        var value = Read([ioName]);
         return value.Values.First();
     }
 
     /// <inheritdoc/>
     public async Task<dynamic> ReadDynamicAsync(string ioName)
     {
-        var value = await ReadAsync(new[] { ioName })
+        var value = await ReadAsync([ioName])
             .ConfigureAwait(false);
         return value.Values.First();
     }

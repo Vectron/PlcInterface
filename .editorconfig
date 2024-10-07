@@ -28,6 +28,9 @@ trim_trailing_whitespace = true
 [*.sln]
 indent_style = tab
 
+[*.slnx]
+indent_size = 2
+
 # Visual Studio XML Project Files
 [*.{csproj,vbproj,vcxproj.filters,proj,projitems,shproj}]
 indent_size = 2
@@ -325,6 +328,10 @@ dotnet_naming_style.disallowed_style.required_suffix = ____RULE_VIOLATION____
 dotnet_naming_style.internal_error_style.capitalization  = pascal_case
 dotnet_naming_style.internal_error_style.required_prefix = ____INTERNAL_ERROR____
 dotnet_naming_style.internal_error_style.required_suffix = ____INTERNAL_ERROR____
+# async methods should end with 'Async'
+dotnet_naming_style.async_suffix_style.required_suffix = Async
+dotnet_naming_style.async_suffix_style.word_separator =
+dotnet_naming_style.async_suffix_style.capitalization = pascal_case
 
 ##########################################
 # .NET Design Guideline Field Naming Rules
@@ -416,6 +423,16 @@ dotnet_naming_rule.sanity_check_uncovered_field_case_rule.symbols  = sanity_chec
 dotnet_naming_rule.sanity_check_uncovered_field_case_rule.style    = internal_error_style
 dotnet_naming_rule.sanity_check_uncovered_field_case_rule.severity = error
 
+##########################################
+# Naming rules for fields follow the StyleCop analyzers
+##########################################
+
+dotnet_naming_symbols.async_methods_group.applicable_accessibilities = *
+dotnet_naming_symbols.async_methods_group.applicable_kinds = method
+dotnet_naming_symbols.async_methods_group.required_modifiers = async
+dotnet_naming_rule.async_methods_must_have_async_suffix_rule.symbols = async_methods_group
+dotnet_naming_rule.async_methods_must_have_async_suffix_rule.style = async_suffix_style
+dotnet_naming_rule.async_methods_must_have_async_suffix_rule.severity = error
 
 ##########################################
 # Other Naming Rules
@@ -608,7 +625,7 @@ dotnet_diagnostic.MA0013.severity = none
 # MA0014: Do not raise System.ApplicationException type (same as CA2201)
 dotnet_diagnostic.MA0014.severity = none
 # MA0015: Specify the parameter name in ArgumentException (same as CA2208)
-dotnet_diagnostic.MA0015.severity = none          
+dotnet_diagnostic.MA0015.severity = none
 # MA0016: Prefer using collection abstraction instead of implementation
 dotnet_diagnostic.MA0016.severity = warning
 # MA0017: Abstract types should not have public or internal constructors
@@ -844,7 +861,7 @@ dotnet_diagnostic.MA0125.severity = warning
 dotnet_diagnostic.MA0126.severity = warning
 # MA0127: Use String.Equals instead of is pattern
 dotnet_diagnostic.MA0127.severity = none
-# MA0128: Use 'is' operator instead of SequenceEqual 
+# MA0128: Use 'is' operator instead of SequenceEqual
 dotnet_diagnostic.MA0128.severity = suggestion
 # MA0129: Await task in using statement
 dotnet_diagnostic.MA0129.severity = warning

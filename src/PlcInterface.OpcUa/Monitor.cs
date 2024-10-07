@@ -47,7 +47,7 @@ public partial class Monitor : IOpcMonitor, IDisposable
         sessionStream = connection.SessionStream
             .Where(x => x.IsConnected)
             .Select(x => x.Value)
-            .Select(x => Observable.FromAsync(() => OnSessionConnected(x)))
+            .Select(x => Observable.FromAsync(() => OnSessionConnectedAsync(x)))
             .Concat()
             .Subscribe();
     }
@@ -140,7 +140,7 @@ public partial class Monitor : IOpcMonitor, IDisposable
         }
     }
 
-    private async Task OnSessionConnected(ISession session)
+    private async Task OnSessionConnectedAsync(ISession session)
     {
         LogUpdatingSubscriptions();
         foreach (var keyValue in registeredSymbols)

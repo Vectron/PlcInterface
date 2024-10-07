@@ -7,7 +7,7 @@ namespace PlcInterface.Abstraction.Tests;
 public class IReadWriteExtensionTests
 {
     [TestMethod]
-    public async Task WaitForValueAsyncBlocksUntilValueIsTriggered()
+    public async Task WaitForValueAsyncBlocksUntilValueIsTriggeredAsync()
     {
         // Arrange
         var ioName = "test.var";
@@ -39,24 +39,7 @@ public class IReadWriteExtensionTests
     }
 
     [TestMethod]
-    public async Task WaitForValueIgnoresNullValues()
-    {
-        // Arrange
-        var ioName = "test.var";
-        var result = "test";
-        var readWriteMock = new Mock<IReadWrite>();
-        var counter = 0;
-        _ = readWriteMock.Setup(x => x.ReadAsync<string>(It.Is<string>(x => x.Equals(ioName, StringComparison.Ordinal)))).Returns(() => counter++ == 0 ? Task.FromResult<string>(null!) : Task.FromResult(result));
-
-        // Act
-        await readWriteMock.Object.WaitForValueAsync(ioName, result, TimeSpan.FromMilliseconds(1000));
-
-        // Assert
-        readWriteMock.Verify(x => x.ReadAsync<string>(It.Is<string>(x => x.Equals(ioName, StringComparison.Ordinal))), Times.Exactly(2));
-    }
-
-    [TestMethod]
-    public void WaitForValueIgnoresNullValuesAsync()
+    public void WaitForValueIgnoresNullValues()
     {
         // Arrange
         var ioName = "test.var";
@@ -70,6 +53,23 @@ public class IReadWriteExtensionTests
 
         // Assert
         readWriteMock.Verify(x => x.Read<string>(It.Is<string>(x => x.Equals(ioName, StringComparison.Ordinal))), Times.Exactly(2));
+    }
+
+    [TestMethod]
+    public async Task WaitForValueIgnoresNullValuesAsync()
+    {
+        // Arrange
+        var ioName = "test.var";
+        var result = "test";
+        var readWriteMock = new Mock<IReadWrite>();
+        var counter = 0;
+        _ = readWriteMock.Setup(x => x.ReadAsync<string>(It.Is<string>(x => x.Equals(ioName, StringComparison.Ordinal)))).Returns(() => counter++ == 0 ? Task.FromResult<string>(null!) : Task.FromResult(result));
+
+        // Act
+        await readWriteMock.Object.WaitForValueAsync(ioName, result, TimeSpan.FromMilliseconds(1000));
+
+        // Assert
+        readWriteMock.Verify(x => x.ReadAsync<string>(It.Is<string>(x => x.Equals(ioName, StringComparison.Ordinal))), Times.Exactly(2));
     }
 
     [TestMethod]

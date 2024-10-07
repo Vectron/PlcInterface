@@ -262,7 +262,7 @@ public abstract class IMonitorTestBase
         "IDisposableAnalyzers.Correctness",
         "IDISP017:Prefer using",
         Justification = "We want to specifically dispose the subscription")]
-    public async Task SubscriptionsWillAllTriggerOnUpdate()
+    public async Task SubscriptionsWillAllTriggerOnUpdateAsync()
     {
         // Arrange
         var serviceProvider = GetServiceProvider();
@@ -270,7 +270,7 @@ public abstract class IMonitorTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var monitor = serviceProvider.GetRequiredService<IMonitor>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var ioName = $"MonitorTestData.{nameof(SubscriptionsWillAllTriggerOnUpdate)}";
+        var ioName = $"MonitorTestData.{nameof(SubscriptionsWillAllTriggerOnUpdateAsync)}";
         var results = new List<bool>();
 
         // Act

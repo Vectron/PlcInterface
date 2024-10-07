@@ -192,7 +192,7 @@ public class PlcConnectionTests
     }
 
     [TestMethod]
-    public async Task IfAutoConnectIsTrueConnectionIsMadeImmediately()
+    public async Task IfAutoConnectIsTrueConnectionIsMadeImmediatelyAsync()
     {
         // Arrange
         var settings = new AdsPlcConnectionOptions()

@@ -202,7 +202,7 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP004:Don't ignore created IDisposable", Justification = "already marked for disposing.")]
-    private async Task CreateCertificate(ApplicationConfiguration applicationConfiguration)
+    private async Task CreateCertificateAsync(ApplicationConfiguration applicationConfiguration)
     {
         var applicationCertificate = applicationConfiguration.SecurityConfiguration.ApplicationCertificate;
         LogCreateCertificate(applicationConfiguration.ApplicationName);
@@ -339,7 +339,7 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
             return false;
         }
 
-        await CreateCertificate(config).ConfigureAwait(false);
+        await CreateCertificateAsync(config).ConfigureAwait(false);
         UpdateApplicationUri(config);
         return true;
     }

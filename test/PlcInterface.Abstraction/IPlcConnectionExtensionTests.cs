@@ -8,7 +8,7 @@ namespace PlcInterface.Abstraction.Tests;
 public class IPlcConnectionExtensionTests
 {
     [TestMethod]
-    public async Task GetConnectedClientAsyncReturnsAValidValue()
+    public async Task GetConnectedClientAsyncReturnsAValidValueAsync()
     {
         // Arrange
         var plcConnectionMock = new Mock<IPlcConnection<GenericParameterHelper>>();
@@ -26,7 +26,7 @@ public class IPlcConnectionExtensionTests
     }
 
     [TestMethod]
-    public async Task GetConnectedClientAsyncThrowsTimeoutExceptionOnTimeOut()
+    public async Task GetConnectedClientAsyncThrowsTimeoutExceptionOnTimeOutAsync()
     {
         // Arrange
         var mock = new Mock<IPlcConnection<GenericParameterHelper>>();

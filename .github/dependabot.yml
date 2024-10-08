@@ -18,3 +18,19 @@ updates:
       day: friday
       time: "23:00"
       timezone: Europe/Amsterdam
+    groups:
+      Beckhoff:
+        patterns:
+          - "Beckhoff.TwinCAT.Ads*"
+      MSTest:
+        patterns:
+          - "MSTest.*"
+      Coverlet:
+        patterns:
+          - "coverlet.*"
+      IOAbstraction:
+        patterns:
+          - "System.IO.Abstractions*"
+      Analyzers:
+        patterns:
+          - "*Analyzer*"

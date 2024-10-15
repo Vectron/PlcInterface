@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <RunSettingsFilePath Condition="$(ContinuousIntegrationBuild) == 'false'">$(SolutionDir)\Integration.runsettings</RunSettingsFilePath>
-    <RunSettingsFilePath Condition="$(ContinuousIntegrationBuild) == 'true'">$(SolutionDir)\CI.runsettings</RunSettingsFilePath>
+    <RunSettingsFilePath Condition="$(ContinuousIntegrationBuild) == 'true'">$(SolutionDir)\GithubActions.runsettings</RunSettingsFilePath>
   </PropertyGroup>
 
   <ItemGroup>

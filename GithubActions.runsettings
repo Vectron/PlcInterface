@@ -59,6 +59,7 @@
             <Logger friendlyName="blame" enabled="True" />
             <Logger friendlyName="trx" enabled="True" />
             <Logger friendlyName="html" enabled="True" />
+            <Logger friendlyName="GitHubActions" enabled="True" />
         </Loggers>
     </LoggerRunSettings>
 

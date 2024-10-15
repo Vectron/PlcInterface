@@ -10,7 +10,6 @@ on:
       - '.editorconfig'
       - '.gitattributes'
       - '.gitignore'
-      - '.runsettings'
       - 'LICENSE.txt'
       - 'README.md'
   
@@ -21,7 +20,6 @@ on:
       - '.editorconfig'
       - '.gitattributes'
       - '.gitignore'
-      - '.runsettings'
       - 'LICENSE.txt'
       - 'README.md'
 

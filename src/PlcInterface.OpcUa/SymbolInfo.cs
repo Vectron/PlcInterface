@@ -1,5 +1,7 @@
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reflection.Metadata;
 using Opc.Ua;
 
 namespace PlcInterface.OpcUa;
@@ -10,7 +12,7 @@ namespace PlcInterface.OpcUa;
 [DebuggerDisplay("{Name}")]
 internal sealed class SymbolInfo : IOpcSymbolInfo
 {
-    private readonly Lazy<int[]> arrayBounds;
+    private readonly Lazy<ArrayShape> arrayShape;
     private readonly NodeInfo nodeInfo;
 
     /// <summary>
@@ -29,13 +31,13 @@ internal sealed class SymbolInfo : IOpcSymbolInfo
         ChildSymbols = [];
         IsBigType = symbol.NodeClass is NodeClass.Object or NodeClass.ObjectType;
         Indices = IndicesHelper.GetIndices(Name);
-        arrayBounds = new Lazy<int[]>(CalculateBounds, isThreadSafe: false);
+        arrayShape = new(CalculateArrayShape, isThreadSafe: true);
         Comment = string.Empty;
     }
 
     /// <inheritdoc/>
-    public int[] ArrayBounds
-        => arrayBounds.Value;
+    public ArrayShape ArrayShape
+        => arrayShape.Value;
 
     /// <inheritdoc/>
     public BuiltInType BuiltInType
@@ -97,22 +99,21 @@ internal sealed class SymbolInfo : IOpcSymbolInfo
     public string TypeName
         => nodeInfo.DataTypeDisplayText;
 
-    private int[] CalculateBounds()
+    private ArrayShape CalculateArrayShape()
     {
         if (ChildSymbols.Count == 0)
         {
-            return [];
+            return default;
         }
 
         var indices = ChildSymbols.Select(x => IndicesHelper.GetIndices(x.AsSpan(Name.Length)));
-        var length = indices.First().Length;
-        var lowerBounds = new int[length];
-        var upperBounds = new int[length];
-        var ranks = new int[length];
+        var rank = indices.First().Length;
+        var lowerBounds = Enumerable.Repeat(int.MaxValue, rank).ToArray();
+        var upperBounds = Enumerable.Repeat(0, rank).ToArray();
 
         foreach (var index in indices)
         {
-            for (var i = 0; i < lowerBounds.Length; i++)
+            for (var i = 0; i < index.Length; i++)
             {
                 if (upperBounds[i] < index[i])
                 {
@@ -123,11 +124,15 @@ internal sealed class SymbolInfo : IOpcSymbolInfo
                 {
                     lowerBounds[i] = index[i];
                 }
-
-                ranks[i] = upperBounds[i] + 1 - lowerBounds[i];
             }
         }
 
-        return ranks;
+        var sizes = Enumerable.Repeat(0, rank).ToArray();
+        for (var i = 0; i < rank; i++)
+        {
+            sizes[i] = upperBounds[i] + 1 - lowerBounds[i];
+        }
+
+        return new ArrayShape(rank, ImmutableArray.Create(sizes), ImmutableArray.Create(lowerBounds));
     }
 }

@@ -333,6 +333,7 @@ public class ReadWriteTests
         _ = typeConverter.Setup(x => x.Convert(It.IsAny<object>(), It.IsAny<Type>())).Returns<object, Type>((o, t) => o);
         _ = typeConverter.Setup(x => x.Convert<int>(It.IsAny<object>())).Returns<object>(o => (int)o);
         _ = typeConverter.Setup(x => x.Convert<bool>(It.IsAny<object>())).Returns<object>(o => (bool)o);
+        _ = typeConverter.Setup(x => x.ConvertToPLCType(It.IsAny<object>())).Returns<object>(o => o);
         return typeConverter.Object;
     }
 }

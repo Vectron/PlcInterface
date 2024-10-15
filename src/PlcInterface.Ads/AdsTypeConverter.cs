@@ -62,6 +62,17 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
         return base.Convert(value, targetType);
     }
 
+    /// <inheritdoc/>
+    public object ConvertToPLCType(object value)
+    {
+        if (value is IArrayWrapper arrayWrapper)
+        {
+            return arrayWrapper.BackingArray;
+        }
+
+        return value;
+    }
+
     private Array ConvertDynamicValueArray(IDynamicValue valueObject, IArrayType arrayType, Type targetType)
     {
         var elementType = targetType.GetElementType()

@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Globalization;
+using System.Reflection;
 
 namespace PlcInterface;
 
@@ -51,6 +52,13 @@ public abstract class TypeConverter : ITypeConverter
         if (targetType.IsArray && value is Array expandArray)
         {
             return ConvertArray(expandArray, targetType);
+        }
+
+        if (targetType.IsGenericType
+            && targetType.GetGenericTypeDefinition() == typeof(NonZeroBasedArray<>)
+            && value is Array nonZeroBoundArray)
+        {
+            return ConvertNonZeroBoundArray(nonZeroBoundArray, targetType);
         }
 
         if (value is ExpandoObject expandoObject)
@@ -109,21 +117,30 @@ public abstract class TypeConverter : ITypeConverter
         throw new NotSupportedException($"Failed to create an instance of {targetType.Name}");
     }
 
-    private Array ConvertArray(Array expandArray, Type targetType)
+    private Array ConvertArray(Array source, Type targetType)
     {
         var elementType = targetType.GetElementType() ?? throw new NotSupportedException($"Unable to retrieve element type");
-        var dimensionLengths = new int[expandArray.Rank];
-        for (var i = 0; i < expandArray.Rank; i++)
+        var dimensionLengths = new int[source.Rank];
+        var dimensionLowerBound = new int[source.Rank];
+        for (var i = 0; i < source.Rank; i++)
         {
-            dimensionLengths[i] = expandArray.GetLength(i);
+            dimensionLengths[i] = source.GetLength(i);
+            dimensionLowerBound[i] = source.GetLowerBound(i);
         }
 
         var destination = Array.CreateInstance(elementType, dimensionLengths);
-        foreach (var indices in IndicesHelper.GetIndices(destination))
+
+        using var destinationEnumerator = IndicesHelper.GetIndices(destination).GetEnumerator();
+        using var sourceEnumerator = IndicesHelper.GetIndices(source).GetEnumerator();
+
+        while (destinationEnumerator.MoveNext() && sourceEnumerator.MoveNext())
         {
-            var dynamicValue = expandArray.GetValue(indices)
-                ?? throw new SymbolException($"No value found at index: {string.Join(';', indices)}");
-            destination.SetValue(Convert(dynamicValue, elementType), indices);
+            var sourceIndices = sourceEnumerator.Current;
+            var destinationIndices = destinationEnumerator.Current;
+
+            var dynamicValue = source.GetValue(sourceIndices)
+                ?? throw new SymbolException($"No value found at index: {string.Join(';', sourceIndices)}");
+            destination.SetValue(Convert(dynamicValue, elementType), destinationIndices);
         }
 
         return destination;
@@ -165,6 +182,39 @@ public abstract class TypeConverter : ITypeConverter
         }
 
         return Convert(GetValue, expando.Count, targetType);
+    }
+
+    private object ConvertNonZeroBoundArray(Array source, Type targetType)
+    {
+        var elementType = targetType.GenericTypeArguments[0];
+
+        var method = typeof(TypeConverter).GetMethod(nameof(CreateNonZeroBasedArray), BindingFlags.Instance | BindingFlags.NonPublic);
+        var genericMethod = method?.MakeGenericMethod(elementType);
+        var array = genericMethod?.Invoke(this, [source])
+            ?? throw new InvalidProgramException("Unable to call CreateNonZeroBasedArray");
+        return array;
+    }
+
+    private NonZeroBasedArray<T> CreateNonZeroBasedArray<T>(Array source)
+    {
+        var dimensionLengths = new int[source.Rank];
+        var dimensionLowerBound = new int[source.Rank];
+        for (var i = 0; i < source.Rank; i++)
+        {
+            dimensionLengths[i] = source.GetLength(i);
+            dimensionLowerBound[i] = source.GetLowerBound(i);
+        }
+
+        var destination = new NonZeroBasedArray<T>(dimensionLengths, dimensionLowerBound);
+        foreach (var indices in destination.Indices)
+        {
+            var dynamicValue = source.GetValue(indices)
+                ?? throw new SymbolException($"No value found at index: {string.Join(';', indices)}");
+            var convertedValue = Convert<T>(dynamicValue);
+            destination.SetValue(convertedValue, indices);
+        }
+
+        return destination;
     }
 
     /// <summary>

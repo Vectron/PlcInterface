@@ -115,7 +115,8 @@ public sealed class OpcTypeConverter(IOpcSymbolHandler symbolHandler) : TypeConv
 
         if (symbolInfo.IsArray)
         {
-            var array = Array.CreateInstance(typeof(object), symbolInfo.ArrayBounds);
+            var arrayShape = symbolInfo.ArrayShape;
+            var array = Array.CreateInstance(typeof(object), [.. arrayShape.Sizes], [.. arrayShape.LowerBounds]);
             foreach (var childSymbolName in symbolInfo.ChildSymbols)
             {
                 var childSymbolInfo = symbolHandler.GetSymbolInfo(childSymbolName);
@@ -189,6 +190,11 @@ public sealed class OpcTypeConverter(IOpcSymbolHandler symbolHandler) : TypeConv
                 (BuiltInType.Float, _) => new Variant(timeSpan.TotalMilliseconds),
                 _ => throw new NotSupportedException($"Can't convert {nameof(TimeSpan)} to {symbolInfo.BuiltInType}"),
             };
+        }
+
+        if (value is IArrayWrapper arrayWrapper)
+        {
+            return new Variant(arrayWrapper.ConvertZeroBased());
         }
 
         return new Variant(value);

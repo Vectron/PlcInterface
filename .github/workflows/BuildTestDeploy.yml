@@ -37,7 +37,7 @@ env:
   Target: PlcInterface.sln
 
 jobs:
-  build-and-test:
+  call-build-test:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]

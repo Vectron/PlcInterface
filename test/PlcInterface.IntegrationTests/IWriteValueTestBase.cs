@@ -149,8 +149,8 @@ public abstract class IWriteValueTestBase
         {
             multiAssert.Check(() => Assert.AreEqual(writeDataEnumerator.Current.Key, newValueEnumerator.Current.Key));
             multiAssert.Check(() => Assert.AreEqual(writeDataEnumerator.Current.Key, originalEnumerator.Current.Key));
-            multiAssert.Check(() => Assert.That.ObjectNotEquals(writeDataEnumerator.Current.Value, originalEnumerator.Current.Value, "Reset values in PLC"));
-            multiAssert.Check(() => Assert.That.ObjectEquals(expectedDataEnumerator.Current, newValueEnumerator.Current.Value, writeDataEnumerator.Current.Key));
+            multiAssert.Check(() => AssertObjectValue.ValuesAreNotEqual(writeDataEnumerator.Current.Value, originalEnumerator.Current.Value, writeDataEnumerator.Current.Key));
+            multiAssert.Check(() => AssertObjectValue.ValuesAreEqual(expectedDataEnumerator.Current, newValueEnumerator.Current.Value, writeDataEnumerator.Current.Key));
         }
 
         multiAssert.Assert();
@@ -201,8 +201,8 @@ public abstract class IWriteValueTestBase
         {
             multiAssert.Check(() => Assert.AreEqual(writeDataEnumerator.Current.Key, newValueEnumerator.Current.Key));
             multiAssert.Check(() => Assert.AreEqual(writeDataEnumerator.Current.Key, originalEnumerator.Current.Key));
-            multiAssert.Check(() => Assert.That.ObjectNotEquals(writeDataEnumerator.Current.Value, originalEnumerator.Current.Value, "Reset values in PLC"));
-            multiAssert.Check(() => Assert.That.ObjectEquals(expectedDataEnumerator.Current, newValueEnumerator.Current.Value, writeDataEnumerator.Current.Key));
+            multiAssert.Check(() => AssertObjectValue.ValuesAreNotEqual(writeDataEnumerator.Current.Value, originalEnumerator.Current.Value, writeDataEnumerator.Current.Key));
+            multiAssert.Check(() => AssertObjectValue.ValuesAreEqual(expectedDataEnumerator.Current, newValueEnumerator.Current.Value, writeDataEnumerator.Current.Key));
         }
 
         multiAssert.Assert();
@@ -228,8 +228,8 @@ public abstract class IWriteValueTestBase
         var newValueRead = readWrite.Read(ioName);
 
         // Assert
-        Assert.That.ObjectNotEquals(readValue ?? newValue, original, "Reset values in PLC");
-        Assert.That.ObjectEquals(readValue ?? newValue, newValueRead, ioName);
+        AssertObjectValue.ValuesAreNotEqual(readValue ?? newValue, original, ioName);
+        AssertObjectValue.ValuesAreEqual(readValue ?? newValue, newValueRead, ioName);
     }
 
     [DataTestMethod]
@@ -252,8 +252,8 @@ public abstract class IWriteValueTestBase
         var newValueRead = await readWrite.ReadAsync(ioName);
 
         // Assert
-        Assert.That.ObjectNotEquals(readValue ?? newValue, original, "Reset values in PLC");
-        Assert.That.ObjectEquals(readValue ?? newValue, newValueRead, ioName);
+        AssertObjectValue.ValuesAreNotEqual(readValue ?? newValue, original, ioName);
+        AssertObjectValue.ValuesAreEqual(readValue ?? newValue, newValueRead, ioName);
     }
 
     protected static void ResetPLCValues(IReadWrite readWrite, string fieldName, [CallerMemberName] string memberName = "")
@@ -296,8 +296,8 @@ public abstract class IWriteValueTestBase
         }
 
         // Assert
-        Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
-        Assert.That.ObjectEquals(readValue, newValueRead, ioName);
+        AssertObjectValue.ValuesAreNotEqual(readValue, original, ioName);
+        AssertObjectValue.ValuesAreEqual(readValue, newValueRead, ioName);
     }
 
     protected async Task WriteValueGenericHelperAsync<T1, T2>(string itemName, T1 newValue, T2 readValue, [CallerMemberName] string memberName = "")
@@ -327,7 +327,7 @@ public abstract class IWriteValueTestBase
         }
 
         // Assert
-        Assert.That.ObjectNotEquals(readValue, original, "Reset values in PLC");
-        Assert.That.ObjectEquals(readValue, newValueRead, ioName);
+        AssertObjectValue.ValuesAreNotEqual(readValue, original, ioName);
+        AssertObjectValue.ValuesAreEqual(readValue, newValueRead, ioName);
     }
 }

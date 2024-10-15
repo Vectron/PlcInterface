@@ -65,7 +65,7 @@ public abstract class IReadValueTestBase
         var actual = readWrite.ReadDynamic(ioName);
 
         // Assert
-        AssertExtension.DUT_TestStructEquals(expected, actual);
+        AssertObjectValue.ValuesAreEqual(expected, actual, ioName);
     }
 
     [TestMethod]
@@ -85,7 +85,7 @@ public abstract class IReadValueTestBase
         var actual = await readWrite.ReadDynamicAsync(ioName);
 
         // Assert
-        AssertExtension.DUT_TestStructEquals(expected, actual);
+        AssertObjectValue.ValuesAreEqual(expected, actual, ioName);
     }
 
     [DataTestMethod]
@@ -147,7 +147,7 @@ public abstract class IReadValueTestBase
             && actualEnumerator.MoveNext())
         {
             multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, actualEnumerator.Current.Key));
-            multiAssert.Check(() => Assert.That.ObjectEquals(dataEnumerator.Current.Value, actualEnumerator.Current.Value, dataEnumerator.Current.Key));
+            multiAssert.Check(() => AssertObjectValue.ValuesAreEqual(dataEnumerator.Current.Value, actualEnumerator.Current.Value, dataEnumerator.Current.Key));
         }
 
         multiAssert.Assert();
@@ -182,7 +182,7 @@ public abstract class IReadValueTestBase
             && actualEnumerator.MoveNext())
         {
             multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, actualEnumerator.Current.Key));
-            multiAssert.Check(() => Assert.That.ObjectEquals(dataEnumerator.Current.Value, actualEnumerator.Current.Value, dataEnumerator.Current.Key));
+            multiAssert.Check(() => AssertObjectValue.ValuesAreEqual(dataEnumerator.Current.Value, actualEnumerator.Current.Value, dataEnumerator.Current.Key));
         }
 
         multiAssert.Assert();
@@ -205,7 +205,7 @@ public abstract class IReadValueTestBase
         var actual = readWrite.Read(ioName);
 
         // Assert
-        Assert.That.ObjectEquals(expectedValue, actual, ioName);
+        AssertObjectValue.ValuesAreEqual(expectedValue, actual, ioName);
     }
 
     [DataTestMethod]
@@ -226,7 +226,7 @@ public abstract class IReadValueTestBase
         var actual = await readWrite.ReadAsync(ioName);
 
         // Assert
-        Assert.That.ObjectEquals(expectedValue, actual, ioName);
+        AssertObjectValue.ValuesAreEqual(expectedValue, actual, ioName);
     }
 
     [TestMethod]
@@ -306,7 +306,7 @@ public abstract class IReadValueTestBase
         // Assert
         Assert.IsNotNull(expectedValue);
         Assert.IsNotNull(actual);
-        Assert.That.ObjectEquals(expectedValue, actual, ioName);
+        AssertObjectValue.ValuesAreEqual(expectedValue, actual, ioName);
     }
 
     protected async Task ReadValueGenericAsync<T>(string itemName, T expectedValue, [CallerMemberName] string memberName = "")
@@ -326,7 +326,7 @@ public abstract class IReadValueTestBase
         // Assert
         Assert.IsNotNull(expectedValue);
         Assert.IsNotNull(actual);
-        Assert.That.ObjectEquals(expectedValue, actual, ioName);
+        AssertObjectValue.ValuesAreEqual(expectedValue, actual, ioName);
     }
 
     protected void WaitsForValueToChangeGeneric<T>(string itemName, T readValue, [CallerMemberName] string memberName = "")

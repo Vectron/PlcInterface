@@ -20,7 +20,7 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="6.1.203" />
     <PackageReference Include="Beckhoff.TwinCAT.Ads.Reactive" Version="6.1.203" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
     <PackageReference Include="System.IO.Abstractions" Version="21.0.29" />
   </ItemGroup>

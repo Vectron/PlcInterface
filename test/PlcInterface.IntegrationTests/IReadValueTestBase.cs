@@ -38,15 +38,23 @@ public abstract class IReadValueTestBase
         ];
 
     private static IEnumerable<object[]> ReadTestDataExtended
-            =>
-            [
+        =>
+        [
             ["IntArray", DUT_TestStruct.Default.IntArray],
             ["MultiDimensionArray", DUT_TestStruct.Default.MultiDimensionArray],
             ["ComplexArray", DUT_TestStruct.Default.ComplexArray],
             ["MultiDimensionComplexArray", DUT_TestStruct.Default.MultiDimensionComplexArray],
-                ["StructValue", DUT_TestStruct.Default],
-                ["StructValue2", DUT_TestClass.Default],
-            ];
+            ["IntArray2", DUT_TestStruct.Default.IntArray2],
+            ["MultiDimensionArray2", DUT_TestStruct.Default.MultiDimensionArray2],
+            ["ComplexArray2", DUT_TestStruct.Default.ComplexArray2],
+            ["StructValue", DUT_TestStruct.Default],
+            ["StructValue2", DUT_TestClass.Default],
+            ["MultiDimensionComplexArray2", DUT_TestStruct.Default.MultiDimensionComplexArray2],
+            ["IntArray2", (short[])DUT_TestStruct.Default.IntArray2.ConvertZeroBased()],
+            ["MultiDimensionArray2", (short[,,])DUT_TestStruct.Default.MultiDimensionArray2.ConvertZeroBased()],
+            ["ComplexArray2", (DUT_TestStruct2[])DUT_TestStruct.Default.ComplexArray2.ConvertZeroBased()],
+            ["MultiDimensionComplexArray2", (DUT_TestStruct2[,,])DUT_TestStruct.Default.MultiDimensionComplexArray2.ConvertZeroBased()],
+        ];
 
     [TestMethod]
     public void ReadDynamicReadsAStructure()
@@ -126,10 +134,13 @@ public abstract class IReadValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var data = ReadTestData.Concat(ReadTestDataExtended).ToDictionary(
-            kv => $"ReadTestData.{nameof(ReadMultipleItemsInOneTransaction)}.{kv[0]}",
-            kv => kv[1],
-            StringComparer.Ordinal);
+        var data = ReadTestData
+            .Concat(ReadTestDataExtended)
+            .DistinctBy(kv => kv[0])
+            .ToDictionary(
+                kv => $"ReadTestData.{nameof(ReadMultipleItemsInOneTransaction)}.{kv[0]}",
+                kv => kv[1],
+                StringComparer.Ordinal);
 
         // Act
         var connected = connection.Connect();
@@ -161,10 +172,13 @@ public abstract class IReadValueTestBase
         using var disposable = serviceProvider as IDisposable;
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
-        var data = ReadTestData.Concat(ReadTestDataExtended).ToDictionary(
-            kv => $"ReadTestData.{nameof(ReadMultipleItemsInOneTransactionAsync)}.{kv[0]}",
-            kv => kv[1],
-            StringComparer.Ordinal);
+        var data = ReadTestData
+            .Concat(ReadTestDataExtended)
+            .DistinctBy(kv => kv[0])
+            .ToDictionary(
+                kv => $"ReadTestData.{nameof(ReadMultipleItemsInOneTransactionAsync)}.{kv[0]}",
+                kv => kv[1],
+                StringComparer.Ordinal);
 
         // Act
         var connected = connection.Connect();

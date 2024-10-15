@@ -1,10 +1,9 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace PlcInterface.IntegrationTests.DataTypes;
 
 [StructLayout(LayoutKind.Sequential, Pack = 0)]
-internal struct DUT_TestStruct2 : IEquatable<DUT_TestStruct2>
+internal struct DUT_TestStruct2
 {
     public static DUT_TestStruct2 Default => new()
     {
@@ -40,26 +39,5 @@ internal struct DUT_TestStruct2 : IEquatable<DUT_TestStruct2>
     public ulong LWordValue
     {
         get; set;
-    }
-
-    [ExcludeFromCodeCoverage]
-    public override readonly bool Equals(object? obj)
-        => obj is DUT_TestStruct2 @struct && Equals(@struct);
-
-    public readonly bool Equals(DUT_TestStruct2 other)
-        => ByteValue == other.ByteValue
-        && WordValue == other.WordValue
-        && DWordValue == other.DWordValue
-        && LWordValue == other.LWordValue;
-
-    [ExcludeFromCodeCoverage]
-    public override readonly int GetHashCode()
-    {
-        var hashCode = -1110352730;
-        hashCode = (hashCode * -1521134295) + ByteValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + WordValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + DWordValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + LWordValue.GetHashCode();
-        return hashCode;
     }
 }

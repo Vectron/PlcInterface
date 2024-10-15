@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using Opc.Ua;
 
 namespace PlcInterface.OpcUa;
@@ -8,9 +9,9 @@ namespace PlcInterface.OpcUa;
 public interface IOpcSymbolInfo : ISymbolInfo
 {
     /// <summary>
-    /// Gets the bounds of the array.
+    /// Gets get the shape of the array.
     /// </summary>
-    int[] ArrayBounds
+    ArrayShape ArrayShape
     {
         get;
     }

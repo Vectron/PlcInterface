@@ -156,7 +156,8 @@ public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHan
         try
         {
             var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, tcSymbols);
-            sumWriter.Write([.. namesValues.Values]);
+            var values = namesValues.Values.Select(typeConverter.ConvertToPLCType).ToArray();
+            sumWriter.Write(values);
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
@@ -177,11 +178,11 @@ public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHan
     {
         var symbolInfo = symbolHandler.GetSymbolInfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
-        var type = value.GetType();
+        var convertedValue = typeConverter.ConvertToPLCType(value);
 
         if ((System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase)
                 || System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
-            && !type.IsArray
+            && !value.GetType().IsArray
             && symbolInfo.ChildSymbols.Count > 0)
         {
             var flattenItems = symbolInfo.FlattenWithValue(symbolHandler, value).ToDictionary(x => x.SymbolInfo.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);
@@ -191,7 +192,7 @@ public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHan
 
         try
         {
-            adsSymbol.WriteValue(value);
+            adsSymbol.WriteValue(convertedValue);
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
@@ -213,7 +214,8 @@ public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHan
         try
         {
             var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, tcSymbols);
-            await sumWriter.WriteAsync([.. namesValues.Values], CancellationToken.None).ConfigureAwait(false);
+            var values = namesValues.Values.Select(typeConverter.ConvertToPLCType).ToArray();
+            await sumWriter.WriteAsync(values, CancellationToken.None).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {
@@ -234,11 +236,11 @@ public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHan
     {
         var symbolInfo = symbolHandler.GetSymbolInfo(ioName);
         var adsSymbol = symbolInfo.Symbol.CastAndValidate();
-        var type = value.GetType();
+        var convertedValue = typeConverter.ConvertToPLCType(value);
 
         if ((System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase)
                 || System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase))
-            && !type.IsArray
+            && !value.GetType().IsArray
             && symbolInfo.ChildSymbols.Count > 0)
         {
             var flattenItems = symbolInfo.FlattenWithValue(symbolHandler, value).ToDictionary(x => x.SymbolInfo.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);
@@ -248,7 +250,7 @@ public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHan
 
         try
         {
-            _ = await adsSymbol.WriteValueAsync(value, CancellationToken.None).ConfigureAwait(false);
+            _ = await adsSymbol.WriteValueAsync(convertedValue, CancellationToken.None).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
         {

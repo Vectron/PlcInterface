@@ -146,10 +146,10 @@ public abstract class IReadValueTestBase
         // Act
         var connected = connection.Connect();
         Assert.IsTrue(connected, "Plc could not connect");
-        var structValue = readWrite.ReadDynamic(ioName);
+        var actual = readWrite.ReadDynamic(ioName);
 
         // Assert
-        AssertExtension.DUT_TestStructEquals(expected, structValue);
+        AssertExtension.DUT_TestStructEquals(expected, actual);
     }
 
     [TestMethod]
@@ -166,10 +166,10 @@ public abstract class IReadValueTestBase
         // Act
         var connected = connection.Connect();
         Assert.IsTrue(connected, "Plc could not connect");
-        var structValue = await readWrite.ReadDynamicAsync(ioName);
+        var actual = await readWrite.ReadDynamicAsync(ioName);
 
         // Assert
-        AssertExtension.DUT_TestStructEquals(expected, structValue);
+        AssertExtension.DUT_TestStructEquals(expected, actual);
     }
 
     [DataTestMethod]
@@ -218,20 +218,20 @@ public abstract class IReadValueTestBase
         // Act
         var connected = connection.Connect();
         Assert.IsTrue(connected, "Plc could not connect");
-        var value = readWrite.Read(data.Keys);
+        var actual = readWrite.Read(data.Keys);
 
         // Assert
         using var dataEnumerator = data.GetEnumerator();
-        using var valueEnumerator = value.GetEnumerator();
+        using var actualEnumerator = actual.GetEnumerator();
 
-        Assert.AreEqual(data.Count, value.Count);
+        Assert.AreEqual(data.Count, actual.Count);
         var multiAssert = new MultiAssert();
 
         while (dataEnumerator.MoveNext()
-            && valueEnumerator.MoveNext())
+            && actualEnumerator.MoveNext())
         {
-            multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, valueEnumerator.Current.Key));
-            multiAssert.Check(() => Assert.That.ObjectEquals(dataEnumerator.Current.Value, valueEnumerator.Current.Value, dataEnumerator.Current.Key));
+            multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, actualEnumerator.Current.Key));
+            multiAssert.Check(() => Assert.That.ObjectEquals(dataEnumerator.Current.Value, actualEnumerator.Current.Value, dataEnumerator.Current.Key));
         }
 
         multiAssert.Assert();
@@ -253,20 +253,20 @@ public abstract class IReadValueTestBase
         // Act
         var connected = connection.Connect();
         Assert.IsTrue(connected, "Plc could not connect");
-        var value = await readWrite.ReadAsync(data.Keys);
+        var actual = await readWrite.ReadAsync(data.Keys);
 
         // Assert
         using var dataEnumerator = data.GetEnumerator();
-        using var valueEnumerator = value.GetEnumerator();
+        using var actualEnumerator = actual.GetEnumerator();
 
-        Assert.AreEqual(data.Count, value.Count);
+        Assert.AreEqual(data.Count, actual.Count);
         var multiAssert = new MultiAssert();
 
         while (dataEnumerator.MoveNext()
-            && valueEnumerator.MoveNext())
+            && actualEnumerator.MoveNext())
         {
-            multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, valueEnumerator.Current.Key));
-            multiAssert.Check(() => Assert.That.ObjectEquals(dataEnumerator.Current.Value, valueEnumerator.Current.Value, dataEnumerator.Current.Key));
+            multiAssert.Check(() => Assert.AreEqual(dataEnumerator.Current.Key, actualEnumerator.Current.Key));
+            multiAssert.Check(() => Assert.That.ObjectEquals(dataEnumerator.Current.Value, actualEnumerator.Current.Value, dataEnumerator.Current.Key));
         }
 
         multiAssert.Assert();
@@ -286,10 +286,10 @@ public abstract class IReadValueTestBase
 
         // Act
         Assert.IsTrue(connection.Connect());
-        var value = readWrite.Read(ioName);
+        var actual = readWrite.Read(ioName);
 
         // Assert
-        Assert.That.ObjectEquals(expectedValue, value, ioName);
+        Assert.That.ObjectEquals(expectedValue, actual, ioName);
     }
 
     [DataTestMethod]
@@ -307,10 +307,10 @@ public abstract class IReadValueTestBase
         // Act
         var connected = connection.Connect();
         Assert.IsTrue(connected, "Plc could not connect");
-        var value = await readWrite.ReadAsync(ioName);
+        var actual = await readWrite.ReadAsync(ioName);
 
         // Assert
-        Assert.That.ObjectEquals(expectedValue, value, ioName);
+        Assert.That.ObjectEquals(expectedValue, actual, ioName);
     }
 
     [TestMethod]
@@ -385,12 +385,12 @@ public abstract class IReadValueTestBase
         // Act
         var connected = connection.Connect();
         Assert.IsTrue(connected, "Plc could not connect");
-        var value = readWrite.Read<T>(ioName);
+        var actual = readWrite.Read<T>(ioName);
 
         // Assert
         Assert.IsNotNull(expectedValue);
-        Assert.IsNotNull(value);
-        Assert.That.ObjectEquals(expectedValue, value, ioName);
+        Assert.IsNotNull(actual);
+        Assert.That.ObjectEquals(expectedValue, actual, ioName);
     }
 
     protected async Task ReadValueGenericAsync<T>(string itemName, T expectedValue, [CallerMemberName] string memberName = "")
@@ -405,12 +405,12 @@ public abstract class IReadValueTestBase
         // Act
         var connected = connection.Connect();
         Assert.IsTrue(connected, "Plc could not connect");
-        var value = await readWrite.ReadAsync<T>(ioName).ConfigureAwait(false);
+        var actual = await readWrite.ReadAsync<T>(ioName).ConfigureAwait(false);
 
         // Assert
         Assert.IsNotNull(expectedValue);
-        Assert.IsNotNull(value);
-        Assert.That.ObjectEquals(expectedValue, value, ioName);
+        Assert.IsNotNull(actual);
+        Assert.That.ObjectEquals(expectedValue, actual, ioName);
     }
 
     protected void WaitsForValueToChangeGeneric<T>(string itemName, T readValue, [CallerMemberName] string memberName = "")

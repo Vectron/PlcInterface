@@ -43,51 +43,10 @@ public abstract class IWriteValueTestBase
             ["EnumValue1", TestEnum.Third, (int)TestEnum.Third],
             ["EnumValue2", (short)TestEnum.Third, (int)TestEnum.Third],
             ["EnumValue3", (int)TestEnum.Third],
-        ];
-
-    private static IEnumerable<object[]> WriteTestDataExtended
-        =>
-        [
-            [
-                "IntArray",
-                new short[] { 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010 },
-            ],
-            [
-                "MultiDimensionArray",
-                new short[,,]
-                {
-                    {
-                        { 01000, 02000, 03000, 04000 },
-                        { 05000, 06000, 07000, 08000 },
-                        { 09000, 10000, 11000, 12000 },
-                    },
-                    {
-                        { 13000, 14000, 15000, 16000 },
-                        { 17000, 18000, 19000, 20000 },
-                        { 21000, 22000, 23000, 24000 },
-                    },
-                },
-            ],
-            [
-                "ComplexArray",
-                new DUT_TestStruct2[] { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
-            ],
-            [
-                "MultiDimensionComplexArray",
-                new DUT_TestStruct2[,,]
-                {
-                    {
-                        { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
-                        { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
-                        { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
-                    },
-                    {
-                        { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
-                        { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
-                        { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, },
-                    },
-                },
-            ],
+            ["IntArray", DUT_TestStruct.Write.IntArray],
+            ["MultiDimensionArray", DUT_TestStruct.Write.MultiDimensionArray],
+            ["ComplexArray", DUT_TestStruct.Write.ComplexArray],
+            ["MultiDimensionComplexArray", DUT_TestStruct.Write.MultiDimensionComplexArray],
             ["StructValue1", DUT_TestStruct.Write],
             ["StructValue2", DUT_TestClass.Write],
             ["Nested1", DUT_TestStruct2.Write],

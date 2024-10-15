@@ -8,9 +8,17 @@ namespace PlcInterface;
 /// <typeparam name="T">The Type of the Array to create.</typeparam>
 /// <param name="lengths">A one-dimensional array that contains the size of each dimension of the Array to create.</param>
 /// <param name="lowerBounds">A one-dimensional array that contains the lower bound (starting index) of each dimension of the Array to create.</param>
-public readonly struct NonZeroBasedArray<T>(int[] lengths, int[] lowerBounds) : IEnumerable<T>, IStructuralComparable, IStructuralEquatable
+public readonly struct NonZeroBasedArray<T>(int[] lengths, int[] lowerBounds) : IEnumerable<T>, IStructuralComparable, IStructuralEquatable, IArrayWrapper
 {
     private readonly Array backingArray = Array.CreateInstance(typeof(T), lengths, lowerBounds);
+
+    /// <summary>
+    /// Gets the backing array storage.
+    /// </summary>
+    Array IArrayWrapper.BackingArray => backingArray;
+
+    /// <inheritdoc/>
+    Type IArrayWrapper.ElementType => typeof(T);
 
     /// <summary>
     /// Gets all indices of this array.
@@ -73,18 +81,6 @@ public readonly struct NonZeroBasedArray<T>(int[] lengths, int[] lowerBounds) : 
 
     /// <inheritdoc/>
     int IStructuralComparable.CompareTo(object? other, IComparer comparer) => ((IStructuralComparable)backingArray).CompareTo(other, comparer);
-
-    /// <summary>
-    /// Convert the array to a zero based version.
-    /// </summary>
-    /// <returns>The zero based array.</returns>
-    public Array ConvertZeroBased()
-    {
-        var sizes = Enumerable.Range(0, backingArray.Rank).Select(backingArray.GetLength).ToArray();
-        var newArray = Array.CreateInstance(typeof(T), sizes);
-        Array.Copy(backingArray, newArray, newArray.Length);
-        return newArray;
-    }
 
     /// <inheritdoc/>
     bool IStructuralEquatable.Equals(object? other, IEqualityComparer comparer) => ((IStructuralEquatable)backingArray).Equals(other, comparer);

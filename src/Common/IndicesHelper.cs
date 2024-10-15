@@ -16,10 +16,26 @@ internal static class IndicesHelper
     public static IEnumerable<int[]> GetIndices(Array array)
     {
         var indices = new int[array.Rank];
-        indices[^1]--;
-
-        while (array.IncrementIndices(ref indices))
+        for (var dimension = 0; dimension < array.Rank; dimension++)
         {
+            indices[dimension] = array.GetLowerBound(dimension);
+        }
+
+        yield return indices;
+        for (var i = 0; i < array.Length - 1; i++)
+        {
+            indices[^1]++;
+            for (var dimension = indices.Length - 1; dimension >= 0; dimension--)
+            {
+                var length = array.GetLength(dimension);
+                var lowerBound = array.GetLowerBound(dimension);
+                if (indices[dimension] == length + lowerBound)
+                {
+                    indices[dimension - 1]++;
+                    indices[dimension] = lowerBound;
+                }
+            }
+
             yield return indices;
         }
     }
@@ -58,30 +74,5 @@ internal static class IndicesHelper
         }
 
         return [.. dimensions];
-    }
-
-    /// <summary>
-    /// A helper function for incrementing indices of a multi dimensional <see cref="Array"/>.
-    /// </summary>
-    /// <param name="array">The array being iterated.</param>
-    /// <param name="indices">The indices array that has to be incremented.</param>
-    /// <returns><see langword="true"/> if the new indices is valid, else <see langword="false"/>.</returns>
-    private static bool IncrementIndices(this Array array, ref int[] indices)
-    {
-        for (var i = array.Rank - 1; i >= 0; i--)
-        {
-            indices[i]++;
-            if (indices[i] <= array.GetUpperBound(i))
-            {
-                return true;
-            }
-
-            if (i != 0)
-            {
-                indices[i] = 0;
-            }
-        }
-
-        return false;
     }
 }

@@ -38,6 +38,11 @@ internal static class ISymbolInfoExtension
                     var indices = IndicesHelper.GetIndices(x.Name);
                     childValue = array.GetValue(indices);
                 }
+                else if (value is IArrayWrapper arrayWrapper)
+                {
+                    var indices = IndicesHelper.GetIndices(x.Name);
+                    childValue = arrayWrapper.BackingArray.GetValue(indices);
+                }
                 else
                 {
                     var type = value.GetType();

@@ -1,10 +1,9 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace PlcInterface.IntegrationTests.DataTypes;
 
 [StructLayout(LayoutKind.Sequential, Pack = 0)]
-internal sealed class DUT_TestClass2 : IEquatable<DUT_TestClass2?>
+internal sealed class DUT_TestClass2
 {
     public static DUT_TestClass2 Default => new()
     {
@@ -40,26 +39,5 @@ internal sealed class DUT_TestClass2 : IEquatable<DUT_TestClass2?>
     public ulong LWordValue
     {
         get; set;
-    }
-
-    public override bool Equals(object? obj)
-        => Equals(obj as DUT_TestClass2);
-
-    public bool Equals(DUT_TestClass2? other)
-        => other != null
-            && ByteValue == other.ByteValue
-            && WordValue == other.WordValue
-            && DWordValue == other.DWordValue
-            && LWordValue == other.LWordValue;
-
-    [ExcludeFromCodeCoverage]
-    public override int GetHashCode()
-    {
-        var hashCode = -1110352730;
-        hashCode = (hashCode * -1521134295) + ByteValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + WordValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + DWordValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + LWordValue.GetHashCode();
-        return hashCode;
     }
 }

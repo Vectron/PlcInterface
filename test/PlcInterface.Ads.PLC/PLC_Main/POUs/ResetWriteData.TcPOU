@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1">
   <POU Name="ResetWriteData" Id="{56a86ef4-6e2e-43d3-bcfa-6b6086db4f62}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION ResetWriteData : BOOL
 VAR_INPUT
@@ -53,6 +53,11 @@ END_VAR
 	data.MultiDimensionArray			:= EmptyStruct.MultiDimensionArray;
 	data.ComplexArray					:= EmptyStruct.ComplexArray;
 	data.MultiDimensionComplexArray		:= EmptyStruct.MultiDimensionComplexArray;
+	
+	data.IntArray2				 		:= EmptyStruct.IntArray2;	
+	data.MultiDimensionArray2			:= EmptyStruct.MultiDimensionArray2;
+	data.ComplexArray2					:= EmptyStruct.ComplexArray2;
+	data.MultiDimensionComplexArray2	:= EmptyStruct.MultiDimensionComplexArray2;
 	
 	data.Nested1						:= EmptyStruct.Nested;
 	data.Nested2						:= EmptyStruct.Nested;
@@ -230,6 +235,26 @@ END_IF
 IF (data.MultiDimensionComplexArrayReset) THEN
 	data.MultiDimensionComplexArray		:= EmptyStruct.MultiDimensionComplexArray;
 	data.MultiDimensionComplexArrayReset:= FALSE;
+END_IF
+
+IF (data.IntArray2Reset) THEN
+	data.IntArray2				 		:= EmptyStruct.IntArray2;
+	data.IntArray2Reset					:= FALSE;
+END_IF
+	
+IF (data.MultiDimensionArray2Reset) THEN
+	data.MultiDimensionArray2			:= EmptyStruct.MultiDimensionArray2;
+	data.MultiDimensionArray2Reset		:= FALSE;
+END_IF
+	
+IF (data.ComplexArray2Reset) THEN
+	data.ComplexArray2					:= EmptyStruct.ComplexArray2;
+	data.ComplexArray2Reset				:= FALSE;
+END_IF
+	
+IF (data.MultiDimensionComplexArray2Reset) THEN
+	data.MultiDimensionComplexArray2		:= EmptyStruct.MultiDimensionComplexArray2;
+	data.MultiDimensionComplexArray2Reset:= FALSE;
 END_IF
 	
 IF (data.Nested1Reset) THEN

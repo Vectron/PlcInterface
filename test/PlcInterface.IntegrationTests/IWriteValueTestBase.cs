@@ -47,10 +47,28 @@ public abstract class IWriteValueTestBase
             ["MultiDimensionArray", DUT_TestStruct.Write.MultiDimensionArray],
             ["ComplexArray", DUT_TestStruct.Write.ComplexArray],
             ["MultiDimensionComplexArray", DUT_TestStruct.Write.MultiDimensionComplexArray],
+            ["IntArray2", DUT_TestStruct.Write.IntArray2],
+            ["MultiDimensionArray2", DUT_TestStruct.Write.MultiDimensionArray2],
+            ["ComplexArray2", DUT_TestStruct.Write.ComplexArray2],
+            ["MultiDimensionComplexArray2", DUT_TestStruct.Write.MultiDimensionComplexArray2],
             ["StructValue1", DUT_TestStruct.Write],
             ["StructValue2", DUT_TestClass.Write],
             ["Nested1", DUT_TestStruct2.Write],
             ["Nested2", DUT_TestClass2.Write],
+            ["IntArray2", new short[] { 11000, 11001, 11002, 11003, 11004, 11005, 11006, 11007, 11008, 11009, 11010 }],
+            ["MultiDimensionArray2", new short[,,]
+            {
+                {
+                    { 7101, 7201, 7301, 7401 },
+                    { 7501, 7600, 7701, 7801 },
+                    { 7901, 8000, 8101, 8201 },
+                },
+                {
+                    { 8301, 8401, 8501, 8601 },
+                    { 8701, 8801, 8901, 9001 },
+                    { 8101, 8201, 8301, 9401 },
+                },
+            },]
         ];
 
     [TestMethod]
@@ -76,7 +94,6 @@ public abstract class IWriteValueTestBase
 
     [DataTestMethod]
     [DynamicData(nameof(WriteTestData))]
-    [DynamicData(nameof(WriteTestDataExtended))]
     public void WriteGenericUpdatesTheValueInPlc(string itemName, object newValue, object? readValue = null)
     {
         var writeType = newValue.GetType();
@@ -91,7 +108,6 @@ public abstract class IWriteValueTestBase
 
     [DataTestMethod]
     [DynamicData(nameof(WriteTestData))]
-    [DynamicData(nameof(WriteTestDataExtended))]
     public async Task WriteGenericUpdatesTheValueInPlcAsync(string itemName, object newValue, object? readValue = null)
     {
         var writeType = newValue.GetType();
@@ -113,14 +129,13 @@ public abstract class IWriteValueTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         var writeData = WriteTestData
-            .Concat(WriteTestDataExtended)
+            .DistinctBy(kv => kv[0])
             .ToDictionary(
                 kv => $"WriteTestData.{nameof(WriteMultipleUpdatesTheValueInPlc)}.{kv[0]}",
                 kv => kv[1],
                 StringComparer.Ordinal);
 
         var expectedData = WriteTestData
-            .Concat(WriteTestDataExtended)
             .Select(kv => kv.Length == 3 ? kv[2] : kv[1])
             .ToList();
 
@@ -165,14 +180,13 @@ public abstract class IWriteValueTestBase
         var connection = serviceProvider.GetRequiredService<IPlcConnection>();
         var readWrite = serviceProvider.GetRequiredService<IReadWrite>();
         var writeData = WriteTestData
-            .Concat(WriteTestDataExtended)
+            .DistinctBy(kv => kv[0])
             .ToDictionary(
                 kv => $"WriteTestData.{nameof(WriteMultipleUpdatesTheValueInPlcAsync)}.{kv[0]}",
                 kv => kv[1],
                 StringComparer.Ordinal);
 
         var expectedData = WriteTestData
-            .Concat(WriteTestDataExtended)
             .Select(kv => kv.Length == 3 ? kv[2] : kv[1])
             .ToList();
 
@@ -210,7 +224,6 @@ public abstract class IWriteValueTestBase
 
     [DataTestMethod]
     [DynamicData(nameof(WriteTestData))]
-    [DynamicData(nameof(WriteTestDataExtended))]
     public void WriteUpdatesTheValueInPlc(string itemName, object newValue, object? readValue = null)
     {
         // Arrange
@@ -234,7 +247,6 @@ public abstract class IWriteValueTestBase
 
     [DataTestMethod]
     [DynamicData(nameof(WriteTestData))]
-    [DynamicData(nameof(WriteTestDataExtended))]
     public async Task WriteUpdatesTheValueInPlcAsync(string itemName, object newValue, object? readValue = null)
     {
         // Arrange

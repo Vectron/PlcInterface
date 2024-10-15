@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace PlcInterface.IntegrationTests.DataTypes;
@@ -59,6 +58,10 @@ internal struct DUT_TestStruct
                 { DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default, DUT_TestStruct2.Default },
             },
         },
+        IntArray2 = CreateNonZeroBoundIntArrayRead(),
+        MultiDimensionArray2 = CreateNonZeroBoundMultiDimensionArrayRead(),
+        ComplexArray2 = CreateNonZeroBoundComplexArrayRead(),
+        MultiDimensionComplexArray2 = CreateNonZeroBoundMultiDimensionComplexArrayRead(),
     };
 
     public static DUT_TestStruct Write => new()
@@ -114,6 +117,10 @@ internal struct DUT_TestStruct
                 { DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write, DUT_TestStruct2.Write },
             },
         },
+        IntArray2 = CreateNonZeroBoundIntArrayWrite(),
+        MultiDimensionArray2 = CreateNonZeroBoundMultiDimensionArrayWrite(),
+        ComplexArray2 = CreateNonZeroBoundComplexArrayWrite(),
+        MultiDimensionComplexArray2 = CreateNonZeroBoundMultiDimensionComplexArrayWrite(),
     };
 
     public bool BoolValue
@@ -254,5 +261,221 @@ internal struct DUT_TestStruct
     {
         get;
         set;
+    }
+
+    public NonZeroBasedArray<short> IntArray2
+    {
+        get;
+        set;
+    }
+
+    public NonZeroBasedArray<short> MultiDimensionArray2
+    {
+        get;
+        set;
+    }
+
+    public NonZeroBasedArray<DUT_TestStruct2> ComplexArray2
+    {
+        get;
+        set;
+    }
+
+    public NonZeroBasedArray<DUT_TestStruct2> MultiDimensionComplexArray2
+    {
+        get;
+        set;
+    }
+
+    private static NonZeroBasedArray<short> CreateNonZeroBoundIntArrayRead()
+    {
+        var array = new NonZeroBasedArray<short>([11], [1]);
+        array.SetValue(1000, [01]);
+        array.SetValue(1001, [02]);
+        array.SetValue(1002, [03]);
+        array.SetValue(1003, [04]);
+        array.SetValue(1004, [05]);
+        array.SetValue(1005, [06]);
+        array.SetValue(1006, [07]);
+        array.SetValue(1007, [08]);
+        array.SetValue(1008, [09]);
+        array.SetValue(1009, [10]);
+        array.SetValue(1010, [11]);
+        return array;
+    }
+
+    private static NonZeroBasedArray<short> CreateNonZeroBoundMultiDimensionArrayRead()
+    {
+        var array = new NonZeroBasedArray<short>([2, 3, 4], [1, 1, 1]);
+        array.SetValue(0100, [1, 1, 1]);
+        array.SetValue(0200, [1, 1, 2]);
+        array.SetValue(0300, [1, 1, 3]);
+        array.SetValue(0400, [1, 1, 4]);
+
+        array.SetValue(0500, [1, 2, 1]);
+        array.SetValue(0600, [1, 2, 2]);
+        array.SetValue(0700, [1, 2, 3]);
+        array.SetValue(0800, [1, 2, 4]);
+
+        array.SetValue(0900, [1, 3, 1]);
+        array.SetValue(1000, [1, 3, 2]);
+        array.SetValue(1100, [1, 3, 3]);
+        array.SetValue(1200, [1, 3, 4]);
+
+        array.SetValue(1300, [2, 1, 1]);
+        array.SetValue(1400, [2, 1, 2]);
+        array.SetValue(1500, [2, 1, 3]);
+        array.SetValue(1600, [2, 1, 4]);
+
+        array.SetValue(1700, [2, 2, 1]);
+        array.SetValue(1800, [2, 2, 2]);
+        array.SetValue(1900, [2, 2, 3]);
+        array.SetValue(2000, [2, 2, 4]);
+
+        array.SetValue(2100, [2, 3, 1]);
+        array.SetValue(2200, [2, 3, 2]);
+        array.SetValue(2300, [2, 3, 3]);
+        array.SetValue(2400, [2, 3, 4]);
+        return array;
+    }
+
+    private static NonZeroBasedArray<DUT_TestStruct2> CreateNonZeroBoundComplexArrayRead()
+    {
+        var array = new NonZeroBasedArray<DUT_TestStruct2>([3], [1]);
+        array.SetValue(DUT_TestStruct2.Default, [1]);
+        array.SetValue(DUT_TestStruct2.Default, [2]);
+        array.SetValue(DUT_TestStruct2.Default, [3]);
+        return array;
+    }
+
+    private static NonZeroBasedArray<DUT_TestStruct2> CreateNonZeroBoundMultiDimensionComplexArrayRead()
+    {
+        var array = new NonZeroBasedArray<DUT_TestStruct2>([2, 3, 4], [1, 1, 1]);
+        array.SetValue(DUT_TestStruct2.Default, [1, 1, 1]);
+        array.SetValue(DUT_TestStruct2.Default, [1, 1, 2]);
+        array.SetValue(DUT_TestStruct2.Default, [1, 1, 3]);
+        array.SetValue(DUT_TestStruct2.Default, [1, 1, 4]);
+
+        array.SetValue(DUT_TestStruct2.Default, [1, 2, 1]);
+        array.SetValue(DUT_TestStruct2.Default, [1, 2, 2]);
+        array.SetValue(DUT_TestStruct2.Default, [1, 2, 3]);
+        array.SetValue(DUT_TestStruct2.Default, [1, 2, 4]);
+
+        array.SetValue(DUT_TestStruct2.Default, [1, 3, 1]);
+        array.SetValue(DUT_TestStruct2.Default, [1, 3, 2]);
+        array.SetValue(DUT_TestStruct2.Default, [1, 3, 3]);
+        array.SetValue(DUT_TestStruct2.Default, [1, 3, 4]);
+
+        array.SetValue(DUT_TestStruct2.Default, [2, 1, 1]);
+        array.SetValue(DUT_TestStruct2.Default, [2, 1, 2]);
+        array.SetValue(DUT_TestStruct2.Default, [2, 1, 3]);
+        array.SetValue(DUT_TestStruct2.Default, [2, 1, 4]);
+
+        array.SetValue(DUT_TestStruct2.Default, [2, 2, 1]);
+        array.SetValue(DUT_TestStruct2.Default, [2, 2, 2]);
+        array.SetValue(DUT_TestStruct2.Default, [2, 2, 3]);
+        array.SetValue(DUT_TestStruct2.Default, [2, 2, 4]);
+
+        array.SetValue(DUT_TestStruct2.Default, [2, 3, 1]);
+        array.SetValue(DUT_TestStruct2.Default, [2, 3, 2]);
+        array.SetValue(DUT_TestStruct2.Default, [2, 3, 3]);
+        array.SetValue(DUT_TestStruct2.Default, [2, 3, 4]);
+        return array;
+    }
+
+    private static NonZeroBasedArray<short> CreateNonZeroBoundMultiDimensionArrayWrite()
+    {
+        var array = new NonZeroBasedArray<short>([2, 3, 4], [1, 1, 1]);
+        array.SetValue(01000, [1, 1, 1]);
+        array.SetValue(02000, [1, 1, 2]);
+        array.SetValue(03000, [1, 1, 3]);
+        array.SetValue(04000, [1, 1, 4]);
+
+        array.SetValue(05000, [1, 2, 1]);
+        array.SetValue(06000, [1, 2, 2]);
+        array.SetValue(07000, [1, 2, 3]);
+        array.SetValue(08000, [1, 2, 4]);
+
+        array.SetValue(09000, [1, 3, 1]);
+        array.SetValue(10000, [1, 3, 2]);
+        array.SetValue(11000, [1, 3, 3]);
+        array.SetValue(12000, [1, 3, 4]);
+
+        array.SetValue(13000, [2, 1, 1]);
+        array.SetValue(14000, [2, 1, 2]);
+        array.SetValue(15000, [2, 1, 3]);
+        array.SetValue(16000, [2, 1, 4]);
+
+        array.SetValue(17000, [2, 2, 1]);
+        array.SetValue(18000, [2, 2, 2]);
+        array.SetValue(19000, [2, 2, 3]);
+        array.SetValue(20000, [2, 2, 4]);
+
+        array.SetValue(21000, [2, 3, 1]);
+        array.SetValue(22000, [2, 3, 2]);
+        array.SetValue(23000, [2, 3, 3]);
+        array.SetValue(24000, [2, 3, 4]);
+        return array;
+    }
+
+    private static NonZeroBasedArray<DUT_TestStruct2> CreateNonZeroBoundMultiDimensionComplexArrayWrite()
+    {
+        var array = new NonZeroBasedArray<DUT_TestStruct2>([2, 3, 4], [1, 1, 1]);
+        array.SetValue(DUT_TestStruct2.Write, [1, 1, 1]);
+        array.SetValue(DUT_TestStruct2.Write, [1, 1, 2]);
+        array.SetValue(DUT_TestStruct2.Write, [1, 1, 3]);
+        array.SetValue(DUT_TestStruct2.Write, [1, 1, 4]);
+
+        array.SetValue(DUT_TestStruct2.Write, [1, 2, 1]);
+        array.SetValue(DUT_TestStruct2.Write, [1, 2, 2]);
+        array.SetValue(DUT_TestStruct2.Write, [1, 2, 3]);
+        array.SetValue(DUT_TestStruct2.Write, [1, 2, 4]);
+
+        array.SetValue(DUT_TestStruct2.Write, [1, 3, 1]);
+        array.SetValue(DUT_TestStruct2.Write, [1, 3, 2]);
+        array.SetValue(DUT_TestStruct2.Write, [1, 3, 3]);
+        array.SetValue(DUT_TestStruct2.Write, [1, 3, 4]);
+
+        array.SetValue(DUT_TestStruct2.Write, [2, 1, 1]);
+        array.SetValue(DUT_TestStruct2.Write, [2, 1, 2]);
+        array.SetValue(DUT_TestStruct2.Write, [2, 1, 3]);
+        array.SetValue(DUT_TestStruct2.Write, [2, 1, 4]);
+
+        array.SetValue(DUT_TestStruct2.Write, [2, 2, 1]);
+        array.SetValue(DUT_TestStruct2.Write, [2, 2, 2]);
+        array.SetValue(DUT_TestStruct2.Write, [2, 2, 3]);
+        array.SetValue(DUT_TestStruct2.Write, [2, 2, 4]);
+
+        array.SetValue(DUT_TestStruct2.Write, [2, 3, 1]);
+        array.SetValue(DUT_TestStruct2.Write, [2, 3, 2]);
+        array.SetValue(DUT_TestStruct2.Write, [2, 3, 3]);
+        array.SetValue(DUT_TestStruct2.Write, [2, 3, 4]);
+        return array;
+    }
+
+    private static NonZeroBasedArray<DUT_TestStruct2> CreateNonZeroBoundComplexArrayWrite()
+    {
+        var array = new NonZeroBasedArray<DUT_TestStruct2>([3], [1]);
+        array.SetValue(DUT_TestStruct2.Write, [1]);
+        array.SetValue(DUT_TestStruct2.Write, [2]);
+        array.SetValue(DUT_TestStruct2.Write, [3]);
+        return array;
+    }
+
+    private static NonZeroBasedArray<short> CreateNonZeroBoundIntArrayWrite()
+    {
+        var array = new NonZeroBasedArray<short>([11], [1]);
+        array.SetValue(10000, [01]);
+        array.SetValue(10001, [02]);
+        array.SetValue(10002, [03]);
+        array.SetValue(10003, [04]);
+        array.SetValue(10004, [05]);
+        array.SetValue(10005, [06]);
+        array.SetValue(10006, [07]);
+        array.SetValue(10007, [08]);
+        array.SetValue(10008, [09]);
+        array.SetValue(10009, [10]);
+        array.SetValue(10010, [11]);
+        return array;
     }
 }

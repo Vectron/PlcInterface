@@ -23,7 +23,15 @@ internal sealed class OpcWriteCommand(IOpcReadWrite readWrite, IOpcSymbolHandler
 
         if (symbolInfo.IsArray)
         {
-            throw new InvalidOperationException("Arrays are not supported");
+            if (!value.StartsWith('[') || !value.EndsWith(']'))
+            {
+                throw new InvalidOperationException("Arrays must have the following syntax: ['values']");
+            }
+
+            return value[1..^1]
+                .Split(',')
+                .Select(x => ConvertToManagedType(symbolInfo.BuiltInType, x))
+                .ToArray();
         }
 
         if (symbolInfo.IsBigType)
@@ -31,9 +39,14 @@ internal sealed class OpcWriteCommand(IOpcReadWrite readWrite, IOpcSymbolHandler
             throw new InvalidOperationException("object types are not supported");
         }
 
-        var boxedValue = symbolInfo.BuiltInType switch
+        return ConvertToManagedType(symbolInfo.BuiltInType, value)
+            ?? throw new InvalidOperationException("Unknown data type");
+    }
+
+    private object? ConvertToManagedType(Opc.Ua.BuiltInType builtInType, object value)
+        => builtInType switch
         {
-            Opc.Ua.BuiltInType.Boolean => (object)typeConverter.Convert<bool>(value),
+            Opc.Ua.BuiltInType.Boolean => typeConverter.Convert<bool>(value),
             Opc.Ua.BuiltInType.SByte => typeConverter.Convert<sbyte>(value),
             Opc.Ua.BuiltInType.Byte => typeConverter.Convert<byte>(value),
             Opc.Ua.BuiltInType.Int16 => typeConverter.Convert<short>(value),
@@ -60,11 +73,7 @@ internal sealed class OpcWriteCommand(IOpcReadWrite readWrite, IOpcSymbolHandler
             Opc.Ua.BuiltInType.Variant => null,
             Opc.Ua.BuiltInType.DiagnosticInfo => null,
             Opc.Ua.BuiltInType.Number => null,
-            Opc.Ua.BuiltInType.Enumeration => typeConverter.Convert<int>(value),
+            Opc.Ua.BuiltInType.Enumeration => null,
             _ => null,
         };
-
-        return boxedValue
-            ?? throw new InvalidOperationException("Unknown data type");
-    }
 }

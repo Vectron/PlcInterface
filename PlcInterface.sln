@@ -28,9 +28,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		.runsettings = .runsettings
 		Directory.Build.props = Directory.Build.props
 		LICENSE.txt = LICENSE.txt
+		GithubActions.runsettings = GithubActions.runsettings
 		README.md = README.md
 		version.json = version.json
 	EndProjectSection

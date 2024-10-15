@@ -29,20 +29,63 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  # Stop wasting time caching packages
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  # Disable sending usage data to Microsoft
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  Target: PlcInterface.sln
+
 jobs:
-  call-build-test:
+  build-and-test:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
       fail-fast: true
-    uses: Vectron/GithubWorkflows/.github/workflows/BuildAndTest.yml@main
-    with:
-      os: ${{ matrix.os }}
-      dotnet_version: |
-        6.0.x
-        7.0.x
-        8.0.x
-      solution_file: PlcInterface.sln
+    runs-on: ${{ matrix.os }}
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+    steps:
+    - name: Sanitize windows paths
+      if: runner.os == 'Windows'
+      run: |
+         chcp 65001 #set code page to utf-8
+         $target = $env:Target.Replace('/', '\')
+         echo ("Target=" + $target) >> $env:GITHUB_ENV
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Setup github remotes
+      if: env.GITHUB_PAT != ''
+      run: >
+        dotnet nuget add source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+        --username ${{ github.repository_owner }}
+        --password ${{ secrets.GITHUB_PAT }}
+        --store-password-in-clear-text
+        --name github
+    - name: Install dependencies
+      run: >
+        dotnet restore ${{ env.Target }}
+        /p:EnableWindowsTargeting=true
+    - name: Build
+      run: >
+        dotnet build ${{ env.Target }}
+        --configuration Release
+        --no-restore
+        /p:EnableWindowsTargeting=true
+    - name: Test
+      run: >
+        dotnet test ${{ env.Target }}
+        --configuration Release
+        --verbosity normal
+        --no-build
+        --nologo
+        /p:EnableWindowsTargeting=true
 
   call-deploy:
     needs: call-build-test

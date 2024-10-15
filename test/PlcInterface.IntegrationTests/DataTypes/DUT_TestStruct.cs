@@ -1,11 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using PlcInterface.IntegrationTests.Extension;
 
 namespace PlcInterface.IntegrationTests.DataTypes;
 
 [StructLayout(LayoutKind.Sequential, Pack = 0)]
-internal struct DUT_TestStruct : IEquatable<DUT_TestStruct>
+internal struct DUT_TestStruct
 {
     public static DUT_TestStruct Default => new()
     {
@@ -255,72 +254,5 @@ internal struct DUT_TestStruct : IEquatable<DUT_TestStruct>
     {
         get;
         set;
-    }
-
-    [ExcludeFromCodeCoverage]
-    public override readonly bool Equals(object? obj)
-        => obj is DUT_TestStruct @struct && Equals(@struct);
-
-    public readonly bool Equals(DUT_TestStruct other)
-        => BoolValue == other.BoolValue
-            && ByteValue == other.ByteValue
-            && WordValue == other.WordValue
-            && DWordValue == other.DWordValue
-            && LWordValue == other.LWordValue
-            && ShortValue == other.ShortValue
-            && IntValue == other.IntValue
-            && DIntValue == other.DIntValue
-            && LongValue == other.LongValue
-            && UShortValue == other.UShortValue
-            && UIntValue == other.UIntValue
-            && UDIntValue == other.UDIntValue
-            && ULongValue == other.ULongValue
-            && FloatValue == other.FloatValue
-            && DoubleValue == other.DoubleValue
-            && TimeValue.Equals(other.TimeValue)
-            && TimeOfDay.Equals(other.TimeOfDay)
-            && LTimeValue.Equals(other.LTimeValue)
-            && DateValue.Equals(other.DateValue)
-            && DateAndTimeValue.Equals(other.DateAndTimeValue)
-            && string.Equals(StringValue, other.StringValue, StringComparison.Ordinal)
-            && string.Equals(WStringValue, other.WStringValue, StringComparison.Ordinal)
-            && EqualityComparer<DUT_TestStruct2>.Default.Equals(Nested, other.Nested)
-            && IntArray.SequenceEqual(other.IntArray)
-            && MultiDimensionArray.SequenceEqual<short>(other.MultiDimensionArray)
-            && ComplexArray.SequenceEqual(other.ComplexArray)
-            && MultiDimensionComplexArray.SequenceEqual<DUT_TestStruct2>(other.MultiDimensionComplexArray);
-
-    [ExcludeFromCodeCoverage]
-    public override readonly int GetHashCode()
-    {
-        var hashCode = 1307849462;
-        hashCode = (hashCode * -1521134295) + BoolValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + ByteValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + WordValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + DWordValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + LWordValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + ShortValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + IntValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + DIntValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + LongValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + UShortValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + UIntValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + UDIntValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + ULongValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + FloatValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + DoubleValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + TimeValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + TimeOfDay.GetHashCode();
-        hashCode = (hashCode * -1521134295) + LTimeValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + DateValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + DateAndTimeValue.GetHashCode();
-        hashCode = (hashCode * -1521134295) + StringComparer.Ordinal.GetHashCode(StringValue);
-        hashCode = (hashCode * -1521134295) + StringComparer.Ordinal.GetHashCode(WStringValue);
-        hashCode = (hashCode * -1521134295) + Nested.GetHashCode();
-        hashCode = (hashCode * -1521134295) + EqualityComparer<short[]>.Default.GetHashCode(IntArray);
-        hashCode = (hashCode * -1521134295) + EqualityComparer<short[,,]>.Default.GetHashCode(MultiDimensionArray);
-        hashCode = (hashCode * -1521134295) + EqualityComparer<DUT_TestStruct2[]>.Default.GetHashCode(ComplexArray);
-        hashCode = (hashCode * -1521134295) + EqualityComparer<DUT_TestStruct2[,,]>.Default.GetHashCode(MultiDimensionComplexArray);
-        return hashCode;
     }
 }

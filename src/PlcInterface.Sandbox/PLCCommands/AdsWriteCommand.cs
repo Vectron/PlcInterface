@@ -24,7 +24,22 @@ internal sealed class AdsWriteCommand(IAdsReadWrite readWrite, IAdsSymbolHandler
 
         if (symbolInfo.IsArray)
         {
-            throw new InvalidOperationException("Arrays are not supported");
+            if (!value.StartsWith('[') || !value.EndsWith(']'))
+            {
+                throw new InvalidOperationException("Arrays must have the following syntax: ['values']");
+            }
+
+            if (symbolInfo.Symbol is not IArrayInstance arrayInstance
+                || arrayInstance.ElementType is not TwinCAT.Ads.TypeSystem.DataType elementDataType
+                || elementDataType.ManagedType == null)
+            {
+                throw new InvalidOperationException("Unable to read data type.");
+            }
+
+            return value[1..^1]
+                .Split(',')
+                .Select(x => typeConverter.Convert(x, elementDataType.ManagedType))
+                .ToArray();
         }
 
         if (symbolInfo.IsBigType)

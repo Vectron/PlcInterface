@@ -49,9 +49,19 @@ internal sealed class PlcReadCommand(string name, IReadWrite readWrite) : IConso
             var builder = new StringBuilder()
                 .Append(symbolName)
                 .Append(": ");
-            _ = value is IDictionary<string, object?> multiValues
-                ? builder.AppendLine().Append(ObjectToString(multiValues, 1))
-                : builder.Append(value);
+
+            if (value is IDictionary<string, object?> multiValues)
+            {
+                ObjectToString(builder, multiValues, 1);
+            }
+            else if (value is Array array)
+            {
+                ArrayToString(builder, array, 1);
+            }
+            else
+            {
+                _ = builder.Append(value);
+            }
 
             Console.WriteLine(builder);
         }
@@ -62,26 +72,59 @@ internal sealed class PlcReadCommand(string name, IReadWrite readWrite) : IConso
         }
     }
 
-    private static string ObjectToString(IDictionary<string, object?> parameters, int indentation = 0)
+    private static void ArrayToString(StringBuilder builder, Array array, int indentation = 0)
     {
-        var builder = new StringBuilder();
+        var prefix = string.Join(string.Empty, Enumerable.Repeat("  ", indentation));
+        foreach (var indices in IndicesHelper.GetIndices(array))
+        {
+            _ = builder
+                .AppendLine()
+                .Append(prefix)
+                .Append('[')
+                .Append(indices[0]);
+
+            for (var i = 1; i < indices.Length; i++)
+            {
+                _ = builder
+                    .Append(", ")
+                    .Append(indices[i]);
+            }
+
+            _ = builder
+                .Append("]: ");
+
+            try
+            {
+                var itemValue = array.GetValue(indices)?.ToString() ?? "Null";
+                _ = builder.Append(itemValue);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                _ = builder.Append("Out of range");
+            }
+        }
+    }
+
+    private static void ObjectToString(StringBuilder builder, IDictionary<string, object?> parameters, int indentation = 0)
+    {
         var prefix = string.Join(string.Empty, Enumerable.Repeat("  ", indentation));
         foreach (var (key, value) in parameters)
         {
-            _ = builder.Append(prefix)
+            _ = builder
+                .Append(prefix)
                 .Append(key)
                 .Append(": ");
 
             if (value is IDictionary<string, object?> dictionary)
             {
-                _ = builder.AppendLine()
-                    .Append(ObjectToString(dictionary, indentation + 1));
+                _ = builder
+                    .AppendLine();
+
+                ObjectToString(builder, dictionary, indentation + 1);
                 continue;
             }
 
             _ = builder.AppendLine(value?.ToString());
         }
-
-        return builder.ToString();
     }
 }

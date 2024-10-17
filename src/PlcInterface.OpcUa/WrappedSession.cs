@@ -216,6 +216,23 @@ internal sealed record class WrappedSession(ISession Session) : ISession, IDispo
     public ITypeTable TypeTree => Session.TypeTree;
 
     /// <inheritdoc/>
+    public int LastKeepAliveTickCount => Session.LastKeepAliveTickCount;
+
+    /// <inheritdoc/>
+    public int MaxPublishRequestCount
+    {
+        get => Session.MaxPublishRequestCount;
+        set => Session.MaxPublishRequestCount = value;
+    }
+
+    /// <inheritdoc/>
+    public ContinuationPointPolicy ContinuationPointPolicy
+    {
+        get => Session.ContinuationPointPolicy;
+        set => Session.ContinuationPointPolicy = value;
+    }
+
+    /// <inheritdoc/>
     public ResponseHeader ActivateSession(RequestHeader requestHeader, SignatureData clientSignature, SignedSoftwareCertificateCollection clientSoftwareCertificates, StringCollection localeIds, ExtensionObject userIdentityToken, SignatureData userTokenSignature, out byte[] serverNonce, out StatusCodeCollection results, out DiagnosticInfoCollection diagnosticInfos) => Session.ActivateSession(requestHeader, clientSignature, clientSoftwareCertificates, localeIds, userIdentityToken, userTokenSignature, out serverNonce, out results, out diagnosticInfos);
 
     /// <inheritdoc/>
@@ -605,9 +622,6 @@ internal sealed record class WrappedSession(ISession Session) : ISession, IDispo
     public Task FetchTypeTreeAsync(ExpandedNodeIdCollection typeIds, CancellationToken ct = default) => Session.FetchTypeTreeAsync(typeIds, ct);
 
     /// <inheritdoc/>
-    public void FindComponentIds(NodeId instanceId, IList<string> componentPaths, out NodeIdCollection componentIds, out List<ServiceResult> errors) => Session.FindComponentIds(instanceId, componentPaths, out componentIds, out errors);
-
-    /// <inheritdoc/>
     public ReferenceDescription FindDataDescription(NodeId encodingId) => Session.FindDataDescription(encodingId);
 
     /// <inheritdoc/>
@@ -743,9 +757,6 @@ internal sealed record class WrappedSession(ISession Session) : ISession, IDispo
     public void ReadValues(IList<NodeId> nodeIds, out DataValueCollection values, out IList<ServiceResult> errors) => Session.ReadValues(nodeIds, out values, out errors);
 
     /// <inheritdoc/>
-    public void ReadValues(IList<NodeId> variableIds, IList<Type> expectedTypes, out List<object> values, out List<ServiceResult> errors) => Session.ReadValues(variableIds, expectedTypes, out values, out errors);
-
-    /// <inheritdoc/>
     public Task<(DataValueCollection, IList<ServiceResult>)> ReadValuesAsync(IList<NodeId> nodeIds, CancellationToken ct = default) => Session.ReadValuesAsync(nodeIds, ct);
 
     /// <inheritdoc/>
@@ -870,4 +881,16 @@ internal sealed record class WrappedSession(ISession Session) : ISession, IDispo
 
     /// <inheritdoc/>
     public Task<WriteResponse> WriteAsync(RequestHeader requestHeader, WriteValueCollection nodesToWrite, CancellationToken ct) => Session.WriteAsync(requestHeader, nodesToWrite, ct);
+
+    /// <inheritdoc/>
+    public void FindComponentIds(NodeId instanceId, IList<string> componentPaths, out NodeIdCollection componentIds, out IList<ServiceResult> errors) => Session.FindComponentIds(instanceId, componentPaths, out componentIds, out errors);
+
+    /// <inheritdoc/>
+    public void ReadValues(IList<NodeId> variableIds, IList<Type> expectedTypes, out IList<object> values, out IList<ServiceResult> errors) => Session.ReadValues(variableIds, expectedTypes, out values, out errors);
+
+    /// <inheritdoc/>
+    public void ManagedBrowse(RequestHeader requestHeader, ViewDescription view, IList<NodeId> nodesToBrowse, uint maxResultsToReturn, BrowseDirection browseDirection, NodeId referenceTypeId, bool includeSubtypes, uint nodeClassMask, out IList<ReferenceDescriptionCollection> result, out IList<ServiceResult> errors) => Session.ManagedBrowse(requestHeader, view, nodesToBrowse, maxResultsToReturn, browseDirection, referenceTypeId, includeSubtypes, nodeClassMask, out result, out errors);
+
+    /// <inheritdoc/>
+    public Task<(IList<ReferenceDescriptionCollection>, IList<ServiceResult>)> ManagedBrowseAsync(RequestHeader requestHeader, ViewDescription view, IList<NodeId> nodesToBrowse, uint maxResultsToReturn, BrowseDirection browseDirection, NodeId referenceTypeId, bool includeSubtypes, uint nodeClassMask, CancellationToken ct = default) => Session.ManagedBrowseAsync(requestHeader, view, nodesToBrowse, maxResultsToReturn, browseDirection, referenceTypeId, includeSubtypes, nodeClassMask, ct);
 }

@@ -916,3 +916,28 @@ dotnet_diagnostic.MA0151.severity = warning
 dotnet_diagnostic.MA0152.severity = suggestion
 # MA0153: Do not log symbols decorated with DataClassificationAttribute directly
 dotnet_diagnostic.MA0153.severity = warning
+# MA0154: Use langword in XML comment
+dotnet_diagnostic.MA0154.severity = warning
+# MA0155: Do not use async void methods
+dotnet_diagnostic.MA0154.severity = warning
+# MA0156: Use 'Async' suffix when a method returns IAsyncEnumerable<T>
+dotnet_diagnostic.MA0154.severity = warning
+# MA0157: Do not use 'Async' suffix when a method does not return IAsyncEnumerable<T>
+dotnet_diagnostic.MA0154.severity = warning
+# MA0158: Use System.Threading.Lock
+dotnet_diagnostic.MA0154.severity = warning
+# MA0159: Use 'Order' instead of 'OrderBy'
+dotnet_diagnostic.MA0154.severity = warning
+
+# MA0160: Use ContainsKey instead of TryGetValue
+dotnet_diagnostic.MA0160.severity = warning
+# MA0161: UseShellExecute must be explicitly set
+dotnet_diagnostic.MA0161.severity = warning
+# MA0162: Use Process.Start overload with ProcessStartInfo
+dotnet_diagnostic.MA0162.severity = warning
+# MA0163: UseShellExecute must be false when redirecting standard input or output
+dotnet_diagnostic.MA0163.severity = warning
+# MA0164: Use parentheses to make not pattern clearer
+dotnet_diagnostic.MA0164.severity = warning
+# MA0165: Make interpolated string
+dotnet_diagnostic.MA0165.severity = silent

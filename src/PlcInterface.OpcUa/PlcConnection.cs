@@ -95,7 +95,7 @@ public partial class PlcConnection : IOpcPlcConnection, IDisposable
             await config.Validate(ApplicationType.Client).ConfigureAwait(false);
             var usesSecurity = await SetupSecurityAsync(config).ConfigureAwait(false);
             LogFindingEndpoint(settings.DiscoveryAddress);
-            var selectedEndpoint = CoreClientUtils.SelectEndpoint(settings.DiscoveryAddress.ToString(), usesSecurity, 15000);
+            var selectedEndpoint = await Task.Run(() => CoreClientUtils.SelectEndpoint(settings.DiscoveryAddress.ToString(), usesSecurity, 15000)).ConfigureAwait(false);
             LogSelectedSecurity(selectedEndpoint.SecurityPolicyUri[(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1)..]);
             LogCreateSession();
             var endpointConfiguration = EndpointConfiguration.Create(config);

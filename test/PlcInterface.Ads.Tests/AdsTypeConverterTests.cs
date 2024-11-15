@@ -27,7 +27,7 @@ public class AdsTypeConverterTests
         var actual = typeConverter.Convert(sourceMock.Object, Mock.Of<IValueSymbol>());
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(ICollection));
+        Assert.IsInstanceOfType<ICollection>(actual);
         CollectionAssert.AreEqual(expected, (ICollection)actual);
     }
 
@@ -66,7 +66,7 @@ public class AdsTypeConverterTests
         var actual = typeConverter.Convert<TimesTestType>(sourceMock.Object);
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(TimesTestType));
+        Assert.IsInstanceOfType<TimesTestType>(actual);
         Assert.AreEqual(expected.Date, actual.Date);
         Assert.AreEqual(expected.Time, actual.Time);
         Assert.AreEqual(expected.LTime, actual.LTime);
@@ -87,7 +87,7 @@ public class AdsTypeConverterTests
         var actual = typeConverter.Convert(source, valueSymbolMock.Object);
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(DateTimeOffset));
+        Assert.IsInstanceOfType<DateTimeOffset>(actual);
         Assert.AreEqual(expected, actual);
     }
 
@@ -104,10 +104,10 @@ public class AdsTypeConverterTests
         var actual2 = typeConverter.Convert(1L, valueSymbolMock.Object);
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(int));
+        Assert.IsInstanceOfType<int>(actual);
         Assert.AreEqual(1, actual);
 
-        Assert.IsInstanceOfType(actual2, typeof(long));
+        Assert.IsInstanceOfType<long>(actual2);
         Assert.AreEqual(1L, actual2);
     }
 

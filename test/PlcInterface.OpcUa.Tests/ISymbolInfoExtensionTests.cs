@@ -16,8 +16,8 @@ public class ISymbolInfoExtensionTests
         var actual = symbolInfo.ConvertAndValidate();
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(IOpcSymbolInfo));
-        Assert.IsInstanceOfType(actual, typeof(ISymbolInfo));
+        Assert.IsInstanceOfType<IOpcSymbolInfo>(actual);
+        Assert.IsInstanceOfType<ISymbolInfo>(actual);
         Assert.AreSame(symbolInfo, actual);
     }
 

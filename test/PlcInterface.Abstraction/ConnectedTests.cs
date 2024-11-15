@@ -12,12 +12,12 @@ public class ConnectedTests
         var connected = new Connected<GenericParameterHelper>();
 
         // Act
-        Assert.IsInstanceOfType(connected, typeof(IConnected));
-        Assert.IsInstanceOfType(connected, typeof(IConnected<GenericParameterHelper>));
+        Assert.IsInstanceOfType<IConnected>(connected);
+        Assert.IsInstanceOfType<IConnected<GenericParameterHelper>>(connected);
 
         // Assert
-        Assert.IsInstanceOfType(connected, typeof(IConnected));
-        Assert.IsInstanceOfType(connected, typeof(IConnected<GenericParameterHelper>));
+        Assert.IsInstanceOfType<IConnected>(connected);
+        Assert.IsInstanceOfType<IConnected<GenericParameterHelper>>(connected);
     }
 
     [TestMethod]
@@ -29,8 +29,8 @@ public class ConnectedTests
         var notConnected = Connected.No<GenericParameterHelper>();
 
         // Assert
-        Assert.IsInstanceOfType(notConnected, typeof(IConnected));
-        Assert.IsInstanceOfType(notConnected, typeof(IConnected<GenericParameterHelper>));
+        Assert.IsInstanceOfType<IConnected>(notConnected);
+        Assert.IsInstanceOfType<IConnected<GenericParameterHelper>>(notConnected);
         Assert.IsFalse(notConnected.IsConnected);
         _ = Assert.ThrowsException<InvalidOperationException>(() => notConnected.Value);
     }
@@ -45,8 +45,8 @@ public class ConnectedTests
         var connected = Connected.Yes(expectedValue);
 
         // Assert
-        Assert.IsInstanceOfType(connected, typeof(IConnected));
-        Assert.IsInstanceOfType(connected, typeof(IConnected<GenericParameterHelper>));
+        Assert.IsInstanceOfType<IConnected>(connected);
+        Assert.IsInstanceOfType<IConnected<GenericParameterHelper>>(connected);
         Assert.IsTrue(connected.IsConnected);
         Assert.AreSame(expectedValue, connected.Value);
     }

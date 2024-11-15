@@ -17,8 +17,8 @@ public class ISymbolInfoExtensionTests
         var actual = symbolInfo.CastAndValidate();
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(IAdsSymbolInfo));
-        Assert.IsInstanceOfType(actual, typeof(ISymbolInfo));
+        Assert.IsInstanceOfType<IAdsSymbolInfo>(actual);
+        Assert.IsInstanceOfType<ISymbolInfo>(actual);
         Assert.AreSame(symbolInfo, actual);
     }
 

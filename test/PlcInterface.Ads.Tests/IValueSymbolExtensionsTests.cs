@@ -18,7 +18,7 @@ public class IValueSymbolExtensionsTests
         var actual = symbolMock.Object.CastAndValidate();
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(IValueSymbol));
+        Assert.IsInstanceOfType<IValueSymbol>(actual);
         Assert.AreSame(symbolMock.Object, actual);
     }
 

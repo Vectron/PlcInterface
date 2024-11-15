@@ -30,8 +30,8 @@ internal static class AssertObjectValue
             return expando[name];
         }
 
-        var arguments = new CSharpArgumentInfo[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null) };
-        var binder = Microsoft.CSharp.RuntimeBinder.Binder.GetMember(CSharpBinderFlags.None, name, null, arguments);
+        var arguments = new CSharpArgumentInfo[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, name: null) };
+        var binder = Microsoft.CSharp.RuntimeBinder.Binder.GetMember(CSharpBinderFlags.None, name, context: null, arguments);
         var site = CallSite<Func<CallSite, object, object>>.Create(binder);
         return site.Target(site, o);
     }

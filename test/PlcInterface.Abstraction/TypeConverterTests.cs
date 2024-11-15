@@ -73,7 +73,7 @@ public class TypeConverterTests
         var actual = typeConverter.Convert<DateTimeOffset>(dateTime);
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(DateTimeOffset));
+        Assert.IsInstanceOfType<DateTimeOffset>(actual);
         Assert.AreEqual(new DateTimeOffset(dateTime), actual);
     }
 
@@ -135,7 +135,7 @@ public class TypeConverterTests
         var actual = typeConverter.Convert<TestType>(sourceMock.Object);
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(TestType));
+        Assert.IsInstanceOfType<TestType>(actual);
         Assert.AreEqual(expected.IntValue, actual.IntValue);
         CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
 
@@ -158,7 +158,7 @@ public class TypeConverterTests
         var actual = typeConverter.Convert<TestType>(source);
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(TestType));
+        Assert.IsInstanceOfType<TestType>(actual);
         Assert.AreEqual(expected.IntValue, actual.IntValue);
         CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
 
@@ -175,12 +175,12 @@ public class TypeConverterTests
 
         // Act
         var actual = typeConverter.Convert<int>(stringObject);
-        var actual2 = typeConverter.Convert(stringObject, typeof(int));
+        var actual2 = typeConverter.Convert<int>(stringObject);
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(int));
+        Assert.IsInstanceOfType<int>(actual);
         Assert.AreEqual(100, actual);
-        Assert.IsInstanceOfType(actual2, typeof(int));
+        Assert.IsInstanceOfType<int>(actual2);
         Assert.AreEqual(100, actual2);
     }
 
@@ -193,13 +193,13 @@ public class TypeConverterTests
 
         // Act
         var actual = typeConverter.Convert<TestEnum>(value);
-        var actual2 = typeConverter.Convert(value, typeof(TestEnum));
+        var actual2 = typeConverter.Convert<TestEnum>(value);
 
         // Assert
         Assert.AreEqual(TestEnum.Value4, actual);
-        Assert.IsInstanceOfType(actual, typeof(TestEnum));
+        Assert.IsInstanceOfType<TestEnum>(actual);
         Assert.AreEqual(TestEnum.Value4, actual2);
-        Assert.IsInstanceOfType(actual2, typeof(TestEnum));
+        Assert.IsInstanceOfType<TestEnum>(actual2);
     }
 
     [TestMethod]
@@ -211,10 +211,10 @@ public class TypeConverterTests
 
         // Act
         var actual = typeConverter.Convert<GenericParameterHelper>(expected);
-        var actual2 = typeConverter.Convert(expected, typeof(GenericParameterHelper));
+        var actual2 = typeConverter.Convert<GenericParameterHelper>(expected);
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(GenericParameterHelper));
+        Assert.IsInstanceOfType<GenericParameterHelper>(actual);
         Assert.AreEqual(expected, actual);
         Assert.AreEqual(expected, actual2);
     }
@@ -252,7 +252,7 @@ public class TypeConverterTests
         var actual = typeConverter.Convert<TestRecordType>(sourceMock.Object);
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(TestRecordType));
+        Assert.IsInstanceOfType<TestRecordType>(actual);
         Assert.AreEqual(expected.IntValue, actual.IntValue);
         CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
 
@@ -293,7 +293,7 @@ public class TypeConverterTests
         var actual = typeConverter.Convert<TestRecordStructType>(sourceMock.Object);
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(TestRecordStructType));
+        Assert.IsInstanceOfType<TestRecordStructType>(actual);
         Assert.AreEqual(expected.IntValue, actual.IntValue);
         CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
 
@@ -334,7 +334,7 @@ public class TypeConverterTests
         var actual = typeConverter.Convert<TestValueType>(sourceMock.Object);
 
         // Assert
-        Assert.IsInstanceOfType(actual, typeof(TestValueType));
+        Assert.IsInstanceOfType<TestValueType>(actual);
         Assert.AreEqual(expected.IntValue, actual.IntValue);
         CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
 

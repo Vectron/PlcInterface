@@ -40,7 +40,7 @@ public abstract class TypeConverter : ITypeConverter
         if (targetType.IsEnum
             && value.GetType() == typeof(string))
         {
-            var enumNumber = Convert(value, typeof(long));
+            var enumNumber = Convert<long>(value);
             return Enum.ToObject(targetType, enumNumber);
         }
 

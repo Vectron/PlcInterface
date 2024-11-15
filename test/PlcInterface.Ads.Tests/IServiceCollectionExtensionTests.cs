@@ -35,7 +35,7 @@ public class IServiceCollectionExtensionTests
 
         Assert.IsNull(concrete);
         Assert.IsNull(typeConverter);
-        Assert.IsInstanceOfType(adsTypeConverter, typeof(AdsTypeConverter));
+        Assert.IsInstanceOfType<AdsTypeConverter>(adsTypeConverter);
     }
 
     [TestMethod]
@@ -65,10 +65,10 @@ public class IServiceCollectionExtensionTests
         var monitor = serviceProvider.GetService<IMonitor>();
 
         // Assert
-        Assert.IsInstanceOfType(adsPlcConnection, typeof(PlcConnection));
-        Assert.IsInstanceOfType(adsSymbolHandler, typeof(SymbolHandler));
-        Assert.IsInstanceOfType(adsReadWrite, typeof(ReadWrite));
-        Assert.IsInstanceOfType(adsMonitor, typeof(Monitor));
+        Assert.IsInstanceOfType<PlcConnection>(adsPlcConnection);
+        Assert.IsInstanceOfType<SymbolHandler>(adsSymbolHandler);
+        Assert.IsInstanceOfType<ReadWrite>(adsReadWrite);
+        Assert.IsInstanceOfType<Monitor>(adsMonitor);
         Assert.AreNotSame(adsPlcConnection, plcConnection);
         Assert.AreNotSame(adsSymbolHandler, symbolHandler);
         Assert.AreNotSame(adsReadWrite, readWrite);
@@ -86,7 +86,7 @@ public class IServiceCollectionExtensionTests
 
         Assert.IsNull(concrete);
         Assert.AreSame(adsMonitor, monitor);
-        Assert.IsInstanceOfType(adsMonitor, typeof(Monitor));
+        Assert.IsInstanceOfType<Monitor>(adsMonitor);
     }
 
     [TestMethod]
@@ -102,7 +102,7 @@ public class IServiceCollectionExtensionTests
         Assert.IsNull(concrete);
         Assert.AreSame(adsConnection, connection);
         Assert.AreSame(adsConnection, genericConnection);
-        Assert.IsInstanceOfType(adsConnection, typeof(PlcConnection));
+        Assert.IsInstanceOfType<PlcConnection>(adsConnection);
     }
 
     [TestMethod]
@@ -116,7 +116,7 @@ public class IServiceCollectionExtensionTests
 
         Assert.IsNull(concrete);
         Assert.AreSame(adsReadWrite, readWrite);
-        Assert.IsInstanceOfType(adsReadWrite, typeof(ReadWrite));
+        Assert.IsInstanceOfType<ReadWrite>(adsReadWrite);
     }
 
     [TestMethod]
@@ -130,6 +130,6 @@ public class IServiceCollectionExtensionTests
 
         Assert.IsNull(concrete);
         Assert.AreSame(adsSymbolHandler, symbolHandler);
-        Assert.IsInstanceOfType(adsSymbolHandler, typeof(SymbolHandler));
+        Assert.IsInstanceOfType<SymbolHandler>(adsSymbolHandler);
     }
 }

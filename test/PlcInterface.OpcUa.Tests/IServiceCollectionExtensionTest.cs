@@ -51,10 +51,10 @@ public class IServiceCollectionExtensionTest
         var monitor = serviceProvider.GetService<IMonitor>();
 
         // Assert
-        Assert.IsInstanceOfType(opcPlcConnection, typeof(PlcConnection));
-        Assert.IsInstanceOfType(opcSymbolHandler, typeof(SymbolHandler));
-        Assert.IsInstanceOfType(opcReadWrite, typeof(ReadWrite));
-        Assert.IsInstanceOfType(opcMonitor, typeof(Monitor));
+        Assert.IsInstanceOfType<PlcConnection>(opcPlcConnection);
+        Assert.IsInstanceOfType<SymbolHandler>(opcSymbolHandler);
+        Assert.IsInstanceOfType<ReadWrite>(opcReadWrite);
+        Assert.IsInstanceOfType<Monitor>(opcMonitor);
         Assert.AreNotSame(opcPlcConnection, plcConnection);
         Assert.AreNotSame(opcSymbolHandler, symbolHandler);
         Assert.AreNotSame(opcReadWrite, readWrite);
@@ -72,7 +72,7 @@ public class IServiceCollectionExtensionTest
 
         Assert.IsNull(concrete);
         Assert.AreSame(opcMonitor, monitor);
-        Assert.IsInstanceOfType(opcMonitor, typeof(Monitor));
+        Assert.IsInstanceOfType<Monitor>(opcMonitor);
     }
 
     [TestMethod]
@@ -86,7 +86,7 @@ public class IServiceCollectionExtensionTest
 
         Assert.IsNull(concrete);
         Assert.IsNull(typeConverter);
-        Assert.IsInstanceOfType(opcTypeConverter, typeof(OpcTypeConverter));
+        Assert.IsInstanceOfType<OpcTypeConverter>(opcTypeConverter);
     }
 
     [TestMethod]
@@ -102,7 +102,7 @@ public class IServiceCollectionExtensionTest
         Assert.IsNull(concrete);
         Assert.AreSame(opcConnection, connection);
         Assert.AreSame(opcConnection, genericConnection);
-        Assert.IsInstanceOfType(opcConnection, typeof(PlcConnection));
+        Assert.IsInstanceOfType<PlcConnection>(opcConnection);
     }
 
     [TestMethod]
@@ -116,7 +116,7 @@ public class IServiceCollectionExtensionTest
 
         Assert.IsNull(concrete);
         Assert.AreSame(opcReadWrite, readWrite);
-        Assert.IsInstanceOfType(opcReadWrite, typeof(ReadWrite));
+        Assert.IsInstanceOfType<ReadWrite>(opcReadWrite);
     }
 
     [TestMethod]
@@ -130,6 +130,6 @@ public class IServiceCollectionExtensionTest
 
         Assert.IsNull(concrete);
         Assert.AreSame(opcSymbolHandler, symbolHandler);
-        Assert.IsInstanceOfType(opcSymbolHandler, typeof(SymbolHandler));
+        Assert.IsInstanceOfType<SymbolHandler>(opcSymbolHandler);
     }
 }

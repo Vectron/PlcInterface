@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Dynamic;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -62,11 +63,11 @@ internal static class AssertObjectValue
         {
             var expectedDimensionLength = expected.GetLength(dimension);
             var actualDimensionLength = expected.GetLength(dimension);
-            Assert.AreEqual(expectedDimensionLength, actualDimensionLength, $"{message} -> dimension {dimension} have different lower bounds");
+            Assert.AreEqual(expectedDimensionLength, actualDimensionLength, string.Format(CultureInfo.InvariantCulture, "{0} -> dimension {1} have different lower bounds", message, dimension));
 
             var expectedDimensionLowerBound = expected.GetLength(dimension);
             var actualDimensionLowerBound = expected.GetLength(dimension);
-            Assert.AreEqual(expectedDimensionLowerBound, actualDimensionLowerBound, $"{message} -> dimension {dimension} have different lower bounds");
+            Assert.AreEqual(expectedDimensionLowerBound, actualDimensionLowerBound, string.Format(CultureInfo.InvariantCulture, "{0} -> dimension {1} have different lower bounds", message, dimension));
         }
 
         ValidateEnumerable(expected, actual, message, equals);
@@ -87,7 +88,7 @@ internal static class AssertObjectValue
 
             var currentExpected = expectedEnumerator.Current;
             var currentActual = actualEnumerator.Current;
-            ValidateObject(currentExpected, currentActual, $"{message}[{index}]", equals);
+            ValidateObject(currentExpected, currentActual, string.Format(CultureInfo.InvariantCulture, "{0}[{1}]", message, index), equals);
             index++;
         }
 

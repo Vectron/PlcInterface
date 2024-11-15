@@ -152,7 +152,7 @@ public class DynamicObjectExtensionsTests
         // Assert
         Assert.AreEqual(255, expando.Property1);
         Assert.AreEqual("test", expando.Property2);
-        Assert.AreEqual(false, expando.Property3);
+        Assert.AreEqual(expected: false, actual: expando.Property3);
         Assert.AreEqual(10L, expando.Property4);
         Assert.IsNull(expando.Property5);
     }

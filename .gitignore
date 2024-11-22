@@ -273,3 +273,4 @@ __pycache__/
 *.bak
 **/*.tclrs
 **/*.tpy
+*.dbg

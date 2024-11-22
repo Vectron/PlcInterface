@@ -7,6 +7,9 @@ namespace PlcInterface.Ads;
 /// </content>
 public partial class SymbolHandler
 {
+    [LoggerMessage(EventId = 5, Level = LogLevel.Error, Message = "Plc not connected")]
+    private partial void LogPlcNotConnected();
+
     [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "Symbols updated in {Time} ms, found {Amount} symbols")]
     private partial void LogSymbolsUpdated(long time, int amount);
 

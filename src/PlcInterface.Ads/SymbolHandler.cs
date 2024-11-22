@@ -17,6 +17,7 @@ namespace PlcInterface.Ads;
 /// </summary>
 public partial class SymbolHandler : IAdsSymbolHandler, IDisposable
 {
+    private readonly IAdsPlcConnection connection;
     private readonly CompositeDisposable disposables = [];
     private readonly IFileSystem fileSystem;
     private readonly ILogger<SymbolHandler> logger;
@@ -38,6 +39,7 @@ public partial class SymbolHandler : IAdsSymbolHandler, IDisposable
     public SymbolHandler(IAdsPlcConnection connection, IOptions<AdsSymbolHandlerOptions> options, ILogger<SymbolHandler> logger, IFileSystem fileSystem, ISymbolLoaderFactory symbolLoaderFactory)
     {
         this.options = options.Value;
+        this.connection = connection;
         this.logger = logger;
         this.fileSystem = fileSystem;
         this.symbolLoaderFactory = symbolLoaderFactory;
@@ -72,6 +74,11 @@ public partial class SymbolHandler : IAdsSymbolHandler, IDisposable
             return symbolInfo;
         }
 
+        if (!connection.IsConnected)
+        {
+            throw new SymbolException($"PLC not connected");
+        }
+
         throw new SymbolException($"{ioName} Does not exist in the PLC");
     }
 
@@ -89,6 +96,12 @@ public partial class SymbolHandler : IAdsSymbolHandler, IDisposable
         if (allSymbols.TryGetValue(ioName, out symbolInfo))
         {
             return true;
+        }
+
+        if (!connection.IsConnected)
+        {
+            LogPlcNotConnected();
+            return false;
         }
 
         LogVariableDoesNotExist(ioName);

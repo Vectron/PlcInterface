@@ -40,21 +40,6 @@ public class SymbolHandlerTests
     }
 
     [TestMethod]
-    public void GetGetSymbolInfoThrowsSymbolExceptionWhenNoSymbolsAreLoaded()
-    {
-        // Arrange
-        var adsPlcConnection = new Mock<IAdsPlcConnection>();
-        _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
-        var symbolHandlerSettings = new AdsSymbolHandlerOptions();
-        var fileSystemMock = new Mock<IFileSystem>();
-        var symbolLoaderFactory = new Mock<ISymbolLoaderFactory>();
-        using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock.Object, symbolLoaderFactory.Object);
-
-        // Act Assert
-        _ = Assert.ThrowsException<SymbolException>(() => symbolHandler.GetSymbolInfo("dummyTag"));
-    }
-
-    [TestMethod]
     public void GetSymbolInfoReturnsSymbolWhenAvailable()
     {
         // Arrange
@@ -89,6 +74,26 @@ public class SymbolHandlerTests
     }
 
     [TestMethod]
+    public void GetSymbolInfoThrowsSymbolExceptionWhenNoSymbolsAreLoaded()
+    {
+        // Arrange
+        var ioName = "DummyVar1";
+        var adsPlcConnection = new Mock<IAdsPlcConnection>();
+        _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
+        _ = adsPlcConnection.SetupGet(x => x.IsConnected).Returns(value: true);
+        var symbolHandlerSettings = new AdsSymbolHandlerOptions();
+        var fileSystemMock = new Mock<IFileSystem>();
+        var symbolLoaderFactory = new Mock<ISymbolLoaderFactory>();
+        using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock.Object, symbolLoaderFactory.Object);
+
+        // Act
+
+        // Assert
+        var exception = Assert.ThrowsException<SymbolException>(() => symbolHandler.GetSymbolInfo(ioName));
+        Assert.AreEqual(exception.Message, $"{ioName} Does not exist in the PLC");
+    }
+
+    [TestMethod]
     public void OnConnectSymbolListIsUpdated()
     {
         // Arrange
@@ -118,6 +123,26 @@ public class SymbolHandlerTests
 
         // Assert
         Assert.AreEqual(6, symbolHandler.AllSymbols.Count);
+    }
+
+    [TestMethod]
+    public void SymbolExceptionThrownWhenNoPlcConnected()
+    {
+        // Arrange
+        var ioName = "DummyVar1";
+        var adsPlcConnection = new Mock<IAdsPlcConnection>();
+        _ = adsPlcConnection.SetupGet(x => x.SessionStream).Returns(Mock.Of<IObservable<IConnected<IAdsConnection>>>());
+        _ = adsPlcConnection.SetupGet(x => x.IsConnected).Returns(value: false);
+        var symbolHandlerSettings = new AdsSymbolHandlerOptions();
+        var fileSystemMock = new Mock<IFileSystem>();
+        var symbolLoaderFactory = new Mock<ISymbolLoaderFactory>();
+        using var symbolHandler = new SymbolHandler(adsPlcConnection.Object, MockHelpers.GetOptionsMoq(symbolHandlerSettings), MockHelpers.GetLoggerMock<SymbolHandler>(), fileSystemMock.Object, symbolLoaderFactory.Object);
+
+        // Act
+
+        // Assert
+        var exception = Assert.ThrowsException<SymbolException>(() => symbolHandler.GetSymbolInfo(ioName));
+        Assert.AreEqual(exception.Message, "PLC not connected");
     }
 
     [TestMethod]

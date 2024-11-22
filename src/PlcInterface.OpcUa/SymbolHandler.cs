@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Opc.Ua.Client;
@@ -19,7 +20,6 @@ public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
     private readonly OpcSymbolHandlerOptions options;
     private IDictionary<string, IOpcSymbolInfo> allSymbols = new Dictionary<string, IOpcSymbolInfo>(StringComparer.OrdinalIgnoreCase);
     private bool disposedValue;
-    private ISession? session;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SymbolHandler"/> class.
@@ -32,18 +32,12 @@ public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
         this.connection = connection;
         this.options = options.Value;
         this.logger = logger;
-        disposables.Add(connection.SessionStream.Subscribe(x =>
-        {
-            if (x.IsConnected && x.Value != null)
-            {
-                session = x.Value;
-                UpdateSymbols(session);
-            }
-            else
-            {
-                session = null;
-            }
-        }));
+        var session = connection.SessionStream
+            .Where(x => x.IsConnected)
+            .Select(x => x.Value)
+            .WhereNotNull()
+            .Subscribe(UpdateSymbols);
+        disposables.Add(session);
     }
 
     /// <inheritdoc/>
@@ -70,6 +64,11 @@ public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
             return symbolInfo;
         }
 
+        if (!connection.IsConnected)
+        {
+            throw new SymbolException("PLC not connected");
+        }
+
         throw new SymbolException($"{ioName} Does not exist in the PLC");
     }
 
@@ -84,14 +83,18 @@ public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
     /// <inheritdoc/>
     public bool TryGetSymbolInfo(string ioName, [MaybeNullWhen(false)] out IOpcSymbolInfo symbolInfo)
     {
-        if (allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out var symbolInfoResult))
+        if (allSymbols.TryGetValue(ioName.ToLower(CultureInfo.InvariantCulture), out symbolInfo))
         {
-            symbolInfo = symbolInfoResult;
             return true;
         }
 
+        if (!connection.IsConnected)
+        {
+            LogPlcNotConnected();
+            return false;
+        }
+
         LogVariableDoesNotExist(ioName);
-        symbolInfo = null;
         return false;
     }
 
@@ -107,7 +110,6 @@ public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
             {
                 disposables.Dispose();
                 allSymbols.Clear();
-                session = null;
             }
 
             disposedValue = true;

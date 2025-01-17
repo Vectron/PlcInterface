@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Vectron.Extensions.Logging.Theming.Console" Version="1.0.24" />
     <PackageReference Include="Vectron.InteractiveConsole" Version="1.0.68" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
     <PackageReference Include="Beckhoff.TwinCAT.Ads.TcpRouter" Version="6.1.203" />
   </ItemGroup>

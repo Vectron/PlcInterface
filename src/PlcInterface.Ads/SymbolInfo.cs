@@ -15,6 +15,7 @@ namespace PlcInterface.Ads;
 internal sealed class SymbolInfo(ISymbol symbol, string rootPath) : IAdsSymbolInfo
 {
     /// <inheritdoc/>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0305:Simplify collection initialization", Justification = "Makes it more unreadable")]
     public IList<string> ChildSymbols
         => Symbol.SubSymbols.Select(x => CleanInstancePath(x, rootPath)).ToList();
 

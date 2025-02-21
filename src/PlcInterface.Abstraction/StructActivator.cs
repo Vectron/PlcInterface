@@ -16,6 +16,7 @@ internal sealed class StructActivator(Type type) : ITypeActivator
 {
     private readonly Activator activator = GetActivator(type);
 
+    [SuppressMessage("Style", "IDE0305:Simplify collection initialization", Justification = "Makes it more unreadable")]
     private readonly PropertyInfo[] properties = type
         .GetProperties()
         .Where(x => x.CanWrite)

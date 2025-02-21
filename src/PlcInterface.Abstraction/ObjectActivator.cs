@@ -27,11 +27,11 @@ internal sealed class ObjectActivator : ITypeActivator
 
         parameters = constructorInfo.GetParameters();
         activator = GetActivator(constructorInfo);
-        properties = constructorInfo.DeclaringType
+        var query = constructorInfo.DeclaringType
             .GetProperties()
             .Where(x => x.CanWrite)
-            .Select(x => new PropertySetterHelper(x))
-            .ToArray();
+            .Select(x => new PropertySetterHelper(x));
+        properties = [.. query];
     }
 
     private delegate object Activator(params object[] args);

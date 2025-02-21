@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Vectron.InteractiveConsole.AutoComplete;
 
 namespace PlcInterface.Sandbox.PLCCommands;
@@ -80,6 +81,7 @@ internal sealed class PlcSymbolAutoCompleteHandler(string name, ISymbolHandler s
         return true;
     }
 
+    [SuppressMessage("Style", "IDE0306:Simplify collection initialization", Justification = "Doesn't work on LinkedList See https://github.com/dotnet/roslyn/issues/77174")]
     private void Init(string text)
     {
         if (rootCommand.Equals(text, StringComparison.OrdinalIgnoreCase)

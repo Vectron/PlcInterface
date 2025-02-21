@@ -167,8 +167,8 @@ public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHan
                 .SelectMany(x => symbolHandler.GetSymbolInfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
                 .Select(x => (x.SymbolInfo.CastAndValidate().Symbol, x.Value));
 
-            var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, flattened.Select(x => x.Symbol).ToList());
-            sumWriter.Write(flattened.Select(x => x.Value).ToArray());
+            var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, [.. flattened.Select(x => x.Symbol)]);
+            sumWriter.Write([.. flattened.Select(x => x.Value)]);
         }
     }
 
@@ -225,8 +225,8 @@ public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHan
                 .SelectMany(x => symbolHandler.GetSymbolInfo(x.Key).FlattenWithValue(symbolHandler, x.Value))
                 .Select(x => (x.SymbolInfo.CastAndValidate().Symbol, x.Value));
 
-            var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, flattened.Select(x => x.Symbol).ToList());
-            await sumWriter.WriteAsync(flattened.Select(x => x.Value).ToArray(), CancellationToken.None).ConfigureAwait(false);
+            var sumWriter = sumSymbolFactory.CreateSumSymbolWrite(client, [.. flattened.Select(x => x.Symbol)]);
+            await sumWriter.WriteAsync([.. flattened.Select(x => x.Value)], CancellationToken.None).ConfigureAwait(false);
         }
     }
 

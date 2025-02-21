@@ -37,9 +37,8 @@ jobs:
     with:
       os: ${{ matrix.os }}
       dotnet_version: |
-        6.0.x
-        7.0.x
         8.0.x
+        9.0.x
       solution_file: PlcInterface.sln
 
   call-deploy:
@@ -50,9 +49,8 @@ jobs:
     with:
       os: ubuntu-latest
       dotnet_version: |
-        6.0.x
-        7.0.x
         8.0.x
+        9.0.x
       solution_file: PlcInterface.sln
     secrets:
       NUGET_KEY: ${{ secrets.NUGET_KEY }}

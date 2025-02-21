@@ -10,7 +10,7 @@ public interface ISymbolHandler
     /// <summary>
     /// Gets a collection of all symbols in the PLC.
     /// </summary>
-    IReadOnlyCollection<ISymbolInfo> AllSymbols
+    public IReadOnlyCollection<ISymbolInfo> AllSymbols
     {
         get;
     }
@@ -20,7 +20,7 @@ public interface ISymbolHandler
     /// </summary>
     /// <param name="ioName">The tag name.</param>
     /// <returns>The found <see cref="ISymbolInfo"/>.</returns>
-    ISymbolInfo GetSymbolInfo(string ioName);
+    public ISymbolInfo GetSymbolInfo(string ioName);
 
     /// <summary>
     /// Try to get the <see cref="ISymbolInfo"/>.
@@ -28,5 +28,5 @@ public interface ISymbolHandler
     /// <param name="ioName">The tag name.</param>
     /// <param name="symbolInfo">The found <see cref="ISymbolInfo"/>.</param>
     /// <returns><see langword="true"/> when the symbol was found else <see langword="false"/>.</returns>
-    bool TryGetSymbolInfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo);
+    public bool TryGetSymbolInfo(string ioName, [MaybeNullWhen(false)] out ISymbolInfo symbolInfo);
 }

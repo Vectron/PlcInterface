@@ -18,5 +18,5 @@ internal interface ITypeActivator
     /// <param name="instance">The created instance.</param>
     /// <returns><see langword="true"/> if creation was successful, otherwise false.</returns>
     /// <exception cref="SymbolException">is thrown when the data is invalid.</exception>
-    bool TryCreateInstance(Func<string, Type, object?> memberValueGetter, int memberCount, [MaybeNullWhen(false)] out object instance);
+    public bool TryCreateInstance(Func<string, Type, object?> memberValueGetter, int memberCount, [MaybeNullWhen(false)] out object instance);
 }

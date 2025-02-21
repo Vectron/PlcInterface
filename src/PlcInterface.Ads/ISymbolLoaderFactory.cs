@@ -10,5 +10,5 @@ namespace PlcInterface.Ads;
 public interface ISymbolLoaderFactory
 {
     /// <inheritdoc cref="SymbolLoaderFactory.Create(IConnection, ISymbolLoaderSettings)"/>
-    ISymbolLoader Create(IConnection connection, ISymbolLoaderSettings settings);
+    public ISymbolLoader Create(IConnection connection, ISymbolLoaderSettings settings);
 }

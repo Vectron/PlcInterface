@@ -10,7 +10,7 @@ public interface IAdsSymbolInfo : ISymbolInfo
     /// <summary>
     /// Gets a value indicating whether this symbol represents a array.
     /// </summary>
-    bool IsArray
+    public bool IsArray
     {
         get;
     }
@@ -18,7 +18,7 @@ public interface IAdsSymbolInfo : ISymbolInfo
     /// <summary>
     /// Gets a value indicating whether this symbol represents a complex type.
     /// </summary>
-    bool IsBigType
+    public bool IsBigType
     {
         get;
     }
@@ -26,7 +26,7 @@ public interface IAdsSymbolInfo : ISymbolInfo
     /// <summary>
     /// Gets the PLC symbol this encapsules.
     /// </summary>
-    ISymbol Symbol
+    public ISymbol Symbol
     {
         get;
     }

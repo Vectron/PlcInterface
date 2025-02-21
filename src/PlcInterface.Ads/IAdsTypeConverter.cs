@@ -13,12 +13,12 @@ public interface IAdsTypeConverter : ITypeConverter
     /// <param name="value">The value to fix.</param>
     /// <param name="valueSymbol">The symbol containing type information.</param>
     /// <returns>The converted type.</returns>
-    object Convert(object value, IValueSymbol valueSymbol);
+    public object Convert(object value, IValueSymbol valueSymbol);
 
     /// <summary>
     /// Conver the given object to a type that can be written to the PLC.
     /// </summary>
     /// <param name="value">The object to convert.</param>
     /// <returns>The object that can be written to the PLC.</returns>
-    object ConvertToPLCType(object value);
+    public object ConvertToPLCType(object value);
 }

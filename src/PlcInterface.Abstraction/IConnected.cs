@@ -10,7 +10,7 @@ public interface IConnected<out T> : IConnected
     /// Gets the value containing the lost or opened connection.
     /// </summary>
     /// <exception cref="InvalidOperationException">When <see cref="IConnected.IsConnected"/> returns false.</exception>
-    T Value
+    public T Value
     {
         get;
     }
@@ -24,7 +24,7 @@ public interface IConnected
     /// <summary>
     /// Gets a value indicating whether a value indicating of the connection is open.
     /// </summary>
-    bool IsConnected
+    public bool IsConnected
     {
         get;
     }

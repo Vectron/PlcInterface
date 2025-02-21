@@ -9,7 +9,7 @@ public interface ISymbolInfo
     /// Gets a <see cref="IList{T}"/> of the child symbols names.
     /// </summary>
     /// <value>A <see cref="IList{T}"/> containing all child symbols names.</value>
-    IList<string> ChildSymbols
+    public IList<string> ChildSymbols
     {
         get;
     }
@@ -18,7 +18,7 @@ public interface ISymbolInfo
     /// Gets the comment for this symbol.
     /// </summary>
     /// <value>The comment stored in the plc for this symbol.</value>
-    string Comment
+    public string Comment
     {
         get;
     }
@@ -29,7 +29,7 @@ public interface ISymbolInfo
     /// <value>
     /// The Full name of this symbol (Format: container block + . + symbol name) example: Visualization.L_Display_Door_1_1.
     /// </value>
-    string Name
+    public string Name
     {
         get;
     }
@@ -38,7 +38,7 @@ public interface ISymbolInfo
     /// Gets the name of the symbol. in all lowercase.
     /// </summary>
     /// <value>The Full name of this symbol.</value>
-    string NameLower
+    public string NameLower
     {
         get;
     }
@@ -47,7 +47,7 @@ public interface ISymbolInfo
     /// Gets the short name of the symbol in the PLC.
     /// </summary>
     /// <value>The name of this symbol.</value>
-    string ShortName
+    public string ShortName
     {
         get;
     }

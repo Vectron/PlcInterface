@@ -9,7 +9,7 @@ public interface IPlcConnection<T> : IPlcConnection
     /// <summary>
     /// Gets the generic session stream.
     /// </summary>
-    new IObservable<IConnected<T>> SessionStream
+    public new IObservable<IConnected<T>> SessionStream
     {
         get;
     }
@@ -23,7 +23,7 @@ public interface IPlcConnection
     /// <summary>
     /// Gets a value indicating whether the connections is connected.
     /// </summary>
-    bool IsConnected
+    public bool IsConnected
     {
         get;
     }
@@ -31,7 +31,7 @@ public interface IPlcConnection
     /// <summary>
     /// Gets the session stream.
     /// </summary>
-    IObservable<IConnected> SessionStream
+    public IObservable<IConnected> SessionStream
     {
         get;
     }
@@ -39,7 +39,7 @@ public interface IPlcConnection
     /// <summary>
     /// Gets a settings object for this PLC.
     /// </summary>
-    object Settings
+    public object Settings
     {
         get;
     }
@@ -48,7 +48,7 @@ public interface IPlcConnection
     /// Connect to the PLC.
     /// </summary>
     /// <returns><see langword="true"/> when connection is opened successful, otherwise <see langword="false"/>.</returns>
-    bool Connect();
+    public bool Connect();
 
     /// <summary>
     /// Asynchronously connect to the PLC.
@@ -57,16 +57,16 @@ public interface IPlcConnection
     /// A <see cref="Task"/> that handles the connection. <see langword="true"/> when connection is
     /// opened successful, otherwise <see langword="false"/>.
     /// </returns>
-    Task<bool> ConnectAsync();
+    public Task<bool> ConnectAsync();
 
     /// <summary>
     /// Disconnect from the PLC.
     /// </summary>
-    void Disconnect();
+    public void Disconnect();
 
     /// <summary>
     /// Asynchronously disconnect from the PLC.
     /// </summary>
     /// <returns>A <see cref="Task"/> that handles the disconnection.</returns>
-    Task DisconnectAsync();
+    public Task DisconnectAsync();
 }

@@ -11,5 +11,5 @@ public interface ISumSymbolRead
     public object[] Read();
 
     /// <inheritdoc cref="SumSymbolRead.ReadAsync(CancellationToken)"/>
-    Task<object[]?> ReadAsync(CancellationToken cancel);
+    public Task<object[]?> ReadAsync(CancellationToken cancel);
 }

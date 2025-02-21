@@ -8,7 +8,7 @@ public interface IArrayWrapper
     /// <summary>
     /// Gets the backing array storage.
     /// </summary>
-    Array BackingArray
+    public Array BackingArray
     {
         get;
     }
@@ -16,7 +16,7 @@ public interface IArrayWrapper
     /// <summary>
     /// Gets the type of the element stored in the array.
     /// </summary>
-    Type ElementType
+    public Type ElementType
     {
         get;
     }

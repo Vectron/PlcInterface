@@ -11,7 +11,7 @@ public interface ITypeConverter
     /// <typeparam name="T">The type to convert to.</typeparam>
     /// <param name="value">The object to convert.</param>
     /// <returns>The resulting <typeparamref name="T"/>.</returns>
-    T Convert<T>(object value);
+    public T Convert<T>(object value);
 
     /// <summary>
     /// Converts from object to <paramref name="targetType"/>.
@@ -19,5 +19,5 @@ public interface ITypeConverter
     /// <param name="value">The object to convert.</param>
     /// <param name="targetType">The <see cref="Type"/> to convert to.</param>
     /// <returns>The converted object.</returns>
-    object Convert(object value, Type targetType);
+    public object Convert(object value, Type targetType);
 }

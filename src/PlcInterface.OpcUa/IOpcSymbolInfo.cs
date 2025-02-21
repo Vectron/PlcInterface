@@ -11,7 +11,7 @@ public interface IOpcSymbolInfo : ISymbolInfo
     /// <summary>
     /// Gets get the shape of the array.
     /// </summary>
-    ArrayShape ArrayShape
+    public ArrayShape ArrayShape
     {
         get;
     }
@@ -19,7 +19,7 @@ public interface IOpcSymbolInfo : ISymbolInfo
     /// <summary>
     /// Gets the built in type.
     /// </summary>
-    BuiltInType BuiltInType
+    public BuiltInType BuiltInType
     {
         get;
     }
@@ -27,7 +27,7 @@ public interface IOpcSymbolInfo : ISymbolInfo
     /// <summary>
     /// Gets the PLC symbol this encapsules.
     /// </summary>
-    NodeId Handle
+    public NodeId Handle
     {
         get;
     }
@@ -35,7 +35,7 @@ public interface IOpcSymbolInfo : ISymbolInfo
     /// <summary>
     /// Gets the indices of this array item.
     /// </summary>
-    int[] Indices
+    public int[] Indices
     {
         get;
     }
@@ -43,7 +43,7 @@ public interface IOpcSymbolInfo : ISymbolInfo
     /// <summary>
     /// Gets a value indicating whether this symbol represents a array.
     /// </summary>
-    bool IsArray
+    public bool IsArray
     {
         get;
     }
@@ -51,7 +51,7 @@ public interface IOpcSymbolInfo : ISymbolInfo
     /// <summary>
     /// Gets a value indicating whether this symbol represents a complex type.
     /// </summary>
-    bool IsBigType
+    public bool IsBigType
     {
         get;
     }
@@ -59,7 +59,7 @@ public interface IOpcSymbolInfo : ISymbolInfo
     /// <summary>
     /// Gets the display name of the type.
     /// </summary>
-    string TypeName
+    public string TypeName
     {
         get;
     }

@@ -8,7 +8,7 @@ public interface IMonitorResult
     /// <summary>
     /// Gets the name of the tag.
     /// </summary>
-    string Name
+    public string Name
     {
         get;
     }
@@ -16,7 +16,7 @@ public interface IMonitorResult
     /// <summary>
     /// Gets the new value of the tag.
     /// </summary>
-    object Value
+    public object Value
     {
         get;
     }

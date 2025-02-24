@@ -138,7 +138,6 @@ public class TypeConverterTests
         Assert.AreEqual(expected.IntValue, actual.IntValue);
         CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
 
-        Assert.IsNotNull(actual.SubType);
         Assert.AreEqual(expected.SubType.IntValue, actual.SubType.IntValue);
     }
 
@@ -161,7 +160,6 @@ public class TypeConverterTests
         Assert.AreEqual(expected.IntValue, actual.IntValue);
         CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
 
-        Assert.IsNotNull(actual.SubType);
         Assert.AreEqual(expected.SubType.IntValue, actual.SubType.IntValue);
     }
 
@@ -255,7 +253,6 @@ public class TypeConverterTests
         Assert.AreEqual(expected.IntValue, actual.IntValue);
         CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
 
-        Assert.IsNotNull(actual.SubType);
         Assert.AreEqual(expected.SubType.IntValue, actual.SubType.IntValue);
     }
 
@@ -296,7 +293,6 @@ public class TypeConverterTests
         Assert.AreEqual(expected.IntValue, actual.IntValue);
         CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
 
-        Assert.IsNotNull(actual.SubType);
         Assert.AreEqual(expected.SubType.IntValue, actual.SubType.IntValue);
     }
 
@@ -337,7 +333,6 @@ public class TypeConverterTests
         Assert.AreEqual(expected.IntValue, actual.IntValue);
         CollectionAssert.AreEqual(expected.IntArray, actual.IntArray);
 
-        Assert.IsNotNull(actual.SubType);
         Assert.AreEqual(expected.SubType.IntValue, actual.SubType.IntValue);
     }
 

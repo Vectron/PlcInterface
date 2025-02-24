@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
-  <GVL Name="AdsNet7" Id="{58c6384f-95cc-00d6-0aa6-a8eb1ce8870c}">
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="AdsNet9" Id="{42d615f5-2398-08c1-0ff4-8ceeefd4a042}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 {attribute 'analysis' := '-33'}
 VAR_GLOBAL

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="MSTest.Sdk">
   <ItemGroup>
     <Compile Include="$(CommonDirectory)\*.cs" LinkBase="Common" />
   </ItemGroup>

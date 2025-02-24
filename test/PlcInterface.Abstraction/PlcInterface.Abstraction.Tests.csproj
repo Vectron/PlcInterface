@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="MSTest.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\..\src\PlcInterface.Abstraction\PlcInterface.Abstraction.csproj" />
     <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />

@@ -10,7 +10,7 @@ public class IServiceCollectionExtensionTest
 {
     private static ServiceProvider? provider;
 
-    [ClassCleanup]
+    [ClassCleanup(ClassCleanupBehavior.EndOfClass)]
     public static void CleanDI()
         => provider?.Dispose();
 

@@ -141,7 +141,7 @@ public class SymbolHandlerTests
 
         // Assert
         var exception = Assert.ThrowsException<SymbolException>(() => symbolHandler.GetSymbolInfo(ioName));
-        Assert.AreEqual(exception.Message, "PLC not connected");
+        Assert.AreEqual("PLC not connected", exception.Message);
     }
 
     [TestMethod]

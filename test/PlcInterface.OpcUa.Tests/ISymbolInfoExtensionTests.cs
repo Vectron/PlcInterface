@@ -1,4 +1,3 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
 namespace PlcInterface.OpcUa.Tests;

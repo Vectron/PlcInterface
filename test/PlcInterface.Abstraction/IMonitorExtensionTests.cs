@@ -1,5 +1,4 @@
 using System.Reactive.Subjects;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
 namespace PlcInterface.Abstraction.Tests;

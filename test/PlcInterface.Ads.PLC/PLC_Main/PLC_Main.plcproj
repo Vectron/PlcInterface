@@ -5,7 +5,7 @@
     <ProjectGuid>{79cdeb50-d4a4-4bcd-b53e-fa403d43dc46}</ProjectGuid>
     <SubObjectsSortedByName>True</SubObjectsSortedByName>
     <Name>PLC_Main</Name>
-    <ProgramVersion>3.1.4026.10</ProgramVersion>
+    <ProgramVersion>3.1.4026.13</ProgramVersion>
     <Application>{f11cb5ac-73ff-44ac-9958-ddafed9c0b75}</Application>
     <TypeSystem>{227c8210-7ae8-4def-bd14-023d886c2c18}</TypeSystem>
     <Implicit_Task_Info>{dad0c119-cd8d-42f7-95b9-14170d71eabc}</Implicit_Task_Info>
@@ -47,27 +47,19 @@
     <Compile Include="DUTs\WriteTestData.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GVLs\AdsNet6.TcGVL">
-      <SubType>Code</SubType>
-      <LinkAlways>true</LinkAlways>
-    </Compile>
-    <Compile Include="GVLs\AdsNet7.TcGVL">
-      <SubType>Code</SubType>
-      <LinkAlways>true</LinkAlways>
-    </Compile>
     <Compile Include="GVLs\AdsNet8.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
     </Compile>
-    <Compile Include="GVLs\OpcNet6.TcGVL">
-      <SubType>Code</SubType>
-      <LinkAlways>true</LinkAlways>
-    </Compile>
-    <Compile Include="GVLs\OpcNet7.TcGVL">
+    <Compile Include="GVLs\AdsNet9.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
     </Compile>
     <Compile Include="GVLs\OpcNet8.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="GVLs\OpcNet9.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
     </Compile>

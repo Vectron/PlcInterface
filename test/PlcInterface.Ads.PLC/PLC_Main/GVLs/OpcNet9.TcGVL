@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
-  <GVL Name="OpcNet6" Id="{bcbee6ff-468d-4de1-b7a3-a065b49ecba3}">
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="OpcNet9" Id="{65acbbf4-22b6-0840-1b27-53986e46b206}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 {attribute 'analysis' := '-33'}
 VAR_GLOBAL

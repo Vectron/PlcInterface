@@ -1,43 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1">
   <POU Name="MAIN" Id="{65800fe3-bb5f-43d1-b26a-4a3b6ac53c7a}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[ResetWriteData(AdsNet6.WriteTestData.WriteGenericUpdatesTheValueInPlc);
-ResetWriteData(AdsNet6.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
-ResetWriteData(AdsNet6.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
-ResetWriteData(AdsNet6.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
-ResetWriteData(AdsNet6.WriteTestData.WriteUpdatesTheValueInPlc);
-ResetWriteData(AdsNet6.WriteTestData.WriteUpdatesTheValueInPlcAsync);
-
-ResetWriteData(AdsNet7.WriteTestData.WriteGenericUpdatesTheValueInPlc);
-ResetWriteData(AdsNet7.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
-ResetWriteData(AdsNet7.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
-ResetWriteData(AdsNet7.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
-ResetWriteData(AdsNet7.WriteTestData.WriteUpdatesTheValueInPlc);
-ResetWriteData(AdsNet7.WriteTestData.WriteUpdatesTheValueInPlcAsync);
-
-ResetWriteData(AdsNet8.WriteTestData.WriteGenericUpdatesTheValueInPlc);
+      <ST><![CDATA[ResetWriteData(AdsNet8.WriteTestData.WriteGenericUpdatesTheValueInPlc);
 ResetWriteData(AdsNet8.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
 ResetWriteData(AdsNet8.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
 ResetWriteData(AdsNet8.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
 ResetWriteData(AdsNet8.WriteTestData.WriteUpdatesTheValueInPlc);
 ResetWriteData(AdsNet8.WriteTestData.WriteUpdatesTheValueInPlcAsync);
 
-ResetWriteData(OpcNet6.WriteTestData.WriteGenericUpdatesTheValueInPlc);
-ResetWriteData(OpcNet6.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
-ResetWriteData(OpcNet6.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
-ResetWriteData(OpcNet6.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
-ResetWriteData(OpcNet6.WriteTestData.WriteUpdatesTheValueInPlc);
-ResetWriteData(OpcNet6.WriteTestData.WriteUpdatesTheValueInPlcAsync);
-
-ResetWriteData(OpcNet7.WriteTestData.WriteGenericUpdatesTheValueInPlc);
-ResetWriteData(OpcNet7.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
-ResetWriteData(OpcNet7.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
-ResetWriteData(OpcNet7.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
-ResetWriteData(OpcNet7.WriteTestData.WriteUpdatesTheValueInPlc);
-ResetWriteData(OpcNet7.WriteTestData.WriteUpdatesTheValueInPlcAsync);
+ResetWriteData(AdsNet9.WriteTestData.WriteGenericUpdatesTheValueInPlc);
+ResetWriteData(AdsNet9.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
+ResetWriteData(AdsNet9.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
+ResetWriteData(AdsNet9.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
+ResetWriteData(AdsNet9.WriteTestData.WriteUpdatesTheValueInPlc);
+ResetWriteData(AdsNet9.WriteTestData.WriteUpdatesTheValueInPlcAsync);
 
 ResetWriteData(OpcNet8.WriteTestData.WriteGenericUpdatesTheValueInPlc);
 ResetWriteData(OpcNet8.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
@@ -45,7 +24,23 @@ ResetWriteData(OpcNet8.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
 ResetWriteData(OpcNet8.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
 ResetWriteData(OpcNet8.WriteTestData.WriteUpdatesTheValueInPlc);
 ResetWriteData(OpcNet8.WriteTestData.WriteUpdatesTheValueInPlcAsync);
+
+ResetWriteData(OpcNet9.WriteTestData.WriteGenericUpdatesTheValueInPlc);
+ResetWriteData(OpcNet9.WriteTestData.WriteGenericUpdatesTheValueInPlcAsync);
+ResetWriteData(OpcNet9.WriteTestData.WriteMultipleUpdatesTheValueInPlc);
+ResetWriteData(OpcNet9.WriteTestData.WriteMultipleUpdatesTheValueInPlcAsync);
+ResetWriteData(OpcNet9.WriteTestData.WriteUpdatesTheValueInPlc);
+ResetWriteData(OpcNet9.WriteTestData.WriteUpdatesTheValueInPlcAsync);
 ]]></ST>
     </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="17" Count="5" />
+      <LineId Id="47" Count="5" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="37" Count="5" />
+      <LineId Id="53" Count="6" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>

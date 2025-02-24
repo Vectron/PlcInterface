@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PlcInterface.IntegrationTests;
 using PlcInterface.OpcUa;
 

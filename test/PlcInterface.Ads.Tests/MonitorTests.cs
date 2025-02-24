@@ -1,5 +1,4 @@
 using System.Reactive.Subjects;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TestUtilities;
 using TwinCAT;

@@ -1,4 +1,3 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Opc.Ua.Client;
 using TestUtilities;

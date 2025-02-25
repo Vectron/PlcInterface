@@ -2,7 +2,7 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
   <PropertyGroup>
-    <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
+    <NoWarn>$(NoWarn),1573,1591,1712, MSTESTOBS</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>

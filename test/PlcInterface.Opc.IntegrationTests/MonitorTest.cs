@@ -8,7 +8,6 @@ using PlcInterface.OpcUa;
 namespace PlcInterface.Opc.IntegrationTests;
 
 [TestClass]
-[DoNotParallelize]
 [CICondition(ConditionMode.Exclude)]
 public class MonitorTest : IMonitorTestBase
 {

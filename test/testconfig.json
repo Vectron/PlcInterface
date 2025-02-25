@@ -1,0 +1,35 @@
+{
+  "mstest": {
+    "deployment": {
+      "deleteDeploymentDirectoryAfterTestRunIsComplete": true,
+      "deployTestSourceDependencies": true,
+      "enabled": true
+    },
+    "output": {
+      "captureTrace": false
+    },
+    "parallelism": {
+      "enabled": true,
+      "scope": "method",
+      "workers": 0
+    },
+    "execution": {
+      "considerEmptyDataSourceAsInconclusive": true,
+      "considerFixturesAsSpecialTests": false,
+      "mapInconclusiveToFailed": true,
+      "mapNotRunnableToFailed": true,
+      "treatClassAndAssemblyCleanupWarningsAsErrors": false,
+      "treatDiscoveryWarningsAsErrors": true
+    },
+    "timeout": {
+      "assemblyCleanup": 1000,
+      "assemblyInitialize": 1000,
+      "classCleanup": 1000,
+      "classInitialize": 1000,
+      "test": 600000,
+      "testCleanup": 1000,
+      "testInitialize": 1000,
+      "useCooperativeCancellation": false
+    }
+  }
+}

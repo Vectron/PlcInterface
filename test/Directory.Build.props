@@ -5,6 +5,7 @@
     <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
     <WarningsNotAsErrors>$(WarningsNotAsErrors);MSTESTOBS</WarningsNotAsErrors>
     <TestingPlatformCommandLineArguments>--config-file "$(MSBuildThisFileDirectory)\testconfig.json" --report-trx --coverage --coverage-output-format cobertura</TestingPlatformCommandLineArguments>
+    <TestingPlatformShowTestsFailure>true</TestingPlatformShowTestsFailure>
   </PropertyGroup>
 
   <ItemGroup>

@@ -9,6 +9,7 @@ namespace PlcInterface.Opc.IntegrationTests;
 
 [TestClass]
 [DoNotParallelize]
+[CICondition(ConditionMode.Exclude)]
 public class WriteValueTest : IWriteValueTestBase
 {
     protected override ServiceProvider GetServiceProvider()

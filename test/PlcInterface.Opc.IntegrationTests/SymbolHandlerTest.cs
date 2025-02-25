@@ -9,6 +9,7 @@ namespace PlcInterface.Opc.IntegrationTests;
 
 [TestClass]
 [DoNotParallelize]
+[CICondition(ConditionMode.Exclude)]
 public class SymbolHandlerTest : ISymbolHandlerTestBase
 {
     protected override ServiceProvider GetServiceProvider()

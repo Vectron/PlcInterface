@@ -9,7 +9,6 @@ using PlcInterface.IntegrationTests.Extension;
 
 namespace PlcInterface.IntegrationTests;
 
-[DoNotParallelize]
 public abstract class IMonitorTestBase
 {
     [DataTestMethod]

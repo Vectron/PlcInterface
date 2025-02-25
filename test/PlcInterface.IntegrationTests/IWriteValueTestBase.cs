@@ -7,7 +7,6 @@ using PlcInterface.IntegrationTests.Extension;
 
 namespace PlcInterface.IntegrationTests;
 
-[DoNotParallelize]
 public abstract class IWriteValueTestBase
 {
     private static IEnumerable<object[]> WriteTestData

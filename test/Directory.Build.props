@@ -4,13 +4,7 @@
   <PropertyGroup>
     <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
     <WarningsNotAsErrors>$(WarningsNotAsErrors);MSTESTOBS</WarningsNotAsErrors>
-
-  <PropertyGroup>
-    <RunSettingsFilePath>$(SolutionDir)\Integration.runsettings</RunSettingsFilePath>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="$(ContinuousIntegrationBuild) == 'true'">
-    <RunSettingsFilePath>$(SolutionDir)\GithubActions.runsettings</RunSettingsFilePath>
+    <TestingPlatformCommandLineArguments>--config-file "$(MSBuildThisFileDirectory)\testconfig.json" --report-trx --coverage --coverage-output-format cobertura</TestingPlatformCommandLineArguments>
   </PropertyGroup>
 
   <ItemGroup>

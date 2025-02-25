@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{51750A27-B
 	ProjectSection(SolutionItems) = preProject
 		test\.editorconfig = test\.editorconfig
 		test\Directory.Build.props = test\Directory.Build.props
+		test\testconfig.json = test\testconfig.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlcInterface.OpcUa", "src\PlcInterface.OpcUa\PlcInterface.OpcUa.csproj", "{CF609F06-F1DA-4163-9577-B887F9FE3B3A}"
@@ -30,8 +31,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		LICENSE.txt = LICENSE.txt
-		Integration.runsettings = Integration.runsettings
-		GithubActions.runsettings = GithubActions.runsettings
 		README.md = README.md
 		version.json = version.json
 	EndProjectSection

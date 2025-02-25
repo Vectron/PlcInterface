@@ -9,6 +9,7 @@ namespace PlcInterface.Opc.IntegrationTests;
 
 [TestClass]
 [DoNotParallelize]
+[CICondition(ConditionMode.Exclude)]
 public sealed class ReadValueTest : IReadValueTestBase
 {
     protected override ServiceProvider GetServiceProvider()

@@ -7,6 +7,7 @@ using PlcInterface.IntegrationTests;
 namespace PlcInterface.Ads.IntegrationTests;
 
 [TestClass]
+[CICondition(ConditionMode.Exclude)]
 public sealed class ReadValueTest : IReadValueTestBase
 {
     protected override ServiceProvider GetServiceProvider()

@@ -1,4 +1,4 @@
-﻿# Version: 5.0.0 (Using https://semver.org/)
+# Version: 5.0.0 (Using https://semver.org/)
 # Updated: 2023-10-04
 # See https://github.com/RehanSaeed/EditorConfig/releases for release notes.
 # See https://github.com/RehanSaeed/EditorConfig for updates to this file.
@@ -43,3 +43,176 @@ dotnet_diagnostic.MA0032.severity = none    # MA0032: Use an overload with a Can
 dotnet_diagnostic.MA0042.severity = none    # MA0042: Do not use blocking calls in an async method
 dotnet_diagnostic.MA0045.severity = none    # MA0045: Do not use blocking call in a sync method (need to make containing method async)
 dotnet_diagnostic.SA1601.severity = none    # SA1601 Partial Elements Must Be Documented
+
+##########################################
+# Design Rules
+# MS test Analyzers
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/design-rules
+##########################################
+
+# MSTEST0004 - Public types should be test classes
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0004
+# dotnet_diagnostic.MSTEST0004.severity = default
+
+# MSTEST0006 - Avoid [ExpectedException]
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0006
+# dotnet_diagnostic.MSTEST0006.severity = default
+
+# MSTEST0015 - Test method should not be ignored
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0015
+# dotnet_diagnostic.MSTEST0015.severity = default
+
+# MSTEST0016 - Test class should have test method
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0016
+# dotnet_diagnostic.MSTEST0019.severity = default
+
+# MSTEST0019 - Prefer TestInitialize methods over constructors
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0019
+dotnet_diagnostic.MSTEST0019.severity = none
+
+# MSTEST0020 - Prefer constructors over TestInitialize methods
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0020
+dotnet_diagnostic.MSTEST0020.severity = warning
+
+# MSTEST0021 - Prefer Dispose over TestCleanup methods
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0021
+# dotnet_diagnostic.MSTEST0021.severity = default
+
+# MSTEST0022 - Prefer TestCleanup over Dispose methods
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0022
+dotnet_diagnostic.MSTEST0022.severity = none
+
+# MSTEST0025 - Use 'Assert.Fail' instead of an always-failing assert
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0025
+# dotnet_diagnostic.MSTEST0025.severity = default
+
+# MSTEST0029 - Public method should be test method
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0029
+# dotnet_diagnostic.MSTEST0029.severity = default
+
+# MSTEST0036 - Do not use shadowing inside test class
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0036
+# dotnet_diagnostic.MSTEST0036.severity = default
+
+##########################################
+# Performance Rules
+# MS test Analyzers
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/performance-rules
+##########################################
+
+# MSTEST0001 - Explicitly enable or disable tests parallelization
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0001
+# dotnet_diagnostic.MSTEST0001.severity = default
+
+##########################################
+# Usage Rules
+# MS test Analyzers
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/usage-rules
+##########################################
+
+# MSTEST0002 - Test classes should have valid layout
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0002
+# dotnet_diagnostic.MSTEST0002.severity = default
+
+# MSTEST0003 - Test methods should have valid layout
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0003
+# dotnet_diagnostic.MSTEST0003.severity = default
+
+# MSTEST0005 - Test context property should have valid layout
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0005
+# dotnet_diagnostic.MSTEST0005.severity = default
+
+# MSTEST0007 - Use test attributes only on test methods
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0007
+# dotnet_diagnostic.MSTEST0007.severity = default
+
+# MSTEST0008 - TestInitialize method should have valid layout
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0008
+# dotnet_diagnostic.MSTEST0008.severity = default
+
+# MSTEST0009 - TestCleanup method should have valid layout
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0009
+# dotnet_diagnostic.MSTEST0009.severity = default
+
+# MSTEST0010 - ClassInitialize method should have valid layout
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0010
+# dotnet_diagnostic.MSTEST0010.severity = default
+
+# MSTEST0011 - ClassCleanup method should have valid layout
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0011
+# dotnet_diagnostic.MSTEST0011.severity = default
+
+# MSTEST0012 - AssemblyInitialize method should have valid layout
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0012
+# dotnet_diagnostic.MSTEST0012.severity = default
+
+# MSTEST0013 - AssemblyCleanup method should have valid layout
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0013
+# dotnet_diagnostic.MSTEST0013.severity = default
+
+# MSTEST0014 - DataRow should be valid
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0014
+# dotnet_diagnostic.MSTEST0014.severity = default
+
+# MSTEST0017 - Assertion arguments should be passed in the correct order
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0017
+# dotnet_diagnostic.MSTEST0017.severity = default
+
+# MSTEST0018 - DynamicData should be valid
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0018
+# dotnet_diagnostic.MSTEST0018.severity = default
+
+# MSTEST0023 - Do not negate boolean assertions
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0023
+# dotnet_diagnostic.MSTEST0023.severity = default
+
+# MSTEST0024 - Do not store TestContext in a static member
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0024
+# dotnet_diagnostic.MSTEST0024.severity = default
+
+# MSTEST0026 - Avoid conditional access in assertions
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0026
+# dotnet_diagnostic.MSTEST0026.severity = default
+
+# MSTEST0030 - Type containing [TestMethod] should be marked with [TestClass]
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0030
+# dotnet_diagnostic.MSTEST0030.severity = default
+
+# MSTEST0031 - System.ComponentModel.DescriptionAttribute has no effect on test methods
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0031
+# dotnet_diagnostic.MSTEST0031.severity = default
+
+# MSTEST0032 - Review or remove the assertion as its condition is known to be always true
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0032
+# dotnet_diagnostic.MSTEST0032.severity = default
+
+# MSTEST0034 - Use ClassCleanupBehavior.EndOfClass with the [ClassCleanup]
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0034
+# dotnet_diagnostic.MSTEST0034.severity = default
+
+# MSTEST0035 - [DeploymentItem] can be specified only on test class or test method
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0035
+# dotnet_diagnostic.MSTEST0035.severity = default
+
+# MSTEST0037 - Use proper 'Assert' methods
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0037
+# dotnet_diagnostic.MSTEST0037.severity = default
+
+# MSTEST0038 - Don't use 'Assert.AreSame' or 'Assert.AreNotSame' with value types
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0038
+# dotnet_diagnostic.MSTEST0038.severity = default
+
+# MSTEST0039 - Use newer 'Assert.Throws' methods
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0039
+# dotnet_diagnostic.MSTEST0039.severity = default
+
+# MSTEST0040 - Do not assert inside 'async void' contexts
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0040
+# dotnet_diagnostic.MSTEST0040.severity = default
+
+# MSTEST0041 - Use 'ConditionBaseAttribute' on test classes
+# https://learn.microsoft.com/en-us/dotnet/core/testing/mstest-analyzers/mstest0041
+# dotnet_diagnostic.MSTEST0041.severity = default
+
+dotnet_diagnostic.MSTESTOBS.severity = warning
+

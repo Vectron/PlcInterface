@@ -27,6 +27,6 @@ public class ISymbolInfoExtensionTests
         var symbolMock = Mock.Of<ISymbolInfo>();
 
         // Act Assert
-        _ = Assert.ThrowsException<SymbolException>(symbolMock.ConvertAndValidate);
+        _ = Assert.ThrowsExactly<SymbolException>(() => symbolMock.ConvertAndValidate());
     }
 }

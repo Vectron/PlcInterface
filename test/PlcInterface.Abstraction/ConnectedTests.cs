@@ -30,7 +30,11 @@ public class ConnectedTests
         Assert.IsInstanceOfType<IConnected>(notConnected);
         Assert.IsInstanceOfType<IConnected<GenericParameterHelper>>(notConnected);
         Assert.IsFalse(notConnected.IsConnected);
-        _ = Assert.ThrowsException<InvalidOperationException>(() => notConnected.Value);
+        _ = Assert.ThrowsExactly<InvalidOperationException>(() =>
+        {
+            var connection = notConnected.Value;
+            connection.Data = 42;
+        });
     }
 
     [TestMethod]

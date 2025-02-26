@@ -25,7 +25,7 @@ public class StructActivatorTests
         void Action() => _ = activator.TryCreateInstance((name, type) => null, 1, out var instance);
 
         // Act Assert
-        _ = Assert.ThrowsException<SymbolException>(Action);
+        _ = Assert.ThrowsExactly<SymbolException>(Action);
     }
 
     private struct TestValueType

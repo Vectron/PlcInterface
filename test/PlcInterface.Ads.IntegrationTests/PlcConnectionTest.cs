@@ -18,7 +18,7 @@ public sealed class PlcConnectionTest : IPlcConnectionTestBase
         var connection = serviceProvider.GetRequiredService<IAdsPlcConnection>();
 
         // Act
-        _ = Assert.ThrowsException<TimeoutException>(() => connection.GetConnectedClient());
+        _ = Assert.ThrowsExactly<TimeoutException>(() => connection.GetConnectedClient());
     }
 
     [TestMethod]

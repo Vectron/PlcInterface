@@ -53,8 +53,8 @@ public class ReadWriteTests
         var readWrite = new ReadWrite(connection.Object, symbolHandler.Object, typeConverter, sumSymbolFactory.Object);
 
         // Act Assert
-        _ = Assert.ThrowsException<NotSupportedException>(() => _ = readWrite.ReadDynamic(ioTag));
-        _ = Assert.ThrowsExceptionAsync<NotSupportedException>(() => _ = readWrite.ReadDynamicAsync(ioTag));
+        _ = Assert.ThrowsExactly<NotSupportedException>(() => _ = readWrite.ReadDynamic(ioTag));
+        _ = Assert.ThrowsExactlyAsync<NotSupportedException>(() => _ = readWrite.ReadDynamicAsync(ioTag));
     }
 
     [TestMethod]
@@ -150,10 +150,10 @@ public class ReadWriteTests
         var readWrite = new ReadWrite(connection.Object, symbolHandler.Object, typeConverter, sumSymbolFactory.Object);
 
         // Act Assert
-        _ = Assert.ThrowsException<InvalidOperationException>(() => _ = readWrite.Read(ioTag));
-        _ = Assert.ThrowsException<InvalidOperationException>(() => _ = readWrite.Read<int>(ioTag));
-        _ = Assert.ThrowsExceptionAsync<InvalidOperationException>(() => _ = readWrite.ReadAsync(ioTag));
-        _ = Assert.ThrowsExceptionAsync<InvalidOperationException>(() => _ = readWrite.ReadAsync<int>(ioTag));
+        _ = Assert.ThrowsExactly<InvalidOperationException>(() => _ = readWrite.Read(ioTag));
+        _ = Assert.ThrowsExactly<InvalidOperationException>(() => _ = readWrite.Read<int>(ioTag));
+        _ = Assert.ThrowsExactlyAsync<InvalidOperationException>(() => _ = readWrite.ReadAsync(ioTag));
+        _ = Assert.ThrowsExactlyAsync<InvalidOperationException>(() => _ = readWrite.ReadAsync<int>(ioTag));
     }
 
     [TestMethod]

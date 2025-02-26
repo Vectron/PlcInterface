@@ -263,8 +263,8 @@ public class DynamicObjectExtensionsTests
         var iDynamicValueDynamicObjectMock = iDynamicValueMock.As<IDynamicValue>();
 
         // Act Assert
-        _ = Assert.ThrowsException<NotSupportedException>(dynamicObjectMock.CleanDynamic);
-        _ = Assert.ThrowsException<NotSupportedException>(iDynamicValueMock.Object.CleanDynamic);
+        _ = Assert.ThrowsExactly<NotSupportedException>(() => dynamicObjectMock.CleanDynamic());
+        _ = Assert.ThrowsExactly<NotSupportedException>(() => iDynamicValueMock.Object.CleanDynamic());
     }
 
     private static ArrayType ComplexArrayType(int[] rank)

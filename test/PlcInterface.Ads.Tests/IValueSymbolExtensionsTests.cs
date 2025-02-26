@@ -29,6 +29,6 @@ public class IValueSymbolExtensionsTests
 
         // Act
         // Assert
-        _ = Assert.ThrowsException<SymbolException>(symbolMock.CastAndValidate);
+        _ = Assert.ThrowsExactly<SymbolException>(() => symbolMock.CastAndValidate());
     }
 }

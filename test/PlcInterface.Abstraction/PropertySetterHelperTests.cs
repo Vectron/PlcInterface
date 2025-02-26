@@ -13,6 +13,10 @@ public class PropertySetterHelperTests
         var constructor = Mock.Of<PropertyInfo>(x => x.DeclaringType == null);
 
         // Act Assert
-        _ = Assert.ThrowsException<NotSupportedException>(() => new PropertySetterHelper(constructor));
+        _ = Assert.ThrowsExactly<NotSupportedException>(() =>
+        {
+            var propertySetterHelper = new PropertySetterHelper(constructor);
+            var type = propertySetterHelper.GetType();
+        });
     }
 }

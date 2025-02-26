@@ -5,6 +5,9 @@ namespace PlcInterface;
 /// <summary>
 /// Extension methods for all classes and structs.
 /// </summary>
+#if !CommonProject
+[ExcludeFromCodeCoverage]
+#endif
 internal static class ThrowHelper
 {
     /// <summary>

@@ -5,6 +5,9 @@ namespace PlcInterface;
 /// <summary>
 /// Extension methods for <see cref="Task"/>.
 /// </summary>
+#if !CommonProject
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+#endif
 internal static partial class TaskExtensions
 {
     /// <summary>

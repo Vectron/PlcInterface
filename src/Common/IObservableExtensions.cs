@@ -5,6 +5,9 @@ namespace PlcInterface;
 /// <summary>
 /// Extension methods for <see cref="IObservable{T}"/>.
 /// </summary>
+#if !CommonProject
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+#endif
 internal static class IObservableExtensions
 {
     /// <summary>

@@ -3,6 +3,9 @@ namespace PlcInterface;
 /// <summary>
 /// Extension methods for <see cref="ISymbolInfo"/>.
 /// </summary>
+#if !CommonProject
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+#endif
 internal static class ISymbolInfoExtension
 {
     /// <summary>

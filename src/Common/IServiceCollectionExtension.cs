@@ -5,6 +5,9 @@ namespace PlcInterface;
 /// <summary>
 /// Extension methods for <see cref="IServiceCollection"/>.
 /// </summary>
+#if !CommonProject
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+#endif
 internal static class IServiceCollectionExtension
 {
     /// <summary>

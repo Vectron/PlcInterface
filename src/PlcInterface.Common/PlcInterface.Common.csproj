@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">  
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);CommonProject</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Include="$(CommonDirectory)\*.cs" LinkBase="Common" />
+    <Compile Include="..\PlcInterface.Abstraction\ISymbolInfo.cs" />
+    <Compile Include="..\PlcInterface.Abstraction\ISymbolHandler.cs" />
+    <Compile Include="..\PlcInterface.Abstraction\IArrayWrapper.cs" />
+    <InternalsVisibleTo Include="$(AssemblyName).Tests.Unit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <PackageReference Include="System.Reactive" Version="6.0.1" />
+  </ItemGroup>
+</Project>

@@ -59,7 +59,7 @@ public abstract class ISymbolHandlerTestBase
         var result = symbolHandler.TryGetSymbolInfo(ioName, out var symbol);
 
         // Assert
-        Assert.AreEqual(false, result);
+        Assert.IsFalse(result);
         Assert.IsNull(symbol);
     }
 
@@ -79,7 +79,7 @@ public abstract class ISymbolHandlerTestBase
         var result = symbolHandler.TryGetSymbolInfo(ioName, out var symbol);
 
         // Assert
-        Assert.AreEqual(true, result);
+        Assert.IsTrue(result);
         Assert.IsNotNull(symbol);
         Assert.AreEqual(ioName, symbol.Name);
     }

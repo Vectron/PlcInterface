@@ -79,7 +79,7 @@ public class IReadWriteExtensionTests
         var readWrite = Mock.Of<IReadWrite>();
 
         // Act Assert
-        _ = Assert.ThrowsException<TimeoutException>(() => readWrite.WaitForValue(ioName, filterValue: true, TimeSpan.FromMilliseconds(2)));
+        _ = Assert.ThrowsExactly<TimeoutException>(() => readWrite.WaitForValue(ioName, filterValue: true, TimeSpan.FromMilliseconds(2)));
     }
 
     [TestMethod]
@@ -90,6 +90,6 @@ public class IReadWriteExtensionTests
         var readWrite = Mock.Of<IReadWrite>();
 
         // Act Assert
-        _ = Assert.ThrowsExceptionAsync<TimeoutException>(() => readWrite.WaitForValueAsync(ioName, filterValue: true, TimeSpan.FromMilliseconds(2)));
+        _ = Assert.ThrowsExactlyAsync<TimeoutException>(() => readWrite.WaitForValueAsync(ioName, filterValue: true, TimeSpan.FromMilliseconds(2)));
     }
 }

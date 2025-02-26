@@ -169,7 +169,7 @@ public class AdsTypeConverterTests
         _ = dynamicValue.SetupGet(x => x.DataType).Returns(Mock.Of<IDataType>());
 
         // Act Assert
-        _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
+        _ = Assert.ThrowsExactly<NotSupportedException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
     }
 
     [TestMethod]
@@ -185,7 +185,7 @@ public class AdsTypeConverterTests
         _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(value: true);
 
         // Act Assert
-        _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
+        _ = Assert.ThrowsExactly<SymbolException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
     }
 
     [TestMethod]
@@ -201,7 +201,7 @@ public class AdsTypeConverterTests
         _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(value: false);
 
         // Act Assert
-        _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
+        _ = Assert.ThrowsExactly<SymbolException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
     }
 
     private static ArrayType ComplexArrayType(int[] rank)

@@ -24,7 +24,7 @@ public class TcAdsClientExtensionTests
 
     [TestMethod]
     public void ValidateConnectionThrowsArgumentNullExceptionWhenPassedANull() =>
-        _ = Assert.ThrowsException<ArgumentNullException>(() => TcAdsClientExtension.ValidateConnection(null!));
+        _ = Assert.ThrowsExactly<ArgumentNullException>(() => TcAdsClientExtension.ValidateConnection(null!));
 
     [TestMethod]
     public void ValidateConnectionThrowsInvalidOperationExceptionWhenItCantReadState()
@@ -36,7 +36,7 @@ public class TcAdsClientExtensionTests
         _ = clientMock.Setup(x => x.TryReadState(out stateInfo)).Returns(AdsErrorCode.InternalError);
 
         // Act
-        _ = Assert.ThrowsException<InvalidOperationException>(clientMock.Object.ValidateConnection);
+        _ = Assert.ThrowsExactly<InvalidOperationException>(() => clientMock.Object.ValidateConnection());
 
         // Assert
     }
@@ -51,7 +51,7 @@ public class TcAdsClientExtensionTests
         _ = clientMock.Setup(x => x.TryReadState(out stateInfo)).Returns(AdsErrorCode.InternalError);
 
         // Act
-        _ = Assert.ThrowsException<InvalidOperationException>(clientMock.Object.ValidateConnection);
+        _ = Assert.ThrowsExactly<InvalidOperationException>(() => clientMock.Object.ValidateConnection());
 
         // Assert
     }
@@ -66,7 +66,7 @@ public class TcAdsClientExtensionTests
         _ = clientMock.Setup(x => x.TryReadState(out stateInfo)).Returns(AdsErrorCode.NoError);
 
         // Act
-        _ = Assert.ThrowsException<InvalidOperationException>(clientMock.Object.ValidateConnection);
+        _ = Assert.ThrowsExactly<InvalidOperationException>(() => clientMock.Object.ValidateConnection());
 
         // Assert
     }

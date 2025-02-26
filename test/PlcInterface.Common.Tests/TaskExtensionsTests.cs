@@ -39,7 +39,7 @@ public class TaskExtensionsTests
 
         // Act
         // Assert
-        _ = Assert.ThrowsExceptionAsync<ArgumentNullException>(() => TaskExtensions.LogExceptionsAsync(null!, loggerMock.Object));
-        _ = Assert.ThrowsExceptionAsync<ArgumentNullException>(() => task.LogExceptionsAsync(null!));
+        _ = Assert.ThrowsExactlyAsync<ArgumentNullException>(() => TaskExtensions.LogExceptionsAsync(null!, loggerMock.Object));
+        _ = Assert.ThrowsExactlyAsync<ArgumentNullException>(() => task.LogExceptionsAsync(null!));
     }
 }

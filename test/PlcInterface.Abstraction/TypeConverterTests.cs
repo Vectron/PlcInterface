@@ -346,7 +346,7 @@ public class TypeConverterTests
         _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns(result);
 
         // Act
-        _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
+        _ = Assert.ThrowsExactly<SymbolException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
     }
 
     [TestMethod]
@@ -363,8 +363,8 @@ public class TypeConverterTests
             .Returns([nameof(NoSetterTestType.IntValue)]);
 
         // Act Assert
-        _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<NoSetterTestType>(sourceMock.Object));
-        _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<NoSetterTestType>(expandoSource));
+        _ = Assert.ThrowsExactly<NotSupportedException>(() => typeConverter.Convert<NoSetterTestType>(sourceMock.Object));
+        _ = Assert.ThrowsExactly<NotSupportedException>(() => typeConverter.Convert<NoSetterTestType>(expandoSource));
     }
 
     [TestMethod]
@@ -376,7 +376,7 @@ public class TypeConverterTests
         var sourceMock = new Mock<DynamicObject>();
 
         // Act Assert
-        _ = Assert.ThrowsException<NotSupportedException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
+        _ = Assert.ThrowsExactly<NotSupportedException>(() => typeConverter.Convert<int[]>(sourceMock.Object));
     }
 
     [TestMethod]
@@ -391,7 +391,7 @@ public class TypeConverterTests
         _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out value)).Returns(value: false);
 
         // Act
-        _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
+        _ = Assert.ThrowsExactly<SymbolException>(() => typeConverter.Convert<TestType>(sourceMock.Object));
     }
 
     [TestMethod]
@@ -425,8 +425,8 @@ public class TypeConverterTests
         var dynamicObjectSource = dynamicObjectSourceMock.Object;
 
         // Act Assert
-        _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<TestType>(dynamicObjectSource));
-        _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<TestType>(expandoSource));
+        _ = Assert.ThrowsExactly<SymbolException>(() => typeConverter.Convert<TestType>(dynamicObjectSource));
+        _ = Assert.ThrowsExactly<SymbolException>(() => typeConverter.Convert<TestType>(expandoSource));
     }
 
     [TestMethod]
@@ -437,7 +437,7 @@ public class TypeConverterTests
         var source = TestType.Instance;
 
         // Act Assert
-        _ = Assert.ThrowsException<SymbolException>(() => typeConverter.Convert<int>(source));
+        _ = Assert.ThrowsExactly<SymbolException>(() => typeConverter.Convert<int>(source));
     }
 
     private record struct TestRecordStructType(int IntValue, int[] IntArray, NestedRecordStructType SubType)

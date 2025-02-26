@@ -88,7 +88,7 @@ public class SymbolHandlerTests
         // Act
 
         // Assert
-        var exception = Assert.ThrowsException<SymbolException>(() => symbolHandler.GetSymbolInfo(ioName));
+        var exception = Assert.ThrowsExactly<SymbolException>(() => symbolHandler.GetSymbolInfo(ioName));
         Assert.AreEqual(exception.Message, $"{ioName} Does not exist in the PLC");
     }
 
@@ -140,7 +140,7 @@ public class SymbolHandlerTests
         // Act
 
         // Assert
-        var exception = Assert.ThrowsException<SymbolException>(() => symbolHandler.GetSymbolInfo(ioName));
+        var exception = Assert.ThrowsExactly<SymbolException>(() => symbolHandler.GetSymbolInfo(ioName));
         Assert.AreEqual("PLC not connected", exception.Message);
     }
 

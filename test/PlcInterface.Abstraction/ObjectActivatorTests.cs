@@ -13,7 +13,11 @@ public class ObjectActivatorTests
         var constructorInfo = Mock.Of<ConstructorInfo>(x => x.DeclaringType == null);
 
         // Act Assert
-        _ = Assert.ThrowsException<ArgumentException>(() => new ObjectActivator(constructorInfo));
+        _ = Assert.ThrowsExactly<ArgumentException>(() =>
+        {
+            var objectActivator = new ObjectActivator(constructorInfo);
+            var type = objectActivator.GetType();
+        });
     }
 
     [TestMethod]
@@ -45,7 +49,7 @@ public class ObjectActivatorTests
         void Action() => _ = activator.TryCreateInstance((name, type) => null, 1, out var instance);
 
         // Act Assert
-        _ = Assert.ThrowsException<SymbolException>(Action);
+        _ = Assert.ThrowsExactly<SymbolException>(Action);
     }
 
     private sealed class TestClass

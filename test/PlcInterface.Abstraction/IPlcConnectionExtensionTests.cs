@@ -32,7 +32,7 @@ public class IPlcConnectionExtensionTests
         _ = mock.SetupGet(x => x.SessionStream).Returns(Observable.Repeat(Mock.Of<IConnected<GenericParameterHelper>>()));
 
         // Act Assert
-        _ = await Assert.ThrowsExceptionAsync<TimeoutException>(() => mock.Object.GetConnectedClientAsync(TimeSpan.FromMilliseconds(10)));
+        _ = await Assert.ThrowsExactlyAsync<TimeoutException>(() => mock.Object.GetConnectedClientAsync(TimeSpan.FromMilliseconds(10)));
     }
 
     [TestMethod]
@@ -61,6 +61,6 @@ public class IPlcConnectionExtensionTests
         _ = mock.SetupGet(x => x.SessionStream).Returns(Observable.Repeat(Mock.Of<IConnected<GenericParameterHelper>>()));
 
         // Act Assert
-        _ = Assert.ThrowsExceptionAsync<TimeoutException>(() => mock.Object.GetConnectedClientAsync(TimeSpan.FromMilliseconds(10)));
+        _ = Assert.ThrowsExactlyAsync<TimeoutException>(() => mock.Object.GetConnectedClientAsync(TimeSpan.FromMilliseconds(10)));
     }
 }

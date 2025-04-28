@@ -48,7 +48,7 @@ public static class IMonitorExtension
     public static IObservable<T> SubscribeIO<T>(this IMonitor monitor, string ioName, T filterValue, int updateInterval = 1000)
         => monitor
             .SubscribeIO<T>(ioName, updateInterval)
-            .Where(x => x != null && x.Equals(filterValue));
+            .Where(x => Equals(x, filterValue)); // We use object.Equals here to prevent null pointer exceptions, but still allow null as a filter value.
 
     /// <summary>
     /// Subscribe to the IO stream. with a specific type and filter the value.

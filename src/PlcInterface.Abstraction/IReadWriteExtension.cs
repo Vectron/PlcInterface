@@ -23,7 +23,9 @@ public static class IReadWriteExtension
         while (!token.IsCancellationRequested)
         {
             var value = readWrite.Read<T>(tag);
-            if (value != null && value.Equals(filterValue))
+
+            // We use object.Equals here to prevent null pointer exceptions, but still allow null as a filter value.
+            if (Equals(value, filterValue))
             {
                 return;
             }
@@ -50,7 +52,9 @@ public static class IReadWriteExtension
         while (!token.IsCancellationRequested)
         {
             var value = await readWrite.ReadAsync<T>(tag).ConfigureAwait(false);
-            if (value != null && value.Equals(filterValue))
+
+            // We use object.Equals here to prevent null pointer exceptions, but still allow null as a filter value.
+            if (Equals(value, filterValue))
             {
                 return;
             }

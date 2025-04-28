@@ -146,7 +146,7 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
             {
                 NodeId = x.Item1.Handle,
                 AttributeId = Attributes.Value,
-                Value = new DataValue(typeConverter.CreateOpcVariant(x.Item1.Name, x.Value)),
+                Value = new DataValue(typeConverter.CreateOpcVariant(x.Item1, x.Value)),
             });
 
         var nodesToWrite = new WriteValueCollection(query);

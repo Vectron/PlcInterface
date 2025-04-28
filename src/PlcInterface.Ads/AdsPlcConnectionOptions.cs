@@ -6,23 +6,9 @@ namespace PlcInterface.Ads;
 public class AdsPlcConnectionOptions
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="AdsPlcConnectionOptions"/> class.
-    /// </summary>
-    public AdsPlcConnectionOptions()
-    {
-        AmsNetId = string.Empty;
-        AutoConnect = false;
-        Port = 0;
-    }
-
-    /// <summary>
     /// Gets or sets the address to connect to.
     /// </summary>
-    public string AmsNetId
-    {
-        get;
-        set;
-    }
+    public string AmsNetId { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets a value indicating whether the connection should be opened automatically.

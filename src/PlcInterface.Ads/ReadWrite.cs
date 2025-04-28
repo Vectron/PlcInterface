@@ -29,7 +29,7 @@ public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHan
             .Zip(result, (ioName, value) =>
             {
                 var adsSymbol = symbolHandler.GetSymbolInfo(ioName).Symbol.CastAndValidate();
-                var fixedValue = typeConverter.Convert(value, adsSymbol);
+                var fixedValue = typeConverter.Convert(value, adsSymbol.DataType);
                 return (ioName, fixedValue);
             })
             .ToDictionary(x => x.ioName, x => x.fixedValue, StringComparer.OrdinalIgnoreCase);
@@ -46,7 +46,7 @@ public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHan
             ThrowHelper.ThrowInvalidOperationException_FailedToRead(ioName);
         }
 
-        return typeConverter.Convert(value, adsSymbol);
+        return typeConverter.Convert(value, adsSymbol.DataType);
     }
 
     /// <inheritdoc/>
@@ -74,7 +74,7 @@ public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHan
             ThrowHelper.ThrowInvalidOperationException_FailedToRead(ioName);
         }
 
-        return typeConverter.Convert(resultReadValue.Value, adsSymbol);
+        return typeConverter.Convert(resultReadValue.Value, adsSymbol.DataType);
     }
 
     /// <inheritdoc/>
@@ -111,7 +111,7 @@ public class ReadWrite(IAdsPlcConnection connection, IAdsSymbolHandler symbolHan
                 .Zip(resultSum, (ioName, value) =>
                 {
                     var adsSymbol = symbolHandler.GetSymbolInfo(ioName).Symbol.CastAndValidate();
-                    var fixedValue = typeConverter.Convert(value, adsSymbol);
+                    var fixedValue = typeConverter.Convert(value, adsSymbol.DataType);
                     return (ioName, fixedValue);
                 })
                 .ToDictionary(x => x.ioName, x => x.fixedValue, StringComparer.OrdinalIgnoreCase);

@@ -11,9 +11,9 @@ public interface IAdsTypeConverter : ITypeConverter
     /// Converts Ads types to System types.
     /// </summary>
     /// <param name="value">The value to fix.</param>
-    /// <param name="valueSymbol">The symbol containing type information.</param>
+    /// <param name="dataType">The data type of the value.</param>
     /// <returns>The converted type.</returns>
-    public object Convert(object value, IValueSymbol valueSymbol);
+    public object Convert(object value, IDataType? dataType);
 
     /// <summary>
     /// Conver the given object to a type that can be written to the PLC.

@@ -1,5 +1,4 @@
 using System.Dynamic;
-using System.Globalization;
 using TwinCAT.TypeSystem;
 
 namespace PlcInterface.Ads;
@@ -10,17 +9,40 @@ namespace PlcInterface.Ads;
 public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
 {
     /// <inheritdoc/>
-    public object Convert(object value, IValueSymbol valueSymbol)
+    public object Convert(object value, IDataType? dataType)
     {
-        if (value is DynamicObject dynamicObject)
+        if (dataType is IEnumType)
         {
-            return dynamicObject.CleanDynamic();
+            return Convert(value, typeof(int));
         }
 
-        if (valueSymbol.Category == DataTypeCategory.Enum
-            && value is short)
+        if (dataType is IArrayType arrayType)
         {
-            return System.Convert.ToInt32(value, CultureInfo.InvariantCulture);
+            var elementType = arrayType.ElementType as IManagedMappableType;
+            var managedType = elementType?.ManagedType ?? typeof(object);
+            var rank = arrayType.Dimensions.Count;
+            var managedArrayType = rank == 1 ? managedType.MakeArrayType() : managedType.MakeArrayType(rank);
+            return Convert(value, managedArrayType);
+        }
+
+        if (dataType is IStructType)
+        {
+            return Convert(value, typeof(object));
+        }
+
+        if (value is TwinCAT.PlcOpen.DateBase dateBase)
+        {
+            return new DateTimeOffset(dateBase.Value);
+        }
+
+        if (value is TwinCAT.PlcOpen.TimeBase timeBase)
+        {
+            return timeBase.Time;
+        }
+
+        if (value is TwinCAT.PlcOpen.LTimeBase lTimeBase)
+        {
+            return lTimeBase.Time;
         }
 
         if (value is DateTime dateTime)
@@ -34,29 +56,15 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
     /// <inheritdoc/>
     public override object Convert(object value, Type targetType)
     {
-        if (value is TwinCAT.PlcOpen.DateBase dateBase)
+        if (value is TwinCAT.PlcOpen.IPlcOpenTimeBase plcOpenTimeBase)
         {
-            if (targetType == typeof(DateTimeOffset))
-            {
-                return new DateTimeOffset(dateBase.Value);
-            }
-
-            return dateBase.Value;
+            return ConvertPlcOpenTypes(plcOpenTimeBase, targetType);
         }
 
-        if (value is TwinCAT.PlcOpen.TimeBase timeBase)
+        if (value is IStructValue valueObject
+            && targetType == typeof(object))
         {
-            return timeBase.Time;
-        }
-
-        if (value is TwinCAT.PlcOpen.LTimeBase lTimeBase)
-        {
-            return lTimeBase.Time;
-        }
-
-        if (value is IDynamicValue valueObject && valueObject.DataType is IArrayType arrayType)
-        {
-            return ConvertDynamicValueArray(valueObject, arrayType, targetType);
+            return SanitizeDynamic(valueObject);
         }
 
         return base.Convert(value, targetType);
@@ -73,23 +81,64 @@ public sealed class AdsTypeConverter : TypeConverter, IAdsTypeConverter
         return value;
     }
 
-    private Array ConvertDynamicValueArray(IDynamicValue valueObject, IArrayType arrayType, Type targetType)
+    private static object ConvertPlcOpenTypes(TwinCAT.PlcOpen.IPlcOpenTimeBase plcOpenTimeBase, Type targetType)
     {
-        var elementType = targetType.GetElementType()
-            ?? throw new NotSupportedException($"Unable to retrieve element type");
-        var dimensionLengths = arrayType.Dimensions.GetDimensionLengths();
-        var destination = Array.CreateInstance(elementType, dimensionLengths);
-
-        foreach (var indices in IndicesHelper.GetIndices(destination))
+        if (plcOpenTimeBase is TwinCAT.PlcOpen.DateBase dateBase)
         {
-            if (!valueObject.TryGetIndexValue(indices, out var memberValue))
+            if (targetType == typeof(DateTimeOffset))
             {
-                throw new SymbolException($"No value found at index {string.Join(';', indices)}");
+                return new DateTimeOffset(dateBase.Value);
             }
 
-            destination.SetValue(Convert(memberValue, elementType), indices);
+            if (targetType == typeof(DateTime))
+            {
+                return dateBase.Value;
+            }
         }
 
-        return destination;
+        if (plcOpenTimeBase is TwinCAT.PlcOpen.TimeBase timeBase)
+        {
+            if (targetType == typeof(TimeSpan))
+            {
+                return timeBase.Value;
+            }
+        }
+
+        if (plcOpenTimeBase is TwinCAT.PlcOpen.LTimeBase lTimeBase)
+        {
+            if (targetType == typeof(TimeSpan))
+            {
+                return lTimeBase.Value;
+            }
+        }
+
+        throw new NotSupportedException($"Can not convert from {plcOpenTimeBase.GetType().FullName} to {targetType.FullName}");
+    }
+
+    /// <summary>
+    /// This walks the whole dynamic object to make sure all values are non twincat types.
+    /// </summary>
+    /// <param name="structValue">The structure to sanitize.</param>
+    /// <returns>A new dynamic object.</returns>
+    /// <exception cref="NotSupportedException">When the data type of the member can not be retrieved.</exception>
+    private object SanitizeDynamic(IStructValue structValue)
+    {
+        var dataType = structValue.DataType as IStructType
+            ?? throw new NotSupportedException("Unable to retrieve data type for struct");
+        IDictionary<string, object?> expando = new ExpandoObject();
+        foreach (var member in dataType.AllMembers)
+        {
+            var name = member.InstanceName;
+            var memberDataType = member.DataType
+                ?? throw new NotSupportedException($"Unable to retrieve data type for struct member {name}");
+            if (!structValue.TryGetMemberValue(name, out var childValue))
+            {
+                continue;
+            }
+
+            expando[name] = Convert(childValue, memberDataType);
+        }
+
+        return expando;
     }
 }

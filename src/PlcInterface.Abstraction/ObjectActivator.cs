@@ -8,76 +8,75 @@ namespace PlcInterface;
 /// Encapsules the logic to create a type by constructor with parameters, or default constructor
 /// with property setters.
 /// </summary>
-internal sealed class ObjectActivator : ITypeActivator
+/// <remarks>
+/// Initializes a new instance of the <see cref="ObjectActivator"/> class.
+/// </remarks>
+internal sealed class ObjectActivator(Type type) : ITypeActivator
 {
-    private readonly Activator activator;
-    private readonly ParameterInfo[] parameters;
-    private readonly PropertySetterHelper[] properties;
+    private readonly Dictionary<int, ParametersAndActivator> constructors = GetConstructors(type);
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ObjectActivator"/> class.
-    /// </summary>
-    /// <param name="constructorInfo">The <see cref="ConstructorInfo"/> used to create the type.</param>
-    public ObjectActivator(ConstructorInfo constructorInfo)
-    {
-        if (constructorInfo.DeclaringType == null)
-        {
-            throw new ArgumentException("No declaring type defined.", nameof(constructorInfo));
-        }
-
-        parameters = constructorInfo.GetParameters();
-        activator = GetActivator(constructorInfo);
-        var query = constructorInfo.DeclaringType
+    private readonly Dictionary<PropertyInfo, PropertySetter> propertySetters = type
             .GetProperties()
             .Where(x => x.CanWrite)
-            .Select(x => new PropertySetterHelper(x));
-        properties = [.. query];
-    }
+            .ToDictionary(x => x, GetPropertySetter);
 
     private delegate object Activator(params object[] args);
+
+    private delegate void PropertySetter(object instance, object? value);
 
     /// <inheritdoc/>
     public bool TryCreateInstance(Func<string, Type, object?> memberValueGetter, int memberCount, [MaybeNullWhen(false)] out object instance)
     {
-        instance = default;
-        if (parameters.Length == memberCount)
+        for (var i = memberCount; i >= 0; i--)
         {
-            var arguments = new object[parameters.Length];
-            var index = 0;
-            foreach (var parameter in parameters)
+            if (!constructors.TryGetValue(i, out var data))
             {
-                if (string.IsNullOrEmpty(parameter.Name))
+                continue;
+            }
+
+            var aguments = data.ParameterInfos
+                .Where(p => !string.IsNullOrEmpty(p.Name))
+                .Select(p => memberValueGetter.Invoke(p.Name!, p.ParameterType))
+                .Where(v => v != null)
+                .Cast<object>()
+                .ToArray();
+
+            if (aguments.Length != i)
+            {
+                continue;
+            }
+
+            instance = data.Activator.Invoke(aguments);
+            if (aguments.Length == memberCount)
+            {
+                return true;
+            }
+
+            foreach (var (propertyInfo, setter) in propertySetters)
+            {
+                var memberValue = memberValueGetter.Invoke(propertyInfo.Name, propertyInfo.PropertyType);
+
+                // Setting properties on value types with the expression tree make hidden copies and thus not setting the values.
+                if (type.IsValueType)
                 {
-                    return false;
+                    propertyInfo.SetValue(instance, memberValue);
+                    continue;
                 }
 
-                arguments[index++] = memberValueGetter.Invoke(parameter.Name, parameter.ParameterType)
-                    ?? throw new SymbolException($"Member: {parameter.Name} was null");
-            }
-
-            var argumentsArray = arguments.ToArray();
-            instance = activator.Invoke(argumentsArray);
-            return true;
-        }
-
-        if (properties.Length >= memberCount)
-        {
-            instance = activator.Invoke();
-            foreach (var property in properties)
-            {
-                var memberValue = memberValueGetter.Invoke(property.Name, property.PropertyType)
-                    ?? throw new SymbolException($"Member: {property.Name} was null");
-                property.Set(instance, memberValue);
+                setter(instance, memberValue);
             }
 
             return true;
         }
 
+        instance = null;
         return false;
     }
 
-    private Activator GetActivator(ConstructorInfo constructorInfo)
+    private static Activator GetActivator(ConstructorInfo constructorInfo)
     {
+        var parameters = constructorInfo.GetParameters();
+
         // create a single param of type object[]
         var param = Expression.Parameter(typeof(object[]), "args");
         var argsExp = new Expression[parameters.Length];
@@ -103,4 +102,38 @@ internal sealed class ObjectActivator : ITypeActivator
         var compiled = lambda.Compile();
         return compiled;
     }
+
+    private static Dictionary<int, ParametersAndActivator> GetConstructors(Type type)
+    {
+        var constructorInfos = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
+
+        // Value types might not return a constructor.
+        if (constructorInfos.Length == 0)
+        {
+            object CreateInstance(object[] args) => System.Activator.CreateInstance(type)!;
+            return new Dictionary<int, ParametersAndActivator>
+            {
+                { 0, new ParametersAndActivator([], CreateInstance) },
+            };
+        }
+
+        return constructorInfos
+            .Select(c => new ParametersAndActivator(c.GetParameters(), GetActivator(c)))
+            .ToDictionary(p => p.ParameterInfos.Length);
+    }
+
+    private static PropertySetter GetPropertySetter(PropertyInfo propertyInfo)
+    {
+        var instanceParam = Expression.Parameter(typeof(object));
+        var instanceParamCast = Expression.Convert(instanceParam, propertyInfo.DeclaringType!);
+        var propertyParam = Expression.Parameter(typeof(object));
+        var propertyParamCast = Expression.Convert(propertyParam, propertyInfo.PropertyType);
+        var propertyGetterExpression = Expression.Property(instanceParamCast, propertyInfo.Name);
+        var assignExpression = Expression.Assign(propertyGetterExpression, propertyParamCast);
+        var lambda = Expression.Lambda<PropertySetter>(assignExpression, instanceParam, propertyParam);
+        var compiled = lambda.Compile();
+        return compiled;
+    }
+
+    private record ParametersAndActivator(ParameterInfo[] ParameterInfos, Activator Activator);
 }

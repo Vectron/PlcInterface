@@ -11,7 +11,7 @@ namespace PlcInterface;
 /// </summary>
 public abstract class TypeConverter : ITypeConverter
 {
-    private readonly ConcurrentDictionary<string, ITypeActivator[]> activatorCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, ITypeActivator> activatorCache = new(StringComparer.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
     public virtual T Convert<T>(object value)
@@ -71,50 +71,18 @@ public abstract class TypeConverter : ITypeConverter
             return ConvertDynamic(dynamicObject, targetType);
         }
 
-        try
-        {
-            return System.Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
-        }
-        catch (InvalidCastException ex)
-        {
-            throw new SymbolException(ex.Message);
-        }
+        return System.Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
     }
 
     private object Convert(Func<string, Type, object?> memberValueGetter, int memberCount, Type targetType)
     {
-        var parameterInfo = activatorCache.GetOrAdd(
-            targetType.Name,
-            (key, targetType) =>
-            {
-                var constructors = targetType.GetConstructors();
-                var activators = new List<ITypeActivator>(constructors.Length);
-                if (constructors.Length == 0
-                    && targetType.IsValueType)
-                {
-                    activators.Add(new StructActivator(targetType));
-                }
-
-                foreach (var constructor in constructors)
-                {
-                    activators.Add(new ObjectActivator(constructor));
-                }
-
-                return [.. activators];
-            },
-            targetType);
-
-        foreach (var typeMapperInfo in parameterInfo)
+        var typeActivator = activatorCache.GetOrAdd(targetType.Name, (key, targetType) => new ObjectActivator(targetType), targetType);
+        if (!typeActivator.TryCreateInstance(memberValueGetter, memberCount, out var instance))
         {
-            if (!typeMapperInfo.TryCreateInstance(memberValueGetter, memberCount, out var instance))
-            {
-                continue;
-            }
-
-            return instance;
+            throw new NotSupportedException($"Failed to create an instance of {targetType.Name}");
         }
 
-        throw new NotSupportedException($"Failed to create an instance of {targetType.Name}");
+        return instance;
     }
 
     private Array ConvertArray(Array source, Type targetType)

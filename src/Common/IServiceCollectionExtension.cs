@@ -23,6 +23,7 @@ internal static class IServiceCollectionExtension
         where TService2 : class, TService1
         where TImplementation : class, TService1, TService2
         => serviceDescriptors
-            .AddSingleton<TService2, TImplementation>()
-            .AddSingleton(x => (TService1)x.GetRequiredService<TService2>());
+            .AddSingleton<TImplementation>()
+            .AddSingleton<TService1>(x => x.GetRequiredService<TImplementation>())
+            .AddSingleton<TService2>(x => x.GetRequiredService<TImplementation>());
 }

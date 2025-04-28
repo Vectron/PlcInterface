@@ -41,6 +41,9 @@ public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
     }
 
     /// <inheritdoc/>
+    public event EventHandler? SymbolsUpdated;
+
+    /// <inheritdoc/>
     public IReadOnlyCollection<ISymbolInfo> AllSymbols
         => allSymbols.Values.AsReadOnly();
 
@@ -133,5 +136,6 @@ public partial class SymbolHandler : IOpcSymbolHandler, IDisposable
 
         elapsedWatch.Stop();
         LogSymbolsUpdated(elapsedWatch.ElapsedMilliseconds, allSymbols.Count);
+        SymbolsUpdated?.Invoke(this, EventArgs.Empty);
     }
 }

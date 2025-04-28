@@ -8,6 +8,11 @@ namespace PlcInterface;
 public interface ISymbolHandler
 {
     /// <summary>
+    /// An event that is raised when the symbols are updated.
+    /// </summary>
+    public event EventHandler SymbolsUpdated;
+
+    /// <summary>
     /// Gets a collection of all symbols in the PLC.
     /// </summary>
     public IReadOnlyCollection<ISymbolInfo> AllSymbols

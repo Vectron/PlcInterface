@@ -52,6 +52,9 @@ public partial class SymbolHandler : IAdsSymbolHandler, IDisposable
     }
 
     /// <inheritdoc/>
+    public event EventHandler? SymbolsUpdated;
+
+    /// <inheritdoc/>
     public IReadOnlyCollection<ISymbolInfo> AllSymbols
         => allSymbols.Values;
 
@@ -168,6 +171,7 @@ public partial class SymbolHandler : IAdsSymbolHandler, IDisposable
                 .Cast<IAdsSymbolInfo>()
                 .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
             LogSymbolsUpdated(watch.ElapsedMilliseconds, allSymbols.Count);
+            SymbolsUpdated?.Invoke(this, EventArgs.Empty);
 
             if (options.StoreSymbolsToDisk)
             {

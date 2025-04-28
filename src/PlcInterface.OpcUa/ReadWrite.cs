@@ -222,10 +222,12 @@ public class ReadWrite(IOpcPlcConnection connection, IOpcSymbolHandler symbolHan
                 ioName);
         }
 
-        if (readResponse.Value == null)
+        if (readResponse.Value != null)
         {
-            ThrowHelper.ThrowInvalidOperationException_FailedToRead(ioName);
+            return;
         }
+
+        ThrowHelper.ThrowInvalidOperationException_FailedToRead(ioName);
     }
 
     private static void ValidateResponse(IList request, ResponseHeader responseHeader, StatusCodeCollection statusCodes, DiagnosticInfoCollection diagnosticInfos, IEnumerable<string> ioNames)

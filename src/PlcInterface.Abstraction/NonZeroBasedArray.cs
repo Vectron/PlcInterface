@@ -80,23 +80,114 @@ public readonly struct NonZeroBasedArray<T>(int[] lengths, int[] lowerBounds) : 
         => left.Equals(right);
 
     /// <inheritdoc/>
-    int IStructuralComparable.CompareTo(object? other, IComparer comparer) => ((IStructuralComparable)backingArray).CompareTo(other, comparer);
+    int IStructuralComparable.CompareTo(object? other, IComparer comparer)
+    {
+        if (other == null)
+        {
+            return 1;
+        }
+
+        if (other is NonZeroBasedArray<T> nonZeroArray)
+        {
+            return ((IStructuralComparable)this).CompareTo(nonZeroArray.backingArray, comparer);
+        }
+
+        if (other is not Array o
+            || o.Length != Length
+            || o.Rank != Rank)
+        {
+            throw new ArgumentException("Other not array of correct length/rank");
+        }
+
+        var c = 0;
+        using var indices = IndicesHelper.GetIndices(backingArray).GetEnumerator();
+        using var indicesOther = IndicesHelper.GetIndices(o).GetEnumerator();
+        while (indices.MoveNext() && indicesOther.MoveNext())
+        {
+            var leftIndex = indices.Current;
+            var rightIndex = indicesOther.Current;
+            var leftValue = backingArray.GetValue(leftIndex);
+            var rightValue = o.GetValue(rightIndex);
+
+            c = comparer.Compare(leftValue, rightValue);
+
+            if (c != 0)
+            {
+                break;
+            }
+        }
+
+        return c;
+    }
 
     /// <inheritdoc/>
-    bool IStructuralEquatable.Equals(object? other, IEqualityComparer comparer) => ((IStructuralEquatable)backingArray).Equals(other, comparer);
+    bool IStructuralEquatable.Equals(object? other, IEqualityComparer comparer)
+    {
+        if (other == null)
+        {
+            return false;
+        }
+
+        if (other is NonZeroBasedArray<T> nonZeroArray)
+        {
+            return ((IStructuralEquatable)this).Equals(nonZeroArray.backingArray, comparer);
+        }
+
+        if (other is not Array o
+            || o.Length != Length
+            || o.Rank != Rank)
+        {
+            return false;
+        }
+
+        using var indices = IndicesHelper.GetIndices(backingArray).GetEnumerator();
+        using var indicesOther = IndicesHelper.GetIndices(o).GetEnumerator();
+        while (indices.MoveNext() && indicesOther.MoveNext())
+        {
+            var leftIndex = indices.Current;
+            var rightIndex = indicesOther.Current;
+            var leftValue = backingArray.GetValue(leftIndex);
+            var rightValue = o.GetValue(rightIndex);
+            if (!comparer.Equals(leftValue, rightValue))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /// <inheritdoc/>
     public override bool Equals(object? obj)
-        => backingArray.Equals(obj);
+    {
+        if (obj is NonZeroBasedArray<T> nonZeroArray)
+        {
+            return backingArray.Equals(nonZeroArray.backingArray);
+        }
+
+        return backingArray.Equals(obj);
+    }
 
     /// <inheritdoc/>
     public IEnumerator<T> GetEnumerator() => new NonZeroBasedArrayEnumerator(backingArray);
 
     /// <inheritdoc/>
-    IEnumerator IEnumerable.GetEnumerator() => backingArray.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => new NonZeroBasedArrayEnumerator(backingArray);
 
     /// <inheritdoc/>
-    int IStructuralEquatable.GetHashCode(IEqualityComparer comparer) => ((IStructuralEquatable)backingArray).GetHashCode(comparer);
+    int IStructuralEquatable.GetHashCode(IEqualityComparer comparer)
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+        HashCode hashCode = default;
+        foreach (var index in IndicesHelper.GetIndices(backingArray))
+        {
+            var value = backingArray.GetValue(index)!;
+            var valueHashCode = comparer.GetHashCode(value);
+            hashCode.Add(valueHashCode);
+        }
+
+        return hashCode.ToHashCode();
+    }
 
     /// <inheritdoc/>
     public override int GetHashCode()
@@ -156,10 +247,6 @@ public readonly struct NonZeroBasedArray<T>(int[] lengths, int[] lowerBounds) : 
 
         public void Dispose()
         {
-            if (enumerator is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
         }
 
         public bool MoveNext() => enumerator.MoveNext();

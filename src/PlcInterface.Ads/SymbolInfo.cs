@@ -17,7 +17,7 @@ internal sealed class SymbolInfo(ISymbol symbol, string rootPath) : IAdsSymbolIn
     /// <inheritdoc/>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0305:Simplify collection initialization", Justification = "Makes it more unreadable")]
     public IList<string> ChildSymbols
-        => Symbol.SubSymbols.Select(x => CleanInstancePath(x, rootPath)).ToList();
+        => [.. Symbol.SubSymbols.Select(x => CleanInstancePath(x, rootPath))];
 
     /// <inheritdoc/>
     public string Comment

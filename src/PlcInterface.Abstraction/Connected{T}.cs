@@ -4,7 +4,7 @@ namespace PlcInterface;
 /// A <see cref="IConnected{T}"/> implementation.
 /// </summary>
 /// <typeparam name="T">The type that is connected.</typeparam>
-public class Connected<T> : IConnected<T>
+public sealed class Connected<T> : IConnected<T>
 {
     private readonly T? value;
 

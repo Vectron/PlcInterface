@@ -13,7 +13,7 @@
     <PackageReference Include="Vectron.InteractiveConsole" Version="1.0.68" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
-    <PackageReference Include="Beckhoff.TwinCAT.Ads.TcpRouter" Version="6.1.203" />
+    <PackageReference Include="Beckhoff.TwinCAT.Ads.TcpRouter" Version="7.0.123" />
   </ItemGroup>
 
   <ItemGroup>

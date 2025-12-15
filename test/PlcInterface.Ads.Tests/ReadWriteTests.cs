@@ -84,12 +84,7 @@ public class ReadWriteTests
         Assert.AreEqual(dummyValue, value4);
     }
 
-    // TODO remove suppression when fixed
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "IDisposableAnalyzers.Correctness",
-        "IDISP013:Await in using",
-        Justification = "Problem with expressionTrees; see https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
     public async Task ReadValuesReturnsTheExpectedValuesAsync()
     {
         // Arrange
@@ -202,12 +197,7 @@ public class ReadWriteTests
         valueSymbolMock.Verify(x => x.WriteValueAsync(It.Is<int>(x => dummyValue == x), It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    // TODO remove suppression when fixed
     [TestMethod]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "IDisposableAnalyzers.Correctness",
-        "IDISP013:Await in using",
-        Justification = "Problem with expressionTrees; see https://github.com/DotNetAnalyzers/IDisposableAnalyzers/issues/370")]
     public async Task WriteMultipleCallsUnderlyingWriteMethodAsync()
     {
         // Arrange

@@ -71,12 +71,12 @@ public class PlcConnection : IAdsPlcConnection, IDisposable
         => DisconnectAsync().GetAwaiter().GetResult();
 
     /// <inheritdoc/>
-    public Task DisconnectAsync()
-        => Task.Run(() =>
-        {
-            _ = adsDisposableConnection.Disconnect();
-            adsDisposableConnection.ConnectionStateChanged -= AdsDisposableConnection_ConnectionStateChanged;
-        });
+    public async Task DisconnectAsync()
+    {
+        using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        _ = await adsDisposableConnection.DisconnectAsync(timeoutCts.Token).ConfigureAwait(false);
+        adsDisposableConnection.ConnectionStateChanged -= AdsDisposableConnection_ConnectionStateChanged;
+    }
 
     /// <inheritdoc/>
     public void Dispose()

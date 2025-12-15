@@ -47,7 +47,7 @@ public class AdsTypeConverterTests
                 nameof(TimesTestType.DateTimeOffset),
             ]);
         _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
-            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((binder, out value) =>
             {
                 value = binder.Name switch
                 {
@@ -120,7 +120,7 @@ public class AdsTypeConverterTests
         var dynamicValue = sourceMock.As<IDynamicValue>();
         _ = dynamicValue.SetupGet(x => x.DataType).Returns(ComplexArrayType([2]));
         var dummy = new object();
-        _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(new MockDelegates.OutFunction<int[], object?, bool>((int[] indices, out object? value) =>
+        _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy)).Returns(new MockDelegates.OutFunction<int[], object?, bool>((indices, out value) =>
         {
             value = ((NestedType)expected.GetValue(indices)!).GetDynamicObjectMock();
             return true;
@@ -145,7 +145,7 @@ public class AdsTypeConverterTests
         _ = dynamicValue.SetupGet(x => x.DataType).Returns(IntArrayType([9]));
         var dummy = new object();
         _ = dynamicValue.Setup(x => x.TryGetIndexValue(It.IsAny<int[]>(), out dummy))
-            .Returns(new MockDelegates.OutFunction<int[], object?, bool>((int[] indices, out object? value) =>
+            .Returns(new MockDelegates.OutFunction<int[], object?, bool>((indices, out value) =>
             {
                 value = expected.GetValue(indices);
                 return true;
@@ -238,7 +238,7 @@ public class AdsTypeConverterTests
             var result = new object();
             _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns([nameof(IntValue)]);
             _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
-                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((binder, out value) =>
                 {
                     value = binder.Name switch
                     {

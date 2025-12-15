@@ -134,7 +134,7 @@ public class DynamicObjectExtensionsTests
         var iDynamicValueDynamicObjectMock = dynamicObjectMock.As<IDynamicValue>();
         _ = iDynamicValueDynamicObjectMock.SetupGet(x => x.DataType).Returns(Mock.Of<IStructType>());
         _ = iDynamicValueDynamicObjectMock.Setup(x => x.TryGetMemberValue(It.IsAny<string>(), out dummy))
-            .Callback(new MockDelegates.OutAction<string, object?>((string name, out object? value)
+            .Callback(new MockDelegates.OutAction<string, object?>((name, out value)
             => value = name switch
             {
                 "Property1" => 255,
@@ -167,7 +167,7 @@ public class DynamicObjectExtensionsTests
         var nestedDynamicIDynamicValue = nestedDynamicMock.As<IDynamicValue>();
         _ = nestedDynamicIDynamicValue.SetupGet(x => x.DataType).Returns(Mock.Of<IStructType>());
         _ = nestedDynamicIDynamicValue.Setup(x => x.TryGetMemberValue(It.IsAny<string>(), out dummy))
-            .Callback(new MockDelegates.OutAction<string, object?>((string name, out object? value)
+            .Callback(new MockDelegates.OutAction<string, object?>((name, out value)
             => value = name switch
             {
                 "Nested1" => 255,
@@ -207,7 +207,7 @@ public class DynamicObjectExtensionsTests
         var firstIDynamicValue = firstDynamic.As<IDynamicValue>();
         _ = firstIDynamicValue.SetupGet(x => x.DataType).Returns(Mock.Of<IStructType>());
         _ = firstIDynamicValue.Setup(x => x.TryGetMemberValue(It.IsAny<string>(), out dummy))
-            .Returns(new MockDelegates.OutFunction<string, object?, bool>((string name, out object? value) =>
+            .Returns(new MockDelegates.OutFunction<string, object?, bool>((name, out value) =>
             {
                 value = name switch
                 {

@@ -141,7 +141,7 @@ public class PlcConnectionTests
         connection.Disconnect();
 
         // Assert
-        adsClientMock.Verify(x => x.Disconnect(), Times.Once);
+        adsClientMock.Verify(x => x.DisconnectAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [TestMethod]
@@ -161,7 +161,7 @@ public class PlcConnectionTests
         await connection.DisconnectAsync();
 
         // Assert
-        adsClientMock.Verify(x => x.Disconnect(), Times.Once);
+        adsClientMock.Verify(x => x.DisconnectAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [TestMethod]

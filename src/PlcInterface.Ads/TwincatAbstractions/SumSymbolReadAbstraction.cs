@@ -10,7 +10,7 @@ namespace PlcInterface.Ads.TwinCATAbstractions;
 /// <inheritdoc cref="SumSymbolRead"/>
 internal sealed class SumSymbolReadAbstraction(IAdsConnection connection, IList<ISymbol> symbols) : ISumSymbolRead
 {
-    private readonly SumSymbolRead backend = new(connection, symbols);
+    private readonly SumSymbolRead backend = new(connection, symbols, SumFallbackMode.All);
 
     /// <inheritdoc/>
     public object[] Read()

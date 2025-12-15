@@ -1,0 +1,19 @@
+{
+  "solution": {
+    "path": "PlcInterface.slnx",
+    "projects": [
+      "src\\PlcInterface.Abstraction\\PlcInterface.Abstraction.csproj",
+      "src\\PlcInterface.Ads\\PlcInterface.Ads.csproj",
+      "src\\PlcInterface.OpcUa\\PlcInterface.OpcUa.csproj",
+      "src\\PlcInterface.Sandbox\\PlcInterface.Sandbox.csproj",
+      "test\\PlcInterface.Abstraction\\PlcInterface.Abstraction.Tests.csproj",
+      "test\\PlcInterface.Ads.IntegrationTests\\PlcInterface.Ads.IntegrationTests.csproj",
+      "test\\PlcInterface.Ads.Tests\\PlcInterface.Ads.Tests.csproj",
+      "test\\PlcInterface.Common.Tests\\PlcInterface.Common.Tests.csproj",
+      "test\\PlcInterface.IntegrationTests\\PlcInterface.IntegrationTests.csproj",
+      "test\\PlcInterface.Opc.IntegrationTests\\PlcInterface.Opc.IntegrationTests.csproj",
+      "test\\PlcInterface.OpcUa.Tests\\PlcInterface.OpcUa.Tests.csproj",
+      "test\\TestUtilities\\TestUtilities.csproj"
+    ]
+  }
+}

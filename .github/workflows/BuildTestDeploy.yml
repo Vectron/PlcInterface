@@ -39,7 +39,7 @@ jobs:
       dotnet_version: |
         8.0.x
         9.0.x
-      solution_file: PlcInterface.slnx
+      solution_file: PlcInterface.CI.slnf
 
   call-deploy:
     needs: call-build-test
@@ -51,7 +51,7 @@ jobs:
       dotnet_version: |
         8.0.x
         9.0.x
-      solution_file: PlcInterface.slnx
+      solution_file: PlcInterface.CI.slnf
     secrets:
       NUGET_KEY: ${{ secrets.NUGET_KEY }}
 

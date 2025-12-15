@@ -118,7 +118,7 @@ public class TypeConverterTests
         var sourceMock = new Mock<DynamicObject>();
         var result = new object();
         _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns([nameof(TestType.IntValue), nameof(TestType.IntArray), nameof(TestType.SubType)]);
-        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result)).Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+        _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result)).Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((binder, out value) =>
         {
             value = binder.Name switch
             {
@@ -232,7 +232,7 @@ public class TypeConverterTests
                 nameof(TestRecordType.SubType),
             ]);
         _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
-            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((binder, out value) =>
         {
             value = binder.Name switch
             {
@@ -272,7 +272,7 @@ public class TypeConverterTests
                 nameof(TestRecordStructType.SubType),
             ]);
         _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
-            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((binder, out value) =>
             {
                 value = binder.Name switch
                 {
@@ -312,7 +312,7 @@ public class TypeConverterTests
                 nameof(TestValueType.SubType),
             ]);
         _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
-            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((binder, out value) =>
             {
                 value = binder.Name switch
                 {
@@ -413,7 +413,7 @@ public class TypeConverterTests
                 nameof(TestType.SubType),
             ]);
         _ = dynamicObjectSourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
-            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+            .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((binder, out value) =>
             {
                 value = binder.Name switch
                 {
@@ -454,7 +454,7 @@ public class TypeConverterTests
             var result = new object();
             _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns([nameof(IntValue)]);
             _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
-                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((binder, out value) =>
                 {
                     value = binder.Name switch
                     {
@@ -484,7 +484,7 @@ public class TypeConverterTests
             var result = new object();
             _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns([nameof(IntValue)]);
             _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
-                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((binder, out value) =>
                 {
                     value = binder.Name switch
                     {
@@ -543,7 +543,7 @@ public class TypeConverterTests
             var result = new object();
             _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns([nameof(IntValue)]);
             _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
-                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((binder, out value) =>
                 {
                     value = binder.Name switch
                     {
@@ -615,7 +615,7 @@ public class TypeConverterTests
             var result = new object();
             _ = sourceMock.Setup(x => x.GetDynamicMemberNames()).Returns([nameof(IntValue)]);
             _ = sourceMock.Setup(x => x.TryGetMember(It.IsAny<GetMemberBinder>(), out result))
-                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((GetMemberBinder binder, out object value) =>
+                .Returns(new MockDelegates.OutFunction<GetMemberBinder, object, bool>((binder, out value) =>
                 {
                     value = binder.Name switch
                     {

@@ -1,7 +1,5 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using PlcInterface.Ads;
 using PlcInterface.OpcUa;
 using PlcInterface.Sandbox.PLCCommands;
@@ -58,7 +56,7 @@ internal static class Program
 
         _ = builder.Services
             .AddAdsPLC()
-            .AddSingleton<IAmsRouter>(x => new AmsTcpIpRouter(x.GetRequiredService<ILogger<AmsTcpIpRouter>>(), x.GetRequiredService<IConfiguration>()))
+            .AddSingleton<IAmsRouter, AmsTcpIpRouter>()
             .AddOptions<AdsPlcConnectionOptions>()
                 .BindConfiguration(AdsConnectionSettingsSection)
                 .Services

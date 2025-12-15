@@ -1,0 +1,52 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="TwinCAT OS (x64)" />
+    <Platform Name="TwinCAT RT (x64)" />
+  </Configurations>
+
+  <Folder Name="/.github/">
+    <File Path=".github/dependabot.yml" />
+    <File Path=".github/release.yml" />
+  </Folder>
+
+  <Folder Name="/.github/workflows/">
+    <File Path=".github/workflows/BuildTestDeploy.yml" />
+    <File Path=".github/workflows/DependabotAutoMerge.yml" />
+  </Folder>
+
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="global.json" />
+    <File Path="LICENSE.txt" />
+    <File Path="README.md" />
+    <File Path="version.json" />
+  </Folder>
+
+  <Folder Name="/src/">
+    <Project Path="src/PlcInterface.Abstraction/PlcInterface.Abstraction.csproj" />
+    <Project Path="src/PlcInterface.Ads/PlcInterface.Ads.csproj" />
+    <Project Path="src/PlcInterface.OpcUa/PlcInterface.OpcUa.csproj" />
+    <Project Path="src/PlcInterface.Sandbox/PlcInterface.Sandbox.csproj" />
+  </Folder>
+
+  <Folder Name="/test/">
+    <File Path="test/.editorconfig" />
+    <File Path="test/Directory.Build.props" />
+    <File Path="test/testconfig.json" />
+    <Project Path="test/PlcInterface.Abstraction/PlcInterface.Abstraction.Tests.csproj" />
+    <Project Path="test/PlcInterface.Ads.IntegrationTests/PlcInterface.Ads.IntegrationTests.csproj" />
+    <Project Path="test/PlcInterface.Ads.PLC/PlcInterface.Ads.PLC.tsproj" Type="b1e792be-aa5f-4e3c-8c82-674bf9c0715b" Id="58d6b92e-b1eb-47dc-aef1-d477d3a9d0e8">
+      <Platform Solution="*|Any CPU" Project="TwinCAT RT (x64)" />
+    </Project>
+    <Project Path="test/PlcInterface.Ads.Tests/PlcInterface.Ads.Tests.csproj" />
+    <Project Path="test/PlcInterface.Common.Tests/PlcInterface.Common.Tests.csproj" />
+    <Project Path="test/PlcInterface.IntegrationTests/PlcInterface.IntegrationTests.csproj" />
+    <Project Path="test/PlcInterface.Opc.IntegrationTests/PlcInterface.Opc.IntegrationTests.csproj" />
+    <Project Path="test/PlcInterface.OpcUa.Tests/PlcInterface.OpcUa.Tests.csproj" />
+    <Project Path="test/TestUtilities/TestUtilities.csproj" />
+  </Folder>
+</Solution>

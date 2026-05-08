@@ -17,8 +17,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="7.0.123" />
-    <PackageReference Include="Beckhoff.TwinCAT.Ads.Reactive" Version="7.0.123" />
+    <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="7.0.172" />
+    <PackageReference Include="Beckhoff.TwinCAT.Ads.Reactive" Version="7.0.172" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.4" />
     <PackageReference Include="System.IO.Abstractions" Version="22.0.15" />
   </ItemGroup>
